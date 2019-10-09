@@ -7,12 +7,20 @@ import signal
 
 from PyMata.pymata import PyMata
 from std_msgs.msg import Int32
+from std_msgs.msg import Empty
 from std_msgs.msg import String
+
 board = PyMata("/dev/ttyUSB0", verbose=True)
 rospy.init_node('listener', anonymous=True)
 
 left_pub = rospy.Publisher('left_encoder', String, queue_size=10)
 right_pub = rospy.Publisher('right_encoder', String, queue_size=10)
+distance_pub = rospy.Publisher('distance', Int32, queue_size=10)
+
+trigger_pin = 4
+echo_pin = 3
+
+
 
 def interrupt_callback2(data):
 	left_pub.publish(str(data[2]))
@@ -33,6 +41,10 @@ def init_pymata():
         board.reset()
     sys.exit(0)
 
+#  board.set_pin_mode(3, board.OUTPUT, board.DIGITAL)
+#  board.set_pin_mode(4, board.OUTPUT, board.DIGITAL)
+  board.sonar_config(trigger_pin, echo_pin)
+
   signal.signal(signal.SIGINT, signal_handler)
 
   board.set_pin_mode(6, board.OUTPUT, board.DIGITAL)
@@ -44,8 +56,8 @@ def init_pymata():
   board.set_pin_mode(10, board.PWM, board.DIGITAL)
 
   #TODO: make pymata.ino use in terrcupt on pin 2 and 3 and diable reporting on these pins
-  board.set_pin_mode(2, board.INPUT, board.DIGITAL, interrupt_callback2)
-  board.set_pin_mode(3, board.INPUT, board.DIGITAL, interrupt_callback3)
+  #board.set_pin_mode(2, board.INPUT, board.DIGITAL, interrupt_callback2)
+  #board.set_pin_mode(3, board.INPUT, board.DIGITAL, interrupt_callback3)
 
 
 
@@ -80,17 +92,25 @@ def right_callback(data):
       prev_right = data.data
 
 
+def distance_callback(data):
+	sonar = board.get_sonar_data()
+	rospy.loginfo(rospy.get_caller_id() + "I heard %s", str(sonar[trigger_pin]))
+	dist = Int32()
+	dist.data = sonar[trigger_pin][1]
+	distance_pub.publish(dist)
+
+
 def listener():
     rospy.Subscriber("left_pwm", Int32, left_callback)
     rospy.Subscriber("right_pwm", Int32, right_callback)
 
-
-
+    rospy.Subscriber("distance_request", Empty, distance_callback)
 
     rospy.spin()
 
 if __name__ == '__main__':
     init_pymata()
     listener()
+
 
 
