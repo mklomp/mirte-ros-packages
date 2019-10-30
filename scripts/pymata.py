@@ -17,9 +17,8 @@ left_pub = rospy.Publisher('left_encoder', String, queue_size=10)
 right_pub = rospy.Publisher('right_encoder', String, queue_size=10)
 distance_pub = rospy.Publisher('distance', Int32, queue_size=10)
 
-trigger_pin = 4
-echo_pin = 3
-
+trigger_pin = 12
+echo_pin = 11
 
 
 def interrupt_callback2(data):
@@ -56,8 +55,8 @@ def init_pymata():
   board.set_pin_mode(10, board.PWM, board.DIGITAL)
 
   #TODO: make pymata.ino use in terrcupt on pin 2 and 3 and diable reporting on these pins
-  #board.set_pin_mode(2, board.INPUT, board.DIGITAL, interrupt_callback2)
-  #board.set_pin_mode(3, board.INPUT, board.DIGITAL, interrupt_callback3)
+  board.set_pin_mode(2, board.INPUT, board.DIGITAL, interrupt_callback2)
+  board.set_pin_mode(3, board.INPUT, board.DIGITAL, interrupt_callback3)
 
 
 
