@@ -101,10 +101,10 @@ def distance_callback(data):
 
 
 def listener():
-    rospy.Subscriber("left_pwm", Int32, left_callback)
-    rospy.Subscriber("right_pwm", Int32, right_callback)
+    rospy.Subscriber("left_pwm", Int32, left_callback, queue_size=1)
+    rospy.Subscriber("right_pwm", Int32, right_callback, queue_size=1)
 
-    rospy.Subscriber("distance_request", Empty, distance_callback)
+    rospy.Subscriber("distance_request", Empty, distance_callback, queue_size=1)
 
     rospy.spin()
 
