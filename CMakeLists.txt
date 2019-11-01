@@ -57,11 +57,10 @@ find_package(catkin REQUIRED COMPONENTS
 #)
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+#add_service_files(
+  #  FILES
+  #  get_distance.srv
+#)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -72,8 +71,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate added messages and services with any dependencies listed here
 #generate_messages(
-#   DEPENDENCIES
-#   std_msgs
+#  DEPENDENCIES
+#  std_msgs
 #)
 
 ################################################
@@ -154,7 +153,6 @@ src/my_robot_base.cpp
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
-   ${${PROJECT_NAME}_EXPORTED_TARGETS}
    ${catkin_LIBRARIES}
  )
 
@@ -205,4 +203,3 @@ target_link_libraries(${PROJECT_NAME}_node
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-

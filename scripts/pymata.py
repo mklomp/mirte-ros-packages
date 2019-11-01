@@ -10,26 +10,25 @@ from std_msgs.msg import Int32
 from std_msgs.msg import Empty
 from std_msgs.msg import String
 
+from zoef_types.srv import *
+
 board = PyMata("/dev/ttyUSB0", verbose=True)
 rospy.init_node('listener', anonymous=True)
 
 left_pub = rospy.Publisher('left_encoder', String, queue_size=10)
 right_pub = rospy.Publisher('right_encoder', String, queue_size=10)
-distance_pub = rospy.Publisher('distance', Int32, queue_size=10)
 
 trigger_pin = 12
 echo_pin = 11
-
 
 def interrupt_callback2(data):
 	left_pub.publish(str(data[2]))
 
 def interrupt_callback3(data):
-        right_pub.publish(str(data[2]))
+  right_pub.publish(str(data[2]))
 
 prev_left = 0
 prev_right = 0
-
 
 # Create a PyMata instance
 def init_pymata():
@@ -90,26 +89,23 @@ def right_callback(data):
       board.analog_write(10, min(abs(data.data) * 3,255))
       prev_right = data.data
 
+def handle_get_pin_value(req):
+  board.set_pin_mode(req.pin, board.INPUT, board.ANALOG)
+  return get_pin_valueResponse(board.analog_read(req.pin))
 
-def distance_callback(data):
-	sonar = board.get_sonar_data()
-	rospy.loginfo(rospy.get_caller_id() + "I heard %s", str(sonar[trigger_pin]))
-	dist = Int32()
-	dist.data = sonar[trigger_pin][1]
-	distance_pub.publish(dist)
-
+def handle_get_distance(req):
+  sonar = board.get_sonar_data()
+  return get_distanceResponse(sonar[trigger_pin][1])
 
 def listener():
     rospy.Subscriber("left_pwm", Int32, left_callback, queue_size=1)
     rospy.Subscriber("right_pwm", Int32, right_callback, queue_size=1)
 
-    rospy.Subscriber("distance_request", Empty, distance_callback, queue_size=1)
+    rospy.Service('get_distance', get_distance, handle_get_distance)
+    rospy.Service('get_pin_value', get_pin_value, handle_get_pin_value)
 
     rospy.spin()
 
 if __name__ == '__main__':
     init_pymata()
     listener()
-
-
-
