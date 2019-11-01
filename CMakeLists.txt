@@ -58,6 +58,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   get_distance.srv
+  get_pin_value.srv
 )
 
 ## Generate actions in the 'action' folder
