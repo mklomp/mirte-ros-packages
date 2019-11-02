@@ -10,7 +10,7 @@ from std_msgs.msg import Int32
 from std_msgs.msg import Empty
 from std_msgs.msg import String
 
-from zoef_types.srv import *
+from zoef_msgs.srv import *
 
 board = PyMata("/dev/ttyUSB0", verbose=True)
 rospy.init_node('listener', anonymous=True)
