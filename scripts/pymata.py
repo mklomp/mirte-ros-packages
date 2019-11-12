@@ -9,23 +9,46 @@ from PyMata.pymata import PyMata
 from std_msgs.msg import Int32
 from std_msgs.msg import Empty
 from std_msgs.msg import String
+from std_msgs.msg import Header
+from zoef_msgs.msg import Encoder
 
 from zoef_msgs.srv import *
 
 board = PyMata("/dev/ttyUSB0", verbose=True)
 rospy.init_node('listener', anonymous=True)
 
-left_pub = rospy.Publisher('left_encoder', String, queue_size=10)
-right_pub = rospy.Publisher('right_encoder', String, queue_size=10)
+left_pub = rospy.Publisher('left_encoder', Encoder, queue_size=10)
+right_pub = rospy.Publisher('right_encoder', Encoder, queue_size=10)
 
 trigger_pin = 12
 echo_pin = 11
 
+prev_left_enc = False
+prev_right_enc = False
+
 def interrupt_callback2(data):
-	left_pub.publish(str(data[2]))
+  global prev_left_enc
+  curr_val = bool(data[2])
+  if (prev_left_enc != curr_val):
+    prev_left_enc = curr_val
+    header = Header()
+    header.stamp = rospy.Time.now()
+    encoder = Encoder()
+    encoder.header = header
+    encoder.value = curr_val
+    left_pub.publish(encoder)
 
 def interrupt_callback3(data):
-  right_pub.publish(str(data[2]))
+  global prev_right_enc
+  curr_val = bool(data[2])
+  if (prev_right_enc != curr_val):
+    prev_left_enc = curr_val
+    header = Header()
+    header.stamp = rospy.Time.now()
+    encoder = Encoder()
+    encoder.header = header
+    encoder.value = curr_val
+    right_pub.publish(encoder)
 
 prev_left = 0
 prev_right = 0
@@ -39,8 +62,6 @@ def init_pymata():
         board.reset()
     sys.exit(0)
 
-#  board.set_pin_mode(3, board.OUTPUT, board.DIGITAL)
-#  board.set_pin_mode(4, board.OUTPUT, board.DIGITAL)
   board.sonar_config(trigger_pin, echo_pin)
 
   signal.signal(signal.SIGINT, signal_handler)
@@ -54,29 +75,24 @@ def init_pymata():
   board.set_pin_mode(10, board.PWM, board.DIGITAL)
 
   #TODO: make pymata.ino use in terrcupt on pin 2 and 3 and diable reporting on these pins
+  # Or use encodrs like in pymata3
   board.set_pin_mode(2, board.INPUT, board.DIGITAL, interrupt_callback2)
   board.set_pin_mode(3, board.INPUT, board.DIGITAL, interrupt_callback3)
 
-
-
 def left_callback(data):
-#    global board
     global prev_left
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
     if (data.data != prev_left):
       if (data.data > 0):
 	board.digital_write(7, 0)
         board.digital_write(6, 1)
-	print "left forward"
       else: 
         board.digital_write(6, 0)
         board.digital_write(7, 1)
-	print "left backward"
       board.analog_write(5, min(abs(data.data) * 3,255))
       prev_left = data.data
 
 def right_callback(data):
-#    global board
     global prev_right
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
     if (data.data != prev_right):
@@ -98,6 +114,7 @@ def handle_get_distance(req):
   return get_distanceResponse(sonar[trigger_pin][1])
 
 def listener():
+    global ticks
     rospy.Subscriber("left_pwm", Int32, left_callback, queue_size=1)
     rospy.Subscriber("right_pwm", Int32, right_callback, queue_size=1)
 

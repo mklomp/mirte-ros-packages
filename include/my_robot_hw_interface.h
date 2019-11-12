@@ -76,7 +76,7 @@ public:
 
     std::ostringstream os;
     os << "Wheel cmd: " << cmd[0] << "  "  << voltage_left << "     "  << voltage_right;
-    ROS_INFO_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!!!!!: " << os.str()); 
+   // ROS_INFO_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!!!!!: " << os.str()); 
  }
 
   /**
@@ -97,7 +97,7 @@ public:
 
     std::ostringstream os;
     os << "Wheel velocitu: " << _wheel_encoder[0] / period.toSec() << "     "  << _wheel_encoder[1] / period.toSec() << "      "  << period.toSec();
-    ROS_INFO_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!!!!!: " << os.str());    
+   // ROS_INFO_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!!!!!: " << os.str());    
 
     _wheel_encoder[0] = 0;
     _wheel_encoder[1] = 0;
