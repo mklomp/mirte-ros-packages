@@ -17,6 +17,7 @@
 #include <std_msgs/Float32.h>
 #include <std_msgs/Int32.h>
 #include <std_srvs/Empty.h>
+#include <zoef_msgs/Encoder.h>
 
 // ros_control
 #include <controller_manager/controller_manager.h>
@@ -162,11 +163,11 @@ private:
   }
 
 
-  void leftWheelEncoderCallback(const std_msgs::Int32& msg) {
+  void leftWheelEncoderCallback(const zoef_msgs::Encoder& msg) {
     _wheel_encoder[0]++;
   }
 
-  void rightWheelEncoderCallback(const std_msgs::Int32& msg) {
+  void rightWheelEncoderCallback(const zoef_msgs::Encoder& msg) {
     _wheel_encoder[1]++;
   }
 
