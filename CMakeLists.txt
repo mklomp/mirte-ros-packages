@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  geometry_msgs
   message_generation
 )
 
@@ -58,6 +59,7 @@ add_service_files(
   FILES
   get_distance.srv
   get_pin_value.srv
+  get_virtual_color.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -71,6 +73,7 @@ add_service_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
  )
 
 ################################################
@@ -105,7 +108,7 @@ generate_messages(
 catkin_package(
 	#  INCLUDE_DIRS include
 #  LIBRARIES zoef_types
- CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
+ CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs message_runtime
 #  DEPENDS system_lib
 )
 
