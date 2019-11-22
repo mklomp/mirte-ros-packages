@@ -3,20 +3,39 @@
 import rospy
 import cv2 as cv
 import numpy as np
+from pyzbar.pyzbar import decode
 
 from zoef_msgs.srv import *
-from geometry_msgs.msg import Vector3
+from zoef_msgs.msg import color
 
 cap = cv.VideoCapture(0)
-cap.set(3,160)
-cap.set(4,120)
+
+# smaller for higher framerate
+# cap.set(3,160)
+# cap.set(4,120)
 
 ret, img = cap.read()
 
+# get initial width and height
 w = img.shape[1]
 h = img.shape[0]
 
 rospy.init_node('listener', anonymous=True)
+
+# not only gets qr codes, but basically anything you throw at it
+def handle_get_barcode(req):
+    ret, img = cap.read()
+    gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+    barcodes = decode(gray_img)
+
+    # only return one barcode at a time
+    if(len(barcodes) > 0):
+        return barcodes[0].data.decode("utf-8")
+    
+    # return empty string when nothing is found
+    return ""
+
 
 def handle_get_virtual_color(req):
     global w
@@ -36,18 +55,17 @@ def handle_get_virtual_color(req):
     mean_left = cv.mean(img, mask=mask_left)[:-1]
     mean_right = cv.mean(img, mask=mask_right)[:-1]
 
+    # opencv works with (b,g,r), but we want (r,g,b)
     if(req.direction == "left"):
-        v = Vector3(mean_left[0], mean_left[1], mean_left[2])
-        return v
+        return color(int(mean_left[2]), int(mean_left[1]), int(mean_left[0]))
     elif(req.direction == "right"):
-        v = Vector3(mean_right[0], mean_right[1], mean_right[2])
-        return v
+        return color(int(mean_right[2]), int(mean_right[1]), int(mean_right[0]))
     else:
-        v = Vector3(0.0, 0.0, 0.0)
-        return v
+        return color(0, 0, 0)
 
 def listener():
     rospy.Service('get_virtual_color', get_virtual_color, handle_get_virtual_color)
+    rospy.Service('get_barcode', get_barcode, handle_get_barcode)
     rospy.spin()
 
 if __name__ == '__main__':
