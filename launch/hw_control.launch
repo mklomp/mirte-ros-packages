@@ -20,6 +20,10 @@
     <node name="my_robot_pymata"
           pkg="zoef_ros_package"
           type="pymata.py" output="screen"/>
+          
+    <node name="my_robot_camera"
+          pkg="zoef_ros_package"
+          type="camera.py" output="screen"/>
 
 
     <!-- Load controller config -->
