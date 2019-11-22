@@ -52,6 +52,7 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    Encoder.msg
+   color.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -60,6 +61,7 @@ add_service_files(
   get_distance.srv
   get_pin_value.srv
   get_virtual_color.srv
+  get_barcode.srv
 )
 
 ## Generate actions in the 'action' folder
