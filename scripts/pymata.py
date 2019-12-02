@@ -20,6 +20,9 @@ rospy.init_node('listener', anonymous=True)
 left_pub = rospy.Publisher('left_encoder', Encoder, queue_size=10)
 right_pub = rospy.Publisher('right_encoder', Encoder, queue_size=10)
 
+distance_publisher = rospy.Publisher('distance', Int32, queue_size=10)
+
+
 trigger_pin = 12
 echo_pin = 11
 
@@ -109,17 +112,24 @@ def handle_get_pin_value(req):
   board.set_pin_mode(req.pin, board.INPUT, board.ANALOG)
   return get_pin_valueResponse(board.analog_read(req.pin))
 
-def handle_get_distance(req):
-  sonar = board.get_sonar_data()
-  return get_distanceResponse(sonar[trigger_pin][1])
+# Publish distance sensor
+def publish_distance(timer):
+    sonar = board.get_sonar_data()
+    distance_publisher.publish(sonar[trigger_pin][1])
+
 
 def listener():
     global ticks
+    # Subscribers (actuators)
     rospy.Subscriber("left_pwm", Int32, left_callback, queue_size=1)
     rospy.Subscriber("right_pwm", Int32, right_callback, queue_size=1)
 
-    rospy.Service('get_distance', get_distance, handle_get_distance)
+    # Services (raw arduino values)
     rospy.Service('get_pin_value', get_pin_value, handle_get_pin_value)
+
+    # Publishers (sensors) using timers
+    distance_rate = 10 # TODO: set via dynamic reconfigure)
+    rospy.Timer(rospy.Duration(1.0 / distance_rate), publish_distance)
 
     rospy.spin()
 

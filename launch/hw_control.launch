@@ -25,6 +25,10 @@
           pkg="zoef_ros_package"
           type="camera.py" output="screen"/>
 
+    <node name="zoef_navigation"
+          pkg="zoef_ros_package"
+          type="navigation.py" output="screen"/>
+
 
     <!-- Load controller config -->
     <rosparam command="load" 
