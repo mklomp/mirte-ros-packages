@@ -4,12 +4,14 @@ import rospy
 import time
 import sys
 import signal
+import math
 
 from PyMata.pymata import PyMata
 from std_msgs.msg import Int32
 from std_msgs.msg import Empty
 from std_msgs.msg import String
 from std_msgs.msg import Header
+from sensor_msgs.msg import Range
 from zoef_msgs.msg import Encoder
 
 from zoef_msgs.srv import *
@@ -20,7 +22,7 @@ rospy.init_node('listener', anonymous=True)
 left_pub = rospy.Publisher('left_encoder', Encoder, queue_size=10)
 right_pub = rospy.Publisher('right_encoder', Encoder, queue_size=10)
 
-distance_publisher = rospy.Publisher('distance', Int32, queue_size=10)
+distance_publisher = rospy.Publisher('distance', Range, queue_size=10)
 
 
 trigger_pin = 12
@@ -115,7 +117,17 @@ def handle_get_pin_value(req):
 # Publish distance sensor
 def publish_distance(timer):
     sonar = board.get_sonar_data()
-    distance_publisher.publish(sonar[trigger_pin][1])
+    dist_value = sonar[trigger_pin][1]
+    header = Header()
+    header.stamp = rospy.Time.now()
+    range = Range()
+    range.header = header
+    range.radiation_type = range.ULTRASOUND
+    range.field_of_view = math.pi * 5
+    range.min_range = 0.02
+    range.max_range = 1.5
+    range.range = dist_value
+    distance_publisher.publish(range)
 
 
 def listener():

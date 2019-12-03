@@ -28,6 +28,11 @@
     <node name="zoef_navigation"
           pkg="zoef_ros_package"
           type="navigation.py" output="screen"/>
+ 
+    <node name="zoef_service_api"
+          pkg="zoef_ros_package"
+          type="service_api.py" output="screen"/>
+
 
 
     <!-- Load controller config -->
