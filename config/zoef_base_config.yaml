@@ -1,0 +1,27 @@
+distance:
+  left_distance:
+    frequency: 10
+    pin: [11, 12]
+  right_distance:
+    frequency: 10
+    pin: [13, 14]
+encoder:
+  left_encoder: {frequency: 10, pin: 2}
+  right_encoder: {frequency: 10, pin: 3}
+ir:
+  left_ir: {frequency: 10, pin: 15}
+  right_ir: {frequency: 10, pin: 16}
+left_motor: left_motor
+motor:
+  left_motor:
+    pin: [5, 6, 7]
+  right_motor:
+    pin: [8, 9, 10]
+right_motor: right_motor
+sound:
+  speaker: {pin: 1}
+virtual_color:
+  left_color: {angle: -20, frequency: 10}
+  right_color: {angle: 20, frequency: 10}
+wheel_radius: 0.065
+wheel_seperation: 0.13

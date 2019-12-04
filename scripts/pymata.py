@@ -5,6 +5,7 @@ import time
 import sys
 import signal
 import math
+import threading
 
 from PyMata.pymata import PyMata
 from std_msgs.msg import Int32
@@ -22,11 +23,11 @@ rospy.init_node('listener', anonymous=True)
 left_pub = rospy.Publisher('left_encoder', Encoder, queue_size=10)
 right_pub = rospy.Publisher('right_encoder', Encoder, queue_size=10)
 
-distance_publisher = rospy.Publisher('distance', Range, queue_size=10)
 
-
-trigger_pin = 12
-echo_pin = 11
+distance_sensors = rospy.get_param("/zoef/distance")
+distance_publishers = {}
+for sensor in distance_sensors:
+   distance_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Range, queue_size=10)
 
 prev_left_enc = False
 prev_right_enc = False
@@ -67,7 +68,8 @@ def init_pymata():
         board.reset()
     sys.exit(0)
 
-  board.sonar_config(trigger_pin, echo_pin)
+  for sensor in distance_sensors:
+     board.sonar_config(distance_sensors[sensor]['pin'][0], distance_sensors[sensor]['pin'][1])
 
   signal.signal(signal.SIGINT, signal_handler)
 
@@ -76,8 +78,8 @@ def init_pymata():
   board.set_pin_mode(5, board.PWM, board.DIGITAL)
 
   board.set_pin_mode(8, board.OUTPUT, board.DIGITAL)
-  board.set_pin_mode(9, board.OUTPUT, board.DIGITAL)
-  board.set_pin_mode(10, board.PWM, board.DIGITAL)
+  #board.set_pin_mode(9, board.OUTPUT, board.DIGITAL)
+  #board.set_pin_mode(10, board.PWM, board.DIGITAL)
 
   #TODO: make pymata.ino use in terrcupt on pin 2 and 3 and diable reporting on these pins
   # Or use encodrs like in pymata3
@@ -115,8 +117,10 @@ def handle_get_pin_value(req):
   return get_pin_valueResponse(board.analog_read(req.pin))
 
 # Publish distance sensor
-def publish_distance(timer):
+def publish_distance(sensor, frequency):
+    threading.Timer(frequency, publish_distance, [sensor, frequency]).start()
     sonar = board.get_sonar_data()
+    trigger_pin = distance_sensors[sensor]['pin'][0]
     dist_value = sonar[trigger_pin][1]
     header = Header()
     header.stamp = rospy.Time.now()
@@ -127,11 +131,11 @@ def publish_distance(timer):
     range.min_range = 0.02
     range.max_range = 1.5
     range.range = dist_value
-    distance_publisher.publish(range)
+    distance_publishers[sensor].publish(range)
 
 
 def listener():
-    global ticks
+
     # Subscribers (actuators)
     rospy.Subscriber("left_pwm", Int32, left_callback, queue_size=1)
     rospy.Subscriber("right_pwm", Int32, right_callback, queue_size=1)
@@ -139,9 +143,20 @@ def listener():
     # Services (raw arduino values)
     rospy.Service('get_pin_value', get_pin_value, handle_get_pin_value)
 
-    # Publishers (sensors) using timers
-    distance_rate = 10 # TODO: set via dynamic reconfigure)
-    rospy.Timer(rospy.Duration(1.0 / distance_rate), publish_distance)
+    # This uses python threading since the commented part using
+    # ropsy.Timer did not work correctly
+    for sensor in distance_sensors:
+        publish_distance(sensor, 1 / distance_sensors[sensor]['frequency'])
+
+    # Version with rospy.Timer. This works, but when put inside a loop,
+    # this will not work.
+    #d = []
+    #for sensor in distance_sensors:
+    #   d.append(sensor)
+    #l = lambda y: publish_distance(d[0])
+    #rospy.Timer(rospy.Duration(1.0), copy.deepcopy(l))
+    #l= lambda x: publish_distance(d[1])
+    #rospy.Timer(rospy.Duration(1.0), l)
 
     rospy.spin()
 
