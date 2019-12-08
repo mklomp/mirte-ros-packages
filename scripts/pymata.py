@@ -5,7 +5,6 @@ import time
 import sys
 import signal
 import math
-import threading
 
 from PyMata.pymata import PyMata
 from std_msgs.msg import Int32
@@ -117,8 +116,7 @@ def handle_get_pin_value(req):
   return get_pin_valueResponse(board.analog_read(req.pin))
 
 # Publish distance sensor
-def publish_distance(sensor, frequency):
-    threading.Timer(frequency, publish_distance, [sensor, frequency]).start()
+def publish_distance(timer, sensor):
     sonar = board.get_sonar_data()
     trigger_pin = distance_sensors[sensor]['pin'][0]
     dist_value = sonar[trigger_pin][1]
@@ -143,20 +141,10 @@ def listener():
     # Services (raw arduino values)
     rospy.Service('get_pin_value', get_pin_value, handle_get_pin_value)
 
-    # This uses python threading since the commented part using
-    # ropsy.Timer did not work correctly
+    # Timer publishers (sensors)
     for sensor in distance_sensors:
-        publish_distance(sensor, 1 / distance_sensors[sensor]['frequency'])
-
-    # Version with rospy.Timer. This works, but when put inside a loop,
-    # this will not work.
-    #d = []
-    #for sensor in distance_sensors:
-    #   d.append(sensor)
-    #l = lambda y: publish_distance(d[0])
-    #rospy.Timer(rospy.Duration(1.0), copy.deepcopy(l))
-    #l= lambda x: publish_distance(d[1])
-    #rospy.Timer(rospy.Duration(1.0), l)
+        l = lambda x,s=sensor: publish_distance(x, s)
+        rospy.Timer(rospy.Duration(1.0/distance_sensors[sensor]['frequency']), l)
 
     rospy.spin()
 
