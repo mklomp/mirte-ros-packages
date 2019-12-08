@@ -11,17 +11,26 @@ from sensor_msgs.msg import Range
 from zoef_msgs.srv import GetDistance, GetDistanceResponse
 
 # Message filters
-distance_filter = message_filters.Subscriber('distance', Range)
-distance_cache = message_filters.Cache(distance_filter, 1, allow_headerless=True)
+distance_sensors = rospy.get_param("/zoef/distance")
+distance_caches = {}
+for sensor in distance_sensors:
+   distance_filter = message_filters.Subscriber('/zoef/' + sensor, Range)
+   distance_caches[sensor] = message_filters.Cache(distance_filter, 1)
 
-def handle_distance(req):
+def handle_distance(req, sensor):
     now = rospy.get_rostime()
-    last_value = distance_cache.getElemBeforeTime(now)
+    print sensor
+    last_value = distance_caches[sensor].getElemBeforeTime(now)
     return GetDistanceResponse(last_value.range)
 
 def start_service_api():
     rospy.init_node('zoef_service_api', anonymous=False)
-    move_service = rospy.Service('zoef_service_api/get_distance', GetDistance, handle_distance)
+    distance_sensors = rospy.get_param("/zoef/distance")
+    move_services = {}
+    for sensor in distance_sensors:
+       l = lambda msg, s=sensor: handle_distance(msg, s)
+       move_services[sensor] = rospy.Service('zoef_service_api/get_' + sensor, GetDistance, l)
+
     rospy.spin()
 
 if __name__ == "__main__":
