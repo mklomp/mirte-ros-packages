@@ -12,7 +12,7 @@ from std_msgs.msg import Empty
 from std_msgs.msg import String
 from std_msgs.msg import Header
 from sensor_msgs.msg import Range
-from zoef_msgs.msg import Encoder
+from zoef_msgs.msg import Encoder, Intensity
 
 from zoef_msgs.srv import *
 
@@ -27,6 +27,12 @@ distance_sensors = rospy.get_param("/zoef/distance")
 distance_publishers = {}
 for sensor in distance_sensors:
    distance_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Range, queue_size=10)
+
+intensity_sensors = rospy.get_param("/zoef/intensity")
+intensity_publishers = {}
+for sensor in intensity_sensors:
+   intensity_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Intensity, queue_size=10)
+
 
 prev_left_enc = False
 prev_right_enc = False
@@ -67,8 +73,13 @@ def init_pymata():
         board.reset()
     sys.exit(0)
 
+  # TODO: store a list of set values, so they can not be changed
   for sensor in distance_sensors:
      board.sonar_config(distance_sensors[sensor]['pin'][0], distance_sensors[sensor]['pin'][1])
+
+  for sensor in intensity_sensors:
+     board.set_pin_mode(intensity_sensors[sensor]['pin'], board.INPUT, board.ANALOG)
+
 
   signal.signal(signal.SIGINT, signal_handler)
 
@@ -133,6 +144,17 @@ def publish_distance(timer, sensor):
     range.range = dist_value
     distance_publishers[sensor].publish(range)
 
+# Publish (IR) light intensity sensor
+def publish_intensity(timer, sensor):
+    pin = intensity_sensors[sensor]['pin']
+    intensity_value = board.analog_read(pin)
+    header = Header()
+    header.stamp = rospy.Time.now()
+    intensity = Intensity()
+    intensity.header = header
+    intensity.value = intensity_value
+    intensity_publishers[sensor].publish(intensity)
+
 
 def listener():
 
@@ -147,6 +169,12 @@ def listener():
     for sensor in distance_sensors:
         l = lambda x,s=sensor: publish_distance(x, s)
         rospy.Timer(rospy.Duration(1.0/distance_sensors[sensor]['frequency']), l)
+
+    for sensor in intensity_sensors:
+        l = lambda x,s=sensor: publish_intensity(x, s)
+        rospy.Timer(rospy.Duration(1.0/intensity_sensors[sensor]['frequency']), l)
+
+
 
     rospy.spin()
 

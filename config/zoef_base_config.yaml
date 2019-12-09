@@ -6,11 +6,11 @@ distance:
     frequency: 2
     pin: [12, 11]
 encoder:
-  left_encoder: {frequency: 10, pin: 2}
-  right_encoder: {frequency: 10, pin: 3}
-ir:
-  left_ir: {frequency: 10, pin: 15}
-  right_ir: {frequency: 10, pin: 16}
+  left_encoder: {frequency: 2, pin: 2}
+  right_encoder: {frequency: 2, pin: 3}
+intensity:
+  left_intensity: {frequency: 2, pin: 2}  #TODO: this assumes analog 2
+  right_intensity: {frequency: 2, pin: 3}
 left_motor: left_motor
 motor:
   left_motor:
