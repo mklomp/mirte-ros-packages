@@ -120,6 +120,8 @@ def publish_distance(timer, sensor):
     sonar = board.get_sonar_data()
     trigger_pin = distance_sensors[sensor]['pin'][0]
     dist_value = sonar[trigger_pin][1]
+    if isinstance(dist_value, list): # sometimes this returns as a array (TODO: find out where that comes from)
+       dist_value = dist_value[0]
     header = Header()
     header.stamp = rospy.Time.now()
     range = Range()

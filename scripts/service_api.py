@@ -19,7 +19,6 @@ for sensor in distance_sensors:
 
 def handle_distance(req, sensor):
     now = rospy.get_rostime()
-    print sensor
     last_value = distance_caches[sensor].getElemBeforeTime(now)
     return GetDistanceResponse(last_value.range)
 

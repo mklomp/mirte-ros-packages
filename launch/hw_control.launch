@@ -20,7 +20,7 @@
           pkg="zoef_ros_package" 
           type="zoef_ros_package_node" output="screen"/>
 
-    <node name="my_robot_pymata"
+    <node name="zoef_pymata"
           pkg="zoef_ros_package"
           type="pymata.py" output="screen"/>
           
@@ -48,9 +48,7 @@
           output="screen" 
           args="mobile_base_controller"/> 
 
-    <node name="rosbrigde_websocket"
-          pkg="rosbridge_server"
-          type="rosbridge_websocket"/>
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 
 <!--
   <node name="educational" pkg="educational_topics" type="turn.py" />

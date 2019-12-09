@@ -1,10 +1,10 @@
 distance:
   left_distance:
-    frequency: 10
-    pin: [11, 12]
+    frequency: 2
+    pin: [10, 9]
   right_distance:
-    frequency: 10
-    pin: [13, 14]
+    frequency: 2
+    pin: [12, 11]
 encoder:
   left_encoder: {frequency: 10, pin: 2}
   right_encoder: {frequency: 10, pin: 3}
