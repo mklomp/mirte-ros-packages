@@ -51,12 +51,14 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    Encoder.msg
+   Intensity.msg
  )
 
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
   GetDistance.srv
+  GetIntensity.srv
   get_pin_value.srv
   Move.srv
   Turn.srv
