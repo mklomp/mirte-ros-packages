@@ -17,11 +17,10 @@ from zoef_msgs.msg import Encoder, Intensity
 from zoef_msgs.srv import *
 
 board = PyMata("/dev/ttyUSB0", verbose=True)
-rospy.init_node('listener', anonymous=True)
+rospy.init_node('zoef_pymata', anonymous=True)
 
 left_pub = rospy.Publisher('left_encoder', Encoder, queue_size=10)
 right_pub = rospy.Publisher('right_encoder', Encoder, queue_size=10)
-
 
 distance_sensors = rospy.get_param("/zoef/distance")
 distance_publishers = {}
@@ -33,6 +32,10 @@ intensity_publishers = {}
 for sensor in intensity_sensors:
    intensity_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Intensity, queue_size=10)
 
+motors = rospy.get_param("/zoef/motor")
+prev_motor_pwm = {}
+for motor in motors:
+   prev_motor_pwm[motor] = 0
 
 prev_left_enc = False
 prev_right_enc = False
@@ -61,9 +64,6 @@ def interrupt_callback3(data):
     encoder.value = curr_val
     right_pub.publish(encoder)
 
-prev_left = 0
-prev_right = 0
-
 # Create a PyMata instance
 def init_pymata():
 
@@ -73,6 +73,8 @@ def init_pymata():
         board.reset()
     sys.exit(0)
 
+  signal.signal(signal.SIGINT, signal_handler)
+
   # TODO: store a list of set values, so they can not be changed
   for sensor in distance_sensors:
      board.sonar_config(distance_sensors[sensor]['pin'][0], distance_sensors[sensor]['pin'][1])
@@ -80,47 +82,31 @@ def init_pymata():
   for sensor in intensity_sensors:
      board.set_pin_mode(intensity_sensors[sensor]['pin'], board.INPUT, board.ANALOG)
 
-
-  signal.signal(signal.SIGINT, signal_handler)
-
-  board.set_pin_mode(6, board.OUTPUT, board.DIGITAL)
-  board.set_pin_mode(7, board.OUTPUT, board.DIGITAL)
-  board.set_pin_mode(5, board.PWM, board.DIGITAL)
-
-  board.set_pin_mode(8, board.OUTPUT, board.DIGITAL)
-  #board.set_pin_mode(9, board.OUTPUT, board.DIGITAL)
-  #board.set_pin_mode(10, board.PWM, board.DIGITAL)
+  for motor in motors:
+     board.set_pin_mode(motors[motor]['pin'][0], board.OUTPUT, board.DIGITAL)   #6, 8
+     board.set_pin_mode(motors[motor]['pin'][1], board.OUTPUT, board.DIGITAL)   #7, 9
+     board.set_pin_mode(motors[motor]['pin'][2], board.PWM, board.DIGITAL)      #5,10
 
   #TODO: make pymata.ino use in terrcupt on pin 2 and 3 and diable reporting on these pins
   # Or use encodrs like in pymata3
   board.set_pin_mode(2, board.INPUT, board.DIGITAL, interrupt_callback2)
   board.set_pin_mode(3, board.INPUT, board.DIGITAL, interrupt_callback3)
 
-def left_callback(data):
-    global prev_left
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
-    if (data.data != prev_left):
-      if (data.data > 0):
-	board.digital_write(7, 0)
-        board.digital_write(6, 1)
-      else: 
-        board.digital_write(6, 0)
-        board.digital_write(7, 1)
-      board.analog_write(5, min(abs(data.data) * 3,255))
-      prev_left = data.data
 
-def right_callback(data):
-    global prev_right
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
-    if (data.data != prev_right):
-      if (data.data > 0):
-        board.digital_write(9, 0)
-        board.digital_write(8, 1)
-      else: 
-        board.digital_write(8, 0)
-        board.digital_write(9, 1)
-      board.analog_write(10, min(abs(data.data) * 3,255))
-      prev_right = data.data
+# Set PWM values
+def set_motor_pwm(req, motor):
+    global prev_motor_pwm
+    print "setting: "+ str(req.pwm)
+    if (req.pwm != prev_motor_pwm[motor]):
+      if (req.pwm > 0):
+        board.digital_write(motors[motor]['pin'][1], 0)
+        board.digital_write(motors[motor]['pin'][0], 1)
+      else:
+        board.digital_write(motors[motor]['pin'][0], 0)
+        board.digital_write(motors[motor]['pin'][1], 1)
+      board.analog_write(motors[motor]['pin'][2], min(abs(req.pwm) * 3,255))
+      prev_motor_pwm[motor] = req.pwm
+    return SetMotorPWMResponse(True)
 
 def handle_get_pin_value(req):
   board.set_pin_mode(req.pin, board.INPUT, board.ANALOG)
@@ -158,9 +144,10 @@ def publish_intensity(timer, sensor):
 
 def listener():
 
-    # Subscribers (actuators)
-    rospy.Subscriber("left_pwm", Int32, left_callback, queue_size=1)
-    rospy.Subscriber("right_pwm", Int32, right_callback, queue_size=1)
+    # Services (actuators)
+    for motor in motors:
+       l = lambda req,m=motor: set_motor_pwm(req, m)
+       rospy.Service("/zoef_pymata/set_" + motor + "_pwm", SetMotorPWM, l)
 
     # Services (raw arduino values)
     rospy.Service('get_pin_value', get_pin_value, handle_get_pin_value)
@@ -173,8 +160,6 @@ def listener():
     for sensor in intensity_sensors:
         l = lambda x,s=sensor: publish_intensity(x, s)
         rospy.Timer(rospy.Duration(1.0/intensity_sensors[sensor]['frequency']), l)
-
-
 
     rospy.spin()
 
