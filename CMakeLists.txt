@@ -60,6 +60,7 @@ add_service_files(
   GetDistance.srv
   GetIntensity.srv
   get_pin_value.srv
+  SetMotorPWM.srv
   Move.srv
   Turn.srv
 )
