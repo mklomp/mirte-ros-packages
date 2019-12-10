@@ -1,2 +1,2 @@
 Header header
-bool value
+int32 value

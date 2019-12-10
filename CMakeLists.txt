@@ -59,6 +59,7 @@ add_service_files(
   FILES
   GetDistance.srv
   GetIntensity.srv
+  GetEncoder.srv
   get_pin_value.srv
   SetMotorPWM.srv
   Move.srv
