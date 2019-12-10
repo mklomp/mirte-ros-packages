@@ -19,9 +19,6 @@ from zoef_msgs.srv import *
 board = PyMata("/dev/ttyUSB0", verbose=True)
 rospy.init_node('zoef_pymata', anonymous=True)
 
-left_pub = rospy.Publisher('left_encoder', Encoder, queue_size=10)
-right_pub = rospy.Publisher('right_encoder', Encoder, queue_size=10)
-
 distance_sensors = rospy.get_param("/zoef/distance")
 distance_publishers = {}
 for sensor in distance_sensors:
@@ -32,37 +29,24 @@ intensity_publishers = {}
 for sensor in intensity_sensors:
    intensity_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Intensity, queue_size=10)
 
+encoder_sensors = rospy.get_param("/zoef/encoder")
+encoder_publishers = {}
+for sensor in encoder_sensors:
+   encoder_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Encoder, queue_size=10)
+
 motors = rospy.get_param("/zoef/motor")
 prev_motor_pwm = {}
 for motor in motors:
    prev_motor_pwm[motor] = 0
 
-prev_left_enc = False
-prev_right_enc = False
 
-def interrupt_callback2(data):
-  global prev_left_enc
-  curr_val = bool(data[2])
-  if (prev_left_enc != curr_val):
-    prev_left_enc = curr_val
+def publish_encoder(data, sensor):
     header = Header()
     header.stamp = rospy.Time.now()
     encoder = Encoder()
     encoder.header = header
-    encoder.value = curr_val
-    left_pub.publish(encoder)
-
-def interrupt_callback3(data):
-  global prev_right_enc
-  curr_val = bool(data[2])
-  if (prev_right_enc != curr_val):
-    prev_left_enc = curr_val
-    header = Header()
-    header.stamp = rospy.Time.now()
-    encoder = Encoder()
-    encoder.header = header
-    encoder.value = curr_val
-    right_pub.publish(encoder)
+    encoder.value = data[2]
+    encoder_publishers[sensor].publish(encoder)
 
 # Create a PyMata instance
 def init_pymata():
@@ -87,11 +71,9 @@ def init_pymata():
      board.set_pin_mode(motors[motor]['pin'][1], board.OUTPUT, board.DIGITAL)   #7, 9
      board.set_pin_mode(motors[motor]['pin'][2], board.PWM, board.DIGITAL)      #5,10
 
-  #TODO: make pymata.ino use in terrcupt on pin 2 and 3 and diable reporting on these pins
-  # Or use encodrs like in pymata3
-  board.set_pin_mode(2, board.INPUT, board.DIGITAL, interrupt_callback2)
-  board.set_pin_mode(3, board.INPUT, board.DIGITAL, interrupt_callback3)
-
+  for sensor in encoder_sensors:
+     l = lambda x,s=sensor: publish_encoder(x, s)
+     board.set_pin_mode(encoder_sensors[sensor]['pin'], board.INPUT, board.DIGITAL, l)
 
 # Set PWM values
 def set_motor_pwm(req, motor):

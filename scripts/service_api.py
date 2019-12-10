@@ -8,8 +8,8 @@
 import rospy
 import message_filters
 from sensor_msgs.msg import Range
-from zoef_msgs.msg import Intensity
-from zoef_msgs.srv import GetDistance, GetDistanceResponse, GetIntensity, GetIntensityResponse
+from zoef_msgs.msg import Intensity, Encoder
+from zoef_msgs.srv import GetDistance, GetDistanceResponse, GetIntensity, GetIntensityResponse, GetEncoder, GetEncoderResponse
 
 # Message filters
 distance_sensors = rospy.get_param("/zoef/distance")
@@ -24,6 +24,11 @@ for sensor in intensity_sensors:
    intensity_filter = message_filters.Subscriber('/zoef/' + sensor, Intensity)
    intensity_caches[sensor] = message_filters.Cache(intensity_filter, 1)
 
+encoder_sensors = rospy.get_param("/zoef/encoder")
+encoder_caches = {}
+for sensor in encoder_sensors:
+   encoder_filter = message_filters.Subscriber('/zoef/' + sensor, Encoder)
+   encoder_caches[sensor] = message_filters.Cache(encoder_filter, 100)
 
 def handle_distance(req, sensor):
     now = rospy.get_rostime()
@@ -34,6 +39,14 @@ def handle_intensity(req, sensor):
     now = rospy.get_rostime()
     last_value = intensity_caches[sensor].getElemBeforeTime(now)
     return GetIntensityResponse(last_value.value)
+
+def handle_encoder(req, sensor):
+    now = rospy.get_rostime()
+    values = encoder_caches[sensor].getInterval(now - rospy.Duration(req.time_delta), now)
+    ticks = 0
+    for value in values:
+       ticks = ticks + value.ticks
+    return GetEncoderResponse(ticks)
 
 def start_service_api():
     rospy.init_node('zoef_service_api', anonymous=False)
@@ -47,6 +60,11 @@ def start_service_api():
     for sensor in intensity_sensors:
        l = lambda msg, s=sensor: handle_intensity(msg, s)
        rospy.Service('/zoef_service_api/get_' + sensor, GetIntensity, l)
+
+    encoder_sensors = rospy.get_param("/zoef/encoder")
+    for sensor in encoder_sensors:
+       l = lambda msg, s=sensor: handle_encoder(msg, s)
+       rospy.Service('/zoef_service_api/get_' + sensor, GetEncoder, l)
 
     rospy.spin()
 
