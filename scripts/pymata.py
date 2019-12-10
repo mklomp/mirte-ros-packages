@@ -16,25 +16,32 @@ from zoef_msgs.msg import Encoder, Intensity
 
 from zoef_msgs.srv import *
 
-board = PyMata("/dev/ttyUSB0", verbose=True)
 rospy.init_node('zoef_pymata', anonymous=True)
+device = rospy.get_param('~device')
+devices = rospy.get_param("/zoef/device")
+dev = devices[device]['dev']
+board = PyMata(dev, verbose=True)
 
 distance_sensors = rospy.get_param("/zoef/distance")
+distance_sensors = {k: v for k, v in distance_sensors.iteritems() if v['device'] == device}
 distance_publishers = {}
 for sensor in distance_sensors:
    distance_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Range, queue_size=10)
 
 intensity_sensors = rospy.get_param("/zoef/intensity")
+intensity_sensors = {k: v for k, v in intensity_sensors.iteritems() if v['device'] == device}
 intensity_publishers = {}
 for sensor in intensity_sensors:
    intensity_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Intensity, queue_size=10)
 
 encoder_sensors = rospy.get_param("/zoef/encoder")
+encoder_sensors = {k: v for k, v in encoder_sensors.iteritems() if v['device'] == device}
 encoder_publishers = {}
 for sensor in encoder_sensors:
    encoder_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Encoder, queue_size=10)
 
 motors = rospy.get_param("/zoef/motor")
+motors = {k: v for k, v in motors.iteritems() if v['device'] == device}
 prev_motor_pwm = {}
 for motor in motors:
    prev_motor_pwm[motor] = 0
@@ -78,7 +85,6 @@ def init_pymata():
 # Set PWM values
 def set_motor_pwm(req, motor):
     global prev_motor_pwm
-    print "setting: "+ str(req.pwm)
     if (req.pwm != prev_motor_pwm[motor]):
       if (req.pwm > 0):
         board.digital_write(motors[motor]['pin'][1], 0)

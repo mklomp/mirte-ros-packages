@@ -1,21 +1,29 @@
+device:
+  zoef:
+    type: zoef
+    dev: "/dev/ttyUSB0"
 distance:
   left_distance:
+    device: zoef
     frequency: 2
     pin: [10, 9]
   right_distance:
+    device: zoef
     frequency: 2
     pin: [12, 11]
 encoder:
-  left_encoder: {pin: 2}  #No frequency, since it is an interrupt
-  right_encoder: {pin: 3}
+  left_encoder: {device: zoef, pin: 2}  #No frequency, since it is an interrupt
+  right_encoder: {device: zoef, pin: 3}
 intensity:
-  left_intensity: {frequency: 2, pin: 2}  #TODO: this assumes analog 2
-  right_intensity: {frequency: 2, pin: 3}
+  left_intensity: {device: zoef, frequency: 2, pin: 2}  #TODO: this assumes analog 2
+  right_intensity: {device: zoef, frequency: 2, pin: 3}
 left_motor: left_motor
 motor:
   left_motor:
+    device: zoef
     pin: [5, 6, 7]
   right_motor:
+    device: zoef
     pin: [8, 9, 10]
 right_motor: right_motor
 sound:
