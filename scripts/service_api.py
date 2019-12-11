@@ -42,11 +42,8 @@ def handle_intensity(req, sensor):
 
 def handle_encoder(req, sensor):
     now = rospy.get_rostime()
-    values = encoder_caches[sensor].getInterval(now - rospy.Duration(req.time_delta), now)
-    ticks = 0
-    for value in values:
-       ticks = ticks + value.ticks
-    return GetEncoderResponse(ticks)
+    last_value = encoder_caches[sensor].getElemBeforeTime(now)
+    return GetEncoderResponse(last_value.value)
 
 def start_service_api():
     rospy.init_node('zoef_service_api', anonymous=False)
@@ -70,4 +67,3 @@ def start_service_api():
 
 if __name__ == "__main__":
     start_service_api()
-

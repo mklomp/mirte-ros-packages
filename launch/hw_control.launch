@@ -9,22 +9,22 @@
         <rosparam file="$(find zoef_ros_package)/config/zoef_base_config.yaml"/>
     </group>
 
-    <node name="zoef_base_node" 
-          pkg="zoef_ros_package" 
+    <node name="zoef_base_node"
+          pkg="zoef_ros_package"
           type="zoef_ros_package_node" output="screen"/>
 
     <node name="zoef_pymata_launcher"
           pkg="zoef_ros_package"
           type="pymata_launcher.py" output="screen"/>
-     
-    <node name="my_robot_camera"
+
+    <!-- <node name="my_robot_camera"
           pkg="zoef_ros_package"
-          type="camera.py" output="screen"/>
+          type="camera.py" output="screen"/> -->
 
     <node name="zoef_navigation"
           pkg="zoef_ros_package"
           type="navigation.py" output="screen"/>
- 
+
     <node name="zoef_service_api"
           pkg="zoef_ros_package"
           type="service_api.py" output="screen"/>
@@ -32,11 +32,11 @@
     <!-- Load controller config -->
     <rosparam command="load" file="$(find zoef_ros_package)/config/my_robot_common.yaml"/>
 
-    <node name="controller_spawner" 
-          pkg="controller_manager" 
-          type="spawner" 
-          output="screen" 
-          args="mobile_base_controller"/> 
+    <node name="controller_spawner"
+          pkg="controller_manager"
+          type="spawner"
+          output="screen"
+          args="mobile_base_controller"/>
 
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 
@@ -47,6 +47,6 @@
   </node>
 
   <node name="web_video_server" pkg="web_video_server" type="web_video_server"/>
-  --> 
+  -->
 
 </launch>

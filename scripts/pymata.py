@@ -52,7 +52,7 @@ def publish_encoder(data, sensor):
     header.stamp = rospy.Time.now()
     encoder = Encoder()
     encoder.header = header
-    encoder.value = data[2]
+    encoder.value = data[2][1]
     encoder_publishers[sensor].publish(encoder)
 
 # Create a PyMata instance
@@ -79,8 +79,9 @@ def init_pymata():
      board.set_pin_mode(motors[motor]['pin'][2], board.PWM, board.DIGITAL)      #5,10
 
   for sensor in encoder_sensors:
+     sensor_args = encoder_sensors[sensor]
      l = lambda x,s=sensor: publish_encoder(x, s)
-     board.set_pin_mode(encoder_sensors[sensor]['pin'], board.INPUT, board.DIGITAL, l)
+     board.optical_encoder_config(sensor_args['pin'], sensor_args['ticks_per_wheel'], cb=l)
 
 # Set PWM values
 def set_motor_pwm(req, motor):

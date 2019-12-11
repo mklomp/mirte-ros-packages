@@ -12,8 +12,8 @@ distance:
     frequency: 2
     pin: [12, 11]
 encoder:
-  left_encoder: {device: zoef, pin: 2}  #No frequency, since it is an interrupt
-  right_encoder: {device: zoef, pin: 3}
+  left_encoder: {device: zoef, pin: 2, ticks_per_wheel: 20}  #No frequency, since it is an interrupt
+  right_encoder: {device: zoef, pin: 3, ticks_per_wheel: 20}
 intensity:
   left_intensity: {device: zoef, frequency: 2, pin: 2}  #TODO: this assumes analog 2
   right_intensity: {device: zoef, frequency: 2, pin: 3}
