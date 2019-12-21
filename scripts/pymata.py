@@ -21,6 +21,7 @@ device = rospy.get_param('~device')
 devices = rospy.get_param("/zoef/device")
 dev = devices[device]['dev']
 board = PyMata(dev, verbose=True)
+board.set_sampling_interval(100)
 
 distance_sensors = rospy.get_param("/zoef/distance")
 distance_sensors = {k: v for k, v in distance_sensors.iteritems() if v['device'] == device}
