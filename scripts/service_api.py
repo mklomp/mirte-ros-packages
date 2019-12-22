@@ -28,7 +28,7 @@ encoder_sensors = rospy.get_param("/zoef/encoder")
 encoder_caches = {}
 for sensor in encoder_sensors:
    encoder_filter = message_filters.Subscriber('/zoef/' + sensor, Encoder)
-   encoder_caches[sensor] = message_filters.Cache(encoder_filter, 100)
+   encoder_caches[sensor] = message_filters.Cache(encoder_filter, 1)
 
 def handle_distance(req, sensor):
     now = rospy.get_rostime()
