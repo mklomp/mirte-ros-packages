@@ -20,7 +20,7 @@ rospy.init_node('zoef_pymata', anonymous=True)
 device = rospy.get_param('~device')
 devices = rospy.get_param("/zoef/device")
 dev = devices[device]['dev']
-board = PyMata(dev, verbose=True)
+board = PyMata(dev, verbose=True, baud_rate=1000000)
 board.set_sampling_interval(100)
 
 distance_sensors = rospy.get_param("/zoef/distance")
