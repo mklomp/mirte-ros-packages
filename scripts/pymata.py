@@ -94,7 +94,7 @@ def set_motor_pwm(req, motor):
       else:
         board.digital_write(motors[motor]['pin'][0], 0)
         board.digital_write(motors[motor]['pin'][1], 1)
-      board.analog_write(motors[motor]['pin'][2], min(abs(req.pwm) * 3,255))
+      board.analog_write(motors[motor]['pin'][2], min(abs(req.pwm) ,255))
       prev_motor_pwm[motor] = req.pwm
     return SetMotorPWMResponse(True)
 
