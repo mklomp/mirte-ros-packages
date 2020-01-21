@@ -12,23 +12,29 @@ from zoef_msgs.msg import Intensity, Encoder
 from zoef_msgs.srv import GetDistance, GetDistanceResponse, GetIntensity, GetIntensityResponse, GetEncoder, GetEncoderResponse
 
 # Message filters
-distance_sensors = rospy.get_param("/zoef/distance")
-distance_caches = {}
-for sensor in distance_sensors:
-   distance_filter = message_filters.Subscriber('/zoef/' + sensor, Range)
-   distance_caches[sensor] = message_filters.Cache(distance_filter, 1)
+distance_sensors = {}
+if rospy.has_param("/zoef/distance"):
+   distance_sensors = rospy.get_param("/zoef/distance")
+   distance_caches = {}
+   for sensor in distance_sensors:
+      distance_filter = message_filters.Subscriber('/zoef/' + sensor, Range)
+      distance_caches[sensor] = message_filters.Cache(distance_filter, 1)
 
-intensity_sensors = rospy.get_param("/zoef/intensity")
-intensity_caches = {}
-for sensor in intensity_sensors:
-   intensity_filter = message_filters.Subscriber('/zoef/' + sensor, Intensity)
-   intensity_caches[sensor] = message_filters.Cache(intensity_filter, 1)
+intensity_sensors = {}
+if rospy.has_param("/zoef/intensity"):
+   intensity_sensors = rospy.get_param("/zoef/intensity")
+   intensity_caches = {}
+   for sensor in intensity_sensors:
+      intensity_filter = message_filters.Subscriber('/zoef/' + sensor, Intensity)
+      intensity_caches[sensor] = message_filters.Cache(intensity_filter, 1)
 
-encoder_sensors = rospy.get_param("/zoef/encoder")
-encoder_caches = {}
-for sensor in encoder_sensors:
-   encoder_filter = message_filters.Subscriber('/zoef/' + sensor, Encoder)
-   encoder_caches[sensor] = message_filters.Cache(encoder_filter, 1)
+encoder_sensors = {}
+if rospy.has_param("/zoef/encoder"):
+   encoder_sensors = rospy.get_param("/zoef/encoder")
+   encoder_caches = {}
+   for sensor in encoder_sensors:
+      encoder_filter = message_filters.Subscriber('/zoef/' + sensor, Encoder)
+      encoder_caches[sensor] = message_filters.Cache(encoder_filter, 1)
 
 def handle_distance(req, sensor):
     now = rospy.get_rostime()
@@ -48,20 +54,23 @@ def handle_encoder(req, sensor):
 def start_service_api():
     rospy.init_node('zoef_service_api', anonymous=False)
 
-    distance_sensors = rospy.get_param("/zoef/distance")
-    for sensor in distance_sensors:
-       l = lambda msg, s=sensor: handle_distance(msg, s)
-       rospy.Service('/zoef_service_api/get_' + sensor, GetDistance, l)
+    if rospy.has_param("/zoef/distance"):
+       distance_sensors = rospy.get_param("/zoef/distance")
+       for sensor in distance_sensors:
+          l = lambda msg, s=sensor: handle_distance(msg, s)
+          rospy.Service('/zoef_service_api/get_' + sensor, GetDistance, l)
 
-    intensity_sensors = rospy.get_param("/zoef/intensity")
-    for sensor in intensity_sensors:
-       l = lambda msg, s=sensor: handle_intensity(msg, s)
-       rospy.Service('/zoef_service_api/get_' + sensor, GetIntensity, l)
+    if rospy.has_param("/zoef/intensity"):
+       intensity_sensors = rospy.get_param("/zoef/intensity")
+       for sensor in intensity_sensors:
+          l = lambda msg, s=sensor: handle_intensity(msg, s)
+          rospy.Service('/zoef_service_api/get_' + sensor, GetIntensity, l)
 
-    encoder_sensors = rospy.get_param("/zoef/encoder")
-    for sensor in encoder_sensors:
-       l = lambda msg, s=sensor: handle_encoder(msg, s)
-       rospy.Service('/zoef_service_api/get_' + sensor, GetEncoder, l)
+    if rospy.has_param("/zoef/encoder"):
+       encoder_sensors = rospy.get_param("/zoef/encoder")
+       for sensor in encoder_sensors:
+          l = lambda msg, s=sensor: handle_encoder(msg, s)
+          rospy.Service('/zoef_service_api/get_' + sensor, GetEncoder, l)
 
     rospy.spin()
 

@@ -23,30 +23,37 @@ dev = devices[device]['dev']
 board = PyMata(dev, verbose=True, baud_rate=1000000)
 board.set_sampling_interval(100)
 
-distance_sensors = rospy.get_param("/zoef/distance")
-distance_sensors = {k: v for k, v in distance_sensors.iteritems() if v['device'] == device}
 distance_publishers = {}
-for sensor in distance_sensors:
-   distance_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Range, queue_size=10)
+distance_sensors = {}
+if rospy.has_param("/zoef/distance"):
+   distance_sensors = rospy.get_param("/zoef/distance")
+   distance_sensors = {k: v for k, v in distance_sensors.iteritems() if v['device'] == device}
+   for sensor in distance_sensors:
+      distance_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Range, queue_size=10)
 
-intensity_sensors = rospy.get_param("/zoef/intensity")
-intensity_sensors = {k: v for k, v in intensity_sensors.iteritems() if v['device'] == device}
 intensity_publishers = {}
-for sensor in intensity_sensors:
-   intensity_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Intensity, queue_size=10)
+intensity_sensors = {}
+if rospy.has_param("/zoef/intensity"):
+   intensity_sensors = rospy.get_param("/zoef/intensity")
+   intensity_sensors = {k: v for k, v in intensity_sensors.iteritems() if v['device'] == device}
+   for sensor in intensity_sensors:
+      intensity_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Intensity, queue_size=10)
 
-encoder_sensors = rospy.get_param("/zoef/encoder")
-encoder_sensors = {k: v for k, v in encoder_sensors.iteritems() if v['device'] == device}
 encoder_publishers = {}
-for sensor in encoder_sensors:
-   encoder_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Encoder, queue_size=10)
+encoder_sensors = {}
+if rospy.has_param("/zoef/encoder"):
+   encoder_sensors = rospy.get_param("/zoef/encoder")
+   encoder_sensors = {k: v for k, v in encoder_sensors.iteritems() if v['device'] == device}
+   for sensor in encoder_sensors:
+      encoder_publishers[sensor] = rospy.Publisher('/zoef/' + sensor, Encoder, queue_size=10)
 
-motors = rospy.get_param("/zoef/motor")
-motors = {k: v for k, v in motors.iteritems() if v['device'] == device}
 prev_motor_pwm = {}
-for motor in motors:
-   prev_motor_pwm[motor] = 0
-
+motors = {}
+if rospy.has_param("/zoef/motor"):
+   motors = rospy.get_param("/zoef/motor")
+   motors = {k: v for k, v in motors.iteritems() if v['device'] == device}
+   for motor in motors:
+      prev_motor_pwm[motor] = -1000 # will be set to 0 after init
 
 def publish_encoder(data, sensor):
     header = Header()
@@ -75,9 +82,10 @@ def init_pymata():
      board.set_pin_mode(intensity_sensors[sensor]['pin'], board.INPUT, board.ANALOG)
 
   for motor in motors:
-     board.set_pin_mode(motors[motor]['pin'][0], board.OUTPUT, board.DIGITAL)   #6, 8
-     board.set_pin_mode(motors[motor]['pin'][1], board.OUTPUT, board.DIGITAL)   #7, 9
-     board.set_pin_mode(motors[motor]['pin'][2], board.PWM, board.DIGITAL)      #5,10
+     board.set_pin_mode(motors[motor]['pin'][0], board.OUTPUT, board.DIGITAL)
+     board.set_pin_mode(motors[motor]['pin'][1], board.OUTPUT, board.DIGITAL)
+     board.set_pin_mode(motors[motor]['pin'][2], board.PWM, board.DIGITAL)
+     set_motor_pwm(0, motor)
 
   for sensor in encoder_sensors:
      sensor_args = encoder_sensors[sensor]
@@ -85,18 +93,23 @@ def init_pymata():
      board.optical_encoder_config(sensor_args['pin'], sensor_args['ticks_per_wheel'], cb=l)
 
 # Set PWM values
-def set_motor_pwm(req, motor):
+def set_motor_pwm(pwm, motor):
     global prev_motor_pwm
-    if (req.pwm != prev_motor_pwm[motor]):
-      if (req.pwm > 0):
+
+    if (pwm != prev_motor_pwm[motor]):
+      if (pwm >= 0):
         board.digital_write(motors[motor]['pin'][1], 0)
         board.digital_write(motors[motor]['pin'][0], 1)
       else:
         board.digital_write(motors[motor]['pin'][0], 0)
         board.digital_write(motors[motor]['pin'][1], 1)
-      board.analog_write(motors[motor]['pin'][2], min(abs(req.pwm) ,255))
-      prev_motor_pwm[motor] = req.pwm
+      board.analog_write(motors[motor]['pin'][2], min(abs(pwm) ,255))
+      prev_motor_pwm[motor] = pwm
+
+def set_motor_pwm_service(req, motor):
+    set_motor_pwm(req.pwm, motor)
     return SetMotorPWMResponse(True)
+
 
 def handle_get_pin_value(req):
   board.set_pin_mode(req.pin, board.INPUT, board.ANALOG)
@@ -136,7 +149,7 @@ def listener():
 
     # Services (actuators)
     for motor in motors:
-       l = lambda req,m=motor: set_motor_pwm(req, m)
+       l = lambda req,m=motor: set_motor_pwm_service(req, m)
        rospy.Service("/zoef_pymata/set_" + motor + "_pwm", SetMotorPWM, l)
 
     # Services (raw arduino values)
