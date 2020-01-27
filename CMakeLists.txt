@@ -53,15 +53,21 @@ find_package(catkin REQUIRED COMPONENTS
    FILES
    Encoder.msg
    color.msg
+   Intensity.msg
  )
 
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  get_distance.srv
+  GetDistance.srv
+  GetIntensity.srv
+  GetEncoder.srv
   get_pin_value.srv
   get_virtual_color.srv
   get_barcode.srv
+  SetMotorPWM.srv
+  Move.srv
+  Turn.srv
 )
 
 ## Generate actions in the 'action' folder
