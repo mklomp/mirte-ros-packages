@@ -91,6 +91,7 @@ def init_pymata():
      sensor_args = encoder_sensors[sensor]
      l = lambda x,s=sensor: publish_encoder(x, s)
      board.optical_encoder_config(sensor_args['pin'], sensor_args['ticks_per_wheel'], cb=l)
+#     board.optical_encoder_set_mode(mode=True)
 
 # Set PWM values
 def set_motor_pwm(pwm, motor):
@@ -105,6 +106,7 @@ def set_motor_pwm(pwm, motor):
         board.digital_write(motors[motor]['pin'][1], 1)
       board.analog_write(motors[motor]['pin'][2], min(abs(pwm) ,255))
       prev_motor_pwm[motor] = pwm
+      print pwm
 
 def set_motor_pwm_service(req, motor):
     set_motor_pwm(req.pwm, motor)
