@@ -1,4 +1,4 @@
-float32 speed       # m/s
 float32 distance    # m
+float32 speed       # m/s
 ---
 bool finished
