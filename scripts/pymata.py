@@ -102,6 +102,27 @@ class MX1919Motor():
           await self.board.pwm_write(self.pins[0], min(abs(pwm) ,255))
         self.prev_motor_pwm = pwm
 
+class L298NMotor():
+    def __init__(self, board, pins):
+        self.board = board
+        self.pins = pins
+        self.prev_motor_pwm = -1000 # why not 0?
+        self.loop = asyncio.get_event_loop()
+        self.loop.run_until_complete(self.board.set_pin_mode_digital_output(pins[0]))
+        self.loop.run_until_complete(self.board.set_pin_mode_digital_output(pins[1]))
+        self.loop.run_until_complete(self.board.set_pin_mode_pwm_output(pins[2]))  # EN(able)
+
+    async def set_pwm(self, pwm):
+        # First, set the pin to 0 (to make sure that not both pins are 1)
+        if (pwm >= 0):
+          await self.board.digital_write(self.pins[1], 0)
+          await self.board.digital_write(self.pins[0], 1)
+        else:
+          await self.board.digital_write(self.pins[0], 0)
+          await self.board.digital_write(self.pins[1], 1)
+        await self.board.pwm_write(self.pins[2], min(abs(pwm) ,255))
+        self.prev_motor_pwm = pwm
+
 async def set_motor_pwm_service(req, motor):
     await motor.set_pwm(req.pwm)
     return SetMotorPWMResponse(True)
@@ -138,7 +159,11 @@ def listener():
        motors = {k: v for k, v in motors.items() if v['device'] == device}
 
     for motor in motors:
-       motor_obj = MX1919Motor(board, motors[motor]["pin"])
+       # TODO: use variable in config file
+       if (len(motors[motor]['pin']) == 3):
+          motor_obj = L298NMotor(board, motors[motor]["pin"])
+       else:
+          motor_obj = MX1919Motor(board, motors[motor]["pin"])
        l = lambda req,m=motor_obj: set_motor_pwm_service(req, m)
        server = aiorospy.AsyncService("/zoef_pymata/set_" + motor + "_pwm", SetMotorPWM, l)
        servers.append(loop.create_task(server.start()))

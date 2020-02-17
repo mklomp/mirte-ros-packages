@@ -35,9 +35,11 @@ motor:
   left_motor:
     device: zoef
     pin: [14, 13]   #M1, B14 (PWM), B15 (PWM)
+    #pin: [7, 8, 9]   #M1, D7, D8, D9 (PWM, EN)
   right_motor:
     device: zoef
     pin: [7, 6]     #M2, A15 (PWM), B3 (PWM)
+    #pin: [4, 5, 6]   #M2, D4, D5, D6 (PWM, EN)
 left_motor: left_motor
 right_motor: right_motor
 #wheel_radius: 0.065
