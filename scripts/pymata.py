@@ -17,7 +17,8 @@ from zoef_msgs.srv import *
 
 #TODO: move to main, and make sure board does not need to be global
 rospy.init_node('zoef_pymata', anonymous=True)
-device = rospy.get_param('~device')
+device = 'zoef'
+#device = rospy.get_param('~device')
 #devices = rospy.get_param("/zoef/device")
 #dev = devices[device]['dev']
 board = pymata_express.PymataExpress(baud_rate=1000000)
