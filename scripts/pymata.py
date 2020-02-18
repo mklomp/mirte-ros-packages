@@ -17,15 +17,10 @@ from zoef_msgs.srv import *
 
 #TODO: move to main, and make sure board does not need to be global
 rospy.init_node('zoef_pymata', anonymous=True)
-#device = rospy.get_param('~device')
-device = "zoef"
-devices = rospy.get_param("/zoef/device")
-dev = devices[device]['dev']
-loop = asyncio.get_event_loop()
+device = rospy.get_param('~device')
+#devices = rospy.get_param("/zoef/device")
+#dev = devices[device]['dev']
 board = pymata_express.PymataExpress(baud_rate=1000000)
-loop.run_until_complete(board.set_pin_mode_pwm_output(7))
-loop.run_until_complete(board.pwm_write(7, 0))
-
 
 # Abstract Sensor class
 class SensorMonitor:
@@ -36,45 +31,41 @@ class SensorMonitor:
         self.poll_freq = poll_freq
         self.loop = asyncio.get_event_loop()
 
-    async def get_header(self):
+    def get_header(self):
        header = Header()
-       header.stamp = await self.loop.run_in_executor(None, rospy.Time.now)
+       header.stamp = rospy.Time.now()
        return header
-
-    # For some reason, we need this wrapper.....
-    async def publish_data_wrapper(self, data):
-        await self.loop.run_in_executor(None, self.publisher.publish, data)
 
 class DistanceSensorMonitor(SensorMonitor):
     def __init__(self, board, pins, pub, poll_freq=100):
         super().__init__(board, pins, pub, poll_freq=poll_freq)
 
-    async def set_callback(self):
+    async def start(self):
         await self.board.set_pin_mode_sonar(self.pins[0], self.pins[1], self.publish_data)
 
     async def publish_data(self, data):
        range = Range()
-       range.header = await self.get_header()
+       range.header = self.get_header()
        range.radiation_type = range.ULTRASOUND
        range.field_of_view = math.pi * 5
        range.min_range = 0.02
        range.max_range = 1.5
        range.range = data[2]
-       await self.publish_data_wrapper(range)
+       self.publisher.publish(range)
 
 class IntensitySensorMonitor(SensorMonitor):
     def __init__(self, board, pins, pub, poll_freq=100, differential=0):
         self.differential = differential
         super().__init__(board, pins, pub, poll_freq=poll_freq)
 
-    async def set_callback(self):
+    async def start(self):
         await self.board.set_pin_mode_analog_input(self.pins[0], self.publish_data, differential=self.differential)
 
     async def publish_data(self, data):
        intensity = Intensity()
-       intensity.header = await self.get_header()
+       intensity.header = self.get_header()
        intensity.value = data[2]
-       await self.publish_data_wrapper(intensity)
+       self.publisher.publish(intensity)
 
 class EncoderSensorMonitor(SensorMonitor):
     def __init__(self, board, pins, pub, poll_freq=100, differential=0, ticks_per_wheel=20):
@@ -82,16 +73,16 @@ class EncoderSensorMonitor(SensorMonitor):
         self.ticks_per_wheel = ticks_per_wheel
         super().__init__(board, pins, pub, poll_freq=poll_freq)
 
-    async def set_callback(self):
+    async def start(self):
          pass #Until this is ported
 #        await self.board.optical_encoder_config(self.pins[0], self.ticks_per_wheel, cb=self.publish_data)
 #        await self.board.optical_encoder_set_mode(mode=True)
 
     async def publish_data(publisher, data):
        encoder = Encoder()
-       encoder.header = await self.get_header()
+       encoder.header = self.get_header()
        encoder.value = data[2][1]
-       await self.publish_data_wrapper(encoder)
+       self.publisher.publish(encoder)
 
 #TODO: also supprt L298N
 class MX1919Motor():
@@ -104,17 +95,15 @@ class MX1919Motor():
             self.loop.run_until_complete(self.board.set_pin_mode_pwm_output(pin))
 
     async def set_pwm(self, pwm):
-        print("setting pwm "   + str(self.pins) + ":" + str(pwm))
         if (pwm >= 0):
           await self.board.pwm_write(self.pins[0], 0)
-          await self.board.pwm_write(self.pins[1], min(abs(pwm) ,255)) 
+          await self.board.pwm_write(self.pins[1], min(abs(pwm) ,255))
         else:
           await self.board.pwm_write(self.pins[1], 0)
           await self.board.pwm_write(self.pins[0], min(abs(pwm) ,255))
         self.prev_motor_pwm = pwm
 
 async def set_motor_pwm_service(req, motor):
-    print("receveived "  + str(req.pwm))
     await motor.set_pwm(req.pwm)
     return SetMotorPWMResponse(True)
 
@@ -134,7 +123,6 @@ async def handle_set_pin_value(req):
      return SetPinValueResponse(await board.digital_write(req.pin, req.value))
 
 async def shutdown(signal, loop, board):
-    print("shuting down")
     await board.shutdown()
     tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
     [task.cancel() for task in tasks]
@@ -173,41 +161,41 @@ def publishers():
       distance_sensors = rospy.get_param("/zoef/distance")
       distance_sensors = {k: v for k, v in distance_sensors.items() if v['device'] == device}
       for sensor in distance_sensors:
-         distance_publisher = rospy.Publisher('/zoef/' + sensor, Range, queue_size=10)
+         distance_publisher = rospy.Publisher('/zoef/' + sensor, Range, queue_size=1)
          monitor = DistanceSensorMonitor(board, distance_sensors[sensor]['pin'], distance_publisher, poll_freq=-1)
-         tasks.append(loop.create_task(monitor.set_callback()))
+         tasks.append(loop.create_task(monitor.start()))
 
    intensity_sensors = {}
    if rospy.has_param("/zoef/intensity"):
       intensity_sensors = rospy.get_param("/zoef/intensity")
       intensity_sensors = {k: v for k, v in intensity_sensors.items() if v['device'] == device}
       for sensor in intensity_sensors:
-         intensity_publisher = rospy.Publisher('/zoef/' + sensor, Intensity, queue_size=10)
+         intensity_publisher = rospy.Publisher('/zoef/' + sensor, Intensity, queue_size=1)
          monitor = IntensitySensorMonitor(board, [intensity_sensors[sensor]['pin']], intensity_publisher, poll_freq=-1, differential=0)
-         tasks.append(loop.create_task(monitor.set_callback()))
+         tasks.append(loop.create_task(monitor.start()))
 
    encoder_sensors = {}
    if rospy.has_param("/zoef/encoder"):
       encoder_sensors = rospy.get_param("/zoef/encoder")
       encoder_sensors = {k: v for k, v in encoder_sensors.items() if v['device'] == device}
       for sensor in encoder_sensors:
-         encoder_publisher = rospy.Publisher('/zoef/' + sensor, Encoder, queue_size=10)
+         encoder_publisher = rospy.Publisher('/zoef/' + sensor, Encoder, queue_size=1)
          monitor = EncoderSensorMonitor(board, [encoder_sensors[sensor]['pin']], encoder_publisher, poll_freq=-1, differential=0, ticks_per_wheel=encoder_sensors[sensor]["ticks_per_wheel"])
-         tasks.append(loop.create_task(monitor.set_callback()))
+         tasks.append(loop.create_task(monitor.start()))
 
    for i in tasks:
       loop.run_until_complete(i)
 
 
+
 if __name__ == '__main__':
    loop = asyncio.get_event_loop()
-   loop.set_debug(True)
 
    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
    for s in signals:
       loop.add_signal_handler(s, lambda: asyncio.ensure_future(shutdown(s, loop, board)))
 
-   loop.run_until_complete(board.set_sampling_interval(40))
+   loop.run_until_complete(board.set_sampling_interval(10)) #100Hz (pymata can go up to 1000Hz, but with ROS the CPU load becomes high and we get a lower max)
    publishers()
    listener()
    loop.run_forever() # same as rospy.spin()

@@ -2,14 +2,15 @@ device:
   zoef:
     type: zoef
     dev: "/dev/ttyACM0"
+#    samping_interval: 10   TODO, hardcoded in pymata.py
 distance:
   left_distance:
     device: zoef
-    frequency: 10
+#    frequency: 10  currently not used
     pin: [11, 1]    #SRF1, A9 (trigger), B8 (echo)
   right_distance:
     device: zoef
-    frequency: 10
+#    frequency: 10  currently not used
     pin: [10, 0]    #SRF2, A10 (trigger), B9 (echo)
 encoder:
   left_encoder:     #No frequency, since it is an interrupt
@@ -23,11 +24,11 @@ encoder:
 intensity:
   left_intensity: 
     device: zoef
-    frequency: 100
+#    frequency: 100 currently not used
     pin: 0          #NOTE, ANALOG 0. IR1, A0 (currently not using digital pin A12)
   right_intensity:
     device: zoef
-    frequency: 10
+#    frequency: 10 currently not used
     pin: 1          #NOTE, ANALOG 1, IR2, A1 (currently not using digital pin A11)
 motor:
   #type: MX1919      #TODO: make possbile to run MX1919 with 5V and L298N with 12V, currently on nr of pins
