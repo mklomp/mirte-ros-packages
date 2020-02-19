@@ -9,6 +9,7 @@
         <rosparam file="$(find zoef_ros_package)/config/zoef_base_config.yaml"/>
     </group>
 
+
     <node name="zoef_base_node"
           pkg="zoef_ros_package"
           type="zoef_ros_package_node" output="screen"/>

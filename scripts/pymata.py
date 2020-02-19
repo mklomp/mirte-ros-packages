@@ -21,7 +21,7 @@ device = rospy.get_param('~device')
 devices = rospy.get_param("/zoef/device")
 dev = devices[device]['dev']
 board = PyMata(dev, verbose=True, baud_rate=1000000)
-board.set_sampling_interval(100)
+board.set_sampling_interval(50)
 
 distance_publishers = {}
 distance_sensors = {}
@@ -82,31 +82,45 @@ def init_pymata():
      board.set_pin_mode(intensity_sensors[sensor]['pin'], board.INPUT, board.ANALOG)
 
   for motor in motors:
-     board.set_pin_mode(motors[motor]['pin'][0], board.OUTPUT, board.DIGITAL)
-     board.set_pin_mode(motors[motor]['pin'][1], board.OUTPUT, board.DIGITAL)
-     board.set_pin_mode(motors[motor]['pin'][2], board.PWM, board.DIGITAL)
+     if (len(motors[motor]['pin']) == 3): # L298N
+        board.set_pin_mode(motors[motor]['pin'][0], board.OUTPUT, board.DIGITAL)
+        board.set_pin_mode(motors[motor]['pin'][1], board.OUTPUT, board.DIGITAL)
+        board.set_pin_mode(motors[motor]['pin'][2], board.PWM, board.DIGITAL)
+     else: #MX1919
+        board.set_pin_mode(motors[motor]['pin'][0], board.PWM, board.DIGITAL)
+        board.set_pin_mode(motors[motor]['pin'][1], board.PWM, board.DIGITAL)
      set_motor_pwm(0, motor)
+
 
   for sensor in encoder_sensors:
      sensor_args = encoder_sensors[sensor]
      l = lambda x,s=sensor: publish_encoder(x, s)
      board.optical_encoder_config(sensor_args['pin'], sensor_args['ticks_per_wheel'], cb=l)
-#     board.optical_encoder_set_mode(mode=True)
+     board.optical_encoder_set_mode(mode=True)
 
 # Set PWM values
 def set_motor_pwm(pwm, motor):
     global prev_motor_pwm
 
     if (pwm != prev_motor_pwm[motor]):
-      if (pwm >= 0):
-        board.digital_write(motors[motor]['pin'][1], 0)
-        board.digital_write(motors[motor]['pin'][0], 1)
-      else:
-        board.digital_write(motors[motor]['pin'][0], 0)
-        board.digital_write(motors[motor]['pin'][1], 1)
-      board.analog_write(motors[motor]['pin'][2], min(abs(pwm) ,255))
-      prev_motor_pwm[motor] = pwm
-      print pwm
+      if (len(motors[motor]['pin']) == 3): # L298N
+        if (pwm >= 0):
+          board.digital_write(motors[motor]['pin'][1], 0)
+          board.digital_write(motors[motor]['pin'][0], 1)
+        else:
+          board.digital_write(motors[motor]['pin'][0], 0)
+          board.digital_write(motors[motor]['pin'][1], 1)
+        board.analog_write(motors[motor]['pin'][2], min(abs(pwm) ,255))
+        prev_motor_pwm[motor] = pwm
+      else: # MX1919
+        if (pwm >= 0):
+          board.analog_write(motors[motor]['pin'][0], 0)
+          board.analog_write(motors[motor]['pin'][1], min(abs(pwm) ,255)) 
+        else:
+          board.analog_write(motors[motor]['pin'][1], 0)
+          board.analog_write(motors[motor]['pin'][0], min(abs(pwm) ,255))
+        prev_motor_pwm[motor] = pwm
+
 
 def set_motor_pwm_service(req, motor):
     set_motor_pwm(req.pwm, motor)

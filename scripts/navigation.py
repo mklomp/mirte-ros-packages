@@ -7,14 +7,23 @@ from zoef_msgs.srv import Move, MoveResponse, Turn, TurnResponse
 velocity_publisher = rospy.Publisher('/mobile_base_controller/cmd_vel', Twist, queue_size=10)
 
 def handle_move(req):
+    # req.distance = distance (directional) in m
+    # req.speed = speed (always positive) in m/s
+    if (req.speed < 0):
+       return MoveResponse(False)
+
     vel_msg = Twist()
 
     # Setting the current time for distance calculus
-    vel_msg.linear.x = req.speed
+    directional_speed = req.speed
+    if req.distance < 0:
+       directional_speed = -req.speed
+    vel_msg.linear.x = directional_speed
     t0 = rospy.Time.now().to_sec()
     current_distance = 0
 
-    while(current_distance < req.distance):
+    # TODO: not calculating, but using odom
+    while(current_distance < abs(req.distance)):
         velocity_publisher.publish(vel_msg)
         t1 = rospy.Time.now().to_sec()
         current_distance = req.speed*(t1-t0)
@@ -25,17 +34,26 @@ def handle_move(req):
     return MoveResponse(True)
 
 def handle_turn(req):
+    # req.angle = angle (directional, positive is clockwise) in rad
+    # req.speed = angular speed (always positive) in rad/s
+    if (req.speed < 0):
+       return TurnResponse(False)
+
     vel_msg = Twist()
 
     # Setting the current time for distance calculus
-    vel_msg.angular.z = req.speed
+    directional_speed = req.speed
+    if req.angle < 0:
+       directional_speed = -req.speed
+    vel_msg.angular.z = directional_speed
     t0 = rospy.Time.now().to_sec()
     current_angle = 0
 
-    while(current_angle < rq.angle):
+    # TODO: not calculating, but from odom
+    while(current_angle < abs(req.angle)):
         velocity_publisher.publish(vel_msg)
         t1 = rospy.Time.now().to_sec()
-        current_angle = angular_speed*(t1-t0)
+        current_angle = req.speed*(t1-t0)
 
     # Forcing our robot to stop
     vel_msg.angular.z = 0

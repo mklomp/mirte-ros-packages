@@ -3,27 +3,27 @@
 // https://github.com/eborghi10/my_ROS_mobile_robot/blob/master/my_robot_base/include/my_robot_hw_interface.h
 // https://github.com/PickNikRobotics/ros_control_boilerplate
 // https://github.com/DeborggraeveR/ampru
-// 
 
 // https://github.com/resibots/dynamixel_control_hw/blob/master/include/dynamixel_control_hw/hardware_interface.hpp
 // https://github.com/FRC900/2018RobotCode/blob/master/zebROS_ws/src/ros_control_boilerplate/include/ros_control_boilerplate/frcrobot_hw_interface.h
-
+// INTERESTING CLEAN ONE: https://github.com/ros-controls/ros_controllers/blob/indigo-devel/diff_drive_controller/test/diffbot.h
 
 
 #pragma once
+#define _USE_MATH_DEFINES
 
 // ROS
 #include <ros/ros.h>
-#include <std_msgs/Float32.h>
-#include <std_msgs/Int32.h>
 #include <std_srvs/Empty.h>
 #include <zoef_msgs/Encoder.h>
+#include <zoef_msgs/SetMotorPWM.h>
 
 // ros_control
 #include <controller_manager/controller_manager.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
+
 // ostringstream
 #include <sstream>
 #include <algorithm>
@@ -37,73 +37,69 @@ class MyRobotHWInterface : public hardware_interface::RobotHW
 public:
   MyRobotHWInterface();
 
-  std_msgs::Int32 prev_left;
-  std_msgs::Int32 prev_right;
-
   /*
    *
    */
   void write() {
-    //255 pwm = 90hz -> 90/sec -> ca 2 omwenteling /s -> ca 40 cm /s -> 0.4m/s
+    if (running_){
+      // cmd[0] = ros_control calculated speed of left motor in rad/s
+      // cmd[1] = ros_control calculated speed of right motor in rad/s
 
+      // This function converts cmd[0] to pwm and calls that service
 
-    double diff_speed_left = angularToLinear(cmd[0]);  // TODO: angularToLinear not needed since we can do everythign in agular space
-    double diff_speed_right = angularToLinear(cmd[1]);
+      //NOTE: this *highly* depends on teh voltage of the motors!!!!
+      //For 5V power bank: 255 pwm = 90 ticks/sec -> ca 2 omwenteling/s (4*pi)
+      //For 6V power supply: 255 pwm = 120 ticks/sec -> ca 3 omwentelingen/s (6*pi)
+      int left_pwm  = std::max(std::min(int(cmd[0] / ( 6 * M_PI) * 255), 255), -255);
+      zoef_msgs::SetMotorPWM left_motor_service;
+      left_motor_service.request.pwm = left_pwm;
+      left_client.call(left_motor_service);
 
-    std_msgs::Int32 left_pwm;
-    std_msgs::Int32 right_pwm;
-    left_pwm.data = (int)(diff_speed_left * 600);
-    right_pwm.data = (int)(diff_speed_right * 600);
+      int right_pwm = std::max(std::min(int(cmd[1] / ( 6 * M_PI) * 255), 255), -255);
+      zoef_msgs::SetMotorPWM right_motor_service;
+      right_motor_service.request.pwm = right_pwm;
+      right_client.call(right_motor_service);
 
-    double voltage_left = std::min(std::max(-5.0,diff_speed_left * 50), 5.0) ;
-    double voltage_right = std::min(std::max(-5.0,diff_speed_right * 50), 5.0) ;
+      // Set the direction in so the read() can use it
+      // TODO: this does not work propely, because at the end of a series cmd_vel is negative, while the rotation is not
+      _last_wheel_cmd_direction[0] = cmd[0] > 0.0 ? 1 : -1;
+      _last_wheel_cmd_direction[1] = cmd[1] > 0.0 ? 1 : -1;
 
-    int left_factor;
-    nh.param("left_factor", left_factor, 1);
-    int right_factor;
-    nh.param("right_factor", right_factor, 1);
-
-    _last_wheel_cmd_direction[0] = voltage_left / std::abs(voltage_left);
-    _last_wheel_cmd_direction[1] = voltage_right / std::abs(voltage_right);
-
-    if (left_pwm.data != prev_left.data){
-	left_wheel_command_pub_.publish(left_pwm);
-        prev_left = left_pwm;
+      std::ostringstream os;
+      os << "Speed data: " << cmd[0] << " (" << left_pwm << ")      ," << cmd[1] << " (" << right_pwm << ")          ";// << get_period().toSec();
+      //ROS_INFO_STREAM(os.str());
     }
-    if (right_pwm.data != prev_right.data){
-	right_wheel_command_pub_.publish(right_pwm);
-        prev_right = right_pwm;
-    }
-
-    std::ostringstream os;
-    os << "Wheel cmd: " << cmd[0] << "  "  << voltage_left << "     "  << voltage_right;
-   // ROS_INFO_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!!!!!: " << os.str()); 
  }
 
   /**
-   * Reading encoder values and setting position and velocity of enconders 
+   * Reading encoder values and setting position and velocity of enconders
    */
   void read(const ros::Duration &period) {
+    //_wheel_encoder[0] = number of ticks of left encoder since last call of this function
+    //_wheel_encoder[1] = number of ticks of right encoder since last call of this function
 
-    double wheelRadius = 0.065;
-    double meterPerEncoderTick = wheelRadius * 3.1415926 / 40; 
-    double distance_left = _wheel_encoder[0] * meterPerEncoderTick;
-    double distance_right = _wheel_encoder[1] * meterPerEncoderTick;
+    double meterPerEncoderTick = (_wheel_diameter / 2) * 2 * M_PI / 40.0;
+    int diff_left  = _wheel_encoder[0] - _last_value[0];
+    int diff_right = _wheel_encoder[1] - _last_value[1];
+    _last_value[0] = _wheel_encoder[0];
+    _last_value[1] = _wheel_encoder[1];
 
+    double magic_number = 1.0;
 
-    pos[0] += linearToAngular(distance_left) * _last_wheel_cmd_direction[0];
-    vel[0] = linearToAngular(distance_left) / period.toSec() * _last_wheel_cmd_direction[0];
-    pos[1] += linearToAngular(distance_right) * _last_wheel_cmd_direction[1];
-    vel[1] = linearToAngular(distance_right) / period.toSec() * _last_wheel_cmd_direction[0];
+    double distance_left  = diff_left * meterPerEncoderTick * _last_wheel_cmd_direction[0] * magic_number;
+    double distance_right = diff_right * meterPerEncoderTick * _last_wheel_cmd_direction[1] * magic_number;
+
+    pos[0] += distance_left;
+//    vel[0] = distance_left / period.toSec();
+    pos[1] += distance_right;
+//    vel[1] = distance_right / period.toSec();
 
     std::ostringstream os;
-    os << "Wheel velocitu: " << _wheel_encoder[0] / period.toSec() << "     "  << _wheel_encoder[1] / period.toSec() << "      "  << period.toSec();
-   // ROS_INFO_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!!!!!: " << os.str());    
-
-    _wheel_encoder[0] = 0;
-    _wheel_encoder[1] = 0;
+    os << "Encoder data: " << _wheel_encoder[0]  << " (" << pos[0] << "),  "  << _wheel_encoder[1]  << " (" << pos[1] << ")"  << period.toSec();
+    ROS_INFO_STREAM(os.str());
   }
 
+/*
   ros::Time get_time() {
     prev_update_time = curr_update_time;
     curr_update_time = ros::Time::now();
@@ -113,7 +109,7 @@ public:
   ros::Duration get_period() {
     return curr_update_time - prev_update_time;
   }
-
+*/
   ros::NodeHandle nh;
   ros::NodeHandle private_nh;
 
@@ -130,28 +126,23 @@ private:
   double _max_speed;
   double _wheel_angle[NUM_JOINTS];
   int _wheel_encoder[NUM_JOINTS];
-
+  int _last_value[NUM_JOINTS];
   int _last_wheel_cmd_direction[NUM_JOINTS];
-
 
   ros::Time curr_update_time, prev_update_time;
 
-  ros::Subscriber left_wheel_angle_sub_;
-  ros::Subscriber right_wheel_angle_sub_;
-  ros::Publisher left_wheel_vel_pub_;
-  ros::Publisher right_wheel_vel_pub_;
-
   ros::Subscriber left_wheel_encoder_sub_;
   ros::Subscriber right_wheel_encoder_sub_;
-  ros::Publisher left_wheel_command_pub_;
-  ros::Publisher right_wheel_command_pub_;
-
 
   ros::ServiceServer start_srv_;
   ros::ServiceServer stop_srv_;
 
+  ros::ServiceClient left_client;
+  ros::ServiceClient right_client;
+
+
   bool start_callback(std_srvs::Empty::Request& /*req*/, std_srvs::Empty::Response& /*res*/)
-  { 
+  {
     running_ = true;
     return true;
   }
@@ -164,41 +155,12 @@ private:
 
 
   void leftWheelEncoderCallback(const zoef_msgs::Encoder& msg) {
-    _wheel_encoder[0]++;
+    _wheel_encoder[0] = _wheel_encoder[0] + msg.value;
   }
 
   void rightWheelEncoderCallback(const zoef_msgs::Encoder& msg) {
-    _wheel_encoder[1]++;
+    _wheel_encoder[1] = _wheel_encoder[1] + msg.value;
   }
-
-
-  void leftWheelAngleCallback(const std_msgs::Float32& msg) {
-    _wheel_angle[0] = msg.data;
-  }
-
-  void rightWheelAngleCallback(const std_msgs::Float32& msg) {
-    _wheel_angle[1] = msg.data;
-  }
-
-  void limitDifferentialSpeed(double &diff_speed_left, double &diff_speed_right)
-  {
-	double speed = std::max(std::abs(diff_speed_left), std::abs(diff_speed_right));
-	if (speed > _max_speed) {
-		diff_speed_left *= _max_speed / speed;
-		diff_speed_right *= _max_speed / speed;
-	}
-  }
-
-double linearToAngular(const double &travel) const
-{
-    return travel / 0.065;
-}
-
-double angularToLinear(const double &angle) const
-{
-    return angle * 0.065;
-}
-
 
 };  // class
 
@@ -208,9 +170,9 @@ MyRobotHWInterface::MyRobotHWInterface()
   , start_srv_(nh.advertiseService("start", &MyRobotHWInterface::start_callback, this))
   , stop_srv_(nh.advertiseService("stop", &MyRobotHWInterface::stop_callback, this)) 
   {
-    private_nh.param<double>("wheel_diameter", _wheel_diameter, 0.064);
-    private_nh.param<double>("max_speed", _max_speed, 1.0);
-  
+    private_nh.param<double>("wheel_diameter", _wheel_diameter, 0.06);
+    private_nh.param<double>("max_speed", _max_speed, 2.0);
+
     // Intialize raw data
     std::fill_n(pos, NUM_JOINTS, 0.0);
     std::fill_n(vel, NUM_JOINTS, 0.0);
@@ -230,21 +192,16 @@ MyRobotHWInterface::MyRobotHWInterface()
       jnt_vel_interface.registerHandle(vel_handle);
 
       _wheel_encoder[i] = 0;
+      _last_value[i] = 0;
       _last_wheel_cmd_direction[i] = 0;
     }
     registerInterface(&jnt_state_interface);
     registerInterface(&jnt_vel_interface);
 
-	// Initialize publishers and subscribers
-	left_wheel_vel_pub_ = nh.advertise<std_msgs::Float32>("my_robot/left_wheel_vel", 1);
-	right_wheel_vel_pub_ = nh.advertise<std_msgs::Float32>("my_robot/right_wheel_vel", 1);
+    // Initialize publishers and subscribers
+    left_wheel_encoder_sub_ = nh.subscribe("/zoef/left_encoder", 1, &MyRobotHWInterface::leftWheelEncoderCallback, this);
+    right_wheel_encoder_sub_ = nh.subscribe("/zoef/right_encoder", 1, &MyRobotHWInterface::rightWheelEncoderCallback, this);
 
-	left_wheel_angle_sub_ = nh.subscribe("my_robot/left_wheel_angle", 1, &MyRobotHWInterface::leftWheelAngleCallback, this);
-	right_wheel_angle_sub_ = nh.subscribe("my_robot/right_wheel_angle", 1, &MyRobotHWInterface::rightWheelAngleCallback, this);
-
-	left_wheel_encoder_sub_ = nh.subscribe("left_encoder", 1, &MyRobotHWInterface::leftWheelEncoderCallback, this);
-	right_wheel_encoder_sub_ = nh.subscribe("right_encoder", 1, &MyRobotHWInterface::rightWheelEncoderCallback, this);
-
-	left_wheel_command_pub_ = nh.advertise<std_msgs::Int32>("left_pwm", 1);
-	right_wheel_command_pub_ = nh.advertise<std_msgs::Int32>("right_pwm", 1);
+    left_client = nh.serviceClient<zoef_msgs::SetMotorPWM>("/zoef_pymata/set_left_motor_pwm");
+    right_client = nh.serviceClient<zoef_msgs::SetMotorPWM>("/zoef_pymata/set_right_motor_pwm");
 }
