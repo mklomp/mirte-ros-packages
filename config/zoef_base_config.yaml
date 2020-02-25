@@ -14,9 +14,9 @@ device:
 encoder:
   left_encoder: {device: zoef, pin: 2, ticks_per_wheel: 20}  #No frequency, since it is an interrupt
   right_encoder: {device: zoef, pin: 3, ticks_per_wheel: 20}
-intensity:
-  left_intensity: {device: zoef, frequency: 10, pin: 1} #NOTE: A1
-  right_intensity: {device: zoef, frequency: 10, pin: 2} #NOTE: A2 
+#intensity:
+#  left_intensity: {device: zoef, frequency: 10, pin: 1} #NOTE: A1
+#  right_intensity: {device: zoef, frequency: 10, pin: 2} #NOTE: A2 
 motor:   #TODO: make possbile to run MX1919 with 5V and L298N with 12V
   left_motor:
     device: zoef

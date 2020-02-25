@@ -126,10 +126,22 @@ def set_motor_pwm_service(req, motor):
     set_motor_pwm(req.pwm, motor)
     return SetMotorPWMResponse(True)
 
+def handle_set_pin_mode(req):
+  board.set_pin_mode(req.pin, req.mode, req.type)
+  return SetPinModeResponse(True)
 
 def handle_get_pin_value(req):
-  board.set_pin_mode(req.pin, board.INPUT, board.ANALOG)
-  return get_pin_valueResponse(board.analog_read(req.pin))
+  if req.type == "analog":
+     return GetPinValueResponse(board.analog_read(req.pin))
+  if req.type == "digital":
+     return GetPinValueResponse(board.digital_read(req.pin))
+
+def handle_set_pin_value(req):
+  if req.type == "analog":
+     return SetPinValueResponse(board.analog_write(req.pin, req.value))
+  if req.type == "digital":
+     return SetPinValueResponse(board.digital_write(req.pin, req.value))
+
 
 # Publish distance sensor
 def publish_distance(timer, sensor):
@@ -169,7 +181,9 @@ def listener():
        rospy.Service("/zoef_pymata/set_" + motor + "_pwm", SetMotorPWM, l)
 
     # Services (raw arduino values)
-    rospy.Service('get_pin_value', get_pin_value, handle_get_pin_value)
+    rospy.Service('/zoef/set_pin_mode', SetPinMode, handle_set_pin_mode)
+    rospy.Service('/zoef/set_pin_value', SetPinValue, handle_set_pin_value)
+    rospy.Service('/zoef/get_pin_value', GetPinValue, handle_get_pin_value)
 
     # Timer publishers (sensors)
     for sensor in distance_sensors:
