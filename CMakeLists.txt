@@ -62,7 +62,9 @@ add_service_files(
   GetDistance.srv
   GetIntensity.srv
   GetEncoder.srv
-  get_pin_value.srv
+  SetPinMode.srv
+  GetPinValue.srv
+  SetPinValue.srv
   get_virtual_color.srv
   get_barcode.srv
   SetMotorPWM.srv
