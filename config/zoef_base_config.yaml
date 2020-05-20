@@ -2,11 +2,11 @@ device:
   zoef:
     type: zoef
     dev: "/dev/ttyUSB0"
-#distance:
-#  left_distance:
-#    device: zoef
-#    frequency: 10
-#    pin: [8, 13]   #D10 (trigger), D12 (echo)
+distance:
+  left_distance:
+    device: zoef
+    frequency: 10
+    pin: [8, 13]   #D10 (trigger), D12 (echo)
 #  right_distance:   # BUG: needds to be connected to a digital pin!
 #    device: zoef
 #    frequency: 10
@@ -14,18 +14,18 @@ device:
 encoder:
   left_encoder: {device: zoef, pin: 2, ticks_per_wheel: 20}  #No frequency, since it is an interrupt
   right_encoder: {device: zoef, pin: 3, ticks_per_wheel: 20}
-#intensity:
-#  left_intensity: {device: zoef, frequency: 10, pin: 1} #NOTE: A1
-#  right_intensity: {device: zoef, frequency: 10, pin: 2} #NOTE: A2 
+intensity:
+  left_intensity: {device: zoef, frequency: 10, pin: 1} #NOTE: A1
+  right_intensity: {device: zoef, frequency: 10, pin: 2} #NOTE: A2 
 motor:   #TODO: make possbile to run MX1919 with 5V and L298N with 12V
   left_motor:
     device: zoef
-    pin: [7, 8, 9]  #D7, D8, D9 (PWM)
-#    pin: [9, 11]  #D9 (PWM), D11 (PWM)  FOR MX1919
+#    pin: [7, 8, 9]  #D7, D8, D9 (PWM)
+    pin: [9, 11]  #D9 (PWM), D11 (PWM)  FOR MX1919
   right_motor:
     device: zoef
-    pin: [4, 5, 6]  #D4, D5, D6 (PWM)
-#    pin: [5, 6]  #D5 (PWM), D6 (PWM)    FOR MX1919
+#    pin: [4, 5, 6]  #D4, D5, D6 (PWM)
+    pin: [5, 6]  #D5 (PWM), D6 (PWM)    FOR MX1919
 left_motor: left_motor
 right_motor: right_motor
 #wheel_radius: 0.065
