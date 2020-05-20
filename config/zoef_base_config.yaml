@@ -6,11 +6,11 @@ distance:
   left_distance:
     device: zoef
     frequency: 10
-    pin: [8, 13]   #D10 (trigger), D12 (echo)
+    pin: [10, 12]   #D10 (trigger), D12 (echo)
 #  right_distance:   # BUG: needds to be connected to a digital pin!
 #    device: zoef
 #    frequency: 10
-#    pin: [10, 12]    # pin: [0, 13] on PCB,but connected differently
+#    pin: []    # pin: [0, 13] on PCB,but connected differently
 encoder:
   left_encoder: {device: zoef, pin: 2, ticks_per_wheel: 20}  #No frequency, since it is an interrupt
   right_encoder: {device: zoef, pin: 3, ticks_per_wheel: 20}
