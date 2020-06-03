@@ -1,31 +1,42 @@
 device:
   zoef:
     type: zoef
-    dev: "/dev/ttyUSB0"
+    dev: "/dev/ttyACM0"
 distance:
   left_distance:
     device: zoef
     frequency: 10
-    pin: [10, 12]   #D10 (trigger), D12 (echo)
-#  right_distance:   # BUG: needds to be connected to a digital pin!
-#    device: zoef
-#    frequency: 10
-#    pin: []    # pin: [0, 13] on PCB,but connected differently
+    pin: [14, 13]   #M1, B14 (trigger), B15 (echo)
+  right_distance:
+    device: zoef
+    frequency: 10
+    pin: [7, 6]     #M2, A15 (trigger), B3 (echo)
 encoder:
-  left_encoder: {device: zoef, pin: 2, ticks_per_wheel: 20}  #No frequency, since it is an interrupt
-  right_encoder: {device: zoef, pin: 3, ticks_per_wheel: 20}
+  left_encoder:     #No frequency, since it is an interrupt
+    device: zoef
+    pin: 16         #EN1, B12 (interrupt)
+    ticks_per_wheel: 20
+  right_encoder:    #No frequency, since it is an interrupt
+    device: zoef
+    pin: 15         #EN2, B13 (interrupt)
+    ticks_per_wheel: 20
 intensity:
-  left_intensity: {device: zoef, frequency: 10, pin: 1} #NOTE: A1
-  right_intensity: {device: zoef, frequency: 10, pin: 2} #NOTE: A2 
-motor:   #TODO: make possbile to run MX1919 with 5V and L298N with 12V
+  left_intensity: 
+    device: zoef
+    frequency: 10
+    pin: 0          #NOTE, ANALOG 0. IR1, A0 (currently not using digital pin A12)
+  right_intensity:
+    device: zoef
+    frequency: 10
+    pin: 1          #NOTE, ANALOG 1, IR2, A1 (currently not using digital pin A11)
+motor:
+  type: MX1919      #TODO: make possbile to run MX1919 with 5V and L298N with 12V, currently on nr of pins
   left_motor:
     device: zoef
-#    pin: [7, 8, 9]  #D7, D8, D9 (PWM)
-    pin: [9, 11]  #D9 (PWM), D11 (PWM)  FOR MX1919
+    pin: [11, 1]    #SRF1, A9 (PWM), B8 (PWM)
   right_motor:
     device: zoef
-#    pin: [4, 5, 6]  #D4, D5, D6 (PWM)
-    pin: [5, 6]  #D5 (PWM), D6 (PWM)    FOR MX1919
+    pin: [10, 0]    #SRF2, A10 (PWM), B9 (PWM)
 left_motor: left_motor
 right_motor: right_motor
 #wheel_radius: 0.065
