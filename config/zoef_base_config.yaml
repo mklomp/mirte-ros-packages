@@ -30,7 +30,7 @@ intensity:
     frequency: 10
     pin: 1          #NOTE, ANALOG 1, IR2, A1 (currently not using digital pin A11)
 motor:
-  type: MX1919      #TODO: make possbile to run MX1919 with 5V and L298N with 12V, currently on nr of pins
+#  type: MX1919      #TODO: make possbile to run MX1919 with 5V and L298N with 12V, currently on nr of pins
   left_motor:
     device: zoef
     pin: [14, 13]   #M1, B14 (trigger), B15 (echo)
