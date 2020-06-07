@@ -74,6 +74,7 @@
   <exec_depend>trajectory_msgs</exec_depend>
   <exec_depend>diff_drive_controller</exec_depend>
   <exec_depend>rosbridge_server</exec_depend>
+  <exec_depend>teleop_twist_keyboard</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
