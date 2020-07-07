@@ -10,7 +10,7 @@ distance:
   right_distance:
     device: zoef
     frequency: 10
-    pin: [10, 0]    #SRF2, A10 (PWM), B9 (PWM)
+    pin: [10, 0]    #SRF2, A10 (trigger), B9 (echo)
 encoder:
   left_encoder:     #No frequency, since it is an interrupt
     device: zoef
@@ -23,20 +23,20 @@ encoder:
 intensity:
   left_intensity: 
     device: zoef
-    frequency: 10
+    frequency: 100
     pin: 0          #NOTE, ANALOG 0. IR1, A0 (currently not using digital pin A12)
   right_intensity:
     device: zoef
     frequency: 10
     pin: 1          #NOTE, ANALOG 1, IR2, A1 (currently not using digital pin A11)
 motor:
-  type: MX1919      #TODO: make possbile to run MX1919 with 5V and L298N with 12V, currently on nr of pins
+  #type: MX1919      #TODO: make possbile to run MX1919 with 5V and L298N with 12V, currently on nr of pins
   left_motor:
     device: zoef
-    pin: [14, 13]   #M1, B14 (trigger), B15 (echo)
+    pin: [14, 13]   #M1, B14 (PWM), B15 (PWM)
   right_motor:
     device: zoef
-    pin: [7, 6]     #M2, A15 (trigger), B3 (echo)
+    pin: [7, 6]     #M2, A15 (PWM), B3 (PWM)
 left_motor: left_motor
 right_motor: right_motor
 #wheel_radius: 0.065
