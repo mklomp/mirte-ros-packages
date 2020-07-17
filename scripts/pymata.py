@@ -74,14 +74,12 @@ class EncoderSensorMonitor(SensorMonitor):
         super().__init__(board, pins, pub, poll_freq=poll_freq)
 
     async def start(self):
-         pass #Until this is ported
-#        await self.board.optical_encoder_config(self.pins[0], self.ticks_per_wheel, cb=self.publish_data)
-#        await self.board.optical_encoder_set_mode(mode=True)
+        await self.board.set_pin_mode_optenc(self.pins[0], self.ticks_per_wheel, 2, self.publish_data)
 
-    async def publish_data(publisher, data):
+    async def publish_data(self, data):
        encoder = Encoder()
        encoder.header = self.get_header()
-       encoder.value = data[2][1]
+       encoder.value = data[2]
        self.publisher.publish(encoder)
 
 #TODO: also supprt L298N
@@ -195,7 +193,7 @@ if __name__ == '__main__':
    for s in signals:
       loop.add_signal_handler(s, lambda: asyncio.ensure_future(shutdown(s, loop, board)))
 
-   loop.run_until_complete(board.set_sampling_interval(10)) #100Hz (pymata can go up to 1000Hz, but with ROS the CPU load becomes high and we get a lower max)
+   loop.run_until_complete(board.set_sampling_interval(15)) #66Hz (pymata can go up to 1000Hz, but with ROS the CPU load becomes high and we get a lower max)
    publishers()
    listener()
    loop.run_forever() # same as rospy.spin()
