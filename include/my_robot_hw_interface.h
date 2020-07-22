@@ -56,30 +56,15 @@ public:
 
       int left_pwm  = std::max(std::min(int(cmd[0] / ( 6 * M_PI) * 255), 255), -255);
       if (left_pwm != _last_cmd[0]){
-
-        std::ostringstream os;
-        os << "cmd[0]: " << cmd[0] << " (" << left_pwm << ")" << std::endl; 
-        ROS_INFO_STREAM(os.str());
-
         left_motor_service.request.pwm = left_pwm;
         left_client.call(left_motor_service);
-        os << "done" << std::endl;
-        ROS_INFO_STREAM(os.str());
         _last_cmd[0] = left_pwm;
       }
 
       int right_pwm = std::max(std::min(int(cmd[1] / ( 6 * M_PI) * 255), 255), -255);
       if (right_pwm != _last_cmd[1]){
-
-        std::ostringstream os;
-        os << "cmd[1]: " << cmd[0] << " (" << right_pwm << ")" << std::endl; 
-        ROS_INFO_STREAM(os.str());
-
         right_motor_service.request.pwm = right_pwm;
         right_client.call(right_motor_service);
-        os << "done" << std::endl;
-        ROS_INFO_STREAM(os.str());
-
         _last_cmd[1] = right_pwm;
       }
       // Set the direction in so the read() can use it
@@ -87,9 +72,6 @@ public:
       _last_wheel_cmd_direction[0] = cmd[0] > 0.0 ? 1 : -1;
       _last_wheel_cmd_direction[1] = cmd[1] > 0.0 ? 1 : -1;
 
-//      std::ostringstream os;
-//      os << "Speed data: " << cmd[0] << " (" << left_pwm << ")      ," << cmd[1] << " (" << right_pwm << ")          ";// << get_period().toSec();
-      //ROS_INFO_STREAM(os.str());
     }
  }
 
@@ -116,9 +98,6 @@ public:
     pos[1] += distance_right;
 //    vel[1] = distance_right / period.toSec();
 
-//    std::ostringstream os;
-//    os << "Encoder data: " << _wheel_encoder[0]  << " (" << pos[0] << "),  "  << _wheel_encoder[1]  << " (" << pos[1] << ")"  << period.toSec();
-//    ROS_INFO_STREAM(os.str());
   }
 
 /*
