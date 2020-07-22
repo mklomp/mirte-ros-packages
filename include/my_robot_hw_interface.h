@@ -50,24 +50,28 @@ public:
       //NOTE: this *highly* depends on teh voltage of the motors!!!!
       //For 5V power bank: 255 pwm = 90 ticks/sec -> ca 2 omwenteling/s (4*pi)
       //For 6V power supply: 255 pwm = 120 ticks/sec -> ca 3 omwentelingen/s (6*pi)
+
+
+      // TODO!!!!! For some reason we get a 0 at firts when contuniously moving.
+
       int left_pwm  = std::max(std::min(int(cmd[0] / ( 6 * M_PI) * 255), 255), -255);
-      zoef_msgs::SetMotorPWM left_motor_service;
-      left_motor_service.request.pwm = left_pwm;
-      left_client.call(left_motor_service);
+      if (left_pwm != _last_cmd[0]){
+        left_motor_service.request.pwm = left_pwm;
+        left_client.call(left_motor_service);
+        _last_cmd[0] = left_pwm;
+      }
 
       int right_pwm = std::max(std::min(int(cmd[1] / ( 6 * M_PI) * 255), 255), -255);
-      zoef_msgs::SetMotorPWM right_motor_service;
-      right_motor_service.request.pwm = right_pwm;
-      right_client.call(right_motor_service);
-
+      if (right_pwm != _last_cmd[1]){
+        right_motor_service.request.pwm = right_pwm;
+        right_client.call(right_motor_service);
+        _last_cmd[1] = right_pwm;
+      }
       // Set the direction in so the read() can use it
       // TODO: this does not work propely, because at the end of a series cmd_vel is negative, while the rotation is not
       _last_wheel_cmd_direction[0] = cmd[0] > 0.0 ? 1 : -1;
       _last_wheel_cmd_direction[1] = cmd[1] > 0.0 ? 1 : -1;
 
-      std::ostringstream os;
-      os << "Speed data: " << cmd[0] << " (" << left_pwm << ")      ," << cmd[1] << " (" << right_pwm << ")          ";// << get_period().toSec();
-      //ROS_INFO_STREAM(os.str());
     }
  }
 
@@ -94,9 +98,6 @@ public:
     pos[1] += distance_right;
 //    vel[1] = distance_right / period.toSec();
 
-    std::ostringstream os;
-    os << "Encoder data: " << _wheel_encoder[0]  << " (" << pos[0] << "),  "  << _wheel_encoder[1]  << " (" << pos[1] << ")"  << period.toSec();
-    ROS_INFO_STREAM(os.str());
   }
 
 /*
@@ -126,6 +127,7 @@ private:
   double _max_speed;
   double _wheel_angle[NUM_JOINTS];
   int _wheel_encoder[NUM_JOINTS];
+  int _last_cmd[NUM_JOINTS];
   int _last_value[NUM_JOINTS];
   int _last_wheel_cmd_direction[NUM_JOINTS];
 
@@ -140,6 +142,9 @@ private:
   ros::ServiceClient left_client;
   ros::ServiceClient right_client;
 
+
+  zoef_msgs::SetMotorPWM left_motor_service;
+  zoef_msgs::SetMotorPWM right_motor_service;
 
   bool start_callback(std_srvs::Empty::Request& /*req*/, std_srvs::Empty::Response& /*res*/)
   {
@@ -194,6 +199,7 @@ MyRobotHWInterface::MyRobotHWInterface()
       _wheel_encoder[i] = 0;
       _last_value[i] = 0;
       _last_wheel_cmd_direction[i] = 0;
+      _last_cmd[i] = 0;
     }
     registerInterface(&jnt_state_interface);
     registerInterface(&jnt_vel_interface);
@@ -202,6 +208,9 @@ MyRobotHWInterface::MyRobotHWInterface()
     left_wheel_encoder_sub_ = nh.subscribe("/zoef/left_encoder", 1, &MyRobotHWInterface::leftWheelEncoderCallback, this);
     right_wheel_encoder_sub_ = nh.subscribe("/zoef/right_encoder", 1, &MyRobotHWInterface::rightWheelEncoderCallback, this);
 
-    left_client = nh.serviceClient<zoef_msgs::SetMotorPWM>("/zoef_pymata/set_left_motor_pwm");
-    right_client = nh.serviceClient<zoef_msgs::SetMotorPWM>("/zoef_pymata/set_right_motor_pwm");
+    left_client = nh.serviceClient<zoef_msgs::SetMotorPWM>("/zoef_pymata/set_left_motor_pwm", true);
+    right_client = nh.serviceClient<zoef_msgs::SetMotorPWM>("/zoef_pymata/set_right_motor_pwm", true);
+    left_client.waitForExistence();
+    right_client.waitForExistence();
+
 }
