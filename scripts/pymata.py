@@ -94,13 +94,14 @@ class MX1919Motor():
             self.loop.run_until_complete(self.board.set_pin_mode_pwm_output(pin))
 
     async def set_pwm(self, pwm):
-        if (pwm >= 0):
-          await self.board.pwm_write(self.pins[0], 0)
-          await self.board.pwm_write(self.pins[1], min(abs(pwm) ,255))
-        else:
-          await self.board.pwm_write(self.pins[1], 0)
-          await self.board.pwm_write(self.pins[0], min(abs(pwm) ,255))
-        self.prev_motor_pwm = pwm
+        if (self.prev_motor_pwm != pwm):
+          if (pwm >= 0):
+            await self.board.pwm_write(self.pins[0], 0)
+            await self.board.pwm_write(self.pins[1], min(abs(pwm) ,255))
+          else:
+            await self.board.pwm_write(self.pins[1], 0)
+            await self.board.pwm_write(self.pins[0], min(abs(pwm) ,255))
+          self.prev_motor_pwm = pwm
 
 class L298NMotor():
     def __init__(self, board, pins):
@@ -113,15 +114,16 @@ class L298NMotor():
         self.loop.run_until_complete(self.board.set_pin_mode_pwm_output(pins[2]))  # EN(able)
 
     async def set_pwm(self, pwm):
-        # First, set the pin to 0 (to make sure that not both pins are 1)
-        if (pwm >= 0):
-          await self.board.digital_write(self.pins[1], 0)
-          await self.board.digital_write(self.pins[0], 1)
-        else:
-          await self.board.digital_write(self.pins[0], 0)
-          await self.board.digital_write(self.pins[1], 1)
-        await self.board.pwm_write(self.pins[2], min(abs(pwm) ,255))
-        self.prev_motor_pwm = pwm
+        if (self.prev_motor_pwm != pwm):
+          # First, set the pin to 0 (to make sure that not both pins are 1)
+          if (pwm >= 0):
+            await self.board.digital_write(self.pins[1], 0)
+            await self.board.digital_write(self.pins[0], 1)
+          else:
+            await self.board.digital_write(self.pins[0], 0)
+            await self.board.digital_write(self.pins[1], 1)
+          await self.board.pwm_write(self.pins[2], min(abs(pwm) ,255))
+          self.prev_motor_pwm = pwm
 
 async def set_motor_pwm_service(req, motor):
     await motor.set_pwm(req.pwm)
@@ -219,7 +221,7 @@ if __name__ == '__main__':
    for s in signals:
       loop.add_signal_handler(s, lambda: asyncio.ensure_future(shutdown(s, loop, board)))
 
-   loop.run_until_complete(board.set_sampling_interval(15)) #66Hz (pymata can go up to 1000Hz, but with ROS the CPU load becomes high and we get a lower max)
+   loop.run_until_complete(board.set_sampling_interval(20)) #66Hz (pymata can go up to 1000Hz, but with ROS the CPU load becomes high and we get a lower max)
    publishers()
    listener()
    loop.run_forever() # same as rospy.spin()
