@@ -9,15 +9,15 @@ distance:
   right_distance:
     device: zoef
     connector: SRF1
-#encoder:
-#  left_encoder:
-#    device: zoef
-#    connector: ENCB
-#    ticks_per_wheel: 20
-#  right_encoder:
-#    device: zoef
-#    connector: ENCA
-#    ticks_per_wheel: 20
+encoder:
+  left_encoder:
+    device: zoef
+    connector: ENCB
+    ticks_per_wheel: 20
+  right_encoder:
+    device: zoef
+    connector: ENCA
+    ticks_per_wheel: 20
 intensity:
   left_intensity: 
     device: zoef

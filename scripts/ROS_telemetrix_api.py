@@ -168,7 +168,6 @@ class DistanceSensorMonitor(SensorMonitor):
         super().__init__(board, pins, pub, poll_freq=poll_freq)
 
     async def start(self):
-        print(self.pins)
         await self.board.set_pin_mode_sonar(self.pins["trigger"], self.pins["echo"], self.publish_data)
 
     async def publish_data(self, data):
@@ -215,7 +214,7 @@ class EncoderSensorMonitor(SensorMonitor):
         super().__init__(board, pins, pub, poll_freq=poll_freq)
 
     async def start(self):
-        await self.board.set_pin_mode_optenc(self.pins["pin"], self.ticks_per_wheel, 2, self.publish_data)
+        await self.board.set_pin_mode_encoder(self.pins["pin"], 2, self.ticks_per_wheel, self.publish_data)
 
     async def publish_data(self, data):
        encoder = Encoder()
