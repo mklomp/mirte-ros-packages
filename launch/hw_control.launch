@@ -14,7 +14,7 @@
           pkg="zoef_ros_package"
           type="zoef_ros_package_node" output="screen"/>
 
-    <node name="zoef_telemtrix_zoef"
+    <node name="zoef_telemetrix_zoef"
           pkg="zoef_ros_package"
           type="ROS_telemetrix_api.py" output="screen"/>
 

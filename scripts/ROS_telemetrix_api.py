@@ -154,7 +154,7 @@ class KeypadMonitor(SensorMonitor):
        self.publisher.publish(keypad)
 
        # check if we need to send a pressed message
-       if (self.last_debounced_key is not "") and (self.last_debounced_key is not debounced_key):
+       if (self.last_debounced_key != "") and (self.last_debounced_key is not debounced_key):
           pressed = Keypad()
           pressed.header = self.get_header()
           pressed.key = self.last_debounced_key
@@ -349,7 +349,7 @@ def publishers():
       distance_sensors = rospy.get_param("/zoef/distance")
       distance_sensors = {k: v for k, v in distance_sensors.items() if v['device'] == device}
       for sensor in distance_sensors:
-         distance_publisher = rospy.Publisher('/zoef/' + sensor, Range, queue_size=1)
+         distance_publisher = rospy.Publisher('/zoef/' + sensor, Range, queue_size=1, latch=True)
          monitor = DistanceSensorMonitor(board, get_pin_numbers(distance_sensors[sensor]), distance_publisher, poll_freq=-1)
          tasks.append(loop.create_task(monitor.start()))
 
@@ -372,7 +372,7 @@ def publishers():
       encoder_sensors = rospy.get_param("/zoef/encoder")
       encoder_sensors = {k: v for k, v in encoder_sensors.items() if v['device'] == device}
       for sensor in encoder_sensors:
-         encoder_publisher = rospy.Publisher('/zoef/' + sensor, Encoder, queue_size=1)
+         encoder_publisher = rospy.Publisher('/zoef/' + sensor, Encoder, queue_size=1, latch=True)
          monitor = EncoderSensorMonitor(board, get_pin_numbers(encoder_sensors[sensor]), encoder_publisher, poll_freq=-1, differential=0, ticks_per_wheel=encoder_sensors[sensor]["ticks_per_wheel"])
          tasks.append(loop.create_task(monitor.start()))
 
