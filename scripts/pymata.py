@@ -129,6 +129,11 @@ async def set_motor_pwm_service(req, motor):
     await motor.set_pwm(req.pwm)
     return SetMotorPWMResponse(True)
 
+async def handle_set_led_value(req):
+    led = rospy.get_param("/zoef/led")
+    await board.pwm_write(led["pin"], req.value)
+    return SetLEDValueResponse(True)
+
 async def handle_get_pin_value(req):
   if req.type == "analog":
      data = await board.analog_read(req.pin)
@@ -152,9 +157,16 @@ async def shutdown(signal, loop, board):
     loop.stop()
     exit(0)
 
-def listener():
-
+#TODO: should these services become topics? and then be converted into services in teh other node?
+def listener(loop, board):
     servers = []
+
+    if rospy.has_param("/zoef/led"):
+        led = rospy.get_param("/zoef/led")
+        loop.run_until_complete(board.set_pin_mode_pwm_output(led["pin"]))
+        server = aiorospy.AsyncService('/zoef/set_led_value', SetLEDValue, handle_set_led_value)
+        servers.append(loop.create_task(server.start()))
+
     motors = {}
     if rospy.has_param("/zoef/motor"):
        motors = rospy.get_param("/zoef/motor")
@@ -223,5 +235,5 @@ if __name__ == '__main__':
 
    loop.run_until_complete(board.set_sampling_interval(20)) #66Hz (pymata can go up to 1000Hz, but with ROS the CPU load becomes high and we get a lower max)
    publishers()
-   listener()
+   listener(loop, board)
    loop.run_forever() # same as rospy.spin()
