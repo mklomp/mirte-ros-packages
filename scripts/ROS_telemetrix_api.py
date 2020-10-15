@@ -225,6 +225,11 @@ async def handle_set_led_value(req):
     await board.analog_write(get_pin_numbers(led)["pin"], req.value)
     return SetLEDValueResponse(True)
 
+async def handle_set_servo_angle(req):
+    servo = rospy.get_param("/zoef/servo")
+    await board.servo_write(get_pin_numbers(servo)["pin"], req.angle)
+    return SetServoAngleResponse(True)
+
 async def handle_get_pin_value(req):
   if req.type == "analog":
      data = await board.analog_read(req.pin)
@@ -256,6 +261,12 @@ def listener(loop, board):
         led = rospy.get_param("/zoef/led")
         loop.run_until_complete(board.set_pin_mode_analog_output(get_pin_numbers(led)["pin"]))
         server = aiorospy.AsyncService('/zoef/set_led_value', SetLEDValue, handle_set_led_value)
+        servers.append(loop.create_task(server.start()))
+
+    if rospy.has_param("/zoef/servo"):
+        servo = rospy.get_param("/zoef/servo")
+        loop.run_until_complete(board.set_pin_mode_servo(get_pin_numbers(servo)["pin"]))
+        server = aiorospy.AsyncService('/zoef/set_servo_angle', SetServoAngle, handle_set_servo_angle)
         servers.append(loop.create_task(server.start()))
 
     motors = {}
