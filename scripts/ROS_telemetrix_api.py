@@ -11,7 +11,7 @@ from concurrent.futures import ProcessPoolExecutor
 
 from std_msgs.msg import Int32, Empty, String, Header
 from sensor_msgs.msg import Range
-from zoef_msgs.msg import Encoder, Intensity, IntensityDigital
+from zoef_msgs.msg import *
 
 from zoef_msgs.srv import *
 
@@ -113,6 +113,56 @@ class SensorMonitor:
        header.stamp = rospy.Time.now()
        return header
 
+class KeypadMonitor(SensorMonitor):
+    def __init__(self, board, pins, pub, poll_freq=100, differential=0):
+        self.differential = differential
+        super().__init__(board, pins, pub, poll_freq=poll_freq)
+        self.last_debounce_time = 0
+        self.last_key = ""
+        self.last_debounced_key = ""
+        self.pressed_publisher = rospy.Publisher('/zoef/keypad_pressed', Keypad, queue_size=1)
+
+    async def start(self):
+        await self.board.set_pin_mode_analog_input(self.pins - stm32_analog_offset, self.differential, self.publish_data)
+
+    async def publish_data(self, data):
+       # Determine the key that is pressed
+       key = ""
+       if data[2] < 70:
+          key = "left"
+       elif data[2] < 230:
+          key = "up"
+       elif data[2] < 410:
+          key = "down"
+       elif data[2] < 620:
+          key = "right"
+       elif data[2] < 880:
+          key = "enter"
+
+       # Do some debouncing
+       if self.last_key is not key:
+          self.last_debounce_time = data[3]
+
+       debounced_key = ""
+       if data[3] - self.last_debounce_time > .1:
+          debounced_key = key
+
+       # Publish the last debounced key
+       keypad = Keypad()
+       keypad.header = self.get_header()
+       keypad.key = debounced_key
+       self.publisher.publish(keypad)
+
+       # check if we need to send a pressed message
+       if (self.last_debounced_key is not "") and (self.last_debounced_key is not debounced_key):
+          pressed = Keypad()
+          pressed.header = self.get_header()
+          pressed.key = self.last_debounced_key
+          self.pressed_publisher.publish(pressed)
+
+       self.last_key = key
+       self.last_debounced_key = debounced_key
+
 class DistanceSensorMonitor(SensorMonitor):
     def __init__(self, board, pins, pub, poll_freq=100):
         super().__init__(board, pins, pub, poll_freq=poll_freq)
@@ -144,7 +194,6 @@ class IntensitySensorMonitor(SensorMonitor):
        if self.pins["analog"]:
          await self.board.set_pin_mode_analog_input(self.pins["analog"] - stm32_analog_offset, differential=self.differential, callback=self.publish_analog_data)
        if self.pins["digital"]:
-         print("DIGITAAAAAL ")
          await self.board.set_pin_mode_digital_input(self.pins["digital"], callback=self.publish_digital_data)
 
     async def publish_analog_data(self, data):
@@ -312,6 +361,12 @@ def publishers():
       for sensor in intensity_sensors:
          monitor = IntensitySensorMonitor(board, sensor, poll_freq=-1, differential=0)
          tasks.append(loop.create_task(monitor.start()))
+
+   if rospy.has_param("/zoef/keypad"):
+     keypad = rospy.get_param("/zoef/keypad")
+     keypad_publisher = rospy.Publisher('/zoef/keypad', Keypad, queue_size=1)
+     monitor = KeypadMonitor(board, get_pin_numbers(keypad)['pin'], keypad_publisher, poll_freq=-1, differential=0)
+     tasks.append(loop.create_task(monitor.start()))
 
    encoder_sensors = {}
    if rospy.has_param("/zoef/encoder"):

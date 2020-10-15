@@ -38,9 +38,9 @@ led:
 servo:
   device: zoef
   connector: SERVO
-#keypad:
-#  device: zoef
-#  connector: KEY
+keypad:
+  device: zoef
+  connector: KEY
 motor:
   left_motor:
     device: zoef
