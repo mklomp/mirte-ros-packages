@@ -54,6 +54,8 @@ find_package(catkin REQUIRED COMPONENTS
    Encoder.msg
    color.msg
    Intensity.msg
+   IntensityDigital.msg
+   Keypad.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -62,9 +64,12 @@ add_service_files(
   GetDistance.srv
   GetIntensity.srv
   GetEncoder.srv
+  GetKeypad.srv
   SetPinMode.srv
   GetPinValue.srv
   SetPinValue.srv
+  SetLEDValue.srv
+  SetServoAngle.srv
   get_virtual_color.srv
   get_barcode.srv
   SetMotorPWM.srv
