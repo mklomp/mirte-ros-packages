@@ -15,12 +15,88 @@ from zoef_msgs.msg import Encoder, Intensity
 
 from zoef_msgs.srv import *
 
+# Map to convert from STM32 to pin numbers
+# TODO: maybe convert this into JSON files and load it from there
+# TODO: maybe just make this an list and get the index of the list
+stm32_map = {
+ "B9" : 0,
+ "B8" : 1,
+ "B7" : 2,
+ "B6" : 3,
+ "B5" : 4,
+ "B4" : 5,
+ "B3" : 6,
+ "A15": 7,
+ "A12": 8,
+ "A11": 9,
+ "A10": 10,
+ "A9" : 11,
+ "A8" : 12,
+ "B15": 13,
+ "B14": 14,
+ "B13": 15,
+ "B12": 16,
+ "C13": 16,    # LED
+ "C14": 17,
+ "C15": 18,
+ "A0" : 19,
+ "A1" : 20,
+ "A2" : 21,
+ "A3" : 22,
+ "A4" : 23,
+ "A5" : 24,
+ "A6" : 25,
+ "A7" : 26,
+ "B0" : 27,
+ "B1" : 28,
+ "B10": 29,
+ "B11": 30
+}
+stm32_analog_offset = 19 #TODO: is this still needed in telemetrix?
+
+# Map to convert from Zoef PCB to STM32 pins numbers
+# This should be the same as printed on the PCB
+zoef_pcb_map = {
+ "IR1"  : {"digital": "B1" , "analog": "A0" },
+ "IR2"  : {"digital": "B0" , "analog": "A1" },
+ "SRF1" : {"trigger": "A9" , "echo"  : "B8" },
+ "SRF2" : {"trigger": "A10", "echo"  : "B9" },
+ "I2C1" : {"scl"    : "B6" , "sda"   : "B7" },
+ "I2C2" : {"scl"    : "B10", "sda"   : "B11"},
+ "ENCA" : {"pin"    : "B12"},
+ "ENCB" : {"pin"    : "B13"},
+ "KEY"  : {"pin"    : "A4" },
+ "SERVO": {"pin"    : "B5" },
+ "LED"  : {"pin"    : "B4" },
+ "MA"   : {"1a"     : "A8" , "1b"    : "B3" },
+ "MB"   : {"1a"     : "B14", "1b"    : "B15"}
+}
+
+def get_pin_numbers(component):
+   devices = rospy.get_param('/zoef/device')
+   device = devices[component["device"]]
+   print(component)
+   print(device)
+   pins = {}
+   if device["type"] == "zoef_pcb":
+      mcu = "stm32"
+      pins = zoef_pcb_map[component["connector"]]
+   elif device["type"] == "breadboard":
+      mcu = device["mcu"]
+      pins = component["pins"]
+
+   # convert pin naming to numbers
+   # TODO: add support for nano
+   print(pins)
+   pin_numbers = {}
+   for item in pins:
+      pin_numbers[item] = stm32_map[pins[item]]
+   print(pin_numbers)
+   return pin_numbers
+
 #TODO: move to main, and make sure board does not need to be global
 rospy.init_node('zoef_pymata', anonymous=True)
 device = 'zoef'
-#device = rospy.get_param('~device')
-#devices = rospy.get_param("/zoef/device")
-#dev = devices[device]['dev']
 board = pymata_express.PymataExpress(baud_rate=1000000)
 
 # Abstract Sensor class
@@ -42,7 +118,8 @@ class DistanceSensorMonitor(SensorMonitor):
         super().__init__(board, pins, pub, poll_freq=poll_freq)
 
     async def start(self):
-        await self.board.set_pin_mode_sonar(self.pins[0], self.pins[1], self.publish_data)
+        print(self.pins)
+        await self.board.set_pin_mode_sonar(self.pins["trigger"], self.pins["echo"], self.publish_data)
 
     async def publish_data(self, data):
        range = Range()
@@ -60,7 +137,7 @@ class IntensitySensorMonitor(SensorMonitor):
         super().__init__(board, pins, pub, poll_freq=poll_freq)
 
     async def start(self):
-        await self.board.set_pin_mode_analog_input(self.pins[0], self.publish_data, differential=self.differential)
+        await self.board.set_pin_mode_analog_input(self.pins["analog"] - stm32_analog_offset, self.publish_data, differential=self.differential)
 
     async def publish_data(self, data):
        intensity = Intensity()
@@ -75,7 +152,7 @@ class EncoderSensorMonitor(SensorMonitor):
         super().__init__(board, pins, pub, poll_freq=poll_freq)
 
     async def start(self):
-        await self.board.set_pin_mode_optenc(self.pins[0], self.ticks_per_wheel, 2, self.publish_data)
+        await self.board.set_pin_mode_optenc(self.pins["pin"], self.ticks_per_wheel, 2, self.publish_data)
 
     async def publish_data(self, data):
        encoder = Encoder()
@@ -91,39 +168,39 @@ class MX1919Motor():
         self.prev_motor_pwm = -1000 # why not 0?
         self.loop = asyncio.get_event_loop()
         for pin in self.pins:
-            self.loop.run_until_complete(self.board.set_pin_mode_pwm_output(pin))
+            self.loop.run_until_complete(self.board.set_pin_mode_pwm_output(pins[pin]))
 
     async def set_pwm(self, pwm):
         if (self.prev_motor_pwm != pwm):
           if (pwm >= 0):
-            await self.board.pwm_write(self.pins[0], 0)
-            await self.board.pwm_write(self.pins[1], min(abs(pwm) ,255))
+            await self.board.pwm_write(self.pins["1a"], 0)
+            await self.board.pwm_write(self.pins["1b"], min(abs(pwm) ,255))
           else:
-            await self.board.pwm_write(self.pins[1], 0)
-            await self.board.pwm_write(self.pins[0], min(abs(pwm) ,255))
+            await self.board.pwm_write(self.pins["1b"], 0)
+            await self.board.pwm_write(self.pins["1a"], min(abs(pwm) ,255))
           self.prev_motor_pwm = pwm
 
-class L298NMotor():
-    def __init__(self, board, pins):
-        self.board = board
-        self.pins = pins
-        self.prev_motor_pwm = -1000 # why not 0?
-        self.loop = asyncio.get_event_loop()
-        self.loop.run_until_complete(self.board.set_pin_mode_digital_output(pins[0]))
-        self.loop.run_until_complete(self.board.set_pin_mode_digital_output(pins[1]))
-        self.loop.run_until_complete(self.board.set_pin_mode_pwm_output(pins[2]))  # EN(able)
-
-    async def set_pwm(self, pwm):
-        if (self.prev_motor_pwm != pwm):
-          # First, set the pin to 0 (to make sure that not both pins are 1)
-          if (pwm >= 0):
-            await self.board.digital_write(self.pins[1], 0)
-            await self.board.digital_write(self.pins[0], 1)
-          else:
-            await self.board.digital_write(self.pins[0], 0)
-            await self.board.digital_write(self.pins[1], 1)
-          await self.board.pwm_write(self.pins[2], min(abs(pwm) ,255))
-          self.prev_motor_pwm = pwm
+#class L298NMotor():
+#    def __init__(self, board, pins):
+#        self.board = board
+#        self.pins = pins
+#        self.prev_motor_pwm = -1000 # why not 0?
+#        self.loop = asyncio.get_event_loop()
+#        self.loop.run_until_complete(self.board.set_pin_mode_digital_output(pins[0]))
+#        self.loop.run_until_complete(self.board.set_pin_mode_digital_output(pins[1]))
+#        self.loop.run_until_complete(self.board.set_pin_mode_pwm_output(pins[2]))  # EN(able)
+#
+#    async def set_pwm(self, pwm):
+#        if (self.prev_motor_pwm != pwm):
+#          # First, set the pin to 0 (to make sure that not both pins are 1)
+#          if (pwm >= 0):
+#            await self.board.digital_write(self.pins[1], 0)
+#            await self.board.digital_write(self.pins[0], 1)
+#          else:
+#            await self.board.digital_write(self.pins[0], 0)
+#            await self.board.digital_write(self.pins[1], 1)
+#          await self.board.pwm_write(self.pins[2], min(abs(pwm) ,255))
+#          self.prev_motor_pwm = pwm
 
 async def set_motor_pwm_service(req, motor):
     await motor.set_pwm(req.pwm)
@@ -131,7 +208,7 @@ async def set_motor_pwm_service(req, motor):
 
 async def handle_set_led_value(req):
     led = rospy.get_param("/zoef/led")
-    await board.pwm_write(led["pin"], req.value)
+    await board.pwm_write(get_pin_numbers(led)["pin"], req.value)
     return SetLEDValueResponse(True)
 
 async def handle_get_pin_value(req):
@@ -163,7 +240,7 @@ def listener(loop, board):
 
     if rospy.has_param("/zoef/led"):
         led = rospy.get_param("/zoef/led")
-        loop.run_until_complete(board.set_pin_mode_pwm_output(led["pin"]))
+        loop.run_until_complete(board.set_pin_mode_pwm_output(get_pin_numbers(led)["pin"]))
         server = aiorospy.AsyncService('/zoef/set_led_value', SetLEDValue, handle_set_led_value)
         servers.append(loop.create_task(server.start()))
 
@@ -174,10 +251,10 @@ def listener(loop, board):
 
     for motor in motors:
        # TODO: use variable in config file
-       if (len(motors[motor]['pin']) == 3):
-          motor_obj = L298NMotor(board, motors[motor]["pin"])
-       else:
-          motor_obj = MX1919Motor(board, motors[motor]["pin"])
+#       if (len(motors[motor]['pin']) == 3):
+#          motor_obj = L298NMotor(board, motors[motor]["pin"])
+#       else:
+       motor_obj = MX1919Motor(board, get_pin_numbers(motors[motor]))
        l = lambda req,m=motor_obj: set_motor_pwm_service(req, m)
        server = aiorospy.AsyncService("/zoef_pymata/set_" + motor + "_pwm", SetMotorPWM, l)
        servers.append(loop.create_task(server.start()))
@@ -200,7 +277,7 @@ def publishers():
       distance_sensors = {k: v for k, v in distance_sensors.items() if v['device'] == device}
       for sensor in distance_sensors:
          distance_publisher = rospy.Publisher('/zoef/' + sensor, Range, queue_size=1)
-         monitor = DistanceSensorMonitor(board, distance_sensors[sensor]['pin'], distance_publisher, poll_freq=-1)
+         monitor = DistanceSensorMonitor(board, get_pin_numbers(distance_sensors[sensor]), distance_publisher, poll_freq=-1)
          tasks.append(loop.create_task(monitor.start()))
 
    intensity_sensors = {}
@@ -209,7 +286,7 @@ def publishers():
       intensity_sensors = {k: v for k, v in intensity_sensors.items() if v['device'] == device}
       for sensor in intensity_sensors:
          intensity_publisher = rospy.Publisher('/zoef/' + sensor, Intensity, queue_size=1)
-         monitor = IntensitySensorMonitor(board, [intensity_sensors[sensor]['pin']], intensity_publisher, poll_freq=-1, differential=0)
+         monitor = IntensitySensorMonitor(board, get_pin_numbers(intensity_sensors[sensor]), intensity_publisher, poll_freq=-1, differential=0)
          tasks.append(loop.create_task(monitor.start()))
 
    encoder_sensors = {}
@@ -218,7 +295,7 @@ def publishers():
       encoder_sensors = {k: v for k, v in encoder_sensors.items() if v['device'] == device}
       for sensor in encoder_sensors:
          encoder_publisher = rospy.Publisher('/zoef/' + sensor, Encoder, queue_size=1)
-         monitor = EncoderSensorMonitor(board, [encoder_sensors[sensor]['pin']], encoder_publisher, poll_freq=-1, differential=0, ticks_per_wheel=encoder_sensors[sensor]["ticks_per_wheel"])
+         monitor = EncoderSensorMonitor(board, get_pin_numbers(encoder_sensors[sensor]), encoder_publisher, poll_freq=-1, differential=0, ticks_per_wheel=encoder_sensors[sensor]["ticks_per_wheel"])
          tasks.append(loop.create_task(monitor.start()))
 
    for i in tasks:
