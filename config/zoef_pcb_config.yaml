@@ -5,33 +5,33 @@ device:
 distance:
   left_distance:
     device: zoef
-    connector: SRF1
+    connector: SRF2
   right_distance:
     device: zoef
-    connector: SRF2
+    connector: SRF1
 encoder:
   left_encoder:
     device: zoef
-    connector: ENCA
+    connector: ENCB
     ticks_per_wheel: 20
   right_encoder:
     device: zoef
-    connector: ENCB
+    connector: ENCA
     ticks_per_wheel: 20
 intensity:
   left_intensity: 
     device: zoef
-    connector: IR1
+    connector: IR2
   right_intensity:
     device: zoef
-    connector: IR2
+    connector: IR1
 oled:
   left_oled:
     device: zoef
-    connector: I2C1
+    connector: I2C2
   right_oled:
     device: zoef
-    connector: I2C2
+    connector: I2C1
 led:
   device: zoef
   connector: LED
