@@ -51,9 +51,6 @@ public:
       //For 5V power bank: 255 pwm = 90 ticks/sec -> ca 2 omwenteling/s (4*pi)
       //For 6V power supply: 255 pwm = 120 ticks/sec -> ca 3 omwentelingen/s (6*pi)
 
-
-      // TODO!!!!! For some reason we get a 0 at firts when contuniously moving.
-
       int left_pwm  = std::max(std::min(int(cmd[0] / ( 6 * M_PI) * 255), 255), -255);
       if (left_pwm != _last_cmd[0]){
         left_motor_service.request.pwm = left_pwm;
