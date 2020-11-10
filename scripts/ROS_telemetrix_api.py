@@ -310,7 +310,7 @@ if __name__ == '__main__':
    for s in signals:
       loop.add_signal_handler(s, lambda: asyncio.ensure_future(shutdown(s, loop, board)))
 
-   loop.run_until_complete(board.set_analog_scan_interval(0)) #66Hz (pymata can go up to 1000Hz, but with ROS the CPU load becomes high and we get a lower max)
+   loop.run_until_complete(board.set_analog_scan_interval(20)) #66Hz (pymata can go up to 1000Hz, but with ROS the CPU load becomes high and we get a lower max)
    publishers()
    listener(loop, board)
    loop.run_forever() # same as rospy.spin()
