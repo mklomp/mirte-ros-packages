@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python3.8
 import asyncio
 import sys
 import time
@@ -6,7 +6,7 @@ import math
 import rospy
 import signal
 import aiorospy
-from pymata_express import pymata_express
+from telemetrix_aio import telemetrix_aio
 from concurrent.futures import ProcessPoolExecutor
 
 from std_msgs.msg import Int32, Empty, String, Header
@@ -97,7 +97,7 @@ def get_pin_numbers(component):
 #TODO: move to main, and make sure board does not need to be global
 rospy.init_node('zoef_pymata', anonymous=True)
 device = 'zoef'
-board = pymata_express.PymataExpress(baud_rate=1000000)
+board = telemetrix_aio.TelemetrixAIO()
 
 # Abstract Sensor class
 class SensorMonitor:
@@ -137,7 +137,7 @@ class IntensitySensorMonitor(SensorMonitor):
         super().__init__(board, pins, pub, poll_freq=poll_freq)
 
     async def start(self):
-        await self.board.set_pin_mode_analog_input(self.pins["analog"] - stm32_analog_offset, self.publish_data, differential=self.differential)
+        await self.board.set_pin_mode_analog_input(self.pins["analog"] - stm32_analog_offset, differential=self.differential, callback=self.publish_data)
 
     async def publish_data(self, data):
        intensity = Intensity()
@@ -168,16 +168,16 @@ class MX1919Motor():
         self.prev_motor_pwm = -1000 # why not 0?
         self.loop = asyncio.get_event_loop()
         for pin in self.pins:
-            self.loop.run_until_complete(self.board.set_pin_mode_pwm_output(pins[pin]))
+            self.loop.run_until_complete(self.board.set_pin_mode_analog_output(pins[pin]))
 
     async def set_pwm(self, pwm):
         if (self.prev_motor_pwm != pwm):
           if (pwm >= 0):
-            await self.board.pwm_write(self.pins["1a"], 0)
-            await self.board.pwm_write(self.pins["1b"], min(abs(pwm) ,255))
+            await self.board.analog_write(self.pins["1a"], 0)
+            await self.board.analog_write(self.pins["1b"], min(abs(pwm) ,255))
           else:
-            await self.board.pwm_write(self.pins["1b"], 0)
-            await self.board.pwm_write(self.pins["1a"], min(abs(pwm) ,255))
+            await self.board.analog_write(self.pins["1b"], 0)
+            await self.board.analog_write(self.pins["1a"], min(abs(pwm) ,255))
           self.prev_motor_pwm = pwm
 
 #class L298NMotor():
@@ -208,7 +208,7 @@ async def set_motor_pwm_service(req, motor):
 
 async def handle_set_led_value(req):
     led = rospy.get_param("/zoef/led")
-    await board.pwm_write(get_pin_numbers(led)["pin"], req.value)
+    await board.analog_write(get_pin_numbers(led)["pin"], req.value)
     return SetLEDValueResponse(True)
 
 async def handle_get_pin_value(req):
@@ -221,8 +221,8 @@ async def handle_get_pin_value(req):
 
 async def handle_set_pin_value(req):
   if req.type == "analog":
-     await board.set_pin_mode_pwm_output(req.pin)
-     return SetPinValueResponse(await board.pwm_write(req.pin, req.value))
+     await board.set_pin_mode_analog_output(req.pin)
+     return SetPinValueResponse(await board.analog_write(req.pin, req.value))
   if req.type == "digital":
      return SetPinValueResponse(await board.digital_write(req.pin, req.value))
 
@@ -240,7 +240,7 @@ def listener(loop, board):
 
     if rospy.has_param("/zoef/led"):
         led = rospy.get_param("/zoef/led")
-        loop.run_until_complete(board.set_pin_mode_pwm_output(get_pin_numbers(led)["pin"]))
+        loop.run_until_complete(board.set_pin_mode_analog_output(get_pin_numbers(led)["pin"]))
         server = aiorospy.AsyncService('/zoef/set_led_value', SetLEDValue, handle_set_led_value)
         servers.append(loop.create_task(server.start()))
 
@@ -310,7 +310,7 @@ if __name__ == '__main__':
    for s in signals:
       loop.add_signal_handler(s, lambda: asyncio.ensure_future(shutdown(s, loop, board)))
 
-   loop.run_until_complete(board.set_sampling_interval(20)) #66Hz (pymata can go up to 1000Hz, but with ROS the CPU load becomes high and we get a lower max)
+   loop.run_until_complete(board.set_analog_scan_interval(0)) #66Hz (pymata can go up to 1000Hz, but with ROS the CPU load becomes high and we get a lower max)
    publishers()
    listener(loop, board)
    loop.run_forever() # same as rospy.spin()

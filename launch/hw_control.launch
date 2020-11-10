@@ -14,9 +14,9 @@
           pkg="zoef_ros_package"
           type="zoef_ros_package_node" output="screen"/>
 
-    <node name="zoef_pymata_zoef"
+    <node name="zoef_telemtrix_zoef"
           pkg="zoef_ros_package"
-          type="pymata.py" output="screen"/>
+          type="ROS_telemetrix_api.py" output="screen"/>
 
     <!-- <node name="my_robot_camera"
           pkg="zoef_ros_package"
