@@ -11,7 +11,7 @@ from concurrent.futures import ProcessPoolExecutor
 
 from std_msgs.msg import Int32, Empty, String, Header
 from sensor_msgs.msg import Range
-from zoef_msgs.msg import Encoder, Intensity
+from zoef_msgs.msg import Encoder, Intensity, IntensityDigital
 
 from zoef_msgs.srv import *
 
@@ -132,18 +132,32 @@ class DistanceSensorMonitor(SensorMonitor):
        self.publisher.publish(range)
 
 class IntensitySensorMonitor(SensorMonitor):
-    def __init__(self, board, pins, pub, poll_freq=100, differential=0):
+    def __init__(self, board, sensor, poll_freq=100, differential=0):
         self.differential = differential
+        pub = rospy.Publisher('/zoef/' + sensor, Intensity, queue_size=1)
+        self.publisher_digital = rospy.Publisher('/zoef/' + sensor + "_digital", IntensityDigital, queue_size=1)
+        intensity_sensors = rospy.get_param("/zoef/intensity")
+        pins = get_pin_numbers(intensity_sensors[sensor])
         super().__init__(board, pins, pub, poll_freq=poll_freq)
 
     async def start(self):
-        await self.board.set_pin_mode_analog_input(self.pins["analog"] - stm32_analog_offset, differential=self.differential, callback=self.publish_data)
+       if self.pins["analog"]:
+         await self.board.set_pin_mode_analog_input(self.pins["analog"] - stm32_analog_offset, differential=self.differential, callback=self.publish_analog_data)
+       if self.pins["digital"]:
+         print("DIGITAAAAAL ")
+         await self.board.set_pin_mode_digital_input(self.pins["digital"], callback=self.publish_digital_data)
 
-    async def publish_data(self, data):
+    async def publish_analog_data(self, data):
        intensity = Intensity()
        intensity.header = self.get_header()
        intensity.value = data[2]
        self.publisher.publish(intensity)
+
+    async def publish_digital_data(self, data):
+       intensity = IntensityDigital()
+       intensity.header = self.get_header()
+       intensity.value = bool(data[2])
+       self.publisher_digital.publish(intensity)
 
 class EncoderSensorMonitor(SensorMonitor):
     def __init__(self, board, pins, pub, poll_freq=100, differential=0, ticks_per_wheel=20):
@@ -285,8 +299,7 @@ def publishers():
       intensity_sensors = rospy.get_param("/zoef/intensity")
       intensity_sensors = {k: v for k, v in intensity_sensors.items() if v['device'] == device}
       for sensor in intensity_sensors:
-         intensity_publisher = rospy.Publisher('/zoef/' + sensor, Intensity, queue_size=1)
-         monitor = IntensitySensorMonitor(board, get_pin_numbers(intensity_sensors[sensor]), intensity_publisher, poll_freq=-1, differential=0)
+         monitor = IntensitySensorMonitor(board, sensor, poll_freq=-1, differential=0)
          tasks.append(loop.create_task(monitor.start()))
 
    encoder_sensors = {}

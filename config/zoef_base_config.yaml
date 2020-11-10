@@ -35,9 +35,9 @@ intensity:
 #led:
 #  device: zoef
 #  connector: LED
-#servo:
-#  device: zoef
-#  connector: SERVO
+servo:
+  device: zoef
+  connector: SERVO
 #keypad:
 #  device: zoef
 #  connector: KEY
