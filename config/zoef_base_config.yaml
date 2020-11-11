@@ -32,9 +32,9 @@ intensity:
 #  right_oled:
 #    device: zoef
 #    connector: I2C1
-#led:
-#  device: zoef
-#  connector: LED
+led:
+  device: zoef
+  connector: LED
 servo:
   device: zoef
   connector: SERVO
