@@ -6,7 +6,7 @@
 
     <!-- load zoef parameters -->
     <group ns="zoef">
-        <rosparam file="$(find zoef_ros_package)/config/zoef_base_config.yaml"/>
+        <rosparam file="$(find zoef_ros_package)/config/zoef_nano_config.yaml"/>
     </group>
 
 
