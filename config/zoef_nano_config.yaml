@@ -26,8 +26,11 @@ device:
 #      pin: D3            # pin needs interrupt support
 #    ticks_per_wheel: 20
 intensity:
-  left_intensity: 
+  left:
+    name: left 
     device: zoef
+    max_frequency: 150
+    differential: 0
     pins:
       digital: D7
       analog: A2         # pin needs analog input

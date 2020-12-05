@@ -1,4 +1,5 @@
 #!/usr/bin/env python3.8
+
 import asyncio
 import sys
 import time
@@ -7,19 +8,14 @@ import rospy
 import signal
 import aiorospy
 from telemetrix_aio import telemetrix_aio
-from concurrent.futures import ProcessPoolExecutor
 
+# Import ROS message types
 from std_msgs.msg import Int32, Empty, String, Header
 from sensor_msgs.msg import Range
 from zoef_msgs.msg import *
 
+# Import ROS services
 from zoef_msgs.srv import *
-
-#import nest_asyncio
-#nest_asyncio.apply()
-
-
-loop = asyncio.get_event_loop()
 
 
 # Map to convert from STM32 to pin numbers
@@ -59,9 +55,7 @@ stm32_map = {
  "B10": 29,
  "B11": 30
 }
-stm32_analog_offset = 14 #TODO: is this still needed in telemetrix?
-
-
+stm32_analog_offset = 14
 
 nano_map = {
 "RX0" : 0,
@@ -89,8 +83,6 @@ nano_map = {
 }
 nano_analog_offset = 14
 
-
-
 # Map to convert from Zoef PCB to STM32 pins numbers
 # This should be the same as printed on the PCB
 zoef_pcb_map = {
@@ -109,11 +101,20 @@ zoef_pcb_map = {
  "MB"   : {"1a"     : "B14", "1b"    : "B15"}
 }
 
+# Determine the analog offset, based on the mcu
+# TODO: this shuold be refactored together with the
+# mapping above
+devices = rospy.get_param('/zoef/device')
+analog_offset = 0
+if devices["zoef"]["mcu"] == "stm32":
+   analog_offset = stm32_analog_offset
+else:
+   analog_offset = nano_analog_offset
+
+
 def get_pin_numbers(component):
    devices = rospy.get_param('/zoef/device')
    device = devices[component["device"]]
-   print(component)
-   print(device)
    pins = {}
    if device["type"] == "zoef_pcb":
       mcu = "stm32"
@@ -123,29 +124,22 @@ def get_pin_numbers(component):
       pins = component["pins"]
 
    # convert pin naming to numbers
-   # TODO: add support for nano
-   print(pins)
    pin_numbers = {}
    for item in pins:
       if mcu == "stm32":
          pin_numbers[item] = stm32_map[pins[item]]
       if mcu == "nano":
          pin_numbers[item] = nano_map[pins[item]]
-   print(pin_numbers)
    return pin_numbers
-
-#TODO: move to main, and make sure board does not need to be global
-rospy.init_node('zoef_telemetrix', anonymous=False)  # Only one node can connect with tty
-device = 'zoef'
-board = telemetrix_aio.TelemetrixAIO()
 
 # Abstract Sensor class
 class SensorMonitor:
-    def __init__(self, board, pins, publisher, max_freq=100):
+    def __init__(self, board, sensor, publisher):
         self.board = board
-        self.pins = pins
+        self.pins = get_pin_numbers(sensor)
         self.publisher = publisher
-        self.max_freq = max_freq
+        self.max_freq = sensor["max_frequency"]
+        self.differential = sensor["differential"]
         self.loop = asyncio.get_event_loop()
         self.last_publish_time = -1
 
@@ -160,7 +154,7 @@ class SensorMonitor:
        else:
           now_millis = int(round(time.time() * 1000))
 
-          # always publish the first message (TODO: and mayeb messages that took too long 2x 1/freq?)
+          # always publish the first message (TODO: and maybe messages that took too long 2x 1/freq?)
           if self.last_publish_time == -1:
              self.publisher.publish(data)
              self.last_publish_time = now_millis
@@ -180,7 +174,7 @@ class KeypadMonitor(SensorMonitor):
         self.pressed_publisher = rospy.Publisher('/zoef/keypad_pressed', Keypad, queue_size=1)
 
     async def start(self):
-        await self.board.set_pin_mode_analog_input(self.pins - stm32_analog_offset, self.differential, self.publish_data)
+        await self.board.set_pin_mode_analog_input(self.pins - analog_offset, self.differential, self.publish_data)
 
     async def publish_data(self, data):
        # Determine the key that is pressed
@@ -238,17 +232,16 @@ class DistanceSensorMonitor(SensorMonitor):
        self.publisher.publish(range)
 
 class IntensitySensorMonitor(SensorMonitor):
-    def __init__(self, board, sensor, max_freq=100, differential=0):
-        self.differential = differential
-        pub = rospy.Publisher('/zoef/' + sensor, Intensity, queue_size=1)
-        self.publisher_digital = rospy.Publisher('/zoef/' + sensor + "_digital", IntensityDigital, queue_size=1)
-        intensity_sensors = rospy.get_param("/zoef/intensity")
-        pins = get_pin_numbers(intensity_sensors[sensor])
-        super().__init__(board, pins, pub, max_freq=max_freq)
+    def __init__(self, board, sensor):
+        pub = rospy.Publisher('/zoef/' + sensor["name"] + "_intensity" , Intensity, queue_size=1)
+        super().__init__(board, sensor, pub)
+
+        # Add an extra publisher for the digital data
+        self.publisher_digital = rospy.Publisher('/zoef/' + sensor["name"] + "intensity_digital", IntensityDigital, queue_size=1)
 
     async def start(self):
        if self.pins["analog"]:
-         await self.board.set_pin_mode_analog_input(self.pins["analog"] - stm32_analog_offset, differential=self.differential, callback=self.publish_analog_data)
+         await self.board.set_pin_mode_analog_input(self.pins["analog"] - analog_offset, differential=self.differential, callback=self.publish_analog_data)
        if self.pins["digital"]:
          await self.board.set_pin_mode_digital_input(self.pins["digital"], callback=self.publish_digital_data)
 
@@ -262,7 +255,7 @@ class IntensitySensorMonitor(SensorMonitor):
        intensity = IntensityDigital()
        intensity.header = self.get_header()
        intensity.value = bool(data[2])
-       self.publisher_digital.publish(intensity)
+       self.publish(intensity)
 
 class EncoderSensorMonitor(SensorMonitor):
     def __init__(self, board, pins, pub, max_freq=100, differential=0, ticks_per_wheel=20):
@@ -279,8 +272,7 @@ class EncoderSensorMonitor(SensorMonitor):
        encoder.value = data[2]
        self.publisher.publish(encoder)
 
-#TODO: also supprt L298N
-class MX1919Motor():
+class PWMMotor():
     def __init__(self, board, pins):
         self.board = board
         self.pins = pins
@@ -298,29 +290,6 @@ class MX1919Motor():
             await self.board.analog_write(self.pins["1b"], 0)
             await self.board.analog_write(self.pins["1a"], min(abs(pwm) ,255))
           self.prev_motor_pwm = pwm
-
-#class L298NMotor():
-#    def __init__(self, board, pins):
-#        self.board = board
-#        self.pins = pins
-#        self.prev_motor_pwm = -1000 # why not 0?
-#        self.loop = asyncio.get_event_loop()
-#        self.loop.run_until_complete(self.board.set_pin_mode_digital_output(pins[0]))
-#        self.loop.run_until_complete(self.board.set_pin_mode_digital_output(pins[1]))
-#        self.loop.run_until_complete(self.board.set_pin_mode_pwm_output(pins[2]))  # EN(able)
-#
-#    async def set_pwm(self, pwm):
-#        if (self.prev_motor_pwm != pwm):
-#          # First, set the pin to 0 (to make sure that not both pins are 1)
-#          if (pwm >= 0):
-#            await self.board.digital_write(self.pins[1], 0)
-#            await self.board.digital_write(self.pins[0], 1)
-#          else:
-#            await self.board.digital_write(self.pins[0], 0)
-#            await self.board.digital_write(self.pins[1], 1)
-#          await self.board.pwm_write(self.pins[2], min(abs(pwm) ,255))
-#          self.prev_motor_pwm = pwm
-
 
 async def set_motor_pwm_service(req, motor):
     await motor.set_pwm(req.pwm)
@@ -360,7 +329,7 @@ async def shutdown(signal, loop, board):
     exit(0)
 
 #TODO: should these services become topics? and then be converted into services in teh other node?
-def listener(loop, board):
+def listener(loop, board, device):
     servers = []
 
     if rospy.has_param("/zoef/led"):
@@ -381,11 +350,7 @@ def listener(loop, board):
        motors = {k: v for k, v in motors.items() if v['device'] == device}
 
     for motor in motors:
-       # TODO: use variable in config file
-#       if (len(motors[motor]['pin']) == 3):
-#          motor_obj = L298NMotor(board, motors[motor]["pin"])
-#       else:
-       motor_obj = MX1919Motor(board, get_pin_numbers(motors[motor]))
+       motor_obj = PWMMotor(board, get_pin_numbers(motors[motor]))
        l = lambda req,m=motor_obj: set_motor_pwm_service(req, m)
        server = aiorospy.AsyncService("/zoef_pymata/set_" + motor + "_pwm", SetMotorPWM, l)
        servers.append(loop.create_task(server.start()))
@@ -398,7 +363,7 @@ def listener(loop, board):
     for i in servers:
        loop.run_until_complete(i)
 
-def publishers(loop):
+def publishers(loop, board, device):
    tasks = []
    max_freq = 250
 
@@ -411,13 +376,15 @@ def publishers(loop):
          monitor = DistanceSensorMonitor(board, get_pin_numbers(distance_sensors[sensor]), distance_publisher, max_freq=100)
          tasks.append(loop.create_task(monitor.start()))
 
-   intensity_sensors = {}
+   # Initialize intensity sensors
    if rospy.has_param("/zoef/intensity"):
       intensity_sensors = rospy.get_param("/zoef/intensity")
       intensity_sensors = {k: v for k, v in intensity_sensors.items() if v['device'] == device}
       for sensor in intensity_sensors:
-         monitor = IntensitySensorMonitor(board, sensor, max_freq=100, differential=0)
+         monitor = IntensitySensorMonitor(board, intensity_sensors[sensor])
          tasks.append(loop.create_task(monitor.start()))
+         if intensity_sensors[sensor]["max_frequency"] > max_freq:
+            max_freq = intensity_sensors[sensor]["max_frequency"]
 
    if rospy.has_param("/zoef/keypad"):
      keypad = rospy.get_param("/zoef/keypad")
@@ -449,13 +416,18 @@ def publishers(loop):
 
 
 if __name__ == '__main__':
+   loop = asyncio.get_event_loop()
 
    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
    for s in signals:
       loop.add_signal_handler(s, lambda: asyncio.ensure_future(shutdown(s, loop, board)))
 
-   publishers(loop)
-   listener(loop, board)
+   rospy.init_node('zoef_telemetrix', anonymous=False)  # Only one node can connect with tty
+   device = 'zoef'
+   board = telemetrix_aio.TelemetrixAIO()
+
+   publishers(loop, board, device)
+   listener(loop, board, device)
 
    # Should not be: loop.run_forever() or rospy.spin()
    # Loop forever and give async some time to process
