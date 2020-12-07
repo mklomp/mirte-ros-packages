@@ -171,7 +171,7 @@ class SensorMonitor:
 
 class KeypadMonitor(SensorMonitor):
     def __init__(self, board, pins, pub, max_freq=100, differential=0):
-        pub = rospy.Publisher('/zoef/keypad/' + snesor["name"], Keypad, queue_size=1)
+        pub = rospy.Publisher('/zoef/keypad/' + sensor["name"], Keypad, queue_size=1)
         super().__init__(board, sensor)
         self.last_debounce_time = 0
         self.last_key = ""
@@ -221,7 +221,7 @@ class KeypadMonitor(SensorMonitor):
 
 class DistanceSensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
-        pub = rospy.Publisher('/zoef/' + sensor + "_distance", Range, queue_size=1, latch=True)
+        pub = rospy.Publisher('/zoef/distance/' + sensor["name"], Range, queue_size=1, latch=True)
         super().__init__(board, sensor, pub)
         self.range = Range()
         range.radiation_type = range.ULTRASOUND
@@ -239,11 +239,11 @@ class DistanceSensorMonitor(SensorMonitor):
 
 class IntensitySensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
-        pub = rospy.Publisher('/zoef/' + sensor["name"] + "_intensity" , Intensity, queue_size=1)
+        pub = rospy.Publisher('/zoef/intensity/' + sensor["name"], Intensity, queue_size=1)
         super().__init__(board, sensor, pub)
 
         # Add an extra publisher for the digital data
-        self.publisher_digital = rospy.Publisher('/zoef/' + sensor["name"] + "_intensity_digital", IntensityDigital, queue_size=1)
+        self.publisher_digital = rospy.Publisher('/zoef/intensity/' + sensor["name"] + "_digital", IntensityDigital, queue_size=1)
 
     async def start(self):
         if self.pins["analog"]:
@@ -265,7 +265,7 @@ class IntensitySensorMonitor(SensorMonitor):
 
 class EncoderSensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
-        pub = rospy.Publisher('/zoef/' + sensor + "_encoder", Encoder, queue_size=1, latch=True)
+        pub = rospy.Publisher('/zoef/encoder/' + sensor["name"], Encoder, queue_size=1, latch=True)
         super().__init__(board, sensor)
         self.ticks_per_wheel = sensor["ticks_per_wheel"]
         self.max_freq = -1
