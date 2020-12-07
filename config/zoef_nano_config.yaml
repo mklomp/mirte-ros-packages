@@ -3,42 +3,47 @@ device:
     type: breadboard
     mcu: nano
     samping_interval: 10
-#distance:
-#  left_distance:
-#    device: zoef
-#    pins:
-#      trigger: A3
-#      echo: A4
-#  right_distance:
-#    device: zoef
-#    pins:
-#      trigger: A5
-#      echo: A6
-#encoder:
-#  left_encoder:
-#    device: zoef
-#    pins:
-#      pin: D2            # pin needs interrupt support
-#    ticks_per_wheel: 20
-#  right_encoder:
-#    device: zoef
-#    pins:
-#      pin: D3            # pin needs interrupt support
-#    ticks_per_wheel: 20
+distance:
+  left:
+    name: left
+    device: zoef
+    pins:
+      trigger: A3
+      echo: A4
+  right:
+    name: right
+    device: zoef
+    pins:
+      trigger: A5
+      echo: A6
+encoder:
+  left:
+    name: left
+    device: zoef
+    pins:
+      pin: D2            # pin needs interrupt support
+    ticks_per_wheel: 20
+  right:
+    name: right
+    device: zoef
+    pins:
+      pin: D3            # pin needs interrupt support
+    ticks_per_wheel: 20
 intensity:
   left:
     name: left 
     device: zoef
-    max_frequency: 150
+    max_frequency: 10
     differential: 0
     pins:
       digital: D7
-      analog: A2         # pin needs analog input
-#  right_intensity:
-#    device: zoef
-#    pins:
-#      digital: D8
-#      analog: A1         # pin needs analog input
+      analog: A0         # pin needs analog input
+  right:
+    name: right
+    device: zoef
+    pins:
+      digital: D8
+      analog: A7         # pin needs analog input
 #oled:
 #  left_oled:
 #    device: zoef
@@ -54,16 +59,18 @@ intensity:
 #  pins:
 #    pin: A2                # pin needs analog input
 motor:
-  left_motor:
+  left:
+    name: left
     device: zoef
     pins:
       1a: D5               # pin needs PWM
       1b: D6               # pin needs PWM
-#  right_motor:
-#    device: zoef
-#    pins:
-#      1a: D9               # pin needs PWM
-#      1b: D10              # pin needs PWM
+  right:
+    name: right
+    device: zoef
+    pins:
+      1a: D9               # pin needs PWM
+      1b: D10              # pin needs PWM
 #left_motor: left_motor
 #right_motor: right_motor
 #wheel_radius: 0.065
