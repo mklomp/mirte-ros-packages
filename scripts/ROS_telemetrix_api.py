@@ -180,11 +180,16 @@ class SensorMonitor:
 class KeypadMonitor(SensorMonitor):
     def __init__(self, board, sensor):
         pub = rospy.Publisher('/zoef/keypad/' + sensor["name"], Keypad, queue_size=1)
+        srv = rospy.Service('/zoef/get_keypad_' + sensor["name"], GetKeypad, self.get_data)
         super().__init__(board, sensor, pub)
         self.last_debounce_time = 0
         self.last_key = ""
         self.last_debounced_key = ""
         self.pressed_publisher = rospy.Publisher('/zoef/keypad/' + sensor["name"] + '_pressed', Keypad, queue_size=1)
+        self.last_publish_value = Keypad()
+
+    def get_data(self, req):
+        return GetKeypadResponse(self.last_publish_value.key)
 
     async def start(self):
         await self.board.set_pin_mode_analog_input(self.pins["pin"] - analog_offset, self.differential, self.publish_data)
@@ -230,7 +235,12 @@ class KeypadMonitor(SensorMonitor):
 class DistanceSensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
         pub = rospy.Publisher('/zoef/distance/' + sensor["name"], Range, queue_size=1, latch=True)
+        srv = rospy.Service('/zoef/get_distance_' + sensor["name"], GetDistance, self.get_data)
         super().__init__(board, sensor, pub)
+        self.last_publish_value = Range()
+
+    def get_data(self, req):
+        return GetDistanceResponse(self.last_publish_value.range)
 
     async def start(self):
         await self.board.set_pin_mode_sonar(self.pins["trigger"], self.pins["echo"], self.publish_data)
@@ -252,8 +262,9 @@ class DistanceSensorMonitor(SensorMonitor):
 class DigitalIntensitySensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
         pub = rospy.Publisher('/zoef/intensity/' + sensor["name"] + "_digital", IntensityDigital, queue_size=1, latch=True)
-        #srv = rospy.Service('/zoef_service_api/get_intensity_' + sensor["name"] + "_digital", GetIntensityDigital, self.get_data)
+        srv = rospy.Service('/zoef/get_intensity_' + sensor["name"] + "_digital", GetIntensityDigital, self.get_data)
         super().__init__(board, sensor, pub)
+        self.last_publish_value = IntensityDigital()
 
     def get_data(self, req):
         return GetIntensityDigitalResponse(self.last_publish_value.value)
@@ -270,8 +281,9 @@ class DigitalIntensitySensorMonitor(SensorMonitor):
 class AnalogIntensitySensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
         pub = rospy.Publisher('/zoef/intensity/' + sensor["name"], Intensity, queue_size=1)
-        srv = rospy.Service('/zoef_service_api/get_intensity_' + sensor["name"], GetIntensity, self.get_data)
+        srv = rospy.Service('/zoef/get_intensity_' + sensor["name"], GetIntensity, self.get_data)
         super().__init__(board, sensor, pub)
+        self.last_publish_value = Intensity()
 
     def get_data(self, req):
         return GetIntensityResponse(self.last_publish_value.value)
@@ -288,9 +300,14 @@ class AnalogIntensitySensorMonitor(SensorMonitor):
 class EncoderSensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
         pub = rospy.Publisher('/zoef/encoder/' + sensor["name"], Encoder, queue_size=1, latch=True)
+        srv = rospy.Service('/zoef/get_encoder_' + sensor["name"], GetEncoder, self.get_data)
         super().__init__(board, sensor, pub)
         self.ticks_per_wheel = sensor["ticks_per_wheel"]
         self.max_freq = -1
+        self.last_publish_value = Encoder()
+
+    def get_data(self, req):
+        return GetEncoderResponse(self.last_publish_value.value)
 
     async def start(self):
         await self.board.set_pin_mode_encoder(self.pins["pin"], 2, self.ticks_per_wheel, self.publish_data)
