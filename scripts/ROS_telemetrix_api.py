@@ -370,7 +370,7 @@ async def set_motor_pwm_service(req, motor):
 
 async def handle_set_led_value(req):
     led = rospy.get_param("/zoef/led")
-    await board.analog_write(get_pin_numbers(led)["pin"], req.value)
+    await board.analog_write(get_pin_numbers(led)["pin"], int(min(req.value, 100) / 100.0 * max_pwm_value))
     return SetLEDValueResponse(True)
 
 async def handle_set_servo_angle(req):
@@ -412,17 +412,19 @@ async def shutdown(signal, loop, board):
 def actuators(loop, board, device):
     servers = []
 
+    # TODO: support multiple leds
     if rospy.has_param("/zoef/led"):
-        led = rospy.get_param("/zoef/led")
-        loop.run_until_complete(board.set_pin_mode_analog_output(get_pin_numbers(led)["pin"]))
-        server = aiorospy.AsyncService('/zoef/set_led_value', SetLEDValue, handle_set_led_value)
-        servers.append(loop.create_task(server.start()))
+       led = rospy.get_param("/zoef/led")
+       loop.run_until_complete(board.set_pin_mode_analog_output(get_pin_numbers(led)["pin"]))
+       server = aiorospy.AsyncService('/zoef/set_led_value', SetLEDValue, handle_set_led_value)
+       servers.append(loop.create_task(server.start()))
 
-#    if rospy.has_param("/zoef/servo"):
-#        servo = rospy.get_param("/zoef/servo")
-#        loop.run_until_complete(board.set_pin_mode_servo(get_pin_numbers(servo)["pin"]))
-#        server = aiorospy.AsyncService('/zoef/set_servo_angle', SetServoAngle, handle_set_servo_angle)
-#        servers.append(loop.create_task(server.start()))
+    # TODO: support multiple servo's
+    if rospy.has_param("/zoef/servo"):
+        servo = rospy.get_param("/zoef/servo")
+        loop.run_until_complete(board.set_pin_mode_servo(get_pin_numbers(servo)["pin"]))
+        server = aiorospy.AsyncService('/zoef/set_servo_angle', SetServoAngle, handle_set_servo_angle)
+        servers.append(loop.create_task(server.start()))
 
     if rospy.has_param("/zoef/motor"):
        motors = rospy.get_param("/zoef/motor")
