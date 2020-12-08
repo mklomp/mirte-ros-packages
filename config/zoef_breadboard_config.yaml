@@ -2,47 +2,54 @@ device:
   zoef:
     type: breadboard
     mcu: stm32
-    samping_interval: 10
 distance:
-  left_distance:
+  left:
+    name: left
     device: zoef
     pins:
       trigger: A9
       echo: B8
-  right_distance:
+  right:
+    name: right
     device: zoef
     pins:
       trigger: A10
       echo: B9
 encoder:
-  left_encoder:
+  left:
+    name: left
     device: zoef
     pins:
       pin: B12           # pin needs interrupt support
     ticks_per_wheel: 20
-  right_encoder:
+  right:
+    name: right
     device: zoef
     pins:
       pin: B13           # pin needs interrupt support
     ticks_per_wheel: 20
 intensity:
-  left_intensity: 
+  left:
+    name: left 
     device: zoef
     pins:
       digital: B1
       analog: A0         # pin needs analog input
-  right_intensity:
+  right:
+    name: right
     device: zoef
     pins:
       digital: B0
       analog: A1         # pin needs analog input
 oled:
-  left_oled:
+  left:
+    name: left
     device: zoef
     pins:
       scl: B6
       sda: B7
-  right_oled:
+  right:
+    name: right
     device: zoef
     pins:
       scl: B10
@@ -56,16 +63,20 @@ servo:
   pins:
     pin: B5                # pin needs PWM
 keypad:
-  device: zoef
-  pins:
-    pin: A4                # pin needs analog input
+  yellow:
+    name: keypad
+    device: zoef
+    pins:
+      pin: A4              # pin needs analog input
 motor:
-  left_motor:
+  left:
+    name: left
     device: zoef
     pins:
       1a: A8             # pin needs PWM
       1b: B3             # pin needs PWM
-  right_motor:
+  right:
+    name: right
     device: zoef
     pins:
       1a: B14            # pin needs PWM

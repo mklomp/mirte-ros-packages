@@ -2,7 +2,6 @@ device:
   zoef:
     type: breadboard
     mcu: nano
-    samping_interval: 10
 distance:
   left:
     name: left
@@ -43,21 +42,23 @@ intensity:
     device: zoef
     pins:
       digital: D8
-      analog: A7         # pin needs analog input
+      analog: A1         # pin needs analog input
 #oled:
 #  left_oled:
 #    device: zoef
 #    pins:
 #      scl: A5
 #      sda: A4
-#servo:
-#  device: zoef
-#  pins:
-#    pin: D11               # pin needs PWM
-#keypad:
-#  device: zoef
-#  pins:
-#    pin: A2                # pin needs analog input
+servo:
+  device: zoef
+  pins:
+    pin: D11               # pin needs PWM
+keypad:
+  yellow:
+    name: keypad
+    device: zoef
+    pins:
+      pin: A2              # pin needs analog input
 motor:
   left:
     name: left

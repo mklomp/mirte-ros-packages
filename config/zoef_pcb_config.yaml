@@ -3,35 +3,41 @@ device:
     type: zoef_pcb
     samping_interval: 10
 distance:
-  left_distance:
+  left:
+    name: left
     device: zoef
     connector: SRF2
-  right_distance:
+  right:
+    name: right
     device: zoef
     connector: SRF1
 encoder:
-  left_encoder:
+  left:
+    name: left
     device: zoef
     connector: ENCB
     ticks_per_wheel: 20
-  right_encoder:
+  right:
+    name: right
     device: zoef
     connector: ENCA
     ticks_per_wheel: 20
 intensity:
-  left_intensity: 
+  left:
+    name: left 
     device: zoef
     connector: IR2
-  right_intensity:
+  right:
+    name: right
     device: zoef
     connector: IR1
-oled:
-  left_oled:
-    device: zoef
-    connector: I2C2
-  right_oled:
-    device: zoef
-    connector: I2C1
+#oled:
+#  left_oled:
+#    device: zoef
+#    connector: I2C2
+#  right_oled:
+#    device: zoef
+#    connector: I2C1
 led:
   device: zoef
   connector: LED
@@ -39,13 +45,17 @@ servo:
   device: zoef
   connector: SERVO
 keypad:
-  device: zoef
-  connector: KEY
+  yellow:
+    name: keypad
+    device: zoef
+    connector: KEY
 motor:
-  left_motor:
+  left:
+    name: left
     device: zoef
     connector: MB
-  right_motor:
+  right:
+    name: right
     device: zoef
     connector: MA
 #left_motor: left_motor
