@@ -55,6 +55,7 @@ stm32_map = {
  "B10": 29,
  "B11": 30
 }
+stm32_max_pwm_value = 65535
 stm32_analog_offset = 19
 
 nano_map = {
@@ -81,6 +82,7 @@ nano_map = {
 "A6"  : 20,
 "A7"  : 21
 }
+nano_max_pwm_value = 255
 nano_analog_offset = 14
 
 # Map to convert from Zoef PCB to STM32 pins numbers
@@ -106,11 +108,13 @@ zoef_pcb_map = {
 # mapping above
 devices = rospy.get_param('/zoef/device')
 analog_offset = 0
+max_pwm_value = 0
 if devices["zoef"]["type"] == "zoef_pcb" or devices["zoef"]["mcu"] == "stm32":
    analog_offset = stm32_analog_offset
+   max_pwm_value = stm32_max_pwm_value
 else:
    analog_offset = nano_analog_offset
-
+   max_pwm_value = nano_max_pwm_value
 
 def get_pin_numbers(component):
    devices = rospy.get_param('/zoef/device')
@@ -322,23 +326,46 @@ class PWMMotor():
     def __init__(self, board, pins):
         self.board = board
         self.pins = pins
-        self.prev_motor_pwm = -1000 # why not 0?
+        self.prev_motor_speed = 0
         self.loop = asyncio.get_event_loop()
-        for pin in self.pins:
-            self.loop.run_until_complete(self.board.set_pin_mode_analog_output(pins[pin]))
+        self.initialized = False
 
-    async def set_pwm(self, pwm):
-        if (self.prev_motor_pwm != pwm):
-          if (pwm >= 0):
+    # Ideally one would initialize the pins in the constructor. But
+    # since some mcu's have some voltage on pins when they are not
+    # initialized yet icw some motor controllers that use the
+    # difference between the pins to determine speed and direction
+    # the motor will briefly move when initializing. This is unwanted.
+    # When setting this on the mcu itself the this will be done fast
+    # enough. But using telemetrix is a bit too slow fow this. We
+    # therefore set the pin type on first move, and do this in a way
+    # where is creates a movement in teh same direction.
+    async def init_motors(self, speed):
+        if not self.initialized:
+          if (speed > 0):
+            await self.board.set_pin_mode_analog_output(self.pins["1a"])
+            await self.board.set_pin_mode_analog_output(self.pins["1b"])
+          if (speed < 0):
+            await self.board.set_pin_mode_analog_output(self.pins["1b"])
+            await self.board.set_pin_mode_analog_output(self.pins["1a"])
+          self.initialized = True
+
+    async def set_speed(self, speed):
+        if (self.prev_motor_speed != speed):
+          if (speed == 0):
             await self.board.analog_write(self.pins["1a"], 0)
-            await self.board.analog_write(self.pins["1b"], min(abs(pwm) ,255))
-          else:
             await self.board.analog_write(self.pins["1b"], 0)
-            await self.board.analog_write(self.pins["1a"], min(abs(pwm) ,255))
-          self.prev_motor_pwm = pwm
+          elif (speed > 0):
+            await self.init_motors(speed)
+            await self.board.analog_write(self.pins["1a"], 0)
+            await self.board.analog_write(self.pins["1b"], int(min(speed, 100) / 100.0 * max_pwm_value))
+          elif (speed < 0):
+            await self.init_motors(speed)
+            await self.board.analog_write(self.pins["1b"], 0)
+            await self.board.analog_write(self.pins["1a"], int(min(abs(speed), 100) / 100.0 * max_pwm_value))
+          self.prev_motor_speed = speed
 
 async def set_motor_pwm_service(req, motor):
-    await motor.set_pwm(req.pwm)
+    await motor.set_speed(req.pwm)
     return SetMotorPWMResponse(True)
 
 async def handle_set_led_value(req):
@@ -391,27 +418,25 @@ def actuators(loop, board, device):
         server = aiorospy.AsyncService('/zoef/set_led_value', SetLEDValue, handle_set_led_value)
         servers.append(loop.create_task(server.start()))
 
-    if rospy.has_param("/zoef/servo"):
-        servo = rospy.get_param("/zoef/servo")
-        loop.run_until_complete(board.set_pin_mode_servo(get_pin_numbers(servo)["pin"]))
-        server = aiorospy.AsyncService('/zoef/set_servo_angle', SetServoAngle, handle_set_servo_angle)
-        servers.append(loop.create_task(server.start()))
+#    if rospy.has_param("/zoef/servo"):
+#        servo = rospy.get_param("/zoef/servo")
+#        loop.run_until_complete(board.set_pin_mode_servo(get_pin_numbers(servo)["pin"]))
+#        server = aiorospy.AsyncService('/zoef/set_servo_angle', SetServoAngle, handle_set_servo_angle)
+#        servers.append(loop.create_task(server.start()))
 
-    motors = {}
     if rospy.has_param("/zoef/motor"):
        motors = rospy.get_param("/zoef/motor")
        motors = {k: v for k, v in motors.items() if v['device'] == device}
+       for motor in motors:
+          motor_obj = PWMMotor(board, get_pin_numbers(motors[motor]))
+          l = lambda req,m=motor_obj: set_motor_pwm_service(req, m)
+          server = aiorospy.AsyncService("/zoef/set_" + motor + "_speed", SetMotorPWM, l)
+          servers.append(loop.create_task(server.start()))
 
-    for motor in motors:
-       motor_obj = PWMMotor(board, get_pin_numbers(motors[motor]))
-       l = lambda req,m=motor_obj: set_motor_pwm_service(req, m)
-       server = aiorospy.AsyncService("/zoef_pymata/set_" + motor + "_pwm", SetMotorPWM, l)
-       servers.append(loop.create_task(server.start()))
-
-    server = aiorospy.AsyncService('/zoef/set_pin_value', SetPinValue, handle_set_pin_value)
-    server2 = aiorospy.AsyncService('/zoef/get_pin_value', GetPinValue, handle_get_pin_value)
-    servers.append(loop.create_task(server.start()))
-    servers.append(loop.create_task(server2.start()))
+#    server = aiorospy.AsyncService('/zoef/set_pin_value', SetPinValue, handle_set_pin_value)
+#    server2 = aiorospy.AsyncService('/zoef/get_pin_value', GetPinValue, handle_get_pin_value)
+#    servers.append(loop.create_task(server.start()))
+#    servers.append(loop.create_task(server2.start()))
 
     # Start all async tasks
     # TODO: explain why this will not work when they are started right after they
@@ -511,7 +536,7 @@ if __name__ == '__main__':
    # Initialize all sensors and actuators
    device = 'zoef'
    sensors(loop, board, device)
-#   actuators(loop, board, device)
+   actuators(loop, board, device)
 
    # Should not be: loop.run_forever() or rospy.spin()
    # Loop forever and give async some time to process

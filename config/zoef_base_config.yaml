@@ -27,7 +27,7 @@ intensity:
     name: left 
     device: zoef
     connector: IR2
-    max_frequency: 100
+#    max_frequency: 100
   right:
     name: right
     device: zoef
@@ -50,15 +50,15 @@ keypad:
     name: keypad
     device: zoef
     connector: KEY
-#motor:
-#  left:
-#    name: left
-#    device: zoef
-#    connector: MB
-#  right:
-#    name: right
-#    device: zoef
-#    connector: MA
+motor:
+  left:
+    name: left
+    device: zoef
+    connector: MB
+  right:
+    name: right
+    device: zoef
+    connector: MA
 #left_motor: left_motor
 #right_motor: right_motor
 #wheel_radius: 0.065
