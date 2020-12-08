@@ -63,6 +63,7 @@ add_service_files(
   FILES
   GetDistance.srv
   GetIntensity.srv
+  GetIntensityDigital.srv
   GetEncoder.srv
   GetKeypad.srv
   SetPinMode.srv
