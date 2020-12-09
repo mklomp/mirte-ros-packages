@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.8
-
 import asyncio
+import os
 import sys
 import time
 import math
@@ -398,13 +398,15 @@ async def shutdown(signal, loop, board):
     # Shutdown teh telemtrix board
     await board.shutdown()
 
+    # Stop the asyncio loop
+    loop.stop()
+
     # Shutdown all tasks
     tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
     [task.cancel() for task in tasks]
     await asyncio.gather(*tasks, return_exceptions=True)
 
-    # Stop the asyncio loop and exit
-    loop.stop()
+    # Exit
     exit(0)
 
 # Initialize the actuators. Each actuator will become a service
@@ -519,23 +521,27 @@ def sensors(loop, board, device):
    # data here asap.
    loop.run_until_complete(board.set_analog_scan_interval(int(1000.0/max_freq)))
 
+def send_sigint():
+   os.kill(os.getpid(), signal.SIGINT)
 
 if __name__ == '__main__':
    loop = asyncio.get_event_loop()
 
    # Catch signals to exit properly
+   # We need to do it this way instead of usgin the try/catch
+   # as in the telemetrix examples
    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
    for s in signals:
       loop.add_signal_handler(s, lambda: asyncio.ensure_future(shutdown(s, loop, board)))
 
-   # Initialize the ROS node as anonymous since there
-   # should only be one instnace running.
-   rospy.init_node('zoef_telemetrix', anonymous=False)
-
    # Initialize the telemetrix board
    board = telemetrix_aio.TelemetrixAIO()
 
-   # Initialize all sensors and actuators
+   # Initialize the ROS node as anonymous since there
+   # should only be one instnace running.
+   rospy.init_node('zoef_telemetrix', anonymous=False, disable_signals=False)
+   rospy.on_shutdown(send_sigint)
+
    device = 'zoef'
    sensors(loop, board, device)
    actuators(loop, board, device)
