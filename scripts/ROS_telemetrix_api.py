@@ -364,9 +364,9 @@ class PWMMotor():
             await self.board.analog_write(self.pins["1a"], int(min(abs(speed), 100) / 100.0 * max_pwm_value))
           self.prev_motor_speed = speed
 
-async def set_motor_pwm_service(req, motor):
-    await motor.set_speed(req.pwm)
-    return SetMotorPWMResponse(True)
+async def set_motor_speed_service(req, motor):
+    await motor.set_speed(req.speed)
+    return SetMotorSpeedResponse(True)
 
 async def handle_set_led_value(req):
     led = rospy.get_param("/zoef/led")
@@ -431,8 +431,8 @@ def actuators(loop, board, device):
        motors = {k: v for k, v in motors.items() if v['device'] == device}
        for motor in motors:
           motor_obj = PWMMotor(board, get_pin_numbers(motors[motor]))
-          l = lambda req,m=motor_obj: set_motor_pwm_service(req, m)
-          server = aiorospy.AsyncService("/zoef/set_" + motor + "_speed", SetMotorPWM, l)
+          l = lambda req,m=motor_obj: set_motor_speed_service(req, m)
+          server = aiorospy.AsyncService("/zoef/set_" + motor + "_speed", SetMotorSpeed, l)
           servers.append(loop.create_task(server.start()))
 
 #    server = aiorospy.AsyncService('/zoef/set_pin_value', SetPinValue, handle_set_pin_value)

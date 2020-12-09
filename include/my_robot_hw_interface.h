@@ -16,7 +16,7 @@
 #include <ros/ros.h>
 #include <std_srvs/Empty.h>
 #include <zoef_msgs/Encoder.h>
-#include <zoef_msgs/SetMotorPWM.h>
+#include <zoef_msgs/SetMotorSpeed.h>
 
 // ros_control
 #include <controller_manager/controller_manager.h>
@@ -51,18 +51,18 @@ public:
       //For 5V power bank: 255 pwm = 90 ticks/sec -> ca 2 omwenteling/s (4*pi)
       //For 6V power supply: 255 pwm = 120 ticks/sec -> ca 3 omwentelingen/s (6*pi)
 
-      int left_pwm  = std::max(std::min(int(cmd[0] / ( 6 * M_PI) * 255), 255), -255);
-      if (left_pwm != _last_cmd[0]){
-        left_motor_service.request.pwm = left_pwm;
+      int left_speed  = std::max(std::min(int(cmd[0] / ( 6 * M_PI) * 100), 100), -100);
+      if (left_speed != _last_cmd[0]){
+        left_motor_service.request.speed = left_speed;
         left_client.call(left_motor_service);
-        _last_cmd[0] = left_pwm;
+        _last_cmd[0] = left_speed;
       }
 
-      int right_pwm = std::max(std::min(int(cmd[1] / ( 6 * M_PI) * 255), 255), -255);
-      if (right_pwm != _last_cmd[1]){
-        right_motor_service.request.pwm = right_pwm;
+      int right_speed = std::max(std::min(int(cmd[1] / ( 6 * M_PI) * 100), 100), -100);
+      if (right_speed != _last_cmd[1]){
+        right_motor_service.request.speed = right_speed;
         right_client.call(right_motor_service);
-        _last_cmd[1] = right_pwm;
+        _last_cmd[1] = right_speed;
       }
       // Set the direction in so the read() can use it
       // TODO: this does not work propely, because at the end of a series cmd_vel is negative, while the rotation is not
@@ -140,8 +140,8 @@ private:
   ros::ServiceClient right_client;
 
 
-  zoef_msgs::SetMotorPWM left_motor_service;
-  zoef_msgs::SetMotorPWM right_motor_service;
+  zoef_msgs::SetMotorSpeed left_motor_service;
+  zoef_msgs::SetMotorSpeed right_motor_service;
 
   bool start_callback(std_srvs::Empty::Request& /*req*/, std_srvs::Empty::Response& /*res*/)
   {
@@ -202,13 +202,13 @@ MyRobotHWInterface::MyRobotHWInterface()
     registerInterface(&jnt_vel_interface);
 
     // Initialize publishers and subscribers
-    left_wheel_encoder_sub_ = nh.subscribe("/zoef/left_encoder", 1, &MyRobotHWInterface::leftWheelEncoderCallback, this);
-    right_wheel_encoder_sub_ = nh.subscribe("/zoef/right_encoder", 1, &MyRobotHWInterface::rightWheelEncoderCallback, this);
+    left_wheel_encoder_sub_ = nh.subscribe("/zoef/encoder/left", 1, &MyRobotHWInterface::leftWheelEncoderCallback, this);
+    right_wheel_encoder_sub_ = nh.subscribe("/zoef/encoder/right", 1, &MyRobotHWInterface::rightWheelEncoderCallback, this);
 
 
-    ros::service::waitForService("/zoef_pymata/set_left_motor_pwm");
-    ros::service::waitForService("/zoef_pymata/set_right_motor_pwm");
-    left_client = nh.serviceClient<zoef_msgs::SetMotorPWM>("/zoef_pymata/set_left_motor_pwm", true);
-    right_client = nh.serviceClient<zoef_msgs::SetMotorPWM>("/zoef_pymata/set_right_motor_pwm", true);
+    ros::service::waitForService("/zoef/set_motor_pwm_left");
+    ros::service::waitForService("/zoef/set_motor_pwm_right");
+    left_client = nh.serviceClient<zoef_msgs::SetMotorSpeed>("/zoef/set_motor_speed_left", true);
+    right_client = nh.serviceClient<zoef_msgs::SetMotorSpeed>("/zoef/set_motor_speed_right", true);
     // TODO: checl ion isvalis when running https://answers.ros.org/question/281411/persistent-service-initialization/
 }
