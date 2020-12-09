@@ -73,7 +73,7 @@ add_service_files(
   SetServoAngle.srv
   get_virtual_color.srv
   get_barcode.srv
-  SetMotorPWM.srv
+  SetMotorSpeed.srv
   Move.srv
   Turn.srv
 )
