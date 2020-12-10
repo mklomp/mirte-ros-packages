@@ -1,4 +1,4 @@
-int32 pin
+string pin
 string type
 int32 value
 ---
