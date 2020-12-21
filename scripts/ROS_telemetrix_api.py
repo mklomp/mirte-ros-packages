@@ -21,6 +21,7 @@ from zoef_msgs.srv import *
 # Map to convert from STM32 to pin numbers
 # TODO: maybe convert this into JSON files and load it from there
 # TODO: maybe just make this an list and get the index of the list
+# And/or put this in the param server so teh web interface can also use this
 stm32_map = {
  "B9" : 0,
  "B8" : 1,
@@ -109,12 +110,15 @@ zoef_pcb_map = {
 devices = rospy.get_param('/zoef/device')
 analog_offset = 0
 max_pwm_value = 0
+pin_map = {}
 if devices["zoef"]["type"] == "zoef_pcb" or devices["zoef"]["mcu"] == "stm32":
    analog_offset = stm32_analog_offset
    max_pwm_value = stm32_max_pwm_value
+   pin_map = stm32_map
 else:
    analog_offset = nano_analog_offset
    max_pwm_value = nano_max_pwm_value
+   pin_map = nano_map
 
 def get_pin_numbers(component):
    devices = rospy.get_param('/zoef/device')
@@ -378,20 +382,68 @@ async def handle_set_servo_angle(req):
     await board.servo_write(get_pin_numbers(servo)["pin"], req.angle)
     return SetServoAngleResponse(True)
 
-async def handle_get_pin_value(req):
-  if req.type == "analog":
-     data = await board.analog_read(req.pin)
-     return GetPinValueResponse(data[0])
-  if req.type == "digital":
-     data = await board.digital_read(req.pin)
-     return GetPinValueResponse(data[0])
 
+import nest_asyncio
+nest_asyncio.apply()
+
+# TODO: This needs a full refactor. Probably needs its own class
+# with a member storing all settings of the pins (analog/digital)
+# and whether or not a callback needs to be called.
+# It pwill prbably only need one callback function anyway, pushing
+# the values into the member variable.
+import nest_asyncio
+nest_asyncio.apply()
+
+pin_values = {}
+
+# TODO: and this one probably needs to keep track of
+# time as well, making sure that I can not call
+# this one more often than another pin.
+async def data_callback(data):
+    global pin_values
+    print(data)
+    pin_number = data[1]
+    if data[0] == 3:
+        pin_number += analog_offset
+    pin_values[pin_number] = data[2]
+
+def handle_get_pin_value(req):
+   global pin_values
+   if not req.pin in pin_values:
+      if req.type == "analog":
+         print("heieer analog" )
+         loop.run_until_complete(board.set_pin_mode_analog_input(req.pin - analog_offset, callback=data_callback))
+      if req.type == "digital":
+         print("digitlaal" )
+         loop.run_until_complete(board.set_pin_mode_digital_input(req.pin, callback=data_callback))
+
+   print(pin_values)
+   while not req.pin in pin_values:
+      time.sleep(.00001)
+   value = pin_values[req.pin]
+   return GetPinValueResponse(value)
+
+# TODO: check on existing pin configuration?
 async def handle_set_pin_value(req):
+  # Map pin to the pin map if it is in there, or to
+  # an int if raw pin number
+  if req.pin in pin_map:
+     pin = pin_map[req.pin]
+  else:
+     pin = int(req.pin)
+
   if req.type == "analog":
-     await board.set_pin_mode_analog_output(req.pin)
-     return SetPinValueResponse(await board.analog_write(req.pin, req.value))
+     # This should be a PWM capable pin. Therefore we do not need to
+     # account for the analog_offset. We do need to account for the
+     # max pwm_value though.
+     capped_value = min(req.value, max_pwm_value)
+     await board.set_pin_mode_analog_output(pin)
+     await board.analog_write(pin, capped_value)
   if req.type == "digital":
-     return SetPinValueResponse(await board.digital_write(req.pin, req.value))
+     await board.set_pin_mode_digital_output(pin)
+     await board.digital_write(pin, req.value)
+  return SetPinValueResponse(True)
+
 
 # Shutdown procedure
 async def shutdown(signal, loop, board):
@@ -437,16 +489,12 @@ def actuators(loop, board, device):
           server = aiorospy.AsyncService("/zoef/set_" + motor + "_speed", SetMotorSpeed, l)
           servers.append(loop.create_task(server.start()))
 
-#    server = aiorospy.AsyncService('/zoef/set_pin_value', SetPinValue, handle_set_pin_value)
-#    server2 = aiorospy.AsyncService('/zoef/get_pin_value', GetPinValue, handle_get_pin_value)
-#    servers.append(loop.create_task(server.start()))
-#    servers.append(loop.create_task(server2.start()))
+    # Set a raw pin value
+    server = aiorospy.AsyncService('/zoef/set_pin_value', SetPinValue, handle_set_pin_value)
+    servers.append(loop.create_task(server.start()))
 
-    # Start all async tasks
-    # TODO: explain why this will not work when they are started right after they
-    # are created.
-    for i in servers:
-       loop.run_until_complete(i)
+    return servers
+
 
 # Initialize all sensors based on their definition in ROS param
 # server. For each sensor a topic is created which publishes
@@ -506,11 +554,12 @@ def sensors(loop, board, device):
          # encoder sensors do not need a max_frequency. They are interrupts on
          # on the mcu side.
 
-   # Start all async tasks
-   # TODO: explain why this will not work when they are started right after they
-   # are created.
-   for i in tasks:
-      loop.run_until_complete(i)
+   # Get a raw pin value
+   # TODO: this still needs to be tested. We are waiting on an implementation of ananlog_read()
+   # on the telemetrix side
+   rospy.Service('/zoef/get_pin_value', GetPinValue, handle_get_pin_value)
+   #server = aiorospy.AsyncService('/zoef/get_pin_value', GetPinValue, handle_get_pin_value)
+   #tasks.append(loop.create_task(server.start()))
 
    # For now, we need to set the analog scan interval to teh max_freq. When we set
    # this to 0, we do get the updates from telemetrix as fast as possible. In that
@@ -520,6 +569,9 @@ def sensors(loop, board, device):
    # Maybe there is a better solution for this, to make sure that we get the
    # data here asap.
    loop.run_until_complete(board.set_analog_scan_interval(int(1000.0/max_freq)))
+
+   return tasks
+
 
 def send_sigint():
    os.kill(os.getpid(), signal.SIGINT)
@@ -535,16 +587,20 @@ if __name__ == '__main__':
       loop.add_signal_handler(s, lambda: asyncio.ensure_future(shutdown(s, loop, board)))
 
    # Initialize the telemetrix board
-   board = telemetrix_aio.TelemetrixAIO()
+   board = telemetrix_aio.TelemetrixAIO(loop=loop)
 
    # Initialize the ROS node as anonymous since there
    # should only be one instnace running.
    rospy.init_node('zoef_telemetrix', anonymous=False, disable_signals=False)
    rospy.on_shutdown(send_sigint)
 
+   # Start all tasks for sensors and actuators
    device = 'zoef'
-   sensors(loop, board, device)
-   actuators(loop, board, device)
+   sensor_tasks = sensors(loop, board, device)
+   actuator_tasks = actuators(loop, board, device)
+   all_tasks = sensor_tasks + actuator_tasks
+   for task in all_tasks:
+       loop.run_until_complete(task)
 
    # Should not be: loop.run_forever() or rospy.spin()
    # Loop forever and give async some time to process
