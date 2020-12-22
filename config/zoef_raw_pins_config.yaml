@@ -1,0 +1,78 @@
+device:
+  zoef:
+    type: breadboard
+    mcu: raw             # current setup is an example for the arduino nano
+distance:
+  left:
+    name: left
+    device: zoef
+    pins:
+      trigger: 17
+      echo: 18
+  right:
+    name: right
+    device: zoef
+    pins:
+      trigger: 19
+      echo: 20
+encoder:
+  left:
+    name: left
+    device: zoef
+    pins:
+      pin: 2             # pin needs interrupt support
+    ticks_per_wheel: 20
+  right:
+    name: right
+    device: zoef
+    pins:
+      pin: 3             # pin needs interrupt support
+    ticks_per_wheel: 20
+intensity:
+  left:
+    name: left 
+    device: zoef
+    max_frequency: 10
+    differential: 0
+    pins:
+      digital: 7
+      analog: 0          # pin needs analog input
+  right:
+    name: right
+    device: zoef
+    pins:
+      digital: 8
+      analog: 1          # pin needs analog input
+#oled:
+#  left_oled:
+#    device: zoef
+#    pins:
+#      scl: A5
+#      sda: A4
+servo:
+  device: zoef
+  pins:
+    pin: 11               # pin needs PWM
+keypad:
+  yellow:
+    name: keypad
+    device: zoef
+    pins:
+      pin: 2              # pin needs analog input
+motor:
+  left:
+    name: left
+    device: zoef
+    pins:
+      1a: 5               # pin needs PWM
+      1b: 6               # pin needs PWM
+  right:
+    name: right
+    device: zoef
+    pins:
+      1a: 9               # pin needs PWM
+      1b: 10              # pin needs PWM
+#left_motor: left_motor
+#right_motor: right_motor
+#wheel_radius: 0.065
+#wheel_seperation: 0.13

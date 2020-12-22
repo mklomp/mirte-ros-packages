@@ -115,10 +115,12 @@ if devices["zoef"]["type"] == "zoef_pcb" or devices["zoef"]["mcu"] == "stm32":
    analog_offset = stm32_analog_offset
    max_pwm_value = stm32_max_pwm_value
    pin_map = stm32_map
-else:
+elif devices["zoef"]["mcu"] == "nano":
    analog_offset = nano_analog_offset
    max_pwm_value = nano_max_pwm_value
    pin_map = nano_map
+else:
+   max_pwm_value = 255 # TODO: also make this a setting
 
 def get_pin_numbers(component):
    devices = rospy.get_param('/zoef/device')
@@ -136,8 +138,10 @@ def get_pin_numbers(component):
    for item in pins:
       if mcu == "stm32":
          pin_numbers[item] = stm32_map[pins[item]]
-      if mcu == "nano":
+      elif mcu == "nano":
          pin_numbers[item] = nano_map[pins[item]]
+      else:
+         pin_numbers[item] = pins[item]
    return pin_numbers
 
 # Abstract Sensor class
