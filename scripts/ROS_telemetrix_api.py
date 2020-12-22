@@ -501,7 +501,7 @@ def actuators(loop, board, device):
 # the data.
 def sensors(loop, board, device):
    tasks = []
-   max_freq = 0
+   max_freq = -1
 
    # initialze distance sensors
    if rospy.has_param("/zoef/distance"):
@@ -511,7 +511,7 @@ def sensors(loop, board, device):
          distance_publisher = rospy.Publisher('/zoef/' + sensor, Range, queue_size=1, latch=True)
          monitor = DistanceSensorMonitor(board, distance_sensors[sensor])
          tasks.append(loop.create_task(monitor.start()))
-         if "max_frequency" in distance_sensors[sensor] and distance_sensors[sensor]["max_frequency"] > max_freq:
+         if "max_frequency" in distance_sensors[sensor] and distance_sensors[sensor]["max_frequency"] >= max_freq:
             max_freq = distance_sensors[sensor]["max_frequency"]
          else:
             max_freq = 10
@@ -527,7 +527,7 @@ def sensors(loop, board, device):
          if "digital" in get_pin_numbers(intensity_sensors[sensor]):
             monitor = DigitalIntensitySensorMonitor(board, intensity_sensors[sensor])
             tasks.append(loop.create_task(monitor.start()))
-         if "max_frequency" in intensity_sensors[sensor] and intensity_sensors[sensor]["max_frequency"] > max_freq:
+         if "max_frequency" in intensity_sensors[sensor] and intensity_sensors[sensor]["max_frequency"] >= max_freq:
             max_freq = intensity_sensors[sensor]["max_frequency"]
          else:
             max_freq = 10
@@ -539,7 +539,7 @@ def sensors(loop, board, device):
       for sensor in keypad_sensors:
          monitor = KeypadMonitor(board, keypad_sensors[sensor])
          tasks.append(loop.create_task(monitor.start()))
-         if "max_frequency" in keypad_sensors[sensor] and keypad_sensors[sensor]["max_frequency"] > max_freq:
+         if "max_frequency" in keypad_sensors[sensor] and keypad_sensors[sensor]["max_frequency"] >= max_freq:
             max_freq = keypad_sensors[sensor]["max_frequency"]
          else:
             max_freq = 10
@@ -568,7 +568,10 @@ def sensors(loop, board, device):
    # nest_asyncio icw rospy services.
    # Maybe there is a better solution for this, to make sure that we get the
    # data here asap.
-   loop.run_until_complete(board.set_analog_scan_interval(int(1000.0/max_freq)))
+   if max_freq <= 0:
+      loop.run_until_complete(board.set_analog_scan_interval(0))
+   else:
+      loop.run_until_complete(board.set_analog_scan_interval(int(1000.0/max_freq)))
 
    return tasks
 
