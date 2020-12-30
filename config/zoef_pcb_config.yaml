@@ -31,13 +31,15 @@ intensity:
     name: right
     device: zoef
     connector: IR1
-#oled:
-#  left_oled:
-#    device: zoef
-#    connector: I2C2
-#  right_oled:
-#    device: zoef
-#    connector: I2C1
+oled:
+  left:
+    name: left
+    device: zoef
+    connector: I2C2
+  right:
+    name: right
+    device: zoef
+    connector: I2C1
 led:
   device: zoef
   connector: LED

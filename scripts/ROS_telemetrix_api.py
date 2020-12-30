@@ -1,12 +1,13 @@
 #!/usr/bin/env python3.8
 import asyncio
-import os
+import os, os.path
 import sys
 import time
 import math
 import rospy
 import signal
 import aiorospy
+import io
 from telemetrix_aio import telemetrix_aio
 
 # Import ROS message types
@@ -16,6 +17,18 @@ from zoef_msgs.msg import *
 
 # Import ROS services
 from zoef_msgs.srv import *
+
+from bitstring import BitArray
+import textwrap
+
+from PIL import Image, ImageDraw, ImageFont
+
+#font = ImageFont.truetype("/usr/share/fonts/truetype/terminus.ttf", 12)
+font = ImageFont.truetype("/usr/share/fonts/dejavu/DejaVuSans.ttf", 12)
+
+from adafruit_ssd1306 import _SSD1306
+from concurrent.futures import ThreadPoolExecutor
+executor = ThreadPoolExecutor(10)
 
 
 # Map to convert from STM32 to pin numbers
@@ -255,6 +268,7 @@ class DistanceSensorMonitor(SensorMonitor):
         return GetDistanceResponse(self.last_publish_value.range)
 
     async def start(self):
+        print(self.pins)
         await self.board.set_pin_mode_sonar(self.pins["trigger"], self.pins["echo"], self.publish_data)
 
     async def publish_data(self, data):
@@ -372,6 +386,90 @@ class PWMMotor():
             await self.board.analog_write(self.pins["1a"], int(min(abs(speed), 100) / 100.0 * max_pwm_value))
           self.prev_motor_speed = speed
 
+# Extended adafruit _SSD1306
+class Oled(_SSD1306):
+    def __init__(
+        self, width, height, board, loop, port, addr=0x3C, external_vcc=False, reset=None
+    ):
+        self.board = board
+        self.addr = addr
+        self.temp = bytearray(2)
+        self.i2c_port = port
+        self.loop = asyncio.get_event_loop()
+        # Add an extra byte to the data buffer to hold an I2C data/command byte
+        # to use hardware-compatible I2C transactions.  A memoryview of the
+        # buffer is used to mask this byte from the framebuffer operations
+        # (without a major memory hit as memoryview doesn't copy to a separate
+        # buffer).
+        self.buffer = bytearray(((height // 8) * width) + 1)
+        #self.buffer = bytearray(16)
+        #self.buffer[0] = 0x40  # Set first byte of data buffer to Co=0, D/C=1
+        self.loop.run_until_complete(self.board.set_pin_mode_i2c(i2c_port=self.i2c_port))
+        super().__init__(
+            memoryview(self.buffer)[1:],
+            width,
+            height,
+            external_vcc=external_vcc,
+            reset=reset,
+        )
+
+    def show(self):
+        """Update the display"""
+        xpos0 = 0
+        xpos1 = self.width - 1
+        if self.width == 64:
+            # displays with width of 64 pixels are shifted by 32
+            xpos0 += 32
+            xpos1 += 32
+        if self.width == 72:
+            # displays with width of 72 pixels are shifted by 28
+            xpos0 += 28
+            xpos1 += 28
+        self.write_cmd(0x21) #SET_COL_ADDR)
+        self.write_cmd(xpos0)
+        self.write_cmd(xpos1)
+        self.write_cmd(0x22) #SET_PAGE_ADDR)
+        self.write_cmd(0)
+        self.write_cmd(self.pages - 1)
+        self.write_framebuf()
+
+    def write_cmd(self, cmd):
+        """Send a command to the SPI device"""
+        self.temp[0] = 0x80  # Co=1, D/C#=0
+        self.temp[1] = cmd
+        # this can be called from within a loop (sytarted by write_framebuff) or out of itseflt, without a running loop
+        #loop = self.loop
+        #if loop.is_running():
+        #   loop = asyncio.get_running_loop()
+        #await self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port)
+        #await self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port)
+        self.loop.run_until_complete(self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port)) # await not possible since it is called by parents
+
+    def write_framebuf(self):
+        """Blast out the frame buffer using a single I2C transaction to support
+        hardware I2C interfaces."""
+        #loop = asyncio.get_running_loop()
+        #self.loop.run_until_complete(self.board.i2c_write(60, [0x40]))
+        for i in range(64):  #TODO: can we have higher i2c buffer (limited by firmata 64 bits and wire 32 bits, so actually 16 bits since we need 1 bit)
+            buf = self.buffer[i*16:(i+1)*16+1]
+            buf[0] = 0x40
+            #await self.board.i2c_write(60, buf, i2c_port=self.i2c_port)
+            self.loop.run_until_complete(self.board.i2c_write(60, buf, i2c_port=self.i2c_port)) # can not be awaited, since it is called
+
+    def show_png(self, file):
+      image_file = Image.open(file) # open color image
+      image_file = image_file.convert('1', dither=Image.NONE)
+      # We need to convert this one: https://stackoverflow.com/questions/31077366/pil-cannot-identify-image-file-for-io-bytesio-object
+      byteImgIO = io.BytesIO()
+      image_file.save(byteImgIO, "PNG")
+      byteImgIO.seek(0)
+      image_file = byteImgIO.read()
+      ioFile = io.BytesIO(image_file)
+      image = Image.open(ioFile)
+      self.image(image)
+      self.show()
+
+
 async def set_motor_speed_service(req, motor):
     await motor.set_speed(req.speed)
     return SetMotorSpeedResponse(True)
@@ -427,6 +525,37 @@ def handle_get_pin_value(req):
    value = pin_values[req.pin]
    return GetPinValueResponse(value)
 
+#TODO: make faster with asyncio
+def set_oled_image_service(req, oled):
+    if req.type == "text":
+      text = req.value.replace('\\n', '\n')
+      image = Image.new("1", (128, 64))
+      draw = ImageDraw.Draw(image)
+      split_text = text.splitlines()
+      lines = []
+      for i in split_text:
+         lines.extend(textwrap.wrap(i, width=20))
+
+      y_text = 1
+      for line in lines:
+        width, height = font.getsize(line)
+        draw.text((1, y_text), line, font=font, fill=255)
+        y_text += height
+      oled.image(image)
+      oled.show()
+      return SetOLEDImageResponse(True)
+
+    if req.type == "image":
+      oled.show_png("/usr/local/src/zoef/zoef_oled_images/images/" + req.value + ".png") # open color image
+      return SetOLEDImageResponse(True)
+
+    if req.type == "animation":
+      folder = "/usr/local/src/zoef/zoef_oled_images/animations/" +  req.value + "/"
+      number_of_images = len([name for name in os.listdir(folder) if os.path.isfile(os.path.join(folder, name))])
+      for i in range(number_of_images):
+         oled.show_png(folder + req.value + "_" + str(i) + ".png")
+      return SetOLEDImageResponse(True)
+
 # TODO: check on existing pin configuration?
 async def handle_set_pin_value(req):
   # Map pin to the pin map if it is in there, or to
@@ -469,6 +598,17 @@ async def shutdown(signal, loop, board):
 # which can be called.
 def actuators(loop, board, device):
     servers = []
+
+    if rospy.has_param("/zoef/oled"):
+       oleds = rospy.get_param("/zoef/oled")
+       oleds = {k: v for k, v in oleds.items() if v['device'] == device}
+       oled_id = 0
+       for oled in oleds:
+          oled_obj = Oled(128, 64, board, loop, port=oled_id) #get_pin_numbers(oleds[oled]))
+          l = lambda req,o=oled_obj: set_oled_image_service(req, o)
+          syncServer = rospy.Service("/zoef/set_" + oled + "_image", SetOLEDImage, l)
+          oled_id = oled_id + 1
+       #servers.append(loop.create_task(server.start()))
 
     # TODO: support multiple leds
     if rospy.has_param("/zoef/led"):
