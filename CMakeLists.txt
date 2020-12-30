@@ -70,6 +70,7 @@ add_service_files(
   GetPinValue.srv
   SetPinValue.srv
   SetLEDValue.srv
+  SetOLEDImage.srv
   SetServoAngle.srv
   get_virtual_color.srv
   get_barcode.srv
