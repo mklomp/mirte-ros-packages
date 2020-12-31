@@ -459,14 +459,7 @@ class Oled(_SSD1306):
     def show_png(self, file):
       image_file = Image.open(file) # open color image
       image_file = image_file.convert('1', dither=Image.NONE)
-      # We need to convert this one: https://stackoverflow.com/questions/31077366/pil-cannot-identify-image-file-for-io-bytesio-object
-      byteImgIO = io.BytesIO()
-      image_file.save(byteImgIO, "PNG")
-      byteImgIO.seek(0)
-      image_file = byteImgIO.read()
-      ioFile = io.BytesIO(image_file)
-      image = Image.open(ioFile)
-      self.image(image)
+      self.image(image_file)
       self.show()
 
 
