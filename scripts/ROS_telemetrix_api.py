@@ -53,24 +53,24 @@ stm32_map = {
  "B14": 14,
  "B13": 15,
  "B12": 16,
- "C13": 16,    # LED
- "C14": 17,
- "C15": 18,
- "A0" : 19,
- "A1" : 20,
- "A2" : 21,
- "A3" : 22,
- "A4" : 23,
- "A5" : 24,
- "A6" : 25,
- "A7" : 26,
- "B0" : 27,
- "B1" : 28,
- "B10": 29,
- "B11": 30
+ "C13": 17,    # LED
+ "C14": 18,
+ "C15": 19,
+ "A0" : 20,
+ "A1" : 21,
+ "A2" : 22,
+ "A3" : 23,
+ "A4" : 24,
+ "A5" : 25,
+ "A6" : 26,
+ "A7" : 27,
+ "B0" : 28,
+ "B1" : 29,
+ "B10": 30,
+ "B11": 31
 }
 stm32_max_pwm_value = 65535
-stm32_analog_offset = 19
+stm32_analog_offset = 20
 
 nano_map = {
 "RX0" : 0,
@@ -102,8 +102,8 @@ nano_analog_offset = 14
 # Map to convert from Zoef PCB to STM32 pins numbers
 # This should be the same as printed on the PCB
 zoef_pcb_map = {
- "IR1"  : {"digital": "B10", "analog": "A0" },
- "IR2"  : {"digital": "B1" , "analog": "A1" },
+ "IR1"  : {"digital": "B1" , "analog": "A0" },
+ "IR2"  : {"digital": "B0" , "analog": "A1" },
  "SRF1" : {"trigger": "A9" , "echo"  : "B8" },
  "SRF2" : {"trigger": "A10", "echo"  : "B9" },
  "I2C1" : {"scl"    : "B6" , "sda"   : "B7" },
