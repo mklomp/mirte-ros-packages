@@ -397,6 +397,36 @@ class PWMMotor():
             await self.board.analog_write(self.pins["1a"], int(min(abs(speed), 100) / 100.0 * max_pwm_value))
           self.prev_motor_speed = speed
 
+class L298NMotor():
+    def __init__(self, board, pins):
+        self.board = board
+        self.pins = pins
+        self.prev_motor_speed = 0
+        self.loop = asyncio.get_event_loop()
+        self.initialized = False
+
+    async def init_motors(self):
+        if not self.initialized:
+           await self.board.set_pin_mode_analog_output(self.pins["en"])
+           await self.board.set_pin_mode_digital_output(self.pins["in1"])
+           await self.board.set_pin_mode_digital_output(self.pins["in2"])
+           self.initialized = True
+
+    async def set_speed(self, speed):
+        # Make sure to set first set teh low pin. In this case the H-bridge
+        # will never have two high pins.
+        if (self.prev_motor_speed != speed):
+          self.init_motors()
+          if (speed >= 0):
+            await self.board.digital_write(self.pins["in1"], 0)
+            await self.board.digital_write(self.pins["in2"], 1)
+            await self.board.analog_write(self.pins["en"], int(min(speed, 100) / 100.0 * max_pwm_value))
+          elif (speed < 0):
+            await self.board.digital_write(self.pins["in2"], 0)
+            await self.board.digital_write(self.pins["in1"], 1)
+            await self.board.analog_write(self.pins["en"], int(min(abs(speed), 100) / 100.0 * max_pwm_value))
+          self.prev_motor_speed = speed
+
 # Extended adafruit _SSD1306
 class Oled(_SSD1306):
     def __init__(
@@ -632,7 +662,11 @@ def actuators(loop, board, device):
        motors = rospy.get_param("/zoef/motor")
        motors = {k: v for k, v in motors.items() if v['device'] == device}
        for motor in motors:
-          motor_obj = PWMMotor(board, get_pin_numbers(motors[motor]))
+          motor_obj = {}
+          if motors[motor]["type"] == "l298n":
+             motor_obj = L298NMotor(board, get_pin_numbers(motors[motor]))
+          else:
+             motor_obj = PWMMotor(board, get_pin_numbers(motors[motor]))
           l = lambda req,m=motor_obj: set_motor_speed_service(req, m)
           server = aiorospy.AsyncService("/zoef/set_" + motor + "_speed", SetMotorSpeed, l)
           servers.append(loop.create_task(server.start()))
