@@ -206,9 +206,9 @@ MyRobotHWInterface::MyRobotHWInterface()
     right_wheel_encoder_sub_ = nh.subscribe("/zoef/encoder/right", 1, &MyRobotHWInterface::rightWheelEncoderCallback, this);
 
 
-    ros::service::waitForService("/zoef/set_motor_pwm_left");
-    ros::service::waitForService("/zoef/set_motor_pwm_right");
-    left_client = nh.serviceClient<zoef_msgs::SetMotorSpeed>("/zoef/set_motor_speed_left", true);
-    right_client = nh.serviceClient<zoef_msgs::SetMotorSpeed>("/zoef/set_motor_speed_right", true);
+    ros::service::waitForService("/zoef/set_left_speed");
+    ros::service::waitForService("/zoef/set_right_speed");
+    left_client = nh.serviceClient<zoef_msgs::SetMotorSpeed>("/zoef/set_left_speed", true);
+    right_client = nh.serviceClient<zoef_msgs::SetMotorSpeed>("/zoef/set_right_speed", true);
     // TODO: checl ion isvalis when running https://answers.ros.org/question/281411/persistent-service-initialization/
 }

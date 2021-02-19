@@ -3,10 +3,10 @@ device:
     type: zoef_pcb
     samping_interval: 10
 distance:
-  left:
-    name: left
-    device: zoef
-    connector: SRF2
+#  left:
+#    name: left
+#    device: zoef
+#    connector: SRF2
   right:
     name: right
     device: zoef
@@ -32,10 +32,12 @@ intensity:
     device: zoef
     connector: IR1
 #oled:
-#  left_oled:
+#  left:
+#    name: left
 #    device: zoef
 #    connector: I2C2
-#  right_oled:
+#  right:
+#    name: right
 #    device: zoef
 #    connector: I2C1
 led:
