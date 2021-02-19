@@ -313,18 +313,29 @@ class EncoderSensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
         pub = rospy.Publisher('/zoef/encoder/' + sensor["name"], Encoder, queue_size=1, latch=True)
         srv = rospy.Service('/zoef/get_encoder_' + sensor["name"], GetEncoder, self.get_data)
+        self.speed_pub = rospy.Publisher('/zoef/encoder_speed/' + sensor["name"], Encoder, queue_size=1, latch=True)
         super().__init__(board, sensor, pub)
         self.ticks_per_wheel = sensor["ticks_per_wheel"]
         self.max_freq = -1
         self.last_publish_value = Encoder()
+        self.speed_count = 0
 
     def get_data(self, req):
         return GetEncoderResponse(self.last_publish_value.value)
 
     async def start(self):
         await self.board.set_pin_mode_encoder(self.pins["pin"], 2, self.ticks_per_wheel, self.publish_data)
+        rospy.Timer(rospy.Duration(1.0/10.0), self.publish_speed_data)
+
+    def publish_speed_data(self, event=None):
+        encoder = Encoder()
+        encoder.header = self.get_header()
+        encoder.value = self.speed_count
+        self.speed_count = 0
+        self.speed_pub.publish(encoder)
 
     async def publish_data(self, data):
+        self.speed_count = self.speed_count + 1
         encoder = Encoder()
         encoder.header = self.get_header()
         encoder.value = data[2]
