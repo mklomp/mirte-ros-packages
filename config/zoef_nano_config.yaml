@@ -43,16 +43,23 @@ intensity:
     pins:
       digital: D8
       analog: A1         # pin needs analog input
-#oled:
-#  left_oled:
-#    device: zoef
-#    pins:
-#      scl: A5
-#      sda: A4
+oled:
+  left_oled:
+    device: zoef
+    pins:
+      scl: A5
+      sda: A4
 servo:
-  device: zoef
-  pins:
-    pin: D11               # pin needs PWM
+  left:
+    name: left
+    device: zoef
+    pins:
+      pin: D9               # pin needs PWM
+  right:
+    name: right
+    device: zoef
+    pins:
+      pin: D10               # pin needs PWM
 keypad:
   yellow:
     name: keypad
@@ -63,15 +70,19 @@ motor:
   left:
     name: left
     device: zoef
+    type: l298n
     pins:
-      1a: D5               # pin needs PWM
-      1b: D6               # pin needs PWM
+      en: D5               # pin needs PWM
+      in1: D7
+      in2: D8
   right:
     name: right
     device: zoef
+    type: l298n
     pins:
-      1a: D9               # pin needs PWM
-      1b: D10              # pin needs PWM
+      en: D6               # pin needs PWM
+      in1: D4
+      in2: D12
 #left_motor: left_motor
 #right_motor: right_motor
 #wheel_radius: 0.065
