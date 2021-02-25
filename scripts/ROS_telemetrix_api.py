@@ -416,7 +416,7 @@ class L298NMotor():
         # Make sure to set first set teh low pin. In this case the H-bridge
         # will never have two high pins.
         if (self.prev_motor_speed != speed):
-          self.init_motors()
+          await self.init_motors()
           if (speed >= 0):
             await self.board.digital_write(self.pins["in1"], 0)
             await self.board.digital_write(self.pins["in2"], 1)
