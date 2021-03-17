@@ -102,19 +102,19 @@ nano_analog_offset = 14
 # Map to convert from Zoef PCB to STM32 pins numbers
 # This should be the same as printed on the PCB
 zoef_pcb_map = {
- "IR1"  : {"digital": "B1" , "analog": "A0" },
- "IR2"  : {"digital": "B0" , "analog": "A1" },
- "SRF1" : {"trigger": "A9" , "echo"  : "B8" },
- "SRF2" : {"trigger": "A10", "echo"  : "B9" },
- "I2C1" : {"scl"    : "B6" , "sda"   : "B7" },
- "I2C2" : {"scl"    : "B10", "sda"   : "B11"},
- "ENCA" : {"pin"    : "B12"},
- "ENCB" : {"pin"    : "B13"},
- "KEY"  : {"pin"    : "A4" },
- "SERVO": {"pin"    : "B5" },
- "LED"  : {"pin"    : "B4" },
- "MA"   : {"1a"     : "A8" , "1b"    : "B3" },
- "MB"   : {"1a"     : "B14", "1b"    : "B15"}
+ "IR1"   : {"digital": "B1" , "analog": "A0" },
+ "IR2"   : {"digital": "B0" , "analog": "A1" },
+ "SRF1"  : {"trigger": "A9" , "echo"  : "B8" },
+ "SRF2"  : {"trigger": "A10", "echo"  : "B9" },
+ "I2C1"  : {"scl"    : "B6" , "sda"   : "B7" },
+ "I2C2"  : {"scl"    : "B10", "sda"   : "B11"},
+ "ENCA"  : {"pin"    : "B12"},
+ "ENCB"  : {"pin"    : "B13"},
+ "Keypad": {"pin"    : "A4" },
+ "Servo1": {"pin"    : "B5" },
+ "LED"   : {"pin"    : "B4" },
+ "MA"    : {"1a"     : "A8" , "1b"    : "B3" },
+ "MB"    : {"1a"     : "B14", "1b"    : "B15"}
 }
 
 # Determine the analog offset, based on the mcu
@@ -162,8 +162,6 @@ class SensorMonitor:
     def __init__(self, board, sensor, publisher):
         self.board = board
         self.pins = get_pin_numbers(sensor)
-        print(self.pins)
-        print(analog_offset)
         self.publisher = publisher
         self.max_freq = 10
         if "max_frequency" in sensor:
@@ -270,7 +268,6 @@ class DistanceSensorMonitor(SensorMonitor):
         return GetDistanceResponse(self.last_publish_value.range)
 
     async def start(self):
-        print(self.pins)
         await self.board.set_pin_mode_sonar(self.pins["trigger"], self.pins["echo"], self.publish_data)
 
     async def publish_data(self, data):
@@ -311,7 +308,6 @@ class AnalogIntensitySensorMonitor(SensorMonitor):
         pub = rospy.Publisher('/zoef/intensity/' + sensor["name"], Intensity, queue_size=1)
         srv = rospy.Service('/zoef/get_intensity_' + sensor["name"], GetIntensity, self.get_data)
         super().__init__(board, sensor, pub)
-        print(sensor)
         self.last_publish_value = Intensity()
 
     def get_data(self, req):
@@ -321,7 +317,6 @@ class AnalogIntensitySensorMonitor(SensorMonitor):
         await self.board.set_pin_mode_analog_input(self.pins["analog"] - analog_offset, differential=self.differential, callback=self.publish_data)
 
     async def publish_data(self, data):
-        print(data)
         intensity = Intensity()
         intensity.header = self.get_header()
         intensity.value = data[2]
@@ -333,7 +328,9 @@ class EncoderSensorMonitor(SensorMonitor):
         srv = rospy.Service('/zoef/get_encoder_' + sensor["name"], GetEncoder, self.get_data)
         self.speed_pub = rospy.Publisher('/zoef/encoder_speed/' + sensor["name"], Encoder, queue_size=1, latch=True)
         super().__init__(board, sensor, pub)
-        self.ticks_per_wheel = sensor["ticks_per_wheel"]
+        self.ticks_per_wheel = 20
+        if 'ticks_per_wheel' in sensor:
+           self.ticks_per_wheel = sensor["ticks_per_wheel"]
         self.max_freq = -1
         self.last_publish_value = Encoder()
         self.speed_count = 0
@@ -359,13 +356,38 @@ class EncoderSensorMonitor(SensorMonitor):
         encoder.value = data[2]
         await self.publish(encoder)
 
-class PWMMotor():
-    def __init__(self, board, pins):
+class Servo():
+    def __init__(self, board, servo_obj):
         self.board = board
-        self.pins = pins
+        self.pins = get_pin_numbers(servo_obj)
+        self.name = servo_obj['name']
+
+    async def stop(self):
+        await board.detach_servo(self.pins['pin'])
+
+    async def start(self):
+        await board.set_pin_mode_servo(self.pins['pin'])
+        server = rospy.Service("/zoef/set_" + self.name + "_servo_angle", SetServoAngle, self.set_servo_angle_service)
+
+    def set_servo_angle_service(self, req):
+        asyncio.run(board.servo_write(self.pins['pin'], req.angle))
+        return SetServoAngleResponse(True)
+
+# TODO: create motor classs and inherit from that one
+class PWMMotor():
+    def __init__(self, board, motor_obj):
+        self.board = board
+        self.pins = get_pin_numbers(motor_obj)
+        self.name = motor_obj['name']
         self.prev_motor_speed = 0
-        self.loop = asyncio.get_event_loop()
         self.initialized = False
+
+    async def start(self):
+        server = rospy.Service("/zoef/set_" + self.name + "_speed", SetMotorSpeed, self.set_motor_speed_service)
+
+    def set_motor_speed_service(self, req):
+        asyncio.run(self.set_speed(req.speed))
+        return SetMotorSpeedResponse(True)
 
     # Ideally one would initialize the pins in the constructor. But
     # since some mcu's have some voltage on pins when they are not
@@ -434,13 +456,13 @@ class L298NMotor():
 # Extended adafruit _SSD1306
 class Oled(_SSD1306):
     def __init__(
-        self, width, height, board, loop, port, addr=0x3C, external_vcc=False, reset=None
+        self, width, height, board, oled_obj, port, addr=0x3C, external_vcc=False, reset=None
     ):
         self.board = board
+        self.oled_obj = oled_obj
         self.addr = addr
         self.temp = bytearray(2)
         self.i2c_port = port
-        self.loop = asyncio.get_event_loop()
         # Add an extra byte to the data buffer to hold an I2C data/command byte
         # to use hardware-compatible I2C transactions.  A memoryview of the
         # buffer is used to mask this byte from the framebuffer operations
@@ -449,7 +471,7 @@ class Oled(_SSD1306):
         self.buffer = bytearray(((height // 8) * width) + 1)
         #self.buffer = bytearray(16)
         #self.buffer[0] = 0x40  # Set first byte of data buffer to Co=0, D/C=1
-        self.loop.run_until_complete(self.board.set_pin_mode_i2c(i2c_port=self.i2c_port))
+        asyncio.run(self.board.set_pin_mode_i2c(i2c_port=self.i2c_port))
         super().__init__(
             memoryview(self.buffer)[1:],
             width,
@@ -457,6 +479,40 @@ class Oled(_SSD1306):
             external_vcc=external_vcc,
             reset=reset,
         )
+
+    async def start(self):
+        server = rospy.Service("/zoef/set_" + self.oled_obj['name'] + "_image", SetOLEDImage, self.set_oled_image_service)
+
+    #TODO: make faster with asyncio
+    def set_oled_image_service(self, req):
+      if req.type == "text":
+        text = req.value.replace('\\n', '\n')
+        image = Image.new("1", (128, 64))
+        draw = ImageDraw.Draw(image)
+        split_text = text.splitlines()
+        lines = []
+        for i in split_text:
+          lines.extend(textwrap.wrap(i, width=20))
+
+        y_text = 1
+        for line in lines:
+          width, height = font.getsize(line)
+          draw.text((1, y_text), line, font=font, fill=255)
+          y_text += height
+        self.image(image)
+        self.show()
+
+      if req.type == "image":
+        self.show_png("/usr/local/src/zoef/zoef_oled_images/images/" + req.value + ".png") # open color image
+
+      if req.type == "animation":
+        folder = "/usr/local/src/zoef/zoef_oled_images/animations/" +  req.value + "/"
+        number_of_images = len([name for name in os.listdir(folder) if os.path.isfile(os.path.join(folder, name))])
+        for i in range(number_of_images):
+          self.show_png(folder + req.value + "_" + str(i) + ".png")
+
+      return SetOLEDImageResponse(True)
+
 
     def show(self):
         """Update the display"""
@@ -479,27 +535,15 @@ class Oled(_SSD1306):
         self.write_framebuf()
 
     def write_cmd(self, cmd):
-        """Send a command to the SPI device"""
-        self.temp[0] = 0x80  # Co=1, D/C#=0
+        self.temp[0] = 0x80
         self.temp[1] = cmd
-        # this can be called from within a loop (sytarted by write_framebuff) or out of itseflt, without a running loop
-        #loop = self.loop
-        #if loop.is_running():
-        #   loop = asyncio.get_running_loop()
-        #await self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port)
-        #await self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port)
-        self.loop.run_until_complete(self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port)) # await not possible since it is called by parents
+        asyncio.run(self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port))
 
     def write_framebuf(self):
-        """Blast out the frame buffer using a single I2C transaction to support
-        hardware I2C interfaces."""
-        #loop = asyncio.get_running_loop()
-        #self.loop.run_until_complete(self.board.i2c_write(60, [0x40]))
         for i in range(64):  #TODO: can we have higher i2c buffer (limited by firmata 64 bits and wire 32 bits, so actually 16 bits since we need 1 bit)
             buf = self.buffer[i*16:(i+1)*16+1]
             buf[0] = 0x40
-            #await self.board.i2c_write(60, buf, i2c_port=self.i2c_port)
-            self.loop.run_until_complete(self.board.i2c_write(60, buf, i2c_port=self.i2c_port)) # can not be awaited, since it is called
+            asyncio.run(self.board.i2c_write(60, buf, i2c_port=self.i2c_port))
 
     def show_png(self, file):
       image_file = Image.open(file) # open color image
@@ -507,23 +551,11 @@ class Oled(_SSD1306):
       self.image(image_file)
       self.show()
 
-
-async def set_motor_speed_service(req, motor):
-    await motor.set_speed(req.speed)
-    return SetMotorSpeedResponse(True)
-
 async def handle_set_led_value(req):
     led = rospy.get_param("/zoef/led")
     await board.analog_write(get_pin_numbers(led)["pin"], int(min(req.value, 100) / 100.0 * max_pwm_value))
     return SetLEDValueResponse(True)
 
-async def handle_set_servo_angle(req, servo_pin):
-    await board.servo_write(servo_pin, req.angle)
-    return SetServoAngleResponse(True)
-
-
-#import nest_asyncio
-#nest_asyncio.apply()
 
 # TODO: This needs a full refactor. Probably needs its own class
 # with a member storing all settings of the pins (analog/digital)
@@ -538,7 +570,6 @@ pin_values = {}
 # this one more often than another pin.
 async def data_callback(data):
     global pin_values
-    print(data)
     pin_number = data[1]
     if data[0] == 3:
         pin_number += analog_offset
@@ -548,51 +579,17 @@ def handle_get_pin_value(req):
    global pin_values
    if not req.pin in pin_values:
       if req.type == "analog":
-         print("heieer analog" )
-         loop.run_until_complete(board.set_pin_mode_analog_input(req.pin - analog_offset, callback=data_callback))
+         asyncio.run(board.set_pin_mode_analog_input(req.pin - analog_offset, callback=data_callback))
       if req.type == "digital":
-         print("digitlaal" )
-         loop.run_until_complete(board.set_pin_mode_digital_input(req.pin, callback=data_callback))
+         asyncio.run(board.set_pin_mode_digital_input(req.pin, callback=data_callback))
 
-   print(pin_values)
    while not req.pin in pin_values:
       time.sleep(.00001)
    value = pin_values[req.pin]
    return GetPinValueResponse(value)
 
-#TODO: make faster with asyncio
-def set_oled_image_service(req, oled):
-    if req.type == "text":
-      text = req.value.replace('\\n', '\n')
-      image = Image.new("1", (128, 64))
-      draw = ImageDraw.Draw(image)
-      split_text = text.splitlines()
-      lines = []
-      for i in split_text:
-         lines.extend(textwrap.wrap(i, width=20))
-
-      y_text = 1
-      for line in lines:
-        width, height = font.getsize(line)
-        draw.text((1, y_text), line, font=font, fill=255)
-        y_text += height
-      oled.image(image)
-      oled.show()
-      return SetOLEDImageResponse(True)
-
-    if req.type == "image":
-      oled.show_png("/usr/local/src/zoef/zoef_oled_images/images/" + req.value + ".png") # open color image
-      return SetOLEDImageResponse(True)
-
-    if req.type == "animation":
-      folder = "/usr/local/src/zoef/zoef_oled_images/animations/" +  req.value + "/"
-      number_of_images = len([name for name in os.listdir(folder) if os.path.isfile(os.path.join(folder, name))])
-      for i in range(number_of_images):
-         oled.show_png(folder + req.value + "_" + str(i) + ".png")
-      return SetOLEDImageResponse(True)
-
 # TODO: check on existing pin configuration?
-async def handle_set_pin_value(req):
+def handle_set_pin_value(req):
   # Map pin to the pin map if it is in there, or to
   # an int if raw pin number
   if req.pin in pin_map:
@@ -605,11 +602,13 @@ async def handle_set_pin_value(req):
      # account for the analog_offset. We do need to account for the
      # max pwm_value though.
      capped_value = min(req.value, max_pwm_value)
-     await board.set_pin_mode_analog_output(pin)
-     await board.analog_write(pin, capped_value)
+     asyncio.run(board.set_pin_mode_analog_output(pin))
+     asyncio.run(asyncio.sleep(0.001))
+     asyncio.run(board.analog_write(pin, capped_value))
   if req.type == "digital":
-     await board.set_pin_mode_digital_output(pin)
-     await board.digital_write(pin, req.value)
+     asyncio.run(board.set_pin_mode_digital_output(pin))
+     asyncio.run(asyncio.sleep(0.001))
+     asyncio.run(board.digital_write(pin, req.value))
   return SetPinValueResponse(True)
 
 # Initialize the actuators. Each actuator will become a service
@@ -622,11 +621,9 @@ def actuators(loop, board, device):
        oleds = {k: v for k, v in oleds.items() if v['device'] == device}
        oled_id = 0
        for oled in oleds:
-          oled_obj = Oled(128, 64, board, loop, port=oled_id) #get_pin_numbers(oleds[oled]))
-          l = lambda req,o=oled_obj: set_oled_image_service(req, o)
-          syncServer = rospy.Service("/zoef/set_" + oled + "_image", SetOLEDImage, l)
+          oled_obj = Oled(128, 64, board, oleds[oled], port=oled_id) #get_pin_numbers(oleds[oled]))
           oled_id = oled_id + 1
-       #servers.append(loop.create_task(server.start()))
+          servers.append(loop.create_task(oled_obj.start()))
 
     # TODO: support multiple leds
     if rospy.has_param("/zoef/led"):
@@ -635,32 +632,27 @@ def actuators(loop, board, device):
        server = aiorospy.AsyncService('/zoef/set_led_value', SetLEDValue, handle_set_led_value)
        servers.append(loop.create_task(server.start()))
 
-    if rospy.has_param("/zoef/servo"):
-        servos = rospy.get_param("/zoef/servo")
-        servos = {k: v for k, v in servos.items() if v['device'] == device}
-        for servo in servos:
-           pin = get_pin_numbers(servos[servo])["pin"]
-           loop.run_until_complete(board.set_pin_mode_servo(pin))
-           l = lambda req,p=pin: handle_set_servo_angle(req, p)
-           server = aiorospy.AsyncService('/zoef/set_' + servo + '_servo_angle', SetServoAngle, l)
-           servers.append(loop.create_task(server.start()))
-
     if rospy.has_param("/zoef/motor"):
        motors = rospy.get_param("/zoef/motor")
        motors = {k: v for k, v in motors.items() if v['device'] == device}
        for motor in motors:
           motor_obj = {}
           if motors[motor]["type"] == "l298n":
-             motor_obj = L298NMotor(board, get_pin_numbers(motors[motor]))
+             motor_obj = L298NMotor(board, motors[motor])
           else:
-             motor_obj = PWMMotor(board, get_pin_numbers(motors[motor]))
-          l = lambda req,m=motor_obj: set_motor_speed_service(req, m)
-          server = aiorospy.AsyncService("/zoef/set_" + motor + "_speed", SetMotorSpeed, l)
-          servers.append(loop.create_task(server.start()))
+             motor_obj = PWMMotor(board, motors[motor])
+          servers.append(loop.create_task(motor_obj.start()))
+
+    if rospy.has_param("/zoef/servo"):
+        servos = rospy.get_param("/zoef/servo")
+        servos = {k: v for k, v in servos.items() if v['device'] == device}
+        for servo in servos:
+           servo = Servo(board, servos[servo])
+           servers.append(loop.create_task(servo.start()))
+
 
     # Set a raw pin value
-    server = aiorospy.AsyncService('/zoef/set_pin_value', SetPinValue, handle_set_pin_value)
-    servers.append(loop.create_task(server.start()))
+    server = rospy.Service('/zoef/set_pin_value', SetPinValue, handle_set_pin_value)
 
     return servers
 
@@ -738,9 +730,9 @@ def sensors(loop, board, device):
    # Maybe there is a better solution for this, to make sure that we get the
    # data here asap.
    if max_freq <= 0:
-      loop.run_until_complete(board.set_analog_scan_interval(0))
+      tasks.append(loop.create_task(board.set_analog_scan_interval(0)))
    else:
-      loop.run_until_complete(board.set_analog_scan_interval(int(1000.0/max_freq)))
+      tasks.append(loop.create_task(board.set_analog_scan_interval(int(1000.0/max_freq))))
 
    return tasks
 
@@ -763,7 +755,7 @@ if __name__ == '__main__':
    loop = asyncio.get_event_loop()
 
    # Initialize the telemetrix board
-   board = telemetrix_aio.TelemetrixAIO(loop=loop)
+   board = telemetrix_aio.TelemetrixAIO()
 
    # Catch signals to exit properly
    # We need to do it this way instead of usgin the try/catch
@@ -787,8 +779,8 @@ if __name__ == '__main__':
    # Start all tasks for sensors and actuators
    device = 'zoef'
    sensor_tasks = sensors(loop, board, device)
-   #actuator_tasks = actuators(loop, board, device)
-   all_tasks = sensor_tasks #+ actuator_tasks
+   actuator_tasks = actuators(loop, board, device)
+   all_tasks = sensor_tasks + actuator_tasks
    for task in all_tasks:
        loop.run_until_complete(task)
 
