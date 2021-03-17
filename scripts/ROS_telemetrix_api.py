@@ -162,6 +162,8 @@ class SensorMonitor:
     def __init__(self, board, sensor, publisher):
         self.board = board
         self.pins = get_pin_numbers(sensor)
+        print(self.pins)
+        print(analog_offset)
         self.publisher = publisher
         self.max_freq = 10
         if "max_frequency" in sensor:
@@ -309,6 +311,7 @@ class AnalogIntensitySensorMonitor(SensorMonitor):
         pub = rospy.Publisher('/zoef/intensity/' + sensor["name"], Intensity, queue_size=1)
         srv = rospy.Service('/zoef/get_intensity_' + sensor["name"], GetIntensity, self.get_data)
         super().__init__(board, sensor, pub)
+        print(sensor)
         self.last_publish_value = Intensity()
 
     def get_data(self, req):
@@ -318,6 +321,7 @@ class AnalogIntensitySensorMonitor(SensorMonitor):
         await self.board.set_pin_mode_analog_input(self.pins["analog"] - analog_offset, differential=self.differential, callback=self.publish_data)
 
     async def publish_data(self, data):
+        print(data)
         intensity = Intensity()
         intensity.header = self.get_header()
         intensity.value = data[2]
@@ -518,16 +522,14 @@ async def handle_set_servo_angle(req, servo_pin):
     return SetServoAngleResponse(True)
 
 
-import nest_asyncio
-nest_asyncio.apply()
+#import nest_asyncio
+#nest_asyncio.apply()
 
 # TODO: This needs a full refactor. Probably needs its own class
 # with a member storing all settings of the pins (analog/digital)
 # and whether or not a callback needs to be called.
 # It pwill prbably only need one callback function anyway, pushing
 # the values into the member variable.
-import nest_asyncio
-nest_asyncio.apply()
 
 pin_values = {}
 
@@ -609,23 +611,6 @@ async def handle_set_pin_value(req):
      await board.set_pin_mode_digital_output(pin)
      await board.digital_write(pin, req.value)
   return SetPinValueResponse(True)
-
-
-# Shutdown procedure
-async def shutdown(signal, loop, board):
-    # Shutdown teh telemtrix board
-    await board.shutdown()
-
-    # Stop the asyncio loop
-    loop.stop()
-
-    # Shutdown all tasks
-    tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
-    [task.cancel() for task in tasks]
-    await asyncio.gather(*tasks, return_exceptions=True)
-
-    # Exit
-    exit(0)
 
 # Initialize the actuators. Each actuator will become a service
 # which can be called.
@@ -759,40 +744,55 @@ def sensors(loop, board, device):
 
    return tasks
 
+# Shutdown procedure
+closing = False
+async def shutdown(loop, board):
+   global closing
 
-def send_sigint():
-   os.kill(os.getpid(), signal.SIGINT)
+   # We need to check if this closing is not already
+   # running by an escalated signal.
+   if not closing:
+      closing = True
+      await board.shutdown()
+
+      # Stop the asyncio loop
+      loop.stop()
+      print("Telemetrix shutdown nicely")
 
 if __name__ == '__main__':
    loop = asyncio.get_event_loop()
+
+   # Initialize the telemetrix board
+   board = telemetrix_aio.TelemetrixAIO(loop=loop)
 
    # Catch signals to exit properly
    # We need to do it this way instead of usgin the try/catch
    # as in the telemetrix examples
    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
    for s in signals:
-      loop.add_signal_handler(s, lambda: asyncio.ensure_future(shutdown(s, loop, board)))
-
-   # Initialize the telemetrix board
-   board = telemetrix_aio.TelemetrixAIO(loop=loop)
+     l = lambda loop=loop,board=board: asyncio.ensure_future(shutdown(loop, board))
+     loop.add_signal_handler(s, l)
 
    # Initialize the ROS node as anonymous since there
    # should only be one instnace running.
-   rospy.init_node('zoef_telemetrix', anonymous=False, disable_signals=False)
-   rospy.on_shutdown(send_sigint)
+   rospy.init_node('zoef_telemetrix', anonymous=False)
+
+   # Escalate siging to this process in order to shutdown nicely
+   # This is needed when only this process is killed (eg. rosnode kill)
+   # This cannot be done by calling shutdown() because that is
+   # a different thread without asyncio loop.
+   l = lambda pid=os.getpid(),sig=signal.SIGINT: os.kill(pid, sig)
+   rospy.on_shutdown(l)
 
    # Start all tasks for sensors and actuators
    device = 'zoef'
    sensor_tasks = sensors(loop, board, device)
-   actuator_tasks = actuators(loop, board, device)
-   all_tasks = sensor_tasks + actuator_tasks
+   #actuator_tasks = actuators(loop, board, device)
+   all_tasks = sensor_tasks #+ actuator_tasks
    for task in all_tasks:
        loop.run_until_complete(task)
 
-   # Should not be: loop.run_forever() or rospy.spin()
-   # Loop forever and give async some time to process
-   # The sleep time should be lower than 1/max_freq
-   # Since telemetrix updates at a max of 1ms, 0.00001
-   # should be enough.
-   while True:
-      loop.run_until_complete(asyncio.sleep(0.00001))
+   # Is equivalent to rospy.spin() in a sense that this
+   # will just keep the node running only in a asyncio
+   # way.
+   loop.run_forever()
