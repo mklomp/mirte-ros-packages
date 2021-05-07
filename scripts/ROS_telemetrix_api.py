@@ -104,19 +104,22 @@ nano_analog_offset = 14
 # Map to convert from Zoef PCB to STM32 pins numbers
 # This should be the same as printed on the PCB
 zoef_pcb_map = {
- "IR1"   : {"digital": "B1" , "analog": "A0" },
+ "IR1"   : {"digital": "C15", "analog": "A0" },
  "IR2"   : {"digital": "B0" , "analog": "A1" },
- "SRF1"  : {"trigger": "A9" , "echo"  : "B8" },
- "SRF2"  : {"trigger": "A10", "echo"  : "B9" },
+ "SRF1"  : {"trigger": "B7" , "echo"  : "C14"},
+ "SRF2"  : {"trigger": "A5" , "echo"  : "A6" },
  "I2C1"  : {"scl"    : "B6" , "sda"   : "B7" },
  "I2C2"  : {"scl"    : "B10", "sda"   : "B11"},
- "ENCA"  : {"pin"    : "B12"},
- "ENCB"  : {"pin"    : "B13"},
+ "ENCA"  : {"pin"    : "B4" },
+ "ENCB"  : {"pin"    : "B12"},
  "Keypad": {"pin"    : "A4" },
  "Servo1": {"pin"    : "B5" },
- "LED"   : {"pin"    : "B4" },
+ "Servo2": {"pin"    : "A7" },
+ "LED"   : {"pin"    : "C13"},
  "MA"    : {"1a"     : "A8" , "1b"    : "B3" },
- "MB"    : {"1a"     : "B14", "1b"    : "B15"}
+ "MB"    : {"1a"     : "B14", "1b"    : "B15"},
+ "MC"    : {"1a"     : "B1" , "1b"    : "A10"},
+ "MD"    : {"1a"     : "A9" , "1b"    : "B13"}
 }
 
 # Determine the analog offset, based on the mcu
@@ -480,6 +483,7 @@ class Oled(_SSD1306):
             height,
             external_vcc=external_vcc,
             reset=reset,
+            page_addressing=False
         )
 
     async def start(self):
