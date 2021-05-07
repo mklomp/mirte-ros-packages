@@ -7,21 +7,21 @@ distance:
     name: left
     device: zoef
     connector: SRF2
-  right:
-    name: right
-    device: zoef
-    connector: SRF1
+#  right:                        #TODO: bug in the PCB pin C14
+#    name: right
+#    device: zoef
+#    connector: SRF1
 encoder:
   left:
     name: left
     device: zoef
     connector: ENCB
     ticks_per_wheel: 20
-#  right:
-#    name: right
-#    device: zoef
-#    connector: ENCA
-#    ticks_per_wheel: 20
+  right:
+    name: right
+    device: zoef
+    connector: ENCA
+    ticks_per_wheel: 20
 intensity:
   left:
     name: left 
@@ -31,15 +31,15 @@ intensity:
     name: right
     device: zoef
     connector: IR1
-#oled:
-#  left:
-#    name: left
-#    device: zoef
-#    connector: I2C2
-#  right:
-#    name: right
-#    device: zoef
-#    connector: I2C1
+oled:
+  left:
+    name: left
+    device: zoef
+    connector: I2C2
+  right:
+    name: right
+    device: zoef
+    connector: I2C1
 #led:
 #  device: zoef
 #  connector: LED
@@ -48,6 +48,11 @@ servo:
     name: left
     device: zoef
     connector: Servo1
+servo:
+  left:
+    name: right
+    device: zoef
+    connector: Servo2
 keypad:
   yellow:
     name: keypad
