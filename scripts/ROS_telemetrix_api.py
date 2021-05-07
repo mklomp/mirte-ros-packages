@@ -403,26 +403,26 @@ class PWMMotor():
     async def init_motors(self, speed):
         if not self.initialized:
           if (speed > 0):
-            await self.board.set_pin_mode_analog_output(self.pins["1a"])
+            await self.board.set_pin_mode_digital_output(self.pins["1a"])
             await self.board.set_pin_mode_analog_output(self.pins["1b"])
           if (speed < 0):
             await self.board.set_pin_mode_analog_output(self.pins["1b"])
-            await self.board.set_pin_mode_analog_output(self.pins["1a"])
+            await self.board.set_pin_mode_digital_output(self.pins["1a"])
           self.initialized = True
 
     async def set_speed(self, speed):
         if (self.prev_motor_speed != speed):
           if (speed == 0):
-            await self.board.analog_write(self.pins["1a"], 0)
+            await self.board.digital_write(self.pins["1a"], 0)
             await self.board.analog_write(self.pins["1b"], 0)
           elif (speed > 0):
             await self.init_motors(speed)
-            await self.board.analog_write(self.pins["1a"], 0)
+            await self.board.digital_write(self.pins["1a"], 0)
             await self.board.analog_write(self.pins["1b"], int(min(speed, 100) / 100.0 * max_pwm_value))
           elif (speed < 0):
             await self.init_motors(speed)
-            await self.board.analog_write(self.pins["1b"], 0)
-            await self.board.analog_write(self.pins["1a"], int(min(abs(speed), 100) / 100.0 * max_pwm_value))
+            await self.board.digital_write(self.pins["1a"], 1)
+            await self.board.analog_write(self.pins["1b"], int(max_pwm_value - min(abs(speed), 100) / 100.0 * max_pwm_value))
           self.prev_motor_speed = speed
 
 class L298NMotor():
