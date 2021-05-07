@@ -69,7 +69,9 @@ stm32_map = {
  "B10": 30,
  "B11": 31
 }
-stm32_max_pwm_value = 65535
+# I thought this should be 65535 for the SEM, but for
+# some reason we need 255
+stm32_max_pwm_value = 255
 stm32_analog_offset = 20
 
 nano_map = {
