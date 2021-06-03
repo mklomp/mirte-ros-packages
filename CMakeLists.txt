@@ -141,7 +141,7 @@ add_executable(${PROJECT_NAME}_node
     src/my_robot_base.cpp
 )
 
-add_dependencies(${PROJECT_NAME}_node zoef_msgs_gencpp)
+add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
