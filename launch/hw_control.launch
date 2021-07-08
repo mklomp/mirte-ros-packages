@@ -3,7 +3,7 @@
     <!-- Load parameters that match the correct
          mcu connections -->
     <group ns="zoef">
-        <rosparam file="$(find zoef_ros_package)/config/zoef_user_settings.yaml"/>
+        <rosparam file="$(find zoef_ros_package)/config/zoef_user_config.yaml"/>
     </group>
 
     <!-- Telemetrix node to start all services and topics
