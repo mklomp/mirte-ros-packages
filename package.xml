@@ -75,6 +75,10 @@
   <exec_depend>diff_drive_controller</exec_depend>
   <exec_depend>rosbridge_server</exec_depend>
   <exec_depend>teleop_twist_keyboard</exec_depend>
+  <exec_depend>diagnostic-updater</exec_depend>
+  <exec_depend>joy</exec_depend>
+  <exec_depend>teleop-twist-joy</exec_depend>
+
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
