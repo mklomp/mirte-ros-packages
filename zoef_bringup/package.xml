@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>zoef_ros_package</name>
-  <version>0.0.0</version>
-  <description>The zoef_ros_package package</description>
+  <name>zoef_bringup</name>
+  <version>0.1.0</version>
+  <description>The zoef_bringup package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="martin@todo.todo">martin</maintainer>
+  <maintainer email="m.klomp@tudelft.nl">Martin Klomp</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+  <license>Apache2</license>
 
 
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
@@ -50,35 +50,10 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>roscpp</build_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>zoef_msgs</build_depend>
-  <build_depend>controller_manager</build_depend>
-  <build_depend>roslaunch</build_depend>
-  <build_depend>hardware_interface</build_depend>
-  <build_depend>trajectory_msgs</build_depend>
-  <build_export_depend>roscpp</build_export_depend>
-  <build_export_depend>rospy</build_export_depend>
-  <build_export_depend>std_msgs</build_export_depend>
-
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>rospy</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>zoef_telemetrix</exec_depend>
+  <exec_depend>zoef_teleop</exec_depend>
+  <exec_depend>zoef_control</exec_depend>
   <exec_depend>zoef_msgs</exec_depend>
-  <build_depend>message_generation</build_depend>
-  <exec_depend>message_runtime</exec_depend>
-  <exec_depend>controller_manager</exec_depend>
-  <exec_depend>hardware_interface</exec_depend>
-  <exec_depend>effort_controllers</exec_depend>
-  <exec_depend>trajectory_msgs</exec_depend>
-  <exec_depend>diff_drive_controller</exec_depend>
-  <exec_depend>rosbridge_server</exec_depend>
-  <exec_depend>teleop_twist_keyboard</exec_depend>
-  <exec_depend>diagnostic-updater</exec_depend>
-  <exec_depend>joy</exec_depend>
-  <exec_depend>teleop-twist-joy</exec_depend>
-
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
