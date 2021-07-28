@@ -1,0 +1,6 @@
+string pin
+string type
+int32 value
+---
+bool status
+

@@ -1,0 +1,4 @@
+int32 pin
+string type
+---
+int32 data
