@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(zoef_telemetrix)
+project(mirte_control)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -8,10 +8,11 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  rospy
+  roscpp
   std_msgs
-  zoef_msgs
-  roslaunch
+  mirte_msgs
+  controller_manager
+  hardware_interface
 )
 
 ## System dependencies are found with CMake's conventions
@@ -102,9 +103,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES zoef_ros_package
-  CATKIN_DEPENDS rospy std_msgs zoef_msgs message_runtime
+  INCLUDE_DIRS include
+#  LIBRARIES mirte_ros_package
+  CATKIN_DEPENDS roscpp std_msgs mirte_msgs message_runtime controller_manager hardware_interface
 #  DEPENDS system_lib
 )
 
@@ -115,10 +116,10 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-#include_directories(
-# include/
-#  ${catkin_INCLUDE_DIRS}
-#)
+include_directories(
+ include/
+  ${catkin_INCLUDE_DIRS}
+)
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
@@ -133,11 +134,11 @@ catkin_package(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-#add_executable(${PROJECT_NAME}_node
-#    src/my_robot_base.cpp
-#)
+add_executable(${PROJECT_NAME}_node
+    src/my_robot_base.cpp
+)
 
-#add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -150,9 +151,9 @@ catkin_package(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-#target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(${PROJECT_NAME}_node
+   ${catkin_LIBRARIES}
+ )
 
 #############
 ## Install ##
@@ -194,7 +195,7 @@ catkin_package(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_zoef_ros_package.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_mirte_ros_package.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

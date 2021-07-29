@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(zoef_bringup)
+project(mirte_telemetrix)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -8,6 +8,10 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  rospy
+  std_msgs
+  mirte_msgs
+  roslaunch
 )
 
 ## System dependencies are found with CMake's conventions
@@ -97,12 +101,12 @@ find_package(catkin REQUIRED COMPONENTS
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-#catkin_package(
+catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES zoef_ros_package
-#  CATKIN_DEPENDS roscpp rospy std_msgs zoef_msgs message_runtime controller_manager hardware_interface
+#  LIBRARIES mirte_ros_package
+  CATKIN_DEPENDS rospy std_msgs mirte_msgs message_runtime
 #  DEPENDS system_lib
-#)
+)
 
 
 ###########
@@ -190,7 +194,7 @@ find_package(catkin REQUIRED COMPONENTS
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_zoef_ros_package.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_mirte_ros_package.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

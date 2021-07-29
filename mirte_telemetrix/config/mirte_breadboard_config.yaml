@@ -1,83 +1,83 @@
 device:
-  zoef:
+  mirte:
     type: breadboard
     mcu: stm32
 distance:
   left:
     name: left
-    device: zoef
+    device: mirte
     pins:
       trigger: A9
       echo: B8
   right:
     name: right
-    device: zoef
+    device: mirte
     pins:
       trigger: A10
       echo: B9
 encoder:
   left:
     name: left
-    device: zoef
+    device: mirte
     pins:
       pin: B12           # pin needs interrupt support
     ticks_per_wheel: 20
   right:
     name: right
-    device: zoef
+    device: mirte
     pins:
       pin: B13           # pin needs interrupt support
     ticks_per_wheel: 20
 intensity:
   left:
     name: left 
-    device: zoef
+    device: mirte
     pins:
       digital: B1
       analog: A0         # pin needs analog input
   right:
     name: right
-    device: zoef
+    device: mirte
     pins:
       digital: B0
       analog: A1         # pin needs analog input
 oled:
   left:
     name: left
-    device: zoef
+    device: mirte
     pins:
       scl: B6
       sda: B7
   right:
     name: right
-    device: zoef
+    device: mirte
     pins:
       scl: B10
       sca: B11
 led:
-  device: zoef
+  device: mirte
   pins:
     pin: B4                # pin needs PWM
 servo:
-  device: zoef
+  device: mirte
   pins:
     pin: B5                # pin needs PWM
 keypad:
   yellow:
     name: keypad
-    device: zoef
+    device: mirte
     pins:
       pin: A4              # pin needs analog input
 motor:
   left:
     name: left
-    device: zoef
+    device: mirte
     pins:
       1a: A8             # pin needs PWM
       1b: B3             # pin needs PWM
   right:
     name: right
-    device: zoef
+    device: mirte
     pins:
       1a: B14            # pin needs PWM
       1b: B15            # pin needs PWM

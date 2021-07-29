@@ -5,8 +5,8 @@ import cv2 as cv
 import numpy as np
 from pyzbar.pyzbar import decode
 
-from zoef_msgs.srv import *
-from zoef_msgs.msg import color
+from mirte_msgs.srv import *
+from mirte_msgs.msg import color
 
 cap = cv.VideoCapture(0)
 

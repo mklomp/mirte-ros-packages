@@ -2,7 +2,7 @@
 
 import rospy
 from geometry_msgs.msg import Twist
-from zoef_msgs.srv import Move, MoveResponse, Turn, TurnResponse
+from mirte_msgs.srv import Move, MoveResponse, Turn, TurnResponse
 
 velocity_publisher = rospy.Publisher('/mobile_base_controller/cmd_vel', Twist, queue_size=10)
 
@@ -61,9 +61,9 @@ def handle_turn(req):
     return TurnResponse(True)
 
 def start_navigation_services():
-    rospy.init_node('zoef_navigation', anonymous=False)
-    move_service = rospy.Service('zoef_navigation/move', Move, handle_move)
-    turn_service = rospy.Service('zoef_navigation/turn', Turn, handle_turn)
+    rospy.init_node('mirte_navigation', anonymous=False)
+    move_service = rospy.Service('mirte_navigation/move', Move, handle_move)
+    turn_service = rospy.Service('mirte_navigation/turn', Turn, handle_turn)
     rospy.spin()
 
 if __name__ == "__main__":

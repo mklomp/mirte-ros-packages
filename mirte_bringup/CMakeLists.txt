@@ -1,18 +1,13 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(zoef_msgs)
+project(mirte_bringup)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  std_msgs
-  geometry_msgs
-  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -49,35 +44,16 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
- add_message_files(
-   FILES
-   Encoder.msg
-   color.msg
-   Intensity.msg
-   IntensityDigital.msg
-   Keypad.msg
- )
+#add_message_files(
+#   FILES
+#   MotorCommand.msg
+#)
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  GetDistance.srv
-  GetIntensity.srv
-  GetIntensityDigital.srv
-  GetEncoder.srv
-  GetKeypad.srv
-  SetPinMode.srv
-  GetPinValue.srv
-  SetPinValue.srv
-  SetLEDValue.srv
-  SetOLEDImage.srv
-  SetServoAngle.srv
-  get_virtual_color.srv
-  get_barcode.srv
-  SetMotorSpeed.srv
-  Move.srv
-  Turn.srv
-)
+#add_service_files(
+  #  FILES
+  #  get_distance.srv
+#)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -87,11 +63,10 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
- )
+#generate_messages(
+#  DEPENDENCIES
+#  std_msgs
+#)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -122,12 +97,13 @@ generate_messages(
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-	#  INCLUDE_DIRS include
-#  LIBRARIES zoef_types
- CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs message_runtime
+#catkin_package(
+#  INCLUDE_DIRS include
+#  LIBRARIES mirte_ros_package
+#  CATKIN_DEPENDS roscpp rospy std_msgs mirte_msgs message_runtime controller_manager hardware_interface
 #  DEPENDS system_lib
-)
+#)
+
 
 ###########
 ## Build ##
@@ -135,25 +111,29 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-)
+#include_directories(
+# include/
+#  ${catkin_INCLUDE_DIRS}
+#)
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/zoef_types.cpp
+#   src/${PROJECT_NAME}/mobile_controller.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/zoef_types_node.cpp)
+#add_executable(${PROJECT_NAME}_node
+#    src/my_robot_base.cpp
+#)
+
+#add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -166,7 +146,7 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
+#target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -174,7 +154,7 @@ include_directories(
 ## Install ##
 #############
 
-# all install targets should use catkin DESTINATION variables
+# all install targets should use catkin DESTINATION variablese
 # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
 
 ## Mark executable scripts (Python etc.) for installation
@@ -184,18 +164,11 @@ include_directories(
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
-## Mark executables for installation
-## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-# install(TARGETS ${PROJECT_NAME}_node
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark libraries for installation
-## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-# install(TARGETS ${PROJECT_NAME}
+## Mark executables and/or libraries for installation
+# install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
 ## Mark cpp header files for installation
@@ -217,7 +190,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_zoef_types.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_mirte_ros_package.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

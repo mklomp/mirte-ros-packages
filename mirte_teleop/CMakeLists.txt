@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(zoef_teleop)
+project(mirte_teleop)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -99,8 +99,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 #catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES zoef_ros_package
-#  CATKIN_DEPENDS roscpp rospy std_msgs zoef_msgs message_runtime controller_manager hardware_interface
+#  LIBRARIES mirte_ros_package
+#  CATKIN_DEPENDS roscpp rospy std_msgs mirte_msgs message_runtime controller_manager hardware_interface
 #  DEPENDS system_lib
 #)
 
@@ -190,7 +190,7 @@ find_package(catkin REQUIRED COMPONENTS
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_zoef_ros_package.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_mirte_ros_package.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

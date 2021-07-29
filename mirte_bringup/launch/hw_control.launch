@@ -2,33 +2,33 @@
 
     <!-- Load parameters that match the correct
          mcu connections -->
-    <group ns="zoef">
-        <rosparam file="$(find zoef_telemetrix)/config/zoef_user_config.yaml"/>
+    <group ns="mirte">
+        <rosparam file="$(find mirte_telemetrix)/config/mirte_user_config.yaml"/>
     </group>
 
     <!-- Telemetrix node to start all services and topics
          for the sensors and actuators connected to the
          mcu -->
-    <node name="zoef_telemetrix_zoef" output="screen"
-          pkg="zoef_telemetrix"
+    <node name="mirte_telemetrix_mirte" output="screen"
+          pkg="mirte_telemetrix"
           type="ROS_telemetrix_api.py"/>
 
     <!-- ROS control hardware interface for differential
          drive robot. -->
-    <node name="zoef_base_node" output="screen"
-          pkg="zoef_control"
-          type="zoef_control_node"/>
+    <node name="mirte_base_node" output="screen"
+          pkg="mirte_control"
+          type="mirte_control_node"/>
 
     <!-- <node name="my_robot_camera"
-          pkg="zoef_ros_package"
+          pkg="mirte_ros_package"
           type="camera.py" output="screen"/> -->
 
-    <!-- <node name="zoef_navigation"
-          pkg="zoef_ros_package"
+    <!-- <node name="mirte_navigation"
+          pkg="mirte_ros_package"
           type="navigation.py" output="screen"/> -->
 
     <!-- Load controller config -->
-    <rosparam command="load" file="$(find zoef_control)/config/my_robot_common.yaml"/>
+    <rosparam command="load" file="$(find mirte_control)/config/my_robot_common.yaml"/>
 
     <node name="controller_spawner"
           pkg="controller_manager"

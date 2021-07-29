@@ -15,8 +15,8 @@
 // ROS
 #include <ros/ros.h>
 #include <std_srvs/Empty.h>
-#include <zoef_msgs/Encoder.h>
-#include <zoef_msgs/SetMotorSpeed.h>
+#include <mirte_msgs/Encoder.h>
+#include <mirte_msgs/SetMotorSpeed.h>
 
 // ros_control
 #include <controller_manager/controller_manager.h>
@@ -140,8 +140,8 @@ private:
   ros::ServiceClient right_client;
 
 
-  zoef_msgs::SetMotorSpeed left_motor_service;
-  zoef_msgs::SetMotorSpeed right_motor_service;
+  mirte_msgs::SetMotorSpeed left_motor_service;
+  mirte_msgs::SetMotorSpeed right_motor_service;
 
   bool start_callback(std_srvs::Empty::Request& /*req*/, std_srvs::Empty::Response& /*res*/)
   {
@@ -156,11 +156,11 @@ private:
   }
 
 
-  void leftWheelEncoderCallback(const zoef_msgs::Encoder& msg) {
+  void leftWheelEncoderCallback(const mirte_msgs::Encoder& msg) {
     _wheel_encoder[0] = _wheel_encoder[0] + msg.value;
   }
 
-  void rightWheelEncoderCallback(const zoef_msgs::Encoder& msg) {
+  void rightWheelEncoderCallback(const mirte_msgs::Encoder& msg) {
     _wheel_encoder[1] = _wheel_encoder[1] + msg.value;
   }
 
@@ -202,13 +202,13 @@ MyRobotHWInterface::MyRobotHWInterface()
     registerInterface(&jnt_vel_interface);
 
     // Initialize publishers and subscribers
-    left_wheel_encoder_sub_ = nh.subscribe("/zoef/encoder/left", 1, &MyRobotHWInterface::leftWheelEncoderCallback, this);
-    right_wheel_encoder_sub_ = nh.subscribe("/zoef/encoder/right", 1, &MyRobotHWInterface::rightWheelEncoderCallback, this);
+    left_wheel_encoder_sub_ = nh.subscribe("/mirte/encoder/left", 1, &MyRobotHWInterface::leftWheelEncoderCallback, this);
+    right_wheel_encoder_sub_ = nh.subscribe("/mirte/encoder/right", 1, &MyRobotHWInterface::rightWheelEncoderCallback, this);
 
 
-    ros::service::waitForService("/zoef/set_left_speed");
-    ros::service::waitForService("/zoef/set_right_speed");
-    left_client = nh.serviceClient<zoef_msgs::SetMotorSpeed>("/zoef/set_left_speed", true);
-    right_client = nh.serviceClient<zoef_msgs::SetMotorSpeed>("/zoef/set_right_speed", true);
+    ros::service::waitForService("/mirte/set_left_speed");
+    ros::service::waitForService("/mirte/set_right_speed");
+    left_client = nh.serviceClient<mirte_msgs::SetMotorSpeed>("/mirte/set_left_speed", true);
+    right_client = nh.serviceClient<mirte_msgs::SetMotorSpeed>("/mirte/set_right_speed", true);
     // TODO: checl ion isvalis when running https://answers.ros.org/question/281411/persistent-service-initialization/
 }
