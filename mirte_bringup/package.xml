@@ -50,6 +50,7 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
 
+  <exec_depend>rosbridge_server</exec_depend>
   <exec_depend>mirte_telemetrix</exec_depend>
   <exec_depend>mirte_teleop</exec_depend>
   <exec_depend>mirte_control</exec_depend>
