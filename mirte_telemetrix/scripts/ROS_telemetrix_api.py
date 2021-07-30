@@ -583,15 +583,23 @@ async def data_callback(data):
 
 def handle_get_pin_value(req):
    global pin_values
-   if not req.pin in pin_values:
-      if req.type == "analog":
-         asyncio.run(board.set_pin_mode_analog_input(req.pin - analog_offset, callback=data_callback))
-      if req.type == "digital":
-         asyncio.run(board.set_pin_mode_digital_input(req.pin, callback=data_callback))
+   # Map pin to the pin map if it is in there, or to
+   # an int if raw pin number
+   if req.pin in pin_map:
+      pin = pin_map[req.pin]
+   else:
+      pin = int(req.pin)
 
-   while not req.pin in pin_values:
+   if not pin in pin_values:
+      if req.type == "analog":
+         asyncio.run(board.set_pin_mode_analog_input(pin - analog_offset, callback=data_callback))
+      if req.type == "digital":
+         asyncio.run(board.set_pin_mode_digital_input(pin, callback=data_callback))
+
+   while not pin in pin_values:
       time.sleep(.00001)
-   value = pin_values[req.pin]
+
+   value = pin_values[pin]
    return GetPinValueResponse(value)
 
 # TODO: check on existing pin configuration?
