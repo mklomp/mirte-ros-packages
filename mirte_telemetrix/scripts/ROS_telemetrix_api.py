@@ -106,7 +106,7 @@ nano_analog_offset = 14
 mirte_pcb_map = {
  "IR1"   : {"digital": "C15", "analog": "A0" },
  "IR2"   : {"digital": "B0" , "analog": "A1" },
- "SRF1"  : {"trigger": "B7" , "echo"  : "C14"},
+ "SRF1"  : {"trigger": "A15", "echo"  : "C14"},
  "SRF2"  : {"trigger": "A5" , "echo"  : "A6" },
  "I2C1"  : {"scl"    : "B6" , "sda"   : "B7" },
  "I2C2"  : {"scl"    : "B10", "sda"   : "B11"},
