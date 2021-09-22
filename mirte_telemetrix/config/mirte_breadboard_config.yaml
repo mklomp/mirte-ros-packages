@@ -7,14 +7,14 @@ distance:
     name: left
     device: mirte
     pins:
-      trigger: A9
-      echo: B8
+      trigger: A5
+      echo: A6
   right:
     name: right
     device: mirte
     pins:
-      trigger: A10
-      echo: B9
+      trigger: A15
+      echo: C14
 encoder:
   left:
     name: left
@@ -26,14 +26,14 @@ encoder:
     name: right
     device: mirte
     pins:
-      pin: B13           # pin needs interrupt support
+      pin: B4           # pin needs interrupt support
     ticks_per_wheel: 20
 intensity:
   left:
     name: left 
     device: mirte
     pins:
-      digital: B1
+      digital: C15
       analog: A0         # pin needs analog input
   right:
     name: right
@@ -54,14 +54,17 @@ oled:
     pins:
       scl: B10
       sca: B11
-led:
-  device: mirte
-  pins:
-    pin: B4                # pin needs PWM
 servo:
-  device: mirte
-  pins:
-    pin: B5                # pin needs PWM
+  left:
+    name: left
+    device: mirte
+    pins:
+      pin: B5
+  right:
+    name: right
+    device: mirte
+    pins:
+      pin: A7
 keypad:
   yellow:
     name: keypad
@@ -72,16 +75,14 @@ motor:
   left:
     name: left
     device: mirte
+    type: l9110s
     pins:
       1a: A8             # pin needs PWM
       1b: B3             # pin needs PWM
   right:
     name: right
     device: mirte
+    type: l9110s
     pins:
       1a: B14            # pin needs PWM
       1b: B15            # pin needs PWM
-#left_motor: left_motor
-#right_motor: right_motor
-#wheel_radius: 0.065
-#wheel_seperation: 0.13

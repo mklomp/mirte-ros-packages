@@ -3,10 +3,10 @@ device:
     type: mirte_pcb
     samping_interval: 10
 distance:
-#  left:
-#    name: left
-#    device: mirte
-#    connector: SRF2
+  left:
+    name: left
+    device: mirte
+    connector: SRF2
   right:
     name: right
     device: mirte
@@ -31,36 +31,38 @@ intensity:
     name: right
     device: mirte
     connector: IR1
-#oled:
-#  left:
-#    name: left
-#    device: mirte
-#    connector: I2C2
-#  right:
-#    name: right
-#    device: mirte
-#    connector: I2C1
-led:
-  device: mirte
-  connector: LED
+oled:
+  left:
+    name: left
+    device: mirte
+    connector: I2C2
+  right:
+    name: right
+    device: mirte
+    connector: I2C1
 servo:
-  device: mirte
-  connector: SERVO
+  left:
+    name: left
+    device: mirte
+    connector: Servo1
+servo:
+  left:
+    name: right
+    device: mirte
+    connector: Servo2
 keypad:
   yellow:
     name: keypad
     device: mirte
-    connector: KEY
+    connector: Keypad
 motor:
   left:
     name: left
     device: mirte
     connector: MB
+    type: l9110s
   right:
     name: right
     device: mirte
     connector: MA
-#left_motor: left_motor
-#right_motor: right_motor
-#wheel_radius: 0.065
-#wheel_seperation: 0.13
+    type: l9110s

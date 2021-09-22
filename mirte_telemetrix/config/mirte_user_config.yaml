@@ -7,10 +7,10 @@ distance:
     name: left
     device: mirte
     connector: SRF2
-#  right:                        #TODO: bug in the PCB pin C14
-#    name: right
-#    device: mirte
-#    connector: SRF1
+  right:
+    name: right
+    device: mirte
+    connector: SRF1
 encoder:
   left:
     name: left
@@ -40,9 +40,6 @@ oled:
     name: right
     device: mirte
     connector: I2C1
-#led:
-#  device: mirte
-#  connector: LED
 servo:
   left:
     name: left
@@ -69,7 +66,3 @@ motor:
     device: mirte
     connector: MA
     type: l9110s
-#left_motor: left_motor
-#right_motor: right_motor
-#wheel_radius: 0.065
-#wheel_seperation: 0.13
