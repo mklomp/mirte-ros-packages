@@ -46,7 +46,9 @@
   </node>
 
 
-  <node name="web_video_server" pkg="web_video_server" type="web_video_server"/>
+  <node name="web_video_server" pkg="web_video_server" type="web_video_server">
+    <param name="default_transport" value="theora"/>
+  </node>
 
 
 </launch>
