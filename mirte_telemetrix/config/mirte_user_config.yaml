@@ -45,8 +45,7 @@ servo:
     name: left
     device: mirte
     connector: Servo1
-servo:
-  left:
+  right:
     name: right
     device: mirte
     connector: Servo2
@@ -59,10 +58,10 @@ motor:
   left:
     name: left
     device: mirte
-    connector: MB
+    connector: MD
     type: l9110s
   right:
     name: right
     device: mirte
-    connector: MA
+    connector: MC
     type: l9110s
