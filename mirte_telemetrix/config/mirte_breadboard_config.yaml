@@ -39,7 +39,7 @@ intensity:
     name: right
     device: mirte
     pins:
-      digital: B0
+      digital: A2
       analog: A1         # pin needs analog input
 oled:
   left:
@@ -53,18 +53,18 @@ oled:
     device: mirte
     pins:
       scl: B10
-      sca: B11
+      sda: B11
 servo:
   left:
     name: left
     device: mirte
     pins:
-      pin: B5
+      pin: B3
   right:
     name: right
     device: mirte
     pins:
-      pin: A7
+      pin: A3
 keypad:
   yellow:
     name: keypad
@@ -78,7 +78,7 @@ motor:
     type: l9110s
     pins:
       1a: A8             # pin needs PWM
-      1b: B3             # pin needs PWM
+      1b: B5             # pin needs PWM
   right:
     name: right
     device: mirte

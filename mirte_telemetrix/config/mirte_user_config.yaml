@@ -1,67 +1,88 @@
 device:
   mirte:
-    type: mirte_pcb
-    samping_interval: 10
+    type: breadboard
+    mcu: stm32
 distance:
   left:
     name: left
     device: mirte
-    connector: SRF2
+    pins:
+      trigger: A5
+      echo: A6
   right:
     name: right
     device: mirte
-    connector: SRF1
+    pins:
+      trigger: A15
+      echo: C14
 encoder:
   left:
     name: left
     device: mirte
-    connector: ENCB
+    pins:
+      pin: B12           # pin needs interrupt support
     ticks_per_wheel: 20
   right:
     name: right
     device: mirte
-    connector: ENCA
+    pins:
+      pin: B4           # pin needs interrupt support
     ticks_per_wheel: 20
 intensity:
   left:
     name: left 
     device: mirte
-    connector: IR2
+    pins:
+      digital: C15
+      analog: A0         # pin needs analog input
   right:
     name: right
     device: mirte
-    connector: IR1
+    pins:
+      digital: A2
+      analog: A1         # pin needs analog input
 oled:
   left:
     name: left
     device: mirte
-    connector: I2C2
+    pins:
+      scl: B6
+      sda: B7
   right:
     name: right
     device: mirte
-    connector: I2C1
+    pins:
+      scl: B10
+      sda: B11
 servo:
   left:
     name: left
     device: mirte
-    connector: Servo1
+    pins:
+      pin: B3
   right:
     name: right
     device: mirte
-    connector: Servo2
+    pins:
+      pin: A3
 keypad:
   yellow:
     name: keypad
     device: mirte
-    connector: Keypad
+    pins:
+      pin: A4              # pin needs analog input
 motor:
   left:
     name: left
     device: mirte
-    connector: MD
     type: l9110s
+    pins:
+      1a: A8             # pin needs PWM
+      1b: B5             # pin needs PWM
   right:
     name: right
     device: mirte
-    connector: MC
     type: l9110s
+    pins:
+      1a: B14            # pin needs PWM
+      1b: B15            # pin needs PWM
