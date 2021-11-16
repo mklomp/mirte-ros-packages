@@ -48,6 +48,7 @@
 
   <node name="web_video_server" pkg="web_video_server" type="web_video_server">
     <param name="default_transport" value="theora"/>
+    <param name="port" value="8181"/>
   </node>
 
 
