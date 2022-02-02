@@ -509,10 +509,10 @@ class Oled(_SSD1306):
         self.show()
 
       if req.type == "image":
-        self.show_png("/usr/local/src/mirte/mirte_oled_images/images/" + req.value + ".png") # open color image
+        self.show_png("/usr/local/src/mirte/mirte-oled-images/images/" + req.value + ".png") # open color image
 
       if req.type == "animation":
-        folder = "/usr/local/src/mirte/mirte_oled_images/animations/" +  req.value + "/"
+        folder = "/usr/local/src/mirte/mirte-oled-images/animations/" +  req.value + "/"
         number_of_images = len([name for name in os.listdir(folder) if os.path.isfile(os.path.join(folder, name))])
         for i in range(number_of_images):
           self.show_png(folder + req.value + "_" + str(i) + ".png")
