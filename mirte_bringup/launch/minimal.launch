@@ -37,7 +37,9 @@
           args="mobile_base_controller"/>
 
     <!-- Start the websocket server -->
-    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+      <arg name="websocket_external_port" value="80"/>
+    </include>
 
 
   <!-- TODO: openCV bridge -->
