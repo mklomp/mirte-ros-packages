@@ -2,6 +2,7 @@ device:
   mirte:
     type: breadboard
     mcu: stm32
+    max_frequency: 100
 distance:
   left:
     name: left

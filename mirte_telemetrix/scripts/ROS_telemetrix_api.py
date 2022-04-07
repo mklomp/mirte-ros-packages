@@ -11,7 +11,7 @@ import io
 from telemetrix_aio import telemetrix_aio
 
 # Import ROS message types
-from std_msgs.msg import Header
+from std_msgs.msg import Header, Int32
 from sensor_msgs.msg import Range
 from mirte_msgs.msg import *
 
@@ -310,7 +310,7 @@ class DigitalIntensitySensorMonitor(SensorMonitor):
 
 class AnalogIntensitySensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
-        pub = rospy.Publisher('/mirte/intensity/' + sensor["name"], Intensity, queue_size=1)
+        pub = rospy.Publisher('/mirte/intensity/' + sensor["name"], Intensity, queue_size=100)
         srv = rospy.Service('/mirte/get_intensity_' + sensor["name"], GetIntensity, self.get_data)
         super().__init__(board, sensor, pub)
         self.last_publish_value = Intensity()
@@ -389,6 +389,10 @@ class PWMMotor():
 
     async def start(self):
         server = rospy.Service("/mirte/set_" + self.name + "_speed", SetMotorSpeed, self.set_motor_speed_service)
+        sub = rospy.Subscriber('/mirte/motor_' + self.name + "_speed", Int32, self.callback)
+
+    def callback(self, data):
+        asyncio.run(self.set_speed(data.data))
 
     def set_motor_speed_service(self, req):
         asyncio.run(self.set_speed(req.speed))
@@ -676,48 +680,41 @@ def actuators(loop, board, device):
 # the data.
 def sensors(loop, board, device):
    tasks = []
-   max_freq = -1
+   max_freq = 10
+   if rospy.has_param("/mirte/device/mirte/max_frequency"):
+      max_freq = rospy.get_param("/mirte/device/mirte/max_frequency")
 
    # initialze distance sensors
    if rospy.has_param("/mirte/distance"):
       distance_sensors = rospy.get_param("/mirte/distance")
       distance_sensors = {k: v for k, v in distance_sensors.items() if v['device'] == device}
       for sensor in distance_sensors:
+         distance_sensors[sensor]["max_frequency"] = max_freq
          distance_publisher = rospy.Publisher('/mirte/' + sensor, Range, queue_size=1, latch=True)
          monitor = DistanceSensorMonitor(board, distance_sensors[sensor])
          tasks.append(loop.create_task(monitor.start()))
-         if "max_frequency" in distance_sensors[sensor] and distance_sensors[sensor]["max_frequency"] >= max_freq:
-            max_freq = distance_sensors[sensor]["max_frequency"]
-         else:
-            max_freq = 10
 
    # Initialize intensity sensors
    if rospy.has_param("/mirte/intensity"):
       intensity_sensors = rospy.get_param("/mirte/intensity")
       intensity_sensors = {k: v for k, v in intensity_sensors.items() if v['device'] == device}
       for sensor in intensity_sensors:
+         intensity_sensors[sensor]["max_frequency"] = max_freq
          if "analog" in get_pin_numbers(intensity_sensors[sensor]):
             monitor = AnalogIntensitySensorMonitor(board, intensity_sensors[sensor])
             tasks.append(loop.create_task(monitor.start()))
          if "digital" in get_pin_numbers(intensity_sensors[sensor]):
             monitor = DigitalIntensitySensorMonitor(board, intensity_sensors[sensor])
             tasks.append(loop.create_task(monitor.start()))
-         if "max_frequency" in intensity_sensors[sensor] and intensity_sensors[sensor]["max_frequency"] >= max_freq:
-            max_freq = intensity_sensors[sensor]["max_frequency"]
-         else:
-            max_freq = 10
 
    # Initialize keypad sensors
    if rospy.has_param("/mirte/keypad"):
       keypad_sensors = rospy.get_param("/mirte/keypad")
       keypad_sensors = {k: v for k, v in keypad_sensors.items() if v['device'] == device}
       for sensor in keypad_sensors:
+         keypad_sensors[sensor]["max_frequency"] = max_freq
          monitor = KeypadMonitor(board, keypad_sensors[sensor])
          tasks.append(loop.create_task(monitor.start()))
-         if "max_frequency" in keypad_sensors[sensor] and keypad_sensors[sensor]["max_frequency"] >= max_freq:
-            max_freq = keypad_sensors[sensor]["max_frequency"]
-         else:
-            max_freq = 10
 
    # Initialize encoder sensors
    if rospy.has_param("/mirte/encoder"):
