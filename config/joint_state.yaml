@@ -1,0 +1,15 @@
+mirte:
+  joint_state_controller:
+    type: "joint_state_controller/JointStateController"
+    publish_rate: 50
+
+  # Effort Controllers ---------------------------------------
+  left_wheel_effort_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: joint_left_wheel
+    pid: {p: 100.0, i: 0.1, d: 10.0}
+
+  right_wheel_effort_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: joint_right_wheel
+    pid: {p: 100.0, i: 0.1, d: 10.0}
