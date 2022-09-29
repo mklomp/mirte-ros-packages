@@ -1,7 +1,0 @@
-mirte:
-
- #http://answers.gazebosim.org/question/5468/gazebo_ros_pkgs-no-p-gain-specified-for-pid-in-positionjointinterface/
- gazebo_ros_control:
-   pid_gains:
-     joint_left_wheel: {p: 1000.0, i: 0.0, d: 0.0}
-     joint_right_wheel: {p: 1000.0, i: 0.0, d: 0.0}

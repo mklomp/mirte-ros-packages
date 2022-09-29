@@ -1,8 +1,9 @@
 <?xml version="1.0" ?>
 <robot name="mirte" xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <xacro:include filename="materials.xacro"/>
-  <xacro:include filename="macros.xacro"/>
-  <xacro:property name="yaml_param_file" value="../config/robot_dimensions.yaml" />
+  <xacro:include filename="$(find mirte_gazebo)/urdf/materials.xacro"/>
+  <xacro:include filename="$(find mirte_gazebo)/urdf/macros.xacro"/>
+  <xacro:include filename="$(find mirte_gazebo)/urdf/ros2_control.xacro"/>
+  <xacro:property name="yaml_param_file" value="$(find mirte_gazebo)/config/mirte_dimensions.yaml" />
   <xacro:property name="params" value="${load_yaml(yaml_param_file)}"/>
 
 
@@ -56,10 +57,11 @@
       <geometry>
         <box size="0.01 0.05 0.037"/>
       </geometry>
-    </visual>    <inertial>
-      <mass value="1e-5" />
+    </visual>    
+    <inertial>
+      <mass value="0.0" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0" />
     </inertial>
  </link>
 
@@ -68,6 +70,7 @@
     <origin rpy=" 0 0 0" xyz="${params['caster_wheel_center_x_offset']} ${params['caster_wheel_center_y_offset']} ${params['caster_wheel_center_z_offset']}"/>
   </xacro:caster>
 
+  <!-- NOTE: xacro parser adds joint_ -->
   <xacro:wheel name="left_wheel" parent="link_chassis" radius="${params['wheel_radius']}" mass="${params['wheel_mass']}">
     <origin rpy="0 0 0" xyz="${params['wheel_center_x_offset']} ${params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}"/>
     <joint_options>
@@ -76,6 +79,7 @@
     </joint_options>
   </xacro:wheel>
 
+  <!-- NOTE: xacro parser adds joint_ -->
   <xacro:wheel name="right_wheel" parent="link_chassis" radius="${params['wheel_radius']}" mass="${params['wheel_mass']}">
     <origin rpy="0 0 0" xyz="${params['wheel_center_x_offset']} ${-1*params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}"/>
     <joint_options>
