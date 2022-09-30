@@ -3,6 +3,7 @@
   <xacro:include filename="$(find mirte_gazebo)/urdf/materials.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/macros.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/ros2_control.xacro"/>
+  <xacro:include filename="$(find mirte_gazebo)/urdf/lidar.xacro"/>
   <xacro:property name="yaml_param_file" value="$(find mirte_gazebo)/config/mirte_dimensions.yaml" />
   <xacro:property name="params" value="${load_yaml(yaml_param_file)}"/>
 
