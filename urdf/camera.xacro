@@ -33,8 +33,8 @@
       <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
         <ros>
           <namespace>custom_ns</namespace>
-          <argument>image_raw:=custom</argument>
-          <argument>camera_info:=custom_info</argument>
+          <remapping>~/image_raw:=custom</remapping>
+          <remapping>~/camera_info:=custom_info</remapping>
         </ros>
         <camera_name>camera1</camera_name>
         <frame_name>camera_link</frame_name>
