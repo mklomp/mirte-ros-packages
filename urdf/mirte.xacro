@@ -34,10 +34,10 @@
     </visual>
   </link>
 
-  <link name="footprint" />
+  <link name="base_link" />
 
   <joint name="base_joint" type="fixed">
-    <parent link="footprint"/>
+    <parent link="base_link"/>
     <child link="link_chassis"/>
   </joint>
 

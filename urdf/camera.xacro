@@ -19,7 +19,7 @@
           <format>R8G8B8</format>
         </image>
         <clip>
-          <near>0.02</near>
+          <near>0.0001</near>
           <far>300</far>
         </clip>
         <distortion>
