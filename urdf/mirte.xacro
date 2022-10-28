@@ -20,15 +20,13 @@
     <!-- body -->
     <collision name="collision_chassis">
       <geometry>
-        <box size="${params['base_len']} ${params['base_width']} ${params['base_height']}"/>
-        <!-- <mesh filename="package://mirte_gazebo/meshes/mirte_base.stl" scale="0.001 0.001 0.001"/> -->
+        <mesh filename="file://$(find mirte_gazebo)/meshes/mirte_base.stl" scale="0.001 0.001 0.001"/> -->
       </geometry>
     </collision>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="${params['base_len']} ${params['base_width']} ${params['base_height']}"/>
-        <!-- <mesh filename="package://mirte_gazebo/meshes/mirte_base.stl" scale="0.001 0.001 0.001"/> -->
+        <mesh filename="file://$(find mirte_gazebo)/meshes/mirte_base.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="blue"/>
     </visual>
