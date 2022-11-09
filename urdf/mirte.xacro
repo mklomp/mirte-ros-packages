@@ -5,6 +5,7 @@
   <xacro:include filename="$(find mirte_gazebo)/urdf/ros2_control.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/lidar.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/camera.xacro"/>
+  <xacro:include filename="$(find mirte_gazebo)/urdf/ultrasonic.xacro"/>
   <xacro:property name="yaml_param_file" value="$(find mirte_gazebo)/config/mirte_dimensions.yaml" />
   <xacro:property name="params" value="${load_yaml(yaml_param_file)}"/>
 
@@ -39,33 +40,6 @@
     <child link="link_chassis"/>
   </joint>
 
-<joint name="sonar_front_joint" type="fixed">
-    <axis xyz="0 1 0" />
-    <origin rpy="0 0 0" xyz="0.093 0 0.02" />
-    <parent link="link_chassis"/>
-    <child link="base_sonar_front"/>
-</joint>
-
-<link name="base_sonar_front">
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.01 0.05 0.037"/>
-      </geometry>
-    </collision>    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.01 0.05 0.037"/>
-      </geometry>
-    </visual>    
-    <inertial>
-      <mass value="0.0" />
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0" />
-    </inertial>
- </link>
-
-
   <xacro:caster name="caster_wheel_back" parent="link_chassis" radius="${params['caster_wheel_radius']}" mass="${params['caster_wheel_mass']}">
     <origin rpy=" 0 0 0" xyz="${params['caster_wheel_center_x_offset']} ${params['caster_wheel_center_y_offset']} ${params['caster_wheel_center_z_offset']}"/>
   </xacro:caster>
@@ -87,52 +61,15 @@
       <dynamics damping="0.0" friction="0.0"/>
     </joint_options>
   </xacro:wheel>
-<!--
- <gazebo>
-   <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-     <robotNamespace>/mirte</robotNamespace>
-     <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
-   </plugin>
- </gazebo>
+
+  <xacro:ultrasonic_sensor name="left">
+    <origin rpy="0 0 .45" xyz="0.085 0.04 0.022" />
+  </xacro:ultrasonic_sensor>
+
+  <xacro:ultrasonic_sensor name="right">
+    <origin rpy="0 0 -0.45" xyz="0.085 -0.04 0.022" />
+  </xacro:ultrasonic_sensor>
 
 
-<gazebo reference="base_sonar_front">        
-   <sensor type="ray" name="TeraRanger">
-      <pose>0 0 0 0 0 0</pose>
-      <visualize>false</visualize>
-      <update_rate>12</update_rate>
-      <ray>
-         <scan>
-            <horizontal>
-               <samples>1</samples>
-               <resolution>1</resolution> 
-               <min_angle>-0.14835</min_angle>
-               <max_angle>0.14835</max_angle>
-            </horizontal>
-            <vertical>
-               <samples>1</samples>
-               <resolution>1</resolution> 
-               <min_angle>-0.014835</min_angle>
-               <max_angle>0.014835</max_angle> 
-            </vertical>
-         </scan>
-         <range>
-            <min>0.01</min>
-            <max>2</max>
-            <resolution>0.01</resolution>
-         </range>
-      </ray>
-      <plugin filename="libgazebo_ros_range.so" name="gazebo_ros_range">
-         <gaussianNoise>0.005</gaussianNoise>
-         <alwaysOn>true</alwaysOn>
-         <updateRate>12</updateRate>
-         <topicName>sensor/ir_front</topicName>
-         <frameName>base_sonar_front</frameName>
-         <radiation>ULTRASOUND</radiation>
-         <fov>0.2967</fov>
-      </plugin>
-   </sensor>  
-   </gazebo>
--->
 
 </robot>

@@ -24,6 +24,10 @@
   <material name="white">
     <color rgba="1.0 1.0 1.0 1.0"/>
   </material>
+  <material name="wood">
+    <color rgba="1.0 0.0 1.0 1.0"/>
+  </material>
+
 
   <gazebo reference="link_chassis">
     <turnGravityOff>false</turnGravityOff>
