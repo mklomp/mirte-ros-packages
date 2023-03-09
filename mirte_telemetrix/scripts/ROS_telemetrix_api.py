@@ -8,7 +8,29 @@ import rospy
 import signal
 import aiorospy
 import io
-from telemetrix_aio import telemetrix_aio
+
+# Import the right Telemetrix AIO
+devices = rospy.get_param('/mirte/device')
+if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
+  from tmx_pico_aio import tmx_pico_aio
+else:
+  from telemetrix_aio import telemetrix_aio
+
+# Until we update our own fork of TelemtrixAIO to the renamed pwm calls
+# we need to add a simple wrapper
+async def set_pin_mode_analog_output(board, pin):
+  if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
+    await board.set_pin_mode_pwm_output(pin)
+  else:
+    await board.set_pin_mode_analog_output(pin)
+
+async def analog_write(board, pin, value):
+  if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
+    await board.pwm_write(board, pin, value)
+  else:
+    await board.analog_write(board, pin, value)
+
+
 
 # Import ROS message types
 from std_msgs.msg import Header, Int32
@@ -101,6 +123,43 @@ nano_map = {
 nano_max_pwm_value = 255
 nano_analog_offset = 14
 
+pico_map = {
+"0" : 0,
+"1" : 1,
+"2"  : 2,
+"3"  : 3,
+"4"  : 4,
+"5"  : 5,
+"6"  : 6,
+"7"  : 7,
+"8"  : 8,
+"9"  : 9,
+"10" : 10,
+"11" : 11,
+"12" : 12,
+"13" : 13,
+"14" : 14,
+"15" : 15,
+"16" : 16,
+"17" : 17,
+"18" : 18,
+"19" : 19,
+"20" : 20,
+"21" : 21,
+"22" : 22,
+"23" : 23,
+"24" : 24,
+"25" : 25,   # BUILTIN LED
+"26" : 26,
+"27" : 27,
+"28" : 28,
+"29" : 29,   # VREF, used for battery measurement
+"30" : 30    # TEMP
+}
+
+pico_max_pwm_value = 100 # note: shoudl be percentage
+pico_analog_offset = 26
+
 # Map to convert from Mirte PCB to STM32 pins numbers
 # This should be the same as printed on the PCB
 mirte_pcb_map = {
@@ -137,6 +196,10 @@ elif devices["mirte"]["mcu"] == "nano":
    analog_offset = nano_analog_offset
    max_pwm_value = nano_max_pwm_value
    pin_map = nano_map
+elif devices["mirte"]["mcu"] == "pico":
+   analog_offser = pico_analog_offset
+   max_pwm_value = pico_max_pwm_value
+   pin_map = pico_map
 else:
    max_pwm_value = 255 # TODO: also make this a setting
 
@@ -411,9 +474,9 @@ class PWMMotor():
         if not self.initialized:
           if (speed > 0):
             await self.board.set_pin_mode_digital_output(self.pins["1a"])
-            await self.board.set_pin_mode_analog_output(self.pins["1b"])
+            await set_pin_mode_analog_output(self.board, self.pins["1b"])
           if (speed < 0):
-            await self.board.set_pin_mode_analog_output(self.pins["1b"])
+            await set_pin_mode_analog_output(self.board, self.pins["1b"])
             await self.board.set_pin_mode_digital_output(self.pins["1a"])
           self.initialized = True
 
@@ -421,15 +484,15 @@ class PWMMotor():
         if (self.prev_motor_speed != speed):
           if (speed == 0):
             await self.board.digital_write(self.pins["1a"], 0)
-            await self.board.analog_write(self.pins["1b"], 0)
+            await analog_write(self.board, self.pins["1b"], 0)
           elif (speed > 0):
             await self.init_motors(speed)
             await self.board.digital_write(self.pins["1a"], 0)
-            await self.board.analog_write(self.pins["1b"], int(min(speed, 100) / 100.0 * max_pwm_value))
+            await analog_write(self.board, self.pins["1b"], int(min(speed, 100) / 100.0 * max_pwm_value))
           elif (speed < 0):
             await self.init_motors(speed)
             await self.board.digital_write(self.pins["1a"], 1)
-            await self.board.analog_write(self.pins["1b"], int(max_pwm_value - min(abs(speed), 100) / 100.0 * max_pwm_value))
+            await analog_write(self.board, self.pins["1b"], int(max_pwm_value - min(abs(speed), 100) / 100.0 * max_pwm_value))
           self.prev_motor_speed = speed
 
 class L298NMotor():
@@ -442,7 +505,7 @@ class L298NMotor():
 
     async def init_motors(self):
         if not self.initialized:
-           await self.board.set_pin_mode_analog_output(self.pins["en"])
+           await set_pin_mode_analog_output(self.board, self.pins["en"])
            await self.board.set_pin_mode_digital_output(self.pins["in1"])
            await self.board.set_pin_mode_digital_output(self.pins["in2"])
            self.initialized = True
@@ -455,11 +518,11 @@ class L298NMotor():
           if (speed >= 0):
             await self.board.digital_write(self.pins["in1"], 0)
             await self.board.digital_write(self.pins["in2"], 1)
-            await self.board.analog_write(self.pins["en"], int(min(speed, 100) / 100.0 * max_pwm_value))
+            await analog_write(self.board, self.pins["en"], int(min(speed, 100) / 100.0 * max_pwm_value))
           elif (speed < 0):
             await self.board.digital_write(self.pins["in2"], 0)
             await self.board.digital_write(self.pins["in1"], 1)
-            await self.board.analog_write(self.pins["en"], int(min(abs(speed), 100) / 100.0 * max_pwm_value))
+            await analog_write(self.board, self.pins["en"], int(min(abs(speed), 100) / 100.0 * max_pwm_value))
           self.prev_motor_speed = speed
 
 # Extended adafruit _SSD1306
@@ -563,7 +626,7 @@ class Oled(_SSD1306):
 
 async def handle_set_led_value(req):
     led = rospy.get_param("/mirte/led")
-    await board.analog_write(get_pin_numbers(led)["pin"], int(min(req.value, 100) / 100.0 * max_pwm_value))
+    await analog_write(board, get_pin_numbers(led)["pin"], int(min(req.value, 100) / 100.0 * max_pwm_value))
     return SetLEDValueResponse(True)
 
 
@@ -620,9 +683,9 @@ def handle_set_pin_value(req):
      # account for the analog_offset. We do need to account for the
      # max pwm_value though.
      capped_value = min(req.value, max_pwm_value)
-     asyncio.run(board.set_pin_mode_analog_output(pin))
+     asyncio.run(set_pin_mode_analog_output(board, pin))
      asyncio.run(asyncio.sleep(0.001))
-     asyncio.run(board.analog_write(pin, capped_value))
+     asyncio.run(analog_write(board, pin, capped_value))
   if req.type == "digital":
      asyncio.run(board.set_pin_mode_digital_output(pin))
      asyncio.run(asyncio.sleep(0.001))
@@ -646,7 +709,7 @@ def actuators(loop, board, device):
     # TODO: support multiple leds
     if rospy.has_param("/mirte/led"):
        led = rospy.get_param("/mirte/led")
-       loop.run_until_complete(board.set_pin_mode_analog_output(get_pin_numbers(led)["pin"]))
+       loop.run_until_complete(set_pin_mode_analog_output(board, get_pin_numbers(led)["pin"]))
        server = aiorospy.AsyncService('/mirte/set_led_value', SetLEDValue, handle_set_led_value)
        servers.append(loop.create_task(server.start()))
 
@@ -740,9 +803,15 @@ def sensors(loop, board, device):
    # nest_asyncio icw rospy services.
    # Maybe there is a better solution for this, to make sure that we get the
    # data here asap.
-   if max_freq <= 0:
-      tasks.append(loop.create_task(board.set_analog_scan_interval(0)))
+   if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
+     if max_freq <= 1:
+      tasks.append(loop.create_task(board.set_scan_delay(1)))
+     else:
+      tasks.append(loop.create_task(board.set_scan_delay(int(1000.0/max_freq))))
    else:
+     if max_freq <= 0:
+      tasks.append(loop.create_task(board.set_analog_scan_interval(0)))
+     else:
       tasks.append(loop.create_task(board.set_analog_scan_interval(int(1000.0/max_freq))))
 
    return tasks
@@ -766,7 +835,10 @@ if __name__ == '__main__':
    loop = asyncio.get_event_loop()
 
    # Initialize the telemetrix board
-   board = telemetrix_aio.TelemetrixAIO()
+   if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
+     board = tmx_pico_aio.TmxPicoAio()
+   else:
+     board = telemetrix_aio.TelemetrixAIO()
 
    # Catch signals to exit properly
    # We need to do it this way instead of usgin the try/catch
