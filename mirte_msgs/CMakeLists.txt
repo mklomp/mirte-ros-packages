@@ -14,7 +14,6 @@ set(msg_files
   "msg/Intensity.msg"
   "msg/IntensityDigital.msg"
   "msg/Keypad.msg"
-  "msg/Color.msg"
 )
 
 set(srv_files
