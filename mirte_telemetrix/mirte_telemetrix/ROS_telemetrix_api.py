@@ -41,16 +41,19 @@ from telemetrix_rpi_pico import telemetrix_rpi_pico
 # Until we update our own fork of TelemtrixAIO to the renamed pwm calls
 # we need to add a simple wrapper
 def set_pin_mode_analog_output(board, pin):
-  if devices and (devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico"):
+  #if devices and (devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico"):
+    print("setting pin " +  str(pin) + " to pwm")
     board.set_pin_mode_pwm_output(pin)
-  else:
-    board.set_pin_mode_analog_output(pin)
+  #else:
+  #  board.set_pin_mode_analog_output(pin)
 
 def analog_write(board, pin, value):
-  if devices and (devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico"):
-    board.pwm_write(board, pin, value)
-  else:
-    board.analog_write(board, pin, value)
+    print("setting pin " + str(pin) + " to pwm value " + str(value))
+  #if devices and (devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico"):
+    #board.set_pin_mode_pwm_output(pin)
+    board.pwm_write(pin, value)
+  #else:
+  #  board.analog_write(board, pin, value)
 
 
 
@@ -209,20 +212,20 @@ mirte_pcb_map = {
 analog_offset = 0
 max_pwm_value = 0
 pin_map = {}
-if devices and (devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "stm32"):
-   analog_offset = stm32_analog_offset
-   max_pwm_value = stm32_max_pwm_value
-   pin_map = stm32_map
-elif devices and devices["mirte"]["mcu"] == "nano":
-   analog_offset = nano_analog_offset
-   max_pwm_value = nano_max_pwm_value
-   pin_map = nano_map
-elif devices and devices["mirte"]["mcu"] == "pico":
-   analog_offser = pico_analog_offset
-   max_pwm_value = pico_max_pwm_value
-   pin_map = pico_map
-else:
-   max_pwm_value = 255 # TODO: also make this a setting
+#if devices and (devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "stm32"):
+#   analog_offset = stm32_analog_offset
+#   max_pwm_value = stm32_max_pwm_value
+#   pin_map = stm32_map
+#elif devices and devices["mirte"]["mcu"] == "nano":
+#   analog_offset = nano_analog_offset
+#   max_pwm_value = nano_max_pwm_value
+#   pin_map = nano_map
+#elif devices and devices["mirte"]["mcu"] == "pico":
+analog_offser = pico_analog_offset
+max_pwm_value = pico_max_pwm_value
+pin_map = pico_map
+#else:
+#   max_pwm_value = 255 # TODO: also make this a setting
 
 def get_pin_numbers(component):
    #device = devices[component["device"]]
@@ -468,23 +471,26 @@ class Servo():
 
 # TODO: create motor classs and inherit from that one
 class PWMMotor():
-    def __init__(self, board, motor_obj):
+    def __init__(self, board, motor_obj, a, b):
         self.board = board
-        self.pins = get_pin_numbers(motor_obj)
-        self.name = motor_obj['name']
+        self.a = a
+        self.b = b
+        #self.pins = get_pin_numbers(motor_obj)
+        self.name = motor_obj #motor_obj['name']
         self.prev_motor_speed = 0
         self.initialized = False
 
     def start(self):
         server = node.create_service(SetMotorSpeed, "/mirte/set_" + self.name + "_speed", self.set_motor_speed_service)
-        sub = node.create_subscription(Int32, '/mirte/motor_' + self.name + "_speed", self.callback)
+        #sub = node.create_subscription(Int32, '/mirte/motor_' + self.name + "_speed", self.callback)
 
     def callback(self, data):
         self.set_speed(data.data)
 
-    def set_motor_speed_service(self, req):
+    def set_motor_speed_service(self, req, res):
         self.set_speed(req.speed)
-        return SetMotorSpeedResponse(True)
+        res.status = True
+        return res #SetMotorSpeedResponse(True)
 
     # Ideally one would initialize the pins in the constructor. But
     # since some mcu's have some voltage on pins when they are not
@@ -497,27 +503,30 @@ class PWMMotor():
     # where is creates a movement in teh same direction.
     def init_motors(self, speed):
         if not self.initialized:
-          if (speed > 0):
-            self.board.set_pin_mode_digital_output(self.pins["1a"])
-            set_pin_mode_analog_output(self.board, self.pins["1b"])
+          if (speed >= 0):
+            self.board.set_pin_mode_digital_output(self.a)
+            set_pin_mode_analog_output(self.board, self.b)
+            print("setting correct port")
           if (speed < 0):
-            set_pin_mode_analog_output(self.board, self.pins["1b"])
-            self.board.set_pin_mode_digital_output(self.pins["1a"])
+            set_pin_mode_analog_output(self.board, self.b)
+            self.board.set_pin_mode_digital_output(self.a)
           self.initialized = True
+          #time.sleep(1)
 
     def set_speed(self, speed):
+        print("seting speed to: " + str(speed))
         if (self.prev_motor_speed != speed):
+          self.init_motors(speed)
           if (speed == 0):
-            self.board.digital_write(self.pins["1a"], 0)
-            analog_write(self.board, self.pins["1b"], 0)
+            self.board.digital_write(self.a, 0)
+            analog_write(self.board, self.b, 0)
           elif (speed > 0):
-            self.init_motors(speed)
-            self.board.digital_write(self.pins["1a"], 0)
-            analog_write(self.board, self.pins["1b"], int(min(speed, 100) / 100.0 * max_pwm_value))
+            self.board.digital_write(self.a, 0)
+            print("speed: " + str(speed) + "    pwm: " + str(max_pwm_value))
+            analog_write(self.board, self.b, int(min(speed, 100) / 100.0 * max_pwm_value))
           elif (speed < 0):
-            self.init_motors(speed)
-            self.board.digital_write(self.pins["1a"], 1)
-            analog_write(self.board, self.pins["1b"], int(max_pwm_value - min(abs(speed), 100) / 100.0 * max_pwm_value))
+            self.board.digital_write(self.a, 1)
+            analog_write(self.board, self.b, int(max_pwm_value - min(abs(speed), 100) / 100.0 * max_pwm_value))
           self.prev_motor_speed = speed
 
 class L298NMotor():
@@ -721,36 +730,43 @@ def handle_set_pin_value(req):
 def actuators(board, device):
     servers = []
 
-    oleds = node.declare_parameter("/mirte/oled", {}).value
-    oleds = {k: v for k, v in oleds.items() if v['device'] == device}
-    oled_id = 0
-    for oled in oleds:
-       oled_obj = Oled(128, 64, board, oleds[oled], port=oled_id) #get_pin_numbers(oleds[oled]))
-       oled_id = oled_id + 1
-       servers.append(oled_obj.start())
+#    oleds = node.declare_parameter("/mirte/oled", {}).value
+#    oleds = {k: v for k, v in oleds.items() if v['device'] == device}
+#    oled_id = 0
+#    for oled in oleds:
+#       oled_obj = Oled(128, 64, board, oleds[oled], port=oled_id) #get_pin_numbers(oleds[oled]))
+#       oled_id = oled_id + 1
+#       servers.append(oled_obj.start())
 
     # TODO: support multiple leds
-    led = node.declare_parameter("/mirte/led", {}).value
-    if led:
-       set_pin_mode_analog_output(board, get_pin_numbers(led)["pin"])
-       server = node.create_service(SetLEDValue, '/mirte/set_led_value', handle_set_led_value)
-       servers.append(server.start())
+#    led = node.declare_parameter("/mirte/led", {}).value
+#    if led:
+#       set_pin_mode_analog_output(board, get_pin_numbers(led)["pin"])
+#       server = node.create_service(SetLEDValue, '/mirte/set_led_value', handle_set_led_value)
+#       servers.append(server.start())
 
-    motors = node.declare_parameter("/mirte/motor", {}).value
-    motors = {k: v for k, v in motors.items() if v['device'] == device}
-    for motor in motors:
-       motor_obj = {}
-       if motors[motor]["type"] == "l298n":
-          motor_obj = L298NMotor(board, motors[motor])
-       else:
-          motor_obj = PWMMotor(board, motors[motor])
-       servers.append(motor_obj.start())
+#    motors = node.declare_parameter("/mirte/motor", {}).value
+#    motors = {k: v for k, v in motors.items() if v['device'] == device}
+#    for motor in motors:
+#       motor_obj = {}
+#       if motors[motor]["type"] == "l298n":
+#          motor_obj = L298NMotor(board, motors[motor])
+#       else:
+#          motor_obj = PWMMotor(board, motors[motor])
+#       servers.append(motor_obj.start())
+    motor_obj = PWMMotor(board, "left", 18, 19)
+    servers.append(motor_obj.start())
 
-    servos = node.declare_parameter("/mirte/servo", {}).value
-    servos = {k: v for k, v in servos.items() if v['device'] == device}
-    for servo in servos:
-        servo = Servo(board, servos[servo])
-        servers.append(servo.start())
+    motor_obj2 = PWMMotor(board, "right", 20, 21)
+    servers.append(motor_obj2.start())
+
+
+
+#    servos = node.declare_parameter("/mirte/servo", {}).value
+#    servos = {k: v for k, v in servos.items() if v['device'] == device}
+#    for servo in servos:
+#        servo = Servo(board, servos[servo])
+#        servers.append(servo.start())
 
 
     # Set a raw pin value
@@ -885,8 +901,8 @@ def main(args=None):
    # Start all tasks for sensors and actuators
    device = 'mirte'
    sensor_tasks = sensors(board, device)
-#   actuator_tasks = actuators(board, device)
-   all_tasks = sensor_tasks #+ actuator_tasks
+   actuator_tasks = actuators(board, device)
+   all_tasks = sensor_tasks + actuator_tasks
    for task in all_tasks:
        task
 
