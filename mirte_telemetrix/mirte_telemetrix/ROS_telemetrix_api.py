@@ -13,6 +13,20 @@ import io
 rclpy.init(args=sys.argv)
 node = rclpy.create_node('mirte_telemetrix') #, anonymous=False)
 
+#node.declare_parameters("distance", {
+#  {"laser_topic", "default_scan"},
+#  {"camera_topic", "default_image"},
+#  {"tf_frame", "default_world"},
+#})
+
+#distance_sensors = node.get_parameter('distance').get_parameter_value()
+#print(distance_sensors)
+#print("------------")
+
+#exit()
+
+
+
 # Import the right Telemetrix AIO
 devices = node.declare_parameter('/mirte/device', []).value
 #if devices and (devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico"):
@@ -20,6 +34,9 @@ devices = node.declare_parameter('/mirte/device', []).value
 #else:
 #  from telemetrix import telemetrix
 from telemetrix_rpi_pico import telemetrix_rpi_pico
+
+
+
 
 # Until we update our own fork of TelemtrixAIO to the renamed pwm calls
 # we need to add a simple wrapper
@@ -208,31 +225,31 @@ else:
    max_pwm_value = 255 # TODO: also make this a setting
 
 def get_pin_numbers(component):
-   device = devices[component["device"]]
-   pins = {}
-   if device["type"] == "mirte_pcb":
-      mcu = "stm32"
-      pins = mirte_pcb_map[component["connector"]]
-   elif device["type"] == "breadboard":
-      mcu = device["mcu"]
-      pins = component["pins"]
+   #device = devices[component["device"]]
+   #pins = {}
+   #if device["type"] == "mirte_pcb":
+   #   mcu = "stm32"
+   #   pins = mirte_pcb_map[component["connector"]]
+   #elif device["type"] == "breadboard":
+   #   mcu = device["mcu"]
+   pins = component["pins"]
 
    # convert pin naming to numbers
    pin_numbers = {}
    for item in pins:
-      if mcu == "stm32":
-         pin_numbers[item] = stm32_map[pins[item]]
-      elif mcu == "nano":
-         pin_numbers[item] = nano_map[pins[item]]
-      else:
-         pin_numbers[item] = pins[item]
+   #   if mcu == "stm32":
+   #      pin_numbers[item] = stm32_map[pins[item]]
+   #   elif mcu == "nano":
+   #      pin_numbers[item] = nano_map[pins[item]]
+   #   else:
+      pin_numbers[item] = pins[item]
    return pin_numbers
 
 # Abstract Sensor class
 class SensorMonitor:
     def __init__(self, board, sensor, publisher):
         self.board = board
-        self.pins = get_pin_numbers(sensor)
+        #self.pins = get_pin_numbers(sensor)
         self.publisher = publisher
         self.max_freq = 10
         if "max_frequency" in sensor:
@@ -242,11 +259,11 @@ class SensorMonitor:
            self.differential = sensor["differential"]
         self.last_publish_time = -1
         self.last_publish_value = {}
-        rospy.loginfo("Sensor initialized on topic %s (max_freq: %d, differential: %d)", self.publisher.name, self.max_freq, self.differential)
+        #rospy.loginfo("Sensor initialized on topic %s (max_freq: %d, differential: %d)", self.publisher.name, self.max_freq, self.differential)
 
     def get_header(self):
        header = Header()
-       header.stamp = rospy.Time.now()
+       #header.stamp = rospy.Time.now()
        return header
 
     # NOTE: although there are no async functions in this
@@ -328,9 +345,14 @@ class KeypadMonitor(SensorMonitor):
        self.last_debounced_key = debounced_key
 
 class DistanceSensorMonitor(SensorMonitor):
-    def __init__(self, board, sensor):
-        pub = node.create_publisher(Range, '/mirte/distance/' + sensor["name"], queue_size=1, latch=True)
-        srv = node.create_service(GetDistance, '/mirte/get_distance_' + sensor["name"], self.get_data)
+    def __init__(self, board, sensor, trigger, echo):
+        self.trigger = trigger
+        self.echo = echo
+        pub = node.create_publisher(Range, '/mirte/distance/' + sensor, 10)
+        srv = node.create_service(GetDistance, '/mirte/get_distance_' + sensor, self.get_data)
+       # node.declare_parameter("distance." + str(sensor) + ".pins.trigger", "")
+       # node.declare_parameter("distance." + str(sensor) + ".pins.echo", "")
+   #distance_sensors = node.get_parameter('/mirte/distance').get_parameter_value()
         super().__init__(board, sensor, pub)
         self.last_publish_value = Range()
 
@@ -338,7 +360,8 @@ class DistanceSensorMonitor(SensorMonitor):
         return GetDistanceResponse(self.last_publish_value.range)
 
     def start(self):
-        self.board.set_pin_mode_sonar(self.pins["trigger"], self.pins["echo"], self.publish_data)
+        #trigger = node.get_parameter('distance').get_parameter_value()
+        self.board.set_pin_mode_sonar(self.trigger, self.echo, self.publish_data)
 
     def publish_data(self, data):
         # Although the initialization of this Range message
@@ -351,7 +374,7 @@ class DistanceSensorMonitor(SensorMonitor):
         range.min_range = 0.02
         range.max_range = 1.5
         range.header = self.get_header()
-        range.range = data[2]
+        range.range = float(int(data[2]))
         self.publish(range)
 
 class DigitalIntensitySensorMonitor(SensorMonitor):
@@ -744,40 +767,48 @@ def sensors(board, device):
    max_freq = node.declare_parameter("/mirte/device/mirte/max_frequency", 10).value
 
    # initialze distance sensors
-   distance_sensors = node.declare_parameter("/mirte/distance", {}).value
-   distance_sensors = {k: v for k, v in distance_sensors.items() if v['device'] == device}
-   for sensor in distance_sensors:
-      distance_sensors[sensor]["max_frequency"] = max_freq
-      distance_publisher = node.create_publisher(Range, '/mirte/' + sensor, queue_size=1, latch=True)
-      monitor = DistanceSensorMonitor(board, distance_sensors[sensor])
-      tasks.append(monitor.start())
+   #node.declare_parameter("/mirte/distance", "notinh")
+   #distance_sensors = node.get_parameter('/mirte/distance').get_parameter_value()
+   #print(distance_sensors)
+   #print("------------")
+   #distance_sensors = ["left", "right"]
+#   distance_sensors = node.declare_parameter("/mirte/distance", "").value
+#   distance_sensors = {k: v for k, v in distance_sensors.items() if v['device'] == device}
+   #for sensor in distance_sensors:
+#      distance_sensors[sensor]["max_frequency"] = max_freq
+   #distance_publisher = node.create_publisher(Range, '/mirte/' + sensor, 10)
+   monitor = DistanceSensorMonitor(board, "left", 7, 6)
+   tasks.append(monitor.start())
+
+   monitor2 = DistanceSensorMonitor(board, "right", 9, 8)
+   tasks.append(monitor2.start())
 
    # Initialize intensity sensors
-   intensity_sensors = node.declare_parameter("/mirte/intensity", {}).value
-   intensity_sensors = {k: v for k, v in intensity_sensors.items() if v['device'] == device}
-   for sensor in intensity_sensors:
-      intensity_sensors[sensor]["max_frequency"] = max_freq
-      if "analog" in get_pin_numbers(intensity_sensors[sensor]):
-         monitor = AnalogIntensitySensorMonitor(board, intensity_sensors[sensor])
-         tasks.append(monitor.start())
-      if "digital" in get_pin_numbers(intensity_sensors[sensor]):
-         monitor = DigitalIntensitySensorMonitor(board, intensity_sensors[sensor])
-         tasks.append(monitor.start())
+#   intensity_sensors = node.declare_parameter("/mirte/intensity", {}).value
+#   intensity_sensors = {k: v for k, v in intensity_sensors.items() if v['device'] == device}
+#   for sensor in intensity_sensors:
+#      intensity_sensors[sensor]["max_frequency"] = max_freq
+#      if "analog" in get_pin_numbers(intensity_sensors[sensor]):
+#         monitor = AnalogIntensitySensorMonitor(board, intensity_sensors[sensor])
+#         tasks.append(monitor.start())
+#      if "digital" in get_pin_numbers(intensity_sensors[sensor]):
+#         monitor = DigitalIntensitySensorMonitor(board, intensity_sensors[sensor])
+#         tasks.append(monitor.start())
 
    # Initialize keypad sensors
-   keypad_sensors = node.declare_parameter("/mirte/keypad", {}).value
-   keypad_sensors = {k: v for k, v in keypad_sensors.items() if v['device'] == device}
-   for sensor in keypad_sensors:
-      keypad_sensors[sensor]["max_frequency"] = max_freq
-      monitor = KeypadMonitor(board, keypad_sensors[sensor])
-      tasks.append(monitor.start())
+#   keypad_sensors = node.declare_parameter("/mirte/keypad", {}).value
+#   keypad_sensors = {k: v for k, v in keypad_sensors.items() if v['device'] == device}
+#   for sensor in keypad_sensors:
+#      keypad_sensors[sensor]["max_frequency"] = max_freq
+#      monitor = KeypadMonitor(board, keypad_sensors[sensor])
+#      tasks.append(monitor.start())
 
    # Initialize encoder sensors
-   encoder_sensors = node.declare_parameter("/mirte/encoder", {}).value
-   encoder_sensors = {k: v for k, v in encoder_sensors.items() if v['device'] == device}
-   for sensor in encoder_sensors:
-      monitor = EncoderSensorMonitor(board, encoder_sensors[sensor])
-      tasks.append(monitor.start())
+#   encoder_sensors = node.declare_parameter("/mirte/encoder", {}).value
+#   encoder_sensors = {k: v for k, v in encoder_sensors.items() if v['device'] == device}
+#   for sensor in encoder_sensors:
+#      monitor = EncoderSensorMonitor(board, encoder_sensors[sensor])
+#      tasks.append(monitor.start())
       # encoder sensors do not need a max_frequency. They are interrupts on
       # on the mcu side.
 
@@ -795,18 +826,19 @@ def sensors(board, device):
    # nest_asyncio icw rospy services.
    # Maybe there is a better solution for this, to make sure that we get the
    # data here asap.
-   if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
-     if max_freq <= 1:
-      pass
-      #tasks.append(board.set_scan_delay(1))
-     else:
-      pass
-      #tasks.append(board.set_scan_delay(int(1000.0/max_freq)))
-   else:
-     if max_freq <= 0:
-      tasks.append(board.set_analog_scan_interval(0))
-     else:
-      tasks.append(board.set_analog_scan_interval(int(1000.0/max_freq)))
+#   if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
+#     if max_freq <= 1:
+#      pass
+#      #tasks.append(board.set_scan_delay(1))
+#     else:
+#      pass
+#      #tasks.append(board.set_scan_delay(int(1000.0/max_freq)))
+#   else:
+#     if max_freq <= 0:
+#      tasks.append(board.set_analog_scan_interval(0))
+#     else:
+#      tasks.append(board.set_analog_scan_interval(int(1000.0/max_freq)))
+
 
    return tasks
 
@@ -820,6 +852,8 @@ def shutdown(board):
    if not closing:
       closing = True
       board.shutdown()
+      #node.destroy_node()
+      #rclpy.shutdown()
 
       # Stop the asyncio loop
       print("Telemetrix shutdown nicely")
@@ -835,16 +869,11 @@ def main(args=None):
    # Catch signals to exit properly
    # We need to do it this way instead of usgin the try/catch
    # as in the telemetrix examples
-   signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
-   for s in signals:
-     l = lambda board=board: shutdown(board)
+#   signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+#   for s in signals:
+#     l = lambda board=board: shutdown(board)
+#     signal.signal(s, l)
      #loop.add_signal_handler(s, l)
-
-   # Initialize the ROS node as anonymous since there
-   # should only be one instnace running.
-   rclpy.init(args=sys.argv)
-   node = rclpy.create_node('mirte_telemetrix', anonymous=False)
-
 
    # Escalate siging to this process in order to shutdown nicely
    # This is needed when only this process is killed (eg. rosnode kill)
@@ -856,15 +885,20 @@ def main(args=None):
    # Start all tasks for sensors and actuators
    device = 'mirte'
    sensor_tasks = sensors(board, device)
-   actuator_tasks = actuators(board, device)
-   all_tasks = sensor_tasks + actuator_tasks
+#   actuator_tasks = actuators(board, device)
+   all_tasks = sensor_tasks #+ actuator_tasks
    for task in all_tasks:
        task
 
    # Is equivalent to rospy.spin() in a sense that this
    # will just keep the node running only in a asyncio
    # way.
-   rclpy.spin()
+   #while True:
+   #  time.sleep(0.01)
+   try:
+     rclpy.spin(node)
+   except:
+     shutdown(board)
 
 
 if __name__ == '__main__':
