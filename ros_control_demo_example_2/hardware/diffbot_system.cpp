@@ -19,6 +19,7 @@
 #include <limits>
 #include <memory>
 #include <vector>
+#include <cstdlib>
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -38,6 +39,30 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_init(
   base_x_ = 0.0;
   base_y_ = 0.0;
   base_theta_ = 0.0;
+
+  last_cmd_left_ = 0;
+  last_cmd_right_ = 0;
+
+  std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("diff_drive");
+  left_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("/mirte/set_left_speed");
+  right_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("/mirte/set_right_speed");
+
+  while (!left_client_->wait_for_service(std::chrono::seconds(1))) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+      return hardware_interface::CallbackReturn::ERROR;
+    }
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+  }
+
+  // TODO: conbine with above
+  while (!right_client_->wait_for_service(std::chrono::seconds(1))) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+      return hardware_interface::CallbackReturn::ERROR;
+    }
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+  }
 
   // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
   hw_start_sec_ = std::stod(info_.hardware_parameters["example_param_hw_start_duration_sec"]);
@@ -216,6 +241,27 @@ hardware_interface::return_type DiffBotSystemHardware::read(
 hardware_interface::return_type ros2_control_demo_example_2 ::DiffBotSystemHardware::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
+
+      auto left_request = std::make_shared<mirte_msgs::srv::SetMotorSpeed::Request>();
+      int left_speed  = std::max(std::min(int(hw_commands_[0] / ( 6 * M_PI) * 100), 100), -100);
+      if (left_speed != last_cmd_left_){
+        left_request->speed = left_speed;
+        auto result = left_client_->async_send_request(left_request);
+        last_cmd_left_ = left_speed;
+      }
+
+
+      auto right_request = std::make_shared<mirte_msgs::srv::SetMotorSpeed::Request>();
+      int right_speed = std::max(std::min(int(hw_commands_[1] / ( 6 * M_PI) * 100), 100), -100);
+      if (right_speed != last_cmd_right_){
+        right_request->speed = right_speed;
+        auto result = right_client_->async_send_request(right_request);
+        last_cmd_right_ = right_speed;
+      }
+
+
+
+
   // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Writing...");
 

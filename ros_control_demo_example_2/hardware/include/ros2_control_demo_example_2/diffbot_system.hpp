@@ -27,9 +27,11 @@
 #include "rclcpp/duration.hpp"
 #include "rclcpp/macros.hpp"
 #include "rclcpp/time.hpp"
+#include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 #include "ros2_control_demo_example_2/visibility_control.h"
+#include "mirte_msgs/srv/set_motor_speed.hpp"
 
 namespace ros2_control_demo_example_2
 {
@@ -76,6 +78,11 @@ private:
 
   // Store the wheeled robot position
   double base_x_, base_y_, base_theta_;
+  int last_cmd_left_;
+  int last_cmd_right_;
+
+  rclcpp::Client<mirte_msgs::srv::SetMotorSpeed>::SharedPtr left_client_;
+  rclcpp::Client<mirte_msgs::srv::SetMotorSpeed>::SharedPtr right_client_;
 };
 
 }  // namespace ros2_control_demo_example_2

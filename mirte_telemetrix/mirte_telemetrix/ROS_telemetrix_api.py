@@ -522,11 +522,14 @@ class PWMMotor():
             analog_write(self.board, self.b, 0)
           elif (speed > 0):
             self.board.digital_write(self.a, 0)
-            print("speed: " + str(speed) + "    pwm: " + str(max_pwm_value))
-            analog_write(self.board, self.b, int(min(speed, 100) / 100.0 * max_pwm_value))
+            pwm = int(min(speed, 100) / 100.0 * max_pwm_value)
+            pwm = max(min(99, pwm), 0)
+            analog_write(self.board, self.b, pwm)
           elif (speed < 0):
             self.board.digital_write(self.a, 1)
-            analog_write(self.board, self.b, int(max_pwm_value - min(abs(speed), 100) / 100.0 * max_pwm_value))
+            pwm = int(max_pwm_value - min(abs(speed), 100) / 100.0 * max_pwm_value)
+            pwm = max(min(99, pwm), 0)
+            analog_write(self.board, self.b, pwm)
           self.prev_motor_speed = speed
 
 class L298NMotor():
@@ -911,10 +914,10 @@ def main(args=None):
    # way.
    #while True:
    #  time.sleep(0.01)
-   try:
-     rclpy.spin(node)
-   except:
-     shutdown(board)
+#   try:
+   rclpy.spin(node)
+#   except:
+#     shutdown(board)
 
 
 if __name__ == '__main__':
