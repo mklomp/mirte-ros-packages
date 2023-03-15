@@ -757,10 +757,10 @@ def actuators(board, device):
 #       else:
 #          motor_obj = PWMMotor(board, motors[motor])
 #       servers.append(motor_obj.start())
-    motor_obj = PWMMotor(board, "left", 18, 19)
+    motor_obj = PWMMotor(board, "left", 19, 18)
     servers.append(motor_obj.start())
 
-    motor_obj2 = PWMMotor(board, "right", 20, 21)
+    motor_obj2 = PWMMotor(board, "right", 21, 20)
     servers.append(motor_obj2.start())
 
 
@@ -903,7 +903,7 @@ def main(args=None):
 
    # Start all tasks for sensors and actuators
    device = 'mirte'
-   sensor_tasks = sensors(board, device)
+   sensor_tasks = [] #sensors(board, device)
    actuator_tasks = actuators(board, device)
    all_tasks = sensor_tasks + actuator_tasks
    for task in all_tasks:
@@ -914,10 +914,10 @@ def main(args=None):
    # way.
    #while True:
    #  time.sleep(0.01)
-#   try:
-   rclpy.spin(node)
-#   except:
-#     shutdown(board)
+   try:
+     rclpy.spin(node)
+   except:
+     shutdown(board)
 
 
 if __name__ == '__main__':
