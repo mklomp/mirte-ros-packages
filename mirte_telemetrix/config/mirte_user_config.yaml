@@ -5,9 +5,9 @@ mirte_telemetrix:
         type: breadboard
         mcu: pico
         max_frequency: 100
-    distance:
-      -  name: left
-         device: mirte
+#    distance:
+#      -  name: left
+#         device: mirte
 #         pins:
 #           trigger: 7
 #           echo: 6

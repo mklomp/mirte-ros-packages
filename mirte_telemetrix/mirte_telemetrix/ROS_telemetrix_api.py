@@ -883,7 +883,7 @@ def main(args=None):
    #  board = telemetrix_rpi_pico.TelemetrixRpiPico()
    #else:
    #  board = telemetrix.Telemetrix()
-   board = telemetrix_rpi_pico.TelemetrixRpiPico()
+   board = telemetrix_rpi_pico.TelemetrixRpiPico("/dev/ttyUSB0")
 
    # Catch signals to exit properly
    # We need to do it this way instead of usgin the try/catch
