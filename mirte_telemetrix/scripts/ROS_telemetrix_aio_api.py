@@ -1,32 +1,34 @@
 #!/usr/bin/env python3.8
+import asyncio
 import os, os.path
 import sys
 import time
 import math
 import rospy
 import signal
+import aiorospy
 import io
 
 # Import the right Telemetrix AIO
 devices = rospy.get_param('/mirte/device')
 if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
-  from telemetrix_rpi_pico import telemetrix_rpi_pico
+  from tmx_pico_aio import tmx_pico_aio
 else:
-  from telemetrix import telemetrix
+  from telemetrix_aio import telemetrix_aio
 
 # Until we update our own fork of TelemtrixAIO to the renamed pwm calls
 # we need to add a simple wrapper
-def set_pin_mode_analog_output(board, pin):
+async def set_pin_mode_analog_output(board, pin):
   if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
-    board.set_pin_mode_pwm_output(pin)
+    await board.set_pin_mode_pwm_output(pin)
   else:
-    board.set_pin_mode_analog_output(pin)
+    await board.set_pin_mode_analog_output(pin)
 
-def analog_write(board, pin, value):
+async def analog_write(board, pin, value):
   if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
-    board.pwm_write(board, pin, value)
+    await board.pwm_write(board, pin, value)
   else:
-    board.analog_write(board, pin, value)
+    await board.analog_write(board, pin, value)
 
 
 
@@ -235,6 +237,7 @@ class SensorMonitor:
         self.differential = 0
         if "differential" in sensor:
            self.differential = sensor["differential"]
+        self.loop = asyncio.get_event_loop()
         self.last_publish_time = -1
         self.last_publish_value = {}
         rospy.loginfo("Sensor initialized on topic %s (max_freq: %d, differential: %d)", self.publisher.name, self.max_freq, self.differential)
@@ -247,24 +250,24 @@ class SensorMonitor:
     # NOTE: although there are no async functions in this
     # the function needs to be async since it is called
     # inside a callback of an awaited part of telemetrix
-    def publish_imp(self, data):
+    async def publish_imp(self, data):
        self.publisher.publish(data)
        self.last_publish_value = data
 
-    def publish(self, data):
+    async def publish(self, data):
        if self.max_freq == -1:
-          self.publish_imp(data)
+          await self.publish_imp(data)
        else:
           now_millis = int(round(time.time() * 1000))
 
           # always publish the first message (TODO: and maybe messages that took too long 2x 1/freq?)
           if self.last_publish_time == -1:
-             self.publish_imp(data)
+             await self.publish_imp(data)
              self.last_publish_time = now_millis
 
           # from then on publish if needed based on max_freq
           if now_millis - self.last_publish_time >= 1000.0 / self.max_freq:
-             self.publish_imp(data)
+             await self.publish_imp(data)
              self.last_publish_time += (1000.0 / self.max_freq) # Note: this should not be set to now_millis. This is due to Nyquist.
 
 class KeypadMonitor(SensorMonitor):
@@ -281,10 +284,10 @@ class KeypadMonitor(SensorMonitor):
     def get_data(self, req):
         return GetKeypadResponse(self.last_publish_value.key)
 
-    def start(self):
-        self.board.set_pin_mode_analog_input(self.pins["pin"] - analog_offset, self.differential, self.publish_data)
+    async def start(self):
+        await self.board.set_pin_mode_analog_input(self.pins["pin"] - analog_offset, self.differential, self.publish_data)
 
-    def publish_data(self, data):
+    async def publish_data(self, data):
        # Determine the key that is pressed
        key = ""
        if data[2] < 70:
@@ -310,7 +313,7 @@ class KeypadMonitor(SensorMonitor):
        keypad = Keypad()
        keypad.header = self.get_header()
        keypad.key = debounced_key
-       self.publish(keypad)
+       await self.publish(keypad)
 
        # check if we need to send a pressed message
        if (self.last_debounced_key != "") and (self.last_debounced_key is not debounced_key):
@@ -332,10 +335,10 @@ class DistanceSensorMonitor(SensorMonitor):
     def get_data(self, req):
         return GetDistanceResponse(self.last_publish_value.range)
 
-    def start(self):
-        self.board.set_pin_mode_sonar(self.pins["trigger"], self.pins["echo"], self.publish_data)
+    async def start(self):
+        await self.board.set_pin_mode_sonar(self.pins["trigger"], self.pins["echo"], self.publish_data)
 
-    def publish_data(self, data):
+    async def publish_data(self, data):
         # Although the initialization of this Range message
         # including some of the values could be placed in the
         # constructor for efficiency reasons. This does
@@ -347,7 +350,7 @@ class DistanceSensorMonitor(SensorMonitor):
         range.max_range = 1.5
         range.header = self.get_header()
         range.range = data[2]
-        self.publish(range)
+        await self.publish(range)
 
 class DigitalIntensitySensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
@@ -359,14 +362,14 @@ class DigitalIntensitySensorMonitor(SensorMonitor):
     def get_data(self, req):
         return GetIntensityDigitalResponse(self.last_publish_value.value)
 
-    def start(self):
-        self.board.set_pin_mode_digital_input(self.pins["digital"], callback=self.publish_data)
+    async def start(self):
+        await self.board.set_pin_mode_digital_input(self.pins["digital"], callback=self.publish_data)
 
-    def publish_data(self, data):
+    async def publish_data(self, data):
         intensity = IntensityDigital()
         intensity.header = self.get_header()
         intensity.value = bool(data[2])
-        self.publish(intensity)
+        await self.publish(intensity)
 
 class AnalogIntensitySensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
@@ -378,14 +381,14 @@ class AnalogIntensitySensorMonitor(SensorMonitor):
     def get_data(self, req):
         return GetIntensityResponse(self.last_publish_value.value)
 
-    def start(self):
-        self.board.set_pin_mode_analog_input(self.pins["analog"] - analog_offset, differential=self.differential, callback=self.publish_data)
+    async def start(self):
+        await self.board.set_pin_mode_analog_input(self.pins["analog"] - analog_offset, differential=self.differential, callback=self.publish_data)
 
-    def publish_data(self, data):
+    async def publish_data(self, data):
         intensity = Intensity()
         intensity.header = self.get_header()
         intensity.value = data[2]
-        self.publish(intensity)
+        await self.publish(intensity)
 
 class EncoderSensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
@@ -403,8 +406,8 @@ class EncoderSensorMonitor(SensorMonitor):
     def get_data(self, req):
         return GetEncoderResponse(self.last_publish_value.value)
 
-    def start(self):
-        self.board.set_pin_mode_encoder(self.pins["pin"], 2, self.ticks_per_wheel, self.publish_data)
+    async def start(self):
+        await self.board.set_pin_mode_encoder(self.pins["pin"], 2, self.ticks_per_wheel, self.publish_data)
         rospy.Timer(rospy.Duration(1.0/10.0), self.publish_speed_data)
 
     def publish_speed_data(self, event=None):
@@ -414,12 +417,12 @@ class EncoderSensorMonitor(SensorMonitor):
         self.speed_count = 0
         self.speed_pub.publish(encoder)
 
-    def publish_data(self, data):
+    async def publish_data(self, data):
         self.speed_count = self.speed_count + 1
         encoder = Encoder()
         encoder.header = self.get_header()
         encoder.value = data[2]
-        self.publish(encoder)
+        await self.publish(encoder)
 
 class Servo():
     def __init__(self, board, servo_obj):
@@ -427,15 +430,15 @@ class Servo():
         self.pins = get_pin_numbers(servo_obj)
         self.name = servo_obj['name']
 
-    def stop(self):
-        board.detach_servo(self.pins['pin'])
+    async def stop(self):
+        await board.detach_servo(self.pins['pin'])
 
-    def start(self):
-        board.set_pin_mode_servo(self.pins['pin'])
+    async def start(self):
+        await board.set_pin_mode_servo(self.pins['pin'])
         server = rospy.Service("/mirte/set_" + self.name + "_servo_angle", SetServoAngle, self.set_servo_angle_service)
 
     def set_servo_angle_service(self, req):
-        board.servo_write(self.pins['pin'], req.angle)
+        asyncio.run(board.servo_write(self.pins['pin'], req.angle))
         return SetServoAngleResponse(True)
 
 # TODO: create motor classs and inherit from that one
@@ -447,15 +450,15 @@ class PWMMotor():
         self.prev_motor_speed = 0
         self.initialized = False
 
-    def start(self):
+    async def start(self):
         server = rospy.Service("/mirte/set_" + self.name + "_speed", SetMotorSpeed, self.set_motor_speed_service)
         sub = rospy.Subscriber('/mirte/motor_' + self.name + "_speed", Int32, self.callback)
 
     def callback(self, data):
-        self.set_speed(data.data)
+        asyncio.run(self.set_speed(data.data))
 
     def set_motor_speed_service(self, req):
-        self.set_speed(req.speed)
+        asyncio.run(self.set_speed(req.speed))
         return SetMotorSpeedResponse(True)
 
     # Ideally one would initialize the pins in the constructor. But
@@ -467,29 +470,29 @@ class PWMMotor():
     # enough. But using telemetrix is a bit too slow fow this. We
     # therefore set the pin type on first move, and do this in a way
     # where is creates a movement in teh same direction.
-    def init_motors(self, speed):
+    async def init_motors(self, speed):
         if not self.initialized:
           if (speed > 0):
-            self.board.set_pin_mode_digital_output(self.pins["1a"])
-            set_pin_mode_analog_output(self.board, self.pins["1b"])
+            await self.board.set_pin_mode_digital_output(self.pins["1a"])
+            await set_pin_mode_analog_output(self.board, self.pins["1b"])
           if (speed < 0):
-            set_pin_mode_analog_output(self.board, self.pins["1b"])
-            self.board.set_pin_mode_digital_output(self.pins["1a"])
+            await set_pin_mode_analog_output(self.board, self.pins["1b"])
+            await self.board.set_pin_mode_digital_output(self.pins["1a"])
           self.initialized = True
 
-    def set_speed(self, speed):
+    async def set_speed(self, speed):
         if (self.prev_motor_speed != speed):
           if (speed == 0):
-            self.board.digital_write(self.pins["1a"], 0)
-            analog_write(self.board, self.pins["1b"], 0)
+            await self.board.digital_write(self.pins["1a"], 0)
+            await analog_write(self.board, self.pins["1b"], 0)
           elif (speed > 0):
-            self.init_motors(speed)
-            self.board.digital_write(self.pins["1a"], 0)
-            analog_write(self.board, self.pins["1b"], int(min(speed, 100) / 100.0 * max_pwm_value))
+            await self.init_motors(speed)
+            await self.board.digital_write(self.pins["1a"], 0)
+            await analog_write(self.board, self.pins["1b"], int(min(speed, 100) / 100.0 * max_pwm_value))
           elif (speed < 0):
-            self.init_motors(speed)
-            self.board.digital_write(self.pins["1a"], 1)
-            analog_write(self.board, self.pins["1b"], int(max_pwm_value - min(abs(speed), 100) / 100.0 * max_pwm_value))
+            await self.init_motors(speed)
+            await self.board.digital_write(self.pins["1a"], 1)
+            await analog_write(self.board, self.pins["1b"], int(max_pwm_value - min(abs(speed), 100) / 100.0 * max_pwm_value))
           self.prev_motor_speed = speed
 
 class L298NMotor():
@@ -497,28 +500,29 @@ class L298NMotor():
         self.board = board
         self.pins = pins
         self.prev_motor_speed = 0
+        self.loop = asyncio.get_event_loop()
         self.initialized = False
 
-    def init_motors(self):
+    async def init_motors(self):
         if not self.initialized:
-           set_pin_mode_analog_output(self.board, self.pins["en"])
-           elf.board.set_pin_mode_digital_output(self.pins["in1"])
-           self.board.set_pin_mode_digital_output(self.pins["in2"])
+           await set_pin_mode_analog_output(self.board, self.pins["en"])
+           await self.board.set_pin_mode_digital_output(self.pins["in1"])
+           await self.board.set_pin_mode_digital_output(self.pins["in2"])
            self.initialized = True
 
-    def set_speed(self, speed):
+    async def set_speed(self, speed):
         # Make sure to set first set teh low pin. In this case the H-bridge
         # will never have two high pins.
         if (self.prev_motor_speed != speed):
-          self.init_motors()
+          await self.init_motors()
           if (speed >= 0):
-            self.board.digital_write(self.pins["in1"], 0)
-            self.board.digital_write(self.pins["in2"], 1)
-            analog_write(self.board, self.pins["en"], int(min(speed, 100) / 100.0 * max_pwm_value))
+            await self.board.digital_write(self.pins["in1"], 0)
+            await self.board.digital_write(self.pins["in2"], 1)
+            await analog_write(self.board, self.pins["en"], int(min(speed, 100) / 100.0 * max_pwm_value))
           elif (speed < 0):
-            self.board.digital_write(self.pins["in2"], 0)
-            self.board.digital_write(self.pins["in1"], 1)
-            analog_write(self.board, self.pins["en"], int(min(abs(speed), 100) / 100.0 * max_pwm_value))
+            await self.board.digital_write(self.pins["in2"], 0)
+            await self.board.digital_write(self.pins["in1"], 1)
+            await analog_write(self.board, self.pins["en"], int(min(abs(speed), 100) / 100.0 * max_pwm_value))
           self.prev_motor_speed = speed
 
 # Extended adafruit _SSD1306
@@ -539,7 +543,7 @@ class Oled(_SSD1306):
         self.buffer = bytearray(((height // 8) * width) + 1)
         #self.buffer = bytearray(16)
         #self.buffer[0] = 0x40  # Set first byte of data buffer to Co=0, D/C=1
-        self.board.set_pin_mode_i2c(i2c_port=self.i2c_port)
+        asyncio.run(self.board.set_pin_mode_i2c(i2c_port=self.i2c_port))
         super().__init__(
             memoryview(self.buffer)[1:],
             width,
@@ -549,7 +553,7 @@ class Oled(_SSD1306):
             page_addressing=False
         )
 
-    def start(self):
+    async def start(self):
         server = rospy.Service("/mirte/set_" + self.oled_obj['name'] + "_image", SetOLEDImage, self.set_oled_image_service)
 
     #TODO: make faster with asyncio
@@ -606,13 +610,13 @@ class Oled(_SSD1306):
     def write_cmd(self, cmd):
         self.temp[0] = 0x80
         self.temp[1] = cmd
-        self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port)
+        asyncio.run(self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port))
 
     def write_framebuf(self):
         for i in range(64):  #TODO: can we have higher i2c buffer (limited by firmata 64 bits and wire 32 bits, so actually 16 bits since we need 1 bit)
             buf = self.buffer[i*16:(i+1)*16+1]
             buf[0] = 0x40
-            self.board.i2c_write(60, buf, i2c_port=self.i2c_port)
+            asyncio.run(self.board.i2c_write(60, buf, i2c_port=self.i2c_port))
 
     def show_png(self, file):
       image_file = Image.open(file) # open color image
@@ -620,9 +624,9 @@ class Oled(_SSD1306):
       self.image(image_file)
       self.show()
 
-def handle_set_led_value(req):
+async def handle_set_led_value(req):
     led = rospy.get_param("/mirte/led")
-    analog_write(board, get_pin_numbers(led)["pin"], int(min(req.value, 100) / 100.0 * max_pwm_value))
+    await analog_write(board, get_pin_numbers(led)["pin"], int(min(req.value, 100) / 100.0 * max_pwm_value))
     return SetLEDValueResponse(True)
 
 
@@ -655,9 +659,9 @@ def handle_get_pin_value(req):
 
    if not pin in pin_values:
       if req.type == "analog":
-         board.set_pin_mode_analog_input(pin - analog_offset, callback=data_callback)
+         asyncio.run(board.set_pin_mode_analog_input(pin - analog_offset, callback=data_callback))
       if req.type == "digital":
-         board.set_pin_mode_digital_input(pin, callback=data_callback)
+         asyncio.run(board.set_pin_mode_digital_input(pin, callback=data_callback))
 
    while not pin in pin_values:
       time.sleep(.00001)
@@ -679,18 +683,18 @@ def handle_set_pin_value(req):
      # account for the analog_offset. We do need to account for the
      # max pwm_value though.
      capped_value = min(req.value, max_pwm_value)
-     set_pin_mode_analog_output(board, pin)
-     time.sleep(0.001)
-     analog_write(board, pin, capped_value)
+     asyncio.run(set_pin_mode_analog_output(board, pin))
+     asyncio.run(asyncio.sleep(0.001))
+     asyncio.run(analog_write(board, pin, capped_value))
   if req.type == "digital":
-     board.set_pin_mode_digital_output(pin)
-     time.sleep(0.001)
-     board.digital_write(pin, req.value)
+     asyncio.run(board.set_pin_mode_digital_output(pin))
+     asyncio.run(asyncio.sleep(0.001))
+     asyncio.run(board.digital_write(pin, req.value))
   return SetPinValueResponse(True)
 
 # Initialize the actuators. Each actuator will become a service
 # which can be called.
-def actuators(board, device):
+def actuators(loop, board, device):
     servers = []
 
     if rospy.has_param("/mirte/oled"):
@@ -700,14 +704,14 @@ def actuators(board, device):
        for oled in oleds:
           oled_obj = Oled(128, 64, board, oleds[oled], port=oled_id) #get_pin_numbers(oleds[oled]))
           oled_id = oled_id + 1
-          servers.append(oled_obj.start())
+          servers.append(loop.create_task(oled_obj.start()))
 
     # TODO: support multiple leds
     if rospy.has_param("/mirte/led"):
        led = rospy.get_param("/mirte/led")
-       set_pin_mode_analog_output(board, get_pin_numbers(led)["pin"])
-       server = rospy.Service('/mirte/set_led_value', SetLEDValue, handle_set_led_value)
-       servers.append(server.start())
+       loop.run_until_complete(set_pin_mode_analog_output(board, get_pin_numbers(led)["pin"]))
+       server = aiorospy.AsyncService('/mirte/set_led_value', SetLEDValue, handle_set_led_value)
+       servers.append(loop.create_task(server.start()))
 
     if rospy.has_param("/mirte/motor"):
        motors = rospy.get_param("/mirte/motor")
@@ -718,14 +722,14 @@ def actuators(board, device):
              motor_obj = L298NMotor(board, motors[motor])
           else:
              motor_obj = PWMMotor(board, motors[motor])
-          servers.append(motor_obj.start())
+          servers.append(loop.create_task(motor_obj.start()))
 
     if rospy.has_param("/mirte/servo"):
         servos = rospy.get_param("/mirte/servo")
         servos = {k: v for k, v in servos.items() if v['device'] == device}
         for servo in servos:
            servo = Servo(board, servos[servo])
-           servers.append(servo.start())
+           servers.append(loop.create_task(servo.start()))
 
 
     # Set a raw pin value
@@ -737,7 +741,7 @@ def actuators(board, device):
 # Initialize all sensors based on their definition in ROS param
 # server. For each sensor a topic is created which publishes
 # the data.
-def sensors(board, device):
+def sensors(loop, board, device):
    tasks = []
    max_freq = 10
    if rospy.has_param("/mirte/device/mirte/max_frequency"):
@@ -751,7 +755,7 @@ def sensors(board, device):
          distance_sensors[sensor]["max_frequency"] = max_freq
          distance_publisher = rospy.Publisher('/mirte/' + sensor, Range, queue_size=1, latch=True)
          monitor = DistanceSensorMonitor(board, distance_sensors[sensor])
-         tasks.append(monitor.start())
+         tasks.append(loop.create_task(monitor.start()))
 
    # Initialize intensity sensors
    if rospy.has_param("/mirte/intensity"):
@@ -761,10 +765,10 @@ def sensors(board, device):
          intensity_sensors[sensor]["max_frequency"] = max_freq
          if "analog" in get_pin_numbers(intensity_sensors[sensor]):
             monitor = AnalogIntensitySensorMonitor(board, intensity_sensors[sensor])
-            tasks.append(monitor.start())
+            tasks.append(loop.create_task(monitor.start()))
          if "digital" in get_pin_numbers(intensity_sensors[sensor]):
             monitor = DigitalIntensitySensorMonitor(board, intensity_sensors[sensor])
-            tasks.append(monitor.start())
+            tasks.append(loop.create_task(monitor.start()))
 
    # Initialize keypad sensors
    if rospy.has_param("/mirte/keypad"):
@@ -773,7 +777,7 @@ def sensors(board, device):
       for sensor in keypad_sensors:
          keypad_sensors[sensor]["max_frequency"] = max_freq
          monitor = KeypadMonitor(board, keypad_sensors[sensor])
-         tasks.append(monitor.start())
+         tasks.append(loop.create_task(monitor.start()))
 
    # Initialize encoder sensors
    if rospy.has_param("/mirte/encoder"):
@@ -781,7 +785,7 @@ def sensors(board, device):
       encoder_sensors = {k: v for k, v in encoder_sensors.items() if v['device'] == device}
       for sensor in encoder_sensors:
          monitor = EncoderSensorMonitor(board, encoder_sensors[sensor])
-         tasks.append(monitor.start())
+         tasks.append(loop.create_task(monitor.start()))
          # encoder sensors do not need a max_frequency. They are interrupts on
          # on the mcu side.
 
@@ -801,48 +805,48 @@ def sensors(board, device):
    # data here asap.
    if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
      if max_freq <= 1:
-      pass
-      #tasks.append(board.set_scan_delay(1))
+      tasks.append(loop.create_task(board.set_scan_delay(1)))
      else:
-      pass
-      #tasks.append(board.set_scan_delay(int(1000.0/max_freq)))
+      tasks.append(loop.create_task(board.set_scan_delay(int(1000.0/max_freq))))
    else:
      if max_freq <= 0:
-      tasks.append(board.set_analog_scan_interval(0))
+      tasks.append(loop.create_task(board.set_analog_scan_interval(0)))
      else:
-      tasks.append(board.set_analog_scan_interval(int(1000.0/max_freq)))
+      tasks.append(loop.create_task(board.set_analog_scan_interval(int(1000.0/max_freq))))
 
    return tasks
 
 # Shutdown procedure
 closing = False
-def shutdown(board):
+async def shutdown(loop, board):
    global closing
 
    # We need to check if this closing is not already
    # running by an escalated signal.
    if not closing:
       closing = True
-      board.shutdown()
+      await board.shutdown()
 
       # Stop the asyncio loop
+      loop.stop()
       print("Telemetrix shutdown nicely")
 
 if __name__ == '__main__':
+   loop = asyncio.get_event_loop()
 
    # Initialize the telemetrix board
    if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
-     board = telemetrix_rpi_pico.TelemetrixRpiPico()
+     board = tmx_pico_aio.TmxPicoAio()
    else:
-     board = telemetrix.Telemetrix()
+     board = telemetrix_aio.TelemetrixAIO()
 
    # Catch signals to exit properly
    # We need to do it this way instead of usgin the try/catch
    # as in the telemetrix examples
    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
    for s in signals:
-     l = lambda board=board: shutdown(board)
-     #loop.add_signal_handler(s, l)
+     l = lambda loop=loop,board=board: asyncio.ensure_future(shutdown(loop, board))
+     loop.add_signal_handler(s, l)
 
    # Initialize the ROS node as anonymous since there
    # should only be one instnace running.
@@ -857,13 +861,13 @@ if __name__ == '__main__':
 
    # Start all tasks for sensors and actuators
    device = 'mirte'
-   sensor_tasks = sensors(board, device)
-   actuator_tasks = actuators(board, device)
+   sensor_tasks = sensors(loop, board, device)
+   actuator_tasks = actuators(loop, board, device)
    all_tasks = sensor_tasks + actuator_tasks
    for task in all_tasks:
-       task
+       loop.run_until_complete(task)
 
    # Is equivalent to rospy.spin() in a sense that this
    # will just keep the node running only in a asyncio
    # way.
-   rospy.spin()
+   loop.run_forever()
