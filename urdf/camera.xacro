@@ -1,7 +1,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
     <joint name="joint_camera" type="fixed">
-        <origin xyz="4 0 0" rpy="0 0 0" />
+        <origin xyz="0.1 0 0.035" rpy="0 0 0" />
         <parent link="link_chassis" />
         <child link="camera_link" />
     </joint>

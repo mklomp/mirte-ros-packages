@@ -44,6 +44,11 @@
       </visual>
     </link>
 
+    <gazebo reference="link_${name}">
+       <gravity>0</gravity>
+    </gazebo>
+
+
     <joint name="joint_${name}" type="continuous">
       <xacro:insert_block name="origin" />
       <child link="link_${name}"/>
@@ -59,7 +64,7 @@
      </joint>
      <actuator name="motor_${name}">
        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-       <mechanicalReduction>1</mechanicalReduction>
+       <mechanicalReduction>120</mechanicalReduction>
      </actuator>
    </transmission>
  </xacro:macro>
@@ -85,6 +90,11 @@
        <xacro:insert_block name="origin" />
      </xacro:inertia_sphere>
    </link>
+
+   <gazebo reference="link_${name}">
+    <gravity>0</gravity>
+  </gazebo>
+
 
    <joint name="fixed" type="fixed">
      <parent link="${parent}"/>

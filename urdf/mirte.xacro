@@ -2,12 +2,13 @@
 <robot name="mirte" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:include filename="$(find mirte_gazebo)/urdf/materials.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/macros.xacro"/>
-  <xacro:include filename="$(find mirte_gazebo)/urdf/ros2_control.xacro"/>
-  <xacro:include filename="$(find mirte_gazebo)/urdf/lidar.xacro"/>
+  <xacro:include filename="$(find mirte_gazebo)/urdf/ros_control.xacro"/>
+  <xacro:include filename="$(find mirte_gazebo)/urdf/lidar.xacro"/> 
   <xacro:include filename="$(find mirte_gazebo)/urdf/camera.xacro"/>
-  <xacro:include filename="$(find mirte_gazebo)/urdf/ultrasonic.xacro"/>
+<!--  <xacro:include filename="$(find mirte_gazebo)/urdf/ultrasonic.xacro"/> -->
   <xacro:property name="yaml_param_file" value="$(find mirte_gazebo)/config/mirte_dimensions.yaml" />
   <xacro:property name="params" value="${load_yaml(yaml_param_file)}"/>
+
 
 
 
@@ -33,7 +34,18 @@
     </visual>
   </link>
 
+  <gazebo reference="link_chassis">
+    <gravity>0</gravity>
+  </gazebo>
+
+
+
   <link name="base_link" />
+
+  <gazebo reference="base_link">
+    <gravity>0</gravity>
+  </gazebo>
+
 
   <joint name="base_joint" type="fixed">
     <parent link="base_link"/>
@@ -62,6 +74,7 @@
     </joint_options>
   </xacro:wheel>
 
+<!--
   <xacro:ultrasonic_sensor name="left">
     <origin rpy="0 0 .45" xyz="0.085 0.04 0.022" />
   </xacro:ultrasonic_sensor>
@@ -69,7 +82,7 @@
   <xacro:ultrasonic_sensor name="right">
     <origin rpy="0 0 -0.45" xyz="0.085 -0.04 0.022" />
   </xacro:ultrasonic_sensor>
-
+-->
 
 
 </robot>
