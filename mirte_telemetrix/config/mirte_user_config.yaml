@@ -14,14 +14,12 @@ motor:
   left:
     name: left
     device: mirte
-    type: l9110s
     pins:
       1a: 18             # pin needs PWM
       1b: 19             # pin needs PWM
   right:
     name: right
     device: mirte
-    type: l9110s
     pins:
       1a: 20            # pin needs PWM
       1b: 21            # pin needs PWM

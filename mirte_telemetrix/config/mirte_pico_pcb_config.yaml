@@ -1,0 +1,89 @@
+device:
+  mirte:
+    type: pico_pcb
+    version: 0.6
+    samping_interval: 10
+distance:
+  left:
+    name: left
+    device: mirte
+    connector: SRF1
+  right:
+    name: right
+    device: mirte
+    connector: SRF2
+encoder:
+  left:
+    name: left
+    device: mirte
+    connector: ENCB
+  right:
+    name: right
+    device: mirte
+    connector: ENCA
+intensity:
+  left:
+    name: left 
+    device: mirte
+    connector: IR1
+  right:
+    name: right
+    device: mirte
+    connector: IR2
+oled:
+  left:
+    name: left
+    device: mirte
+    connector: I2C2
+  right:
+    name: right
+    device: mirte
+    connector: I2C1
+# servo: # These two servos don't work with the v0.6 pcb, next version this should be fixed
+#   left:
+#     name: left
+#     device: mirte
+#     connector: Servo3
+# servo:
+#   left:
+#     name: right
+#     device: mirte
+#     connector: Servo4
+servo:
+  left:
+    name: left
+    device: mirte
+    connector: Servo3
+servo:
+  left:
+    name: right
+    device: mirte
+    connector: Servo4
+
+keypad:
+  yellow:
+    name: keypad
+    device: mirte
+    connector: Keypad
+motor:
+  left:
+    name: left
+    device: mirte
+    connector: MC1-A
+    type: l9110s
+  right:
+    name: right
+    device: mirte
+    connector: MC1-B
+    type: l9110s
+  left2:
+    name: left
+    device: mirte
+    connector: MC2-A
+    type: l9110s
+  right2:
+    name: right
+    device: mirte
+    connector: MC2-B
+    type: l9110s
+# TODO: add obstacle detection
