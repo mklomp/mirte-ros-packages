@@ -15,6 +15,11 @@ encoder:
     name: left
     device: mirte
     pins:
-      pin: 14             # pin needs interrupt support
-    ticks_per_wheel: 20
-
+      1a: 18             # pin needs PWM
+      1b: 19             # pin needs PWM
+  right:
+    name: right
+    device: mirte
+    pins:
+      1a: 20            # pin needs PWM
+      1b: 21            # pin needs PWM

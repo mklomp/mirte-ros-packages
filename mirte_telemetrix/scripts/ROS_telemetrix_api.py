@@ -50,177 +50,62 @@ from adafruit_ssd1306 import _SSD1306
 from concurrent.futures import ThreadPoolExecutor
 executor = ThreadPoolExecutor(10)
 
+import pcb_mapping.default
+import pcb_mapping.nano
+import pcb_mapping.pico
+import pcb_mapping.stm32
 
-# Map to convert from STM32 to pin numbers
-# TODO: maybe convert this into JSON files and load it from there
-# TODO: maybe just make this an list and get the index of the list
-# And/or put this in the param server so teh web interface can also use this
-stm32_map = {
- "B9" : 0,
- "B8" : 1,
- "B7" : 2,
- "B6" : 3,
- "B5" : 4,
- "B4" : 5,
- "B3" : 6,
- "A15": 7,
- "A12": 8,
- "A11": 9,
- "A10": 10,
- "A9" : 11,
- "A8" : 12,
- "B15": 13,
- "B14": 14,
- "B13": 15,
- "B12": 16,
- "C13": 17,    # LED
- "C14": 18,
- "C15": 19,
- "A0" : 20,
- "A1" : 21,
- "A2" : 22,
- "A3" : 23,
- "A4" : 24,
- "A5" : 25,
- "A6" : 26,
- "A7" : 27,
- "B0" : 28,
- "B1" : 29,
- "B10": 30,
- "B11": 31
-}
-# I thought this should be 65535 for the SEM, but for
-# some reason we need 255
-stm32_max_pwm_value = 255
-stm32_analog_offset = 20
-
-nano_map = {
-"RX0" : 0,
-"TX1" : 1,
-"D2"  : 2,
-"D3"  : 3,
-"D4"  : 4,
-"D5"  : 5,
-"D6"  : 6,
-"D7"  : 7,
-"D8"  : 8,
-"D9"  : 9,
-"D10" : 10,
-"D11" : 11,
-"D12" : 12,
-"D13" : 13,
-"A0"  : 14,
-"A1"  : 15,
-"A2"  : 16,
-"A3"  : 17,
-"A4"  : 18,
-"A5"  : 19,
-"A6"  : 20,
-"A7"  : 21
-}
-nano_max_pwm_value = 255
-nano_analog_offset = 14
-
-pico_map = {
-"0" : 0,
-"1" : 1,
-"2"  : 2,
-"3"  : 3,
-"4"  : 4,
-"5"  : 5,
-"6"  : 6,
-"7"  : 7,
-"8"  : 8,
-"9"  : 9,
-"10" : 10,
-"11" : 11,
-"12" : 12,
-"13" : 13,
-"14" : 14,
-"15" : 15,
-"16" : 16,
-"17" : 17,
-"18" : 18,
-"19" : 19,
-"20" : 20,
-"21" : 21,
-"22" : 22,
-"23" : 23,
-"24" : 24,
-"25" : 25,   # BUILTIN LED
-"26" : 26,
-"27" : 27,
-"28" : 28,
-"29" : 29,   # VREF, used for battery measurement
-"30" : 30    # TEMP
-}
-
-pico_max_pwm_value = 100 # note: shoudl be percentage
-pico_analog_offset = 26
-
-# Map to convert from Mirte PCB to STM32 pins numbers
-# This should be the same as printed on the PCB
-mirte_pcb_map = {
- "IR1"   : {"digital": "C15", "analog": "A0" },
- "IR2"   : {"digital": "B0" , "analog": "A1" },
- "SRF1"  : {"trigger": "A15", "echo"  : "C14"},
- "SRF2"  : {"trigger": "A5" , "echo"  : "A6" },
- "I2C1"  : {"scl"    : "B6" , "sda"   : "B7" },
- "I2C2"  : {"scl"    : "B10", "sda"   : "B11"},
- "ENCA"  : {"pin"    : "B4" },
- "ENCB"  : {"pin"    : "B12"},
- "Keypad": {"pin"    : "A4" },
- "Servo1": {"pin"    : "B5" },
- "Servo2": {"pin"    : "A7" },
- "LED"   : {"pin"    : "C13"},
- "MA"    : {"1a"     : "A8" , "1b"    : "B3" },
- "MB"    : {"1a"     : "B14", "1b"    : "B15"},
- "MC"    : {"1a"     : "B1" , "1b"    : "A10"},
- "MD"    : {"1a"     : "A9" , "1b"    : "B13"}
-}
+board_mapping = pcb_mapping.default
 
 # Determine the analog offset, based on the mcu
-# TODO: this shuold be refactored together with the
+# TODO: this should be refactored together with the
 # mapping above
 devices = rospy.get_param('/mirte/device')
-analog_offset = 0
-max_pwm_value = 0
-pin_map = {}
+# analog_offset = 0
+# max_pwm_value = 0
+# pin_map = {}
+
+
 if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "stm32":
-   analog_offset = stm32_analog_offset
-   max_pwm_value = stm32_max_pwm_value
-   pin_map = stm32_map
+   # analog_offset = stm32_analog_offset
+   # max_pwm_value = stm32_max_pwm_value
+   # pin_map = stm32_map
+   board_mapping = pcb_mapping.stm32
 elif devices["mirte"]["mcu"] == "nano":
-   analog_offset = nano_analog_offset
-   max_pwm_value = nano_max_pwm_value
-   pin_map = nano_map
-elif devices["mirte"]["mcu"] == "pico":
-   analog_offser = pico_analog_offset
-   max_pwm_value = pico_max_pwm_value
-   pin_map = pico_map
+   # analog_offset = nano_analog_offset
+   # max_pwm_value = nano_max_pwm_value
+   # pin_map = nano_map
+   board_mapping = pcb_mapping.nano
+elif devices["mirte"]["type"] == "pico_pcb" or devices["mirte"]["mcu"] == "pico":
+   board_mapping = pcb_mapping.pico
+   if("version" in devices["mirte"]):
+      board_mapping.version = devices["mirte"]["version"]
 else:
-   max_pwm_value = 255 # TODO: also make this a setting
+   board_mapping = pcb_mapping.default
+
 
 def get_pin_numbers(component):
    devices = rospy.get_param('/mirte/device')
    device = devices[component["device"]]
    pins = {}
-   if device["type"] == "mirte_pcb":
-      mcu = "stm32"
-      pins = mirte_pcb_map[component["connector"]]
-   elif device["type"] == "breadboard":
-      mcu = device["mcu"]
-      pins = component["pins"]
+   if("connector" in component):
+      pins = board_mapping.connectorToPins(component["connector"])
+   # if device["type"] == "mirte_pcb":
+   #    mcu = "stm32"
+   #    pins = board_mapping.pinNameToPinNumber([component["connector"]])
+   # elif device["type"] == "breadboard":
+   #    mcu = device["mcu"]
+   #    pins = component["pins"]
 
    # convert pin naming to numbers
    pin_numbers = {}
    for item in pins:
-      if mcu == "stm32":
-         pin_numbers[item] = stm32_map[pins[item]]
-      elif mcu == "nano":
-         pin_numbers[item] = nano_map[pins[item]]
-      else:
-         pin_numbers[item] = pins[item]
+      # if mcu == "stm32":
+      #    pin_numbers[item] = stm32_map[pins[item]]
+      # elif mcu == "nano":
+      #    pin_numbers[item] = nano_map[pins[item]]
+      # else:
+      pin_numbers[item] = board_mapping.pinNameToPinNumber( pins[item])
    return pin_numbers
 
 # Abstract Sensor class
@@ -281,8 +166,8 @@ class KeypadMonitor(SensorMonitor):
     def get_data(self, req):
         return GetKeypadResponse(self.last_publish_value.key)
 
-    def start(self):
-        self.board.set_pin_mode_analog_input(self.pins["pin"] - analog_offset, self.differential, self.publish_data)
+    async def start(self):
+        await self.board.set_pin_mode_analog_input(self.pins["pin"] - board_mapping.analog_offset, self.differential, self.publish_data)
 
     def publish_data(self, data):
        # Determine the key that is pressed
@@ -378,8 +263,8 @@ class AnalogIntensitySensorMonitor(SensorMonitor):
     def get_data(self, req):
         return GetIntensityResponse(self.last_publish_value.value)
 
-    def start(self):
-        self.board.set_pin_mode_analog_input(self.pins["analog"] - analog_offset, differential=self.differential, callback=self.publish_data)
+    async def start(self):
+        await self.board.set_pin_mode_analog_input(self.pins["analog"] - board_mapping.analog_offset, differential=self.differential, callback=self.publish_data)
 
     def publish_data(self, data):
         intensity = Intensity()
@@ -485,11 +370,11 @@ class PWMMotor():
           elif (speed > 0):
             self.init_motors(speed)
             self.board.digital_write(self.pins["1a"], 0)
-            analog_write(self.board, self.pins["1b"], int(min(speed, 100) / 100.0 * max_pwm_value))
+            analog_write(self.board, self.pins["1b"], int(min(speed, 100) / 100.0 * board_mapping.max_pwm_value))
           elif (speed < 0):
             self.init_motors(speed)
             self.board.digital_write(self.pins["1a"], 1)
-            analog_write(self.board, self.pins["1b"], int(max_pwm_value - min(abs(speed), 100) / 100.0 * max_pwm_value))
+            analog_write(self.board, self.pins["1b"], int(board_mapping.max_pwm_value - min(abs(speed), 100) / 100.0 * board_mapping.max_pwm_value))
           self.prev_motor_speed = speed
 
 class L298NMotor():
@@ -514,11 +399,11 @@ class L298NMotor():
           if (speed >= 0):
             self.board.digital_write(self.pins["in1"], 0)
             self.board.digital_write(self.pins["in2"], 1)
-            analog_write(self.board, self.pins["en"], int(min(speed, 100) / 100.0 * max_pwm_value))
+            analog_write(self.board, self.pins["en"], int(min(speed, 100) / 100.0 * board_mapping.max_pwm_value))
           elif (speed < 0):
             self.board.digital_write(self.pins["in2"], 0)
             self.board.digital_write(self.pins["in1"], 1)
-            analog_write(self.board, self.pins["en"], int(min(abs(speed), 100) / 100.0 * max_pwm_value))
+            analog_write(self.board, self.pins["en"], int(min(abs(speed), 100) / 100.0 * board_mapping.max_pwm_value))
           self.prev_motor_speed = speed
 
 # Extended adafruit _SSD1306
@@ -622,7 +507,7 @@ class Oled(_SSD1306):
 
 def handle_set_led_value(req):
     led = rospy.get_param("/mirte/led")
-    analog_write(board, get_pin_numbers(led)["pin"], int(min(req.value, 100) / 100.0 * max_pwm_value))
+    analog_write(board, get_pin_numbers(led)["pin"], int(min(req.value, 100) / 100.0 * board_mapping.max_pwm_value))
     return SetLEDValueResponse(True)
 
 
@@ -641,21 +526,26 @@ async def data_callback(data):
     global pin_values
     pin_number = data[1]
     if data[0] == 3:
-        pin_number += analog_offset
+        pin_number += board_mapping.analog_offset
     pin_values[pin_number] = data[2]
 
 def handle_get_pin_value(req):
    global pin_values
    # Map pin to the pin map if it is in there, or to
    # an int if raw pin number
-   if req.pin in pin_map:
-      pin = pin_map[req.pin]
-   else:
+   
+   try:
+      pin = board_mapping.pinNameToPinNumber(req.pin)
+   except:
       pin = int(req.pin)
+   # if req.pin in pin_map:
+   #    pin = pin_map[req.pin]
+   # else:
+   #    pin = int(req.pin)
 
    if not pin in pin_values:
       if req.type == "analog":
-         board.set_pin_mode_analog_input(pin - analog_offset, callback=data_callback)
+         board.set_pin_mode_analog_input(pin -board_mapping.analog_offset, callback=data_callback)
       if req.type == "digital":
          board.set_pin_mode_digital_input(pin, callback=data_callback)
 
@@ -669,16 +559,16 @@ def handle_get_pin_value(req):
 def handle_set_pin_value(req):
   # Map pin to the pin map if it is in there, or to
   # an int if raw pin number
-  if req.pin in pin_map:
-     pin = pin_map[req.pin]
-  else:
-     pin = int(req.pin)
+  try:
+      pin = board_mapping.pinNameToPinNumber(req.pin)
+  except:
+      pin = int(req.pin)
 
   if req.type == "analog":
      # This should be a PWM capable pin. Therefore we do not need to
      # account for the analog_offset. We do need to account for the
      # max pwm_value though.
-     capped_value = min(req.value, max_pwm_value)
+     capped_value = min(req.value, board_mapping.max_pwm_value)
      set_pin_mode_analog_output(board, pin)
      time.sleep(0.001)
      analog_write(board, pin, capped_value)
