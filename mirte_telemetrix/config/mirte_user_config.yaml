@@ -2,7 +2,7 @@ device:
   mirte:
     type: breadboard
     mcu: pico
-    max_frequency: 100
+    max_frequency: 10
 distance:
   left:
     name: left
@@ -10,7 +10,7 @@ distance:
     pins:
       trigger: 7
       echo: 6
-motor:
+encoder:
   left:
     name: left
     device: mirte
