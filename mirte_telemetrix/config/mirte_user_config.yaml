@@ -1,89 +1,65 @@
 device:
   mirte:
     type: breadboard
-    mcu: stm32
+    mcu: mega
     max_frequency: 100
-distance:
-  left:
-    name: left
-    device: mirte
-    pins:
-      trigger: A5
-      echo: A6
-  right:
-    name: right
-    device: mirte
-    pins:
-      trigger: A15
-      echo: C14
-encoder:
-  left:
-    name: left
-    device: mirte
-    pins:
-      pin: B12           # pin needs interrupt support
-    ticks_per_wheel: 20
-  right:
-    name: right
-    device: mirte
-    pins:
-      pin: B4           # pin needs interrupt support
-    ticks_per_wheel: 20
-intensity:
-  left:
-    name: left 
-    device: mirte
-    pins:
-      digital: C15
-      analog: A0         # pin needs analog input
-  right:
-    name: right
-    device: mirte
-    pins:
-      digital: A2
-      analog: A1         # pin needs analog input
-oled:
-  left:
-    name: left
-    device: mirte
-    pins:
-      scl: B6
-      sda: B7
-  right:
-    name: right
-    device: mirte
-    pins:
-      scl: B10
-      sda: B11
-servo:
-  left:
-    name: left
-    device: mirte
-    pins:
-      pin: B3
-  right:
-    name: right
-    device: mirte
-    pins:
-      pin: A3
-keypad:
-  yellow:
-    name: keypad
-    device: mirte
-    pins:
-      pin: A4              # pin needs analog input
+
 motor:
-  left:
-    name: left
+  leftfront:
+    name: leftfront
     device: mirte
     type: l9110s
     pins:
-      1a: B5             # pin needs PWM
-      1b: A8             # pin needs PWM
-  right:
-    name: right
+      1a: 4             # pin needs PWM
+      1b: 6             # pin needs PWM
+  rightfront:
+    name: rightfront
     device: mirte
     type: l9110s
     pins:
-      1a: B14            # pin needs PWM
-      1b: B15            # pin needs PWM
+      1a: 11            # pin needs PWM
+      1b: 9            # pin needs PWM
+  leftrear:
+    name: leftrear
+    device: mirte
+    type: l9110s
+    pins:
+      1a: 7             # pin needs PWM
+      1b: 5             # pin needs PWM
+  rightrear:
+    name: rightrear
+    device: mirte
+    type: l9110s
+    pins:
+      1a: 10            # pin needs PWM
+      1b: 8            # pin needs PWM
+
+encoder:
+  leftfront:
+    name: leftfront
+    device: mirte
+    pins:
+      pin: 18           # pin needs interrupt support
+    ticks_per_wheel: 20
+  rightfront:
+    name: rightfront
+    device: mirte
+    pins:
+      pin: 19           # pin needs interrupt support
+    ticks_per_wheel: 20
+  leftrear:
+    name: leftrear
+    device: mirte
+    pins:
+      pin: 20           # pin needs interrupt support
+    ticks_per_wheel: 20
+  rightrear:
+    name: rightrear
+    device: mirte
+    pins:
+      pin: 21           # pin needs interrupt support
+    ticks_per_wheel: 20
+      # 18 14
+      # 19 15
+      # 20 16
+      # 21 17
