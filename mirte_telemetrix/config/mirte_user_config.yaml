@@ -2,7 +2,7 @@ device:
   mirte:
     type: breadboard
     mcu: pico
-    max_frequency: 100
+    max_frequency: 10
 distance:
   left:
     name: left
@@ -10,18 +10,11 @@ distance:
     pins:
       trigger: 7
       echo: 6
-motor:
+encoder:
   left:
     name: left
     device: mirte
-    type: l9110s
     pins:
-      1a: 18             # pin needs PWM
-      1b: 19             # pin needs PWM
-  right:
-    name: right
-    device: mirte
-    type: l9110s
-    pins:
-      1a: 20            # pin needs PWM
-      1b: 21            # pin needs PWM
+      pin: 14             # pin needs interrupt support
+    ticks_per_wheel: 20
+

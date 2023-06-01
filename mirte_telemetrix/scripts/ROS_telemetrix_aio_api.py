@@ -8,6 +8,8 @@ import rospy
 import signal
 import aiorospy
 import io
+from inspect import signature
+
 
 # Import the right Telemetrix AIO
 devices = rospy.get_param('/mirte/device')
@@ -336,6 +338,7 @@ class DistanceSensorMonitor(SensorMonitor):
         return GetDistanceResponse(self.last_publish_value.range)
 
     async def start(self):
+        await self.board.set_scan_delay(100)
         await self.board.set_pin_mode_sonar(self.pins["trigger"], self.pins["echo"], self.publish_data)
 
     async def publish_data(self, data):
@@ -407,7 +410,10 @@ class EncoderSensorMonitor(SensorMonitor):
         return GetEncoderResponse(self.last_publish_value.value)
 
     async def start(self):
-        await self.board.set_pin_mode_encoder(self.pins["pin"], 2, self.ticks_per_wheel, self.publish_data)
+        if("encoder_pin" in signature(self.board.set_pin_mode_encoder).parameters):
+            await self.board.set_pin_mode_encoder(self.pins["pin"], 2, self.ticks_per_wheel, self.publish_data)
+        else:
+            await self.board.set_pin_mode_encoder(self.pins["pin"], 0, self.publish_data, False)
         rospy.Timer(rospy.Duration(1.0/10.0), self.publish_speed_data)
 
     def publish_speed_data(self, event=None):
