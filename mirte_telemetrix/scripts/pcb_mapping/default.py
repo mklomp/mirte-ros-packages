@@ -13,3 +13,5 @@ def pinNameToPinNumber(pin):
 
 max_pwm_value = 255
 analog_offset = 0
+
+mcu = "default"

@@ -73,3 +73,4 @@ def pinNameToPinNumber(pin):
     if pin in stm32_map:
         return stm32_map[pin]
     raise RuntimeError(f"Unknown conversion from pin {pin} to an IO number")
+mcu = "stm32"

@@ -34,3 +34,4 @@ def pinNameToPinNumber(pin):
     if pin in nano_map:
         return nano_map[pin]
     raise RuntimeError(f"Unknown conversion from pin {pin} to an IO number")
+mcu = "nano"
