@@ -79,8 +79,8 @@ public:
    */
   void read(const ros::Duration &period) {
     //_wheel_encoder[0] = number of ticks of left encoder since last call of
-    //this function _wheel_encoder[1] = number of ticks of right encoder since
-    //last call of this function
+    // this function _wheel_encoder[1] = number of ticks of right encoder since
+    // last call of this function
 
     double meterPerEncoderTick = (_wheel_diameter / 2) * 2 * M_PI / 40.0;
     int diff_left = _wheel_encoder[0] - _last_value[0];
