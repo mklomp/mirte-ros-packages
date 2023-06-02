@@ -538,7 +538,9 @@ class Oled(_SSD1306):
             self.i2c_port = board_mapping.getI2CPort(pin_numbers["sda"])
             asyncio.run(
                 self.board.set_pin_mode_i2c(
-                    i2c_port=self.i2c_port, sda_gpio=pin_numbers["sda"], scl_gpio=pin_numbers["scl"]
+                    i2c_port=self.i2c_port,
+                    sda_gpio=pin_numbers["sda"],
+                    scl_gpio=pin_numbers["scl"],
                 )
             )
         else:
@@ -692,7 +694,7 @@ def handle_get_pin_value(req):
 
     while not pin in pin_values:
         # print("sleeping pinvalues")
-        time.sleep(.00001)
+        time.sleep(0.00001)
 
     value = pin_values[pin]
     return GetPinValueResponse(value)

@@ -20,7 +20,8 @@ ret, img = cap.read()
 w = img.shape[1]
 h = img.shape[0]
 
-rospy.init_node('listener', anonymous=True)
+rospy.init_node("listener", anonymous=True)
+
 
 # not only gets qr codes, but basically anything you throw at it
 def handle_get_barcode(req):
@@ -30,9 +31,9 @@ def handle_get_barcode(req):
     barcodes = decode(gray_img)
 
     # only return one barcode at a time
-    if(len(barcodes) > 0):
+    if len(barcodes) > 0:
         return barcodes[0].data.decode("utf-8")
-    
+
     # return empty string when nothing is found
     return ""
 
@@ -40,33 +41,35 @@ def handle_get_barcode(req):
 def handle_get_virtual_color(req):
     global w
     global h
-    
+
     ret, img = cap.read()
 
     # mask
-    mask_left = np.zeros((h,w), np.uint8)
-    mask_right = np.zeros((h,w), np.uint8)
+    mask_left = np.zeros((h, w), np.uint8)
+    mask_right = np.zeros((h, w), np.uint8)
 
     # draw masks
-    cv.circle(mask_left, (5,h-5), 5, (255,255,255), -1)
-    cv.circle(mask_right, (w-5,h-5), 5, (255,255,255), -1)
+    cv.circle(mask_left, (5, h - 5), 5, (255, 255, 255), -1)
+    cv.circle(mask_right, (w - 5, h - 5), 5, (255, 255, 255), -1)
 
     # get mean colors
     mean_left = cv.mean(img, mask=mask_left)[:-1]
     mean_right = cv.mean(img, mask=mask_right)[:-1]
 
     # opencv works with (b,g,r), but we want (r,g,b)
-    if(req.direction == "left"):
+    if req.direction == "left":
         return color(int(mean_left[2]), int(mean_left[1]), int(mean_left[0]))
-    elif(req.direction == "right"):
+    elif req.direction == "right":
         return color(int(mean_right[2]), int(mean_right[1]), int(mean_right[0]))
     else:
         return color(0, 0, 0)
 
+
 def listener():
-    rospy.Service('get_virtual_color', get_virtual_color, handle_get_virtual_color)
-    rospy.Service('get_barcode', get_barcode, handle_get_barcode)
+    rospy.Service("get_virtual_color", get_virtual_color, handle_get_virtual_color)
+    rospy.Service("get_barcode", get_barcode, handle_get_barcode)
     rospy.spin()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     listener()
