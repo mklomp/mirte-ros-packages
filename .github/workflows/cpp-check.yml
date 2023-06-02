@@ -47,7 +47,7 @@ jobs:
         apt_pckgs: software-properties-common libglu1-mesa-dev freeglut3-dev mesa-common-dev
 
         # Additional script that will be run (sourced) AFTER 'apt_pckgs' and before running Cmake
-        init_script: init_script.sh
+        # init_script: init_script.sh
 
         # (Optional) clang-tidy args
         clang_tidy_args: -checks='*,fuchsia-*,google-*,zircon-*,abseil-*,modernize-use-trailing-return-type'
