@@ -19,5 +19,4 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: sudo apt install clang-format -y
-      - run: clang-format --dry-run --Werror ./**/**.cpp
+      - run: sudo apt install clang-format -y && clang-format --dry-run --Werror ./**/**.cpp
