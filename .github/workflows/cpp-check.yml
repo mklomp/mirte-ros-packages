@@ -32,7 +32,7 @@ jobs:
         echo \"Hello from the init script! First arg=\${root_dir} second arg=\${build_dir}\"
 
         add-apt-repository ppa:oibaf/graphics-drivers
-        apt update && apt upgrade
+        apt update && apt upgrade -y
         apt install -y libvulkan1 mesa-vulkan-drivers vulkan-utils" > init_script.sh
 
     - name: Run static analysis
