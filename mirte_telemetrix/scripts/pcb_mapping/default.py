@@ -2,7 +2,9 @@
 
 
 def connectorToPins(connector):
-    raise RuntimeError(f"Unknown conversion from connector {connector} to pins. Set a board type and version.")
+    raise RuntimeError(
+        f"Unknown conversion from connector {connector} to pins. Set a board type and version."
+    )
 
 
 def pinNameToPinNumber(pin):

@@ -2,6 +2,7 @@ device:
   mirte:
     type: pico_pcb
     version: 0.6
+    mcu: pico
     samping_interval: 10
 distance:
   left:
@@ -16,11 +17,11 @@ encoder:
   left:
     name: left
     device: mirte
-    connector: ENCB
+    connector: ENC1
   right:
     name: right
     device: mirte
-    connector: ENCA
+    connector: ENC2
 intensity:
   left:
     name: left 
@@ -54,8 +55,7 @@ servo:
     name: left
     device: mirte
     connector: Servo3
-servo:
-  left:
+  right:
     name: right
     device: mirte
     connector: Servo4
@@ -77,12 +77,12 @@ motor:
     connector: MC1-B
     type: l9110s
   left2:
-    name: left
+    name: left2
     device: mirte
     connector: MC2-A
     type: l9110s
   right2:
-    name: right
+    name: right2
     device: mirte
     connector: MC2-B
     type: l9110s
