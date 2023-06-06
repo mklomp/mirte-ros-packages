@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<robot name="duckietown" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find mirte_gazebo)/urdf/tile.xacro"/>
+
+  <!-- this dummy base is used to link all tiles to -->
+  <link name="dummy_link">
+    <inertial>
+      <mass value="10.0" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="1.0"  iyz="0.0"  izz="1.0" />
+    </inertial>
+  </link>
+
+  <xacro:tile name="straight_1" material="DT/Straight" size="0.6" x="0" y="0"/>
+  <xacro:tile name="curve_1" material="DT/Curve" size="0.6" x="1" y="0" yaw="90"/>
+  <xacro:tile name="curve_2" material="DT/Curve" size="0.6" x="1" y="-1"/>
+  <xacro:tile name="straight_2" material="DT/Straight" size="0.6" x="0" y="-1"/>
+
+
+</robot>

@@ -92,7 +92,7 @@
    </link>
 
    <gazebo reference="link_${name}">
-    <gravity>0</gravity>
+    <gravity>1</gravity>
   </gazebo>
 
 
