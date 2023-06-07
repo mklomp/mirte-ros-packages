@@ -1,9 +1,8 @@
 device:
   mirte:
-    type: pico_pcb
+    type: pcb
     version: 0.6
-    mcu: pico
-    samping_interval: 10
+    max_frequency: 50
 distance:
   left:
     name: left
@@ -46,17 +45,17 @@ oled:
 #     device: mirte
 #     connector: Servo3
 # servo:
-#   left:
+#   right:
 #     name: right
 #     device: mirte
 #     connector: Servo4
 servo:
-  left:
-    name: left
+  gripper:
+    name: gripper
     device: mirte
     connector: Servo3
-  right:
-    name: right
+  arm:
+    name: arm
     device: mirte
     connector: Servo4
 

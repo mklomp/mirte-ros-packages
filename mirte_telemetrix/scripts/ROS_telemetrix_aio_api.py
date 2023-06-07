@@ -57,38 +57,33 @@ from concurrent.futures import ThreadPoolExecutor
 executor = ThreadPoolExecutor(10)
 
 
-import pcb_mapping.default
-import pcb_mapping.nano
-import pcb_mapping.pico
-import pcb_mapping.stm32
+import mappings.default
+import mappings.nano
+import mappings.pico
+import mappings.stm32
+import mappings.pcb
 
-board_mapping = pcb_mapping.default
+board_mapping = mappings.default
 
-# Determine the analog offset, based on the mcu
-# TODO: this shuold be refactored together with the
-# mapping above
 devices = rospy.get_param("/mirte/device")
-# board_mapping.analog_offset = 0
-# board_mapping.max_pwm_value = 0
-# pin_map = {}
 
-
-if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "stm32":
-    # board_mapping.analog_offset = stm32_analog_offset
-    # board_mapping.max_pwm_value = stm32_board_mapping.max_pwm_value
-    # pin_map = stm32_map
-    board_mapping = pcb_mapping.stm32
-elif devices["mirte"]["mcu"] == "nano":
-    # board_mapping.analog_offset = nano_analog_offset
-    # board_mapping.max_pwm_value = nano_board_mapping.max_pwm_value
-    # pin_map = nano_map
-    board_mapping = pcb_mapping.nano
-elif devices["mirte"]["type"] == "pico_pcb" or devices["mirte"]["mcu"] == "pico":
-    board_mapping = pcb_mapping.pico
+if devices["mirte"]["type"] == "pcb":
+    board_mapping = mappings.pcb
     if "version" in devices["mirte"]:
         board_mapping.version = devices["mirte"]["version"]
-else:
-    board_mapping = pcb_mapping.default
+
+if devices["mirte"]["type"] == "raw":
+    if "mcu" in devices["mirte"]:
+        if devices["mirte"]["mcu"] == "stm32":
+            board_mapping = mappings.stm32
+        elif devices["mirte"]["mcu"] == "nano":
+            board_mapping = mappings.nano
+        elif devices["mirte"]["mcu"] == "pico":
+            board_mapping = mappings.pico
+            if "version" in devices["mirte"]:
+                board_mapping.set_version(devices["mirte"]["version"])
+    else:
+        board_mapping = mappings.default
 
 
 def get_pin_numbers(component):
@@ -852,7 +847,7 @@ def sensors(loop, board, device):
     # nest_asyncio icw rospy services.
     # Maybe there is a better solution for this, to make sure that we get the
     # data here asap.
-    if devices["mirte"]["type"] == "mirte_pcb" or devices["mirte"]["mcu"] == "pico":
+    if devices["mirte"]["type"] == "pcb" or devices["mirte"]["mcu"] == "pico":
         if max_freq <= 1:
             tasks.append(loop.create_task(board.set_scan_delay(1)))
         else:
