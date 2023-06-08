@@ -526,6 +526,7 @@ class Oled(_SSD1306):
         self.buffer = bytearray(((height // 8) * width) + 1)
         # self.buffer = bytearray(16)
         # self.buffer[0] = 0x40  # Set first byte of data buffer to Co=0, D/C=1
+        print("i2cport!")
         if board_mapping.get_mcu() == "pico":
             if "connector" in oled_obj:
                 pins = board_mapping.connector_to_pins(oled_obj["connector"])
@@ -535,6 +536,7 @@ class Oled(_SSD1306):
             for item in pins:
                 pin_numbers[item] = board_mapping.pin_name_to_pin_number(pins[item])
             self.i2c_port = board_mapping.get_I2C_port(pin_numbers["sda"])
+            print(self.i2c_port, pin_numbers)
             asyncio.run(
                 self.board.set_pin_mode_i2c(
                     i2c_port=self.i2c_port,
@@ -727,18 +729,19 @@ def handle_set_pin_value(req):
 # which can be called.
 def actuators(loop, board, device):
     servers = []
-
-    if rospy.has_param("/mirte/oled"):
-        oleds = rospy.get_param("/mirte/oled")
-        oleds = {k: v for k, v in oleds.items() if v["device"] == device}
-        oled_id = 0
-        for oled in oleds:
-            oled_obj = Oled(
-                128, 64, board, oleds[oled], port=oled_id
-            )  # get_pin_numbers(oleds[oled]))
-            oled_id = oled_id + 1
-            servers.append(loop.create_task(oled_obj.start()))
-
+    try:
+        if rospy.has_param("/mirte/oled"):
+            oleds = rospy.get_param("/mirte/oled")
+            oleds = {k: v for k, v in oleds.items() if v["device"] == device}
+            oled_id = 0
+            for oled in oleds:
+                oled_obj = Oled(
+                    128, 64, board, oleds[oled], port=oled_id
+                )  # get_pin_numbers(oleds[oled]))
+                oled_id = oled_id + 1
+                servers.append(loop.create_task(oled_obj.start()))
+    except e:
+        print("except asdfsd",e)
     # TODO: support multiple leds
     if rospy.has_param("/mirte/led"):
         led = rospy.get_param("/mirte/led")
@@ -895,7 +898,8 @@ if __name__ == "__main__":
 
     # Initialize the telemetrix board
     if board_mapping.get_mcu() == "pico":
-        board = tmx_pico_aio.TmxPicoAio()
+        board = tmx_pico_aio.TmxPicoAio(
+                    allow_i2c_errors = True)
     else:
         board = telemetrix_aio.TelemetrixAIO()
 
