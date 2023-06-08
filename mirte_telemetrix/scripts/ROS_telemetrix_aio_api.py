@@ -56,7 +56,7 @@ executor = ThreadPoolExecutor(10)
 
 
 import mappings.default
-import mappings.nano
+import mappings.nanoatmega328
 import mappings.pico
 import mappings.stm32
 import mappings.pcb
@@ -68,17 +68,19 @@ devices = rospy.get_param("/mirte/device")
 if devices["mirte"]["type"] == "pcb":
     board_mapping = mappings.pcb
     if "version" in devices["mirte"]:
-            if("mcu" in devices["mirte"]): # pcb 0.4 allows for nano or stm32
-                board_mapping.set_version(devices["mirte"]["version"], devices["mirte"]["mcu"])
-            else:
-                board_mapping.set_version(devices["mirte"]["version"])
+        if "mcu" in devices["mirte"]:  # pcb 0.4 allows for nano or stm32
+            board_mapping.set_version(
+                devices["mirte"]["version"], devices["mirte"]["mcu"]
+            )
+        else:
+            board_mapping.set_version(devices["mirte"]["version"])
 
 if devices["mirte"]["type"] == "breadboard":
     if "mcu" in devices["mirte"]:
         if devices["mirte"]["mcu"] == "stm32":
             board_mapping = mappings.stm32
         elif devices["mirte"]["mcu"] == "nano":
-            board_mapping = mappings.nano
+            board_mapping = mappings.nanoatmega328
         elif devices["mirte"]["mcu"] == "pico":
             board_mapping = mappings.pico
         else:
@@ -449,7 +451,9 @@ class PWMMotor:
                     self.pins["1b"],
                     int(
                         board_mapping.get_max_pwm_value()
-                        - min(abs(speed), 100) / 100.0 * board_mapping.get_max_pwm_value()
+                        - min(abs(speed), 100)
+                        / 100.0
+                        * board_mapping.get_max_pwm_value()
                     ),
                 )
             self.prev_motor_speed = speed
@@ -489,7 +493,9 @@ class L298NMotor:
                 await analog_write(
                     self.board,
                     self.pins["en"],
-                    int(min(abs(speed), 100) / 100.0 * board_mapping.get_max_pwm_value()),
+                    int(
+                        min(abs(speed), 100) / 100.0 * board_mapping.get_max_pwm_value()
+                    ),
                 )
             self.prev_motor_speed = speed
 

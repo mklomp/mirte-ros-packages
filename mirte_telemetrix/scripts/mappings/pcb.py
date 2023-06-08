@@ -1,5 +1,5 @@
 import mappings.pico
-import mappings.nano
+import mappings.nanoatmega328
 import mappings.stm32
 
 

@@ -2,6 +2,8 @@
 
 
 def pin_name_to_pin_number(pin):  # pico has no mapping
+    if pin.startswith("GP"):
+        pin = pin[2:]
     if pin.isdigit():
         return int(pin)
 
