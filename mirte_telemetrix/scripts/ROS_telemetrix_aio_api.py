@@ -895,8 +895,7 @@ if __name__ == "__main__":
 
     # Initialize the telemetrix board
     if board_mapping.get_mcu() == "pico":
-        board = tmx_pico_aio.TmxPicoAio(
-                    allow_i2c_errors = True)
+        board = tmx_pico_aio.TmxPicoAio(allow_i2c_errors=True)
     else:
         board = telemetrix_aio.TelemetrixAIO()
 
