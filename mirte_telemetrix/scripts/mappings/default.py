@@ -1,19 +1,26 @@
 # No mapping, just assume the config is correct
 
 
-def connectorToPins(connector):
+def connector_to_pins(connector):
     raise RuntimeError(
         f"Unknown conversion from connector {connector} to pins. Set a board type and version."
     )
 
 
-def pinNameToPinNumber(pin):
+def pin_name_to_pin_number(pin):
     if int(pin) == pin:
         return pin
     raise RuntimeError(f"Unknown conversion from pin {pin} to an IO number")
 
 
-max_pwm_value = 255
-analog_offset = 0
+def get_mcu():
+    return "none"
 
-mcu = "default"
+def get_I2C_port(sda):
+    return 0
+
+def get_analog_offset():
+    return 0
+
+def get_max_pwm_value():
+    return 255

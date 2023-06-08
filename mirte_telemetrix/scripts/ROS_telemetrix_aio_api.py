@@ -9,14 +9,12 @@ import signal
 import aiorospy
 import io
 from inspect import signature
+from tmx_pico_aio import tmx_pico_aio
+from telemetrix_aio import telemetrix_aio
 
 
 # Import the right Telemetrix AIO
 devices = rospy.get_param("/mirte/device")
-if devices["mirte"]["type"] == "pico_pcb" or devices["mirte"]["mcu"] == "pico":
-    from tmx_pico_aio import tmx_pico_aio
-else:
-    from telemetrix_aio import telemetrix_aio
 
 
 # Until we update our own fork of TelemtrixAIO to the renamed pwm calls
@@ -70,9 +68,12 @@ devices = rospy.get_param("/mirte/device")
 if devices["mirte"]["type"] == "pcb":
     board_mapping = mappings.pcb
     if "version" in devices["mirte"]:
-        board_mapping.version = devices["mirte"]["version"]
+            if("mcu" in devices["mirte"]): # pcb 0.4 allows for nano or stm32
+                board_mapping.set_version(devices["mirte"]["version"], devices["mirte"]["mcu"])
+            else:
+                board_mapping.set_version(devices["mirte"]["version"])
 
-if devices["mirte"]["type"] == "raw":
+if devices["mirte"]["type"] == "breadboard":
     if "mcu" in devices["mirte"]:
         if devices["mirte"]["mcu"] == "stm32":
             board_mapping = mappings.stm32
@@ -80,10 +81,8 @@ if devices["mirte"]["type"] == "raw":
             board_mapping = mappings.nano
         elif devices["mirte"]["mcu"] == "pico":
             board_mapping = mappings.pico
-            if "version" in devices["mirte"]:
-                board_mapping.set_version(devices["mirte"]["version"])
-    else:
-        board_mapping = mappings.default
+        else:
+            board_mapping = mappings.default
 
 
 def get_pin_numbers(component):
@@ -91,12 +90,12 @@ def get_pin_numbers(component):
     device = devices[component["device"]]
     pins = {}
     if "connector" in component:
-        pins = board_mapping.connectorToPins(component["connector"])
+        pins = board_mapping.connector_to_pins(component["connector"])
 
     # convert pin naming to numbers
     pin_numbers = {}
     for item in pins:
-        pin_numbers[item] = board_mapping.pinNameToPinNumber(pins[item])
+        pin_numbers[item] = board_mapping.pin_name_to_pin_number(pins[item])
 
     return pin_numbers
 
@@ -174,7 +173,7 @@ class KeypadMonitor(SensorMonitor):
 
     async def start(self):
         await self.board.set_pin_mode_analog_input(
-            self.pins["pin"] - board_mapping.analog_offset,
+            self.pins["pin"] - board_mapping.get_analog_offset(),
             self.differential,
             self.publish_data,
         )
@@ -302,7 +301,7 @@ class AnalogIntensitySensorMonitor(SensorMonitor):
 
     async def start(self):
         await self.board.set_pin_mode_analog_input(
-            self.pins["analog"] - board_mapping.analog_offset,
+            self.pins["analog"] - board_mapping.get_analog_offset(),
             differential=self.differential,
             callback=self.publish_data,
         )
@@ -337,7 +336,7 @@ class EncoderSensorMonitor(SensorMonitor):
         return GetEncoderResponse(self.last_publish_value.value)
 
     async def start(self):
-        if board_mapping.mcu == "pico":
+        if board_mapping.get_mcu() == "pico":
             await self.board.set_pin_mode_encoder(
                 self.pins["pin"], 0, self.publish_data, False
             )
@@ -440,7 +439,7 @@ class PWMMotor:
                 await analog_write(
                     self.board,
                     self.pins["1b"],
-                    int(min(speed, 100) / 100.0 * board_mapping.max_pwm_value),
+                    int(min(speed, 100) / 100.0 * board_mapping.get_max_pwm_value()),
                 )
             elif speed < 0:
                 await self.init_motors(speed)
@@ -449,8 +448,8 @@ class PWMMotor:
                     self.board,
                     self.pins["1b"],
                     int(
-                        board_mapping.max_pwm_value
-                        - min(abs(speed), 100) / 100.0 * board_mapping.max_pwm_value
+                        board_mapping.get_max_pwm_value()
+                        - min(abs(speed), 100) / 100.0 * board_mapping.get_max_pwm_value()
                     ),
                 )
             self.prev_motor_speed = speed
@@ -482,7 +481,7 @@ class L298NMotor:
                 await analog_write(
                     self.board,
                     self.pins["en"],
-                    int(min(speed, 100) / 100.0 * board_mapping.max_pwm_value),
+                    int(min(speed, 100) / 100.0 * board_mapping.get_max_pwm_value()),
                 )
             elif speed < 0:
                 await self.board.digital_write(self.pins["in2"], 0)
@@ -490,7 +489,7 @@ class L298NMotor:
                 await analog_write(
                     self.board,
                     self.pins["en"],
-                    int(min(abs(speed), 100) / 100.0 * board_mapping.max_pwm_value),
+                    int(min(abs(speed), 100) / 100.0 * board_mapping.get_max_pwm_value()),
                 )
             self.prev_motor_speed = speed
 
@@ -510,7 +509,6 @@ class Oled(_SSD1306):
     ):
         self.board = board
         self.oled_obj = oled_obj
-        print(oled_obj, port)
         self.addr = addr
         self.temp = bytearray(2)
         self.i2c_port = port
@@ -522,15 +520,15 @@ class Oled(_SSD1306):
         self.buffer = bytearray(((height // 8) * width) + 1)
         # self.buffer = bytearray(16)
         # self.buffer[0] = 0x40  # Set first byte of data buffer to Co=0, D/C=1
-        if board_mapping.mcu == "pico":
+        if board_mapping.get_mcu() == "pico":
             if "connector" in oled_obj:
-                pins = board_mapping.connectorToPins(oled_obj["connector"])
+                pins = board_mapping.connector_to_pins(oled_obj["connector"])
             else:
                 pins = oled_obj["pins"]
             pin_numbers = {}
             for item in pins:
-                pin_numbers[item] = board_mapping.pinNameToPinNumber(pins[item])
-            self.i2c_port = board_mapping.getI2CPort(pin_numbers["sda"])
+                pin_numbers[item] = board_mapping.pin_name_to_pin_number(pins[item])
+            self.i2c_port = board_mapping.get_I2C_port(pin_numbers["sda"])
             asyncio.run(
                 self.board.set_pin_mode_i2c(
                     i2c_port=self.i2c_port,
@@ -642,7 +640,7 @@ async def handle_set_led_value(req):
     await analog_write(
         board,
         get_pin_numbers(led)["pin"],
-        int(min(req.value, 100) / 100.0 * board_mapping.max_pwm_value),
+        int(min(req.value, 100) / 100.0 * board_mapping.get_max_pwm_value()),
     )
     return SetLEDValueResponse(True)
 
@@ -664,7 +662,7 @@ async def data_callback(data):
     print("data callback")
     pin_number = data[1]
     if data[0] == 3:
-        pin_number += board_mapping.analog_offset
+        pin_number += board_mapping.get_analog_offset()
     pin_values[pin_number] = data[2]
 
 
@@ -673,7 +671,7 @@ def handle_get_pin_value(req):
     # Map pin to the pin map if it is in there, or to
     # an int if raw pin number
     try:
-        pin = board_mapping.pinNameToPinNumber(req.pin)
+        pin = board_mapping.pin_name_to_pin_number(req.pin)
     except:
         pin = int(req.pin)
 
@@ -681,7 +679,7 @@ def handle_get_pin_value(req):
         if req.type == "analog":
             asyncio.run(
                 board.set_pin_mode_analog_input(
-                    pin - board_mapping.analog_offset, callback=data_callback
+                    pin - board_mapping.get_analog_offset(), callback=data_callback
                 )
             )
         if req.type == "digital":
@@ -700,15 +698,15 @@ def handle_set_pin_value(req):
     # Map pin to the pin map if it is in there, or to
     # an int if raw pin number
     try:
-        pin = board_mapping.pinNameToPinNumber(req.pin)
+        pin = board_mapping.pin_name_to_pin_number(req.pin)
     except:
         pin = int(req.pin)
 
     if req.type == "analog":
         # This should be a PWM capable pin. Therefore we do not need to
-        # account for theboard_mapping.analog_offset. We do need to account for the
+        # account for the board_mapping.analog_offset. We do need to account for the
         # max pwm_value though.
-        capped_value = min(req.value, board_mapping.max_pwm_value)
+        capped_value = min(req.value, board_mapping.get_max_pwm_value())
         asyncio.run(set_pin_mode_analog_output(board, pin))
         asyncio.run(asyncio.sleep(0.001))
         asyncio.run(analog_write(board, pin, capped_value))
@@ -847,7 +845,7 @@ def sensors(loop, board, device):
     # nest_asyncio icw rospy services.
     # Maybe there is a better solution for this, to make sure that we get the
     # data here asap.
-    if devices["mirte"]["type"] == "pcb" or devices["mirte"]["mcu"] == "pico":
+    if board_mapping.get_mcu() == "pico":
         if max_freq <= 1:
             tasks.append(loop.create_task(board.set_scan_delay(1)))
         else:
@@ -890,8 +888,7 @@ if __name__ == "__main__":
     loop = asyncio.get_event_loop()
 
     # Initialize the telemetrix board
-    if devices["mirte"]["type"] == "pico_pcb" or devices["mirte"]["mcu"] == "pico":
-        print(devices["mirte"]["type"], devices["mirte"]["mcu"])
+    if board_mapping.get_mcu() == "pico":
         board = tmx_pico_aio.TmxPicoAio()
     else:
         board = telemetrix_aio.TelemetrixAIO()

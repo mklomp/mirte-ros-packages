@@ -22,18 +22,25 @@ nano_map = {
     "A6": 20,
     "A7": 21,
 }
-max_pwm_value = 255
-analog_offset = 14
 
+def get_analog_offset():
+    return 14
 
-def connectorToPins(connector):
+def get_max_pwm_value():
+    return 255
+
+def connector_to_pins(connector):
     raise RuntimeError(f"Unknown conversion from connector {connector} to an IO number")
 
 
-def pinNameToPinNumber(pin):
+def pin_name_to_pin_number(pin):
     if pin in nano_map:
         return nano_map[pin]
     raise RuntimeError(f"Unknown conversion from pin {pin} to an IO number")
 
 
-mcu = "nano"
+def get_mcu():
+    return "nano"
+
+def get_I2C_port(sda):
+    return 0
