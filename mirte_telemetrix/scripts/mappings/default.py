@@ -16,11 +16,14 @@ def pin_name_to_pin_number(pin):
 def get_mcu():
     return "none"
 
+
 def get_I2C_port(sda):
     return 0
 
+
 def get_analog_offset():
     return 0
+
 
 def get_max_pwm_value():
     return 255

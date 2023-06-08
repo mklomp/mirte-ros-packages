@@ -23,11 +23,14 @@ nano_map = {
     "A7": 21,
 }
 
+
 def get_analog_offset():
     return 14
 
+
 def get_max_pwm_value():
     return 255
+
 
 def connector_to_pins(connector):
     raise RuntimeError(f"Unknown conversion from connector {connector} to an IO number")
@@ -41,6 +44,7 @@ def pin_name_to_pin_number(pin):
 
 def get_mcu():
     return "nano"
+
 
 def get_I2C_port(sda):
     return 0

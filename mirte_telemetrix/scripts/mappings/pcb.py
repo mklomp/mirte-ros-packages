@@ -29,22 +29,20 @@ mirte_pico_pcb_map06 = {
 }
 
 
-
-
-
-
 version = 0.6
 board_mapping = mappings.pico
 connector_mapping = mirte_pico_pcb_map06
 
+
 def get_mcu():
     return board_mapping.get_mcu()
+
 
 def get_analog_offset():
     return board_mapping.get_analog_offset()
 
+
 def connector_to_pins(connector):
-    
     if connector in connector_mapping:
         return connector_mapping[connector]
     raise RuntimeError(
@@ -54,6 +52,7 @@ def connector_to_pins(connector):
 
 def pin_name_to_pin_number(pin):
     return board_mapping.pin_name_to_pin_number(pin)
+
 
 def get_I2C_port(sda):
     return board_mapping.get_I2C_port(sda)
@@ -65,7 +64,7 @@ def set_version(new_version, mcu=""):
     if version == 0.6:
         board_mapping = mappings.pico
     if version == 0.4:
-        if(mcu == "" or mcu == "stm32"):
+        if mcu == "" or mcu == "stm32":
             board_mapping = mappings.stm32
             connector_mapping = mirte_pcb04_stm_map
         # else:
@@ -74,11 +73,10 @@ def set_version(new_version, mcu=""):
     if version == 0.2:
         board_mapping = mappings.stm32
         connector_mapping = mirte_pcb04_stm_map
+
+
 def get_max_pwm_value():
     return board_mapping.get_max_pwm_value()
-
-
-
 
 
 # mappings for older pcbs

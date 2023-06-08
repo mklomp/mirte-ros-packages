@@ -34,18 +34,20 @@ stm32_map = {
     "B11": 31,
 }
 
+
 def get_max_pwm_value():
     return 255
+
+
 def get_analog_offset():
     return 20
-
-
 
 
 def pin_name_to_pin_number(pin):
     if pin in stm32_map:
         return stm32_map[pin]
     raise RuntimeError(f"Unknown conversion from pin {pin} to an IO number")
+
 
 def get_mcu():
     return "stm32"
