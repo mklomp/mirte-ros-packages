@@ -20,14 +20,14 @@ devices = rospy.get_param("/mirte/device")
 # Until we update our own fork of TelemtrixAIO to the renamed pwm calls
 # we need to add a simple wrapper
 async def set_pin_mode_analog_output(board, pin):
-    if devices["mirte"]["type"] == "pico_pcb" or devices["mirte"]["mcu"] == "pico":
+    if board_mapping.get_mcu() == "pico":
         await board.set_pin_mode_pwm_output(pin)
     else:
         await board.set_pin_mode_analog_output(pin)
 
 
 async def analog_write(board, pin, value):
-    if devices["mirte"]["type"] == "pico_pcb" or devices["mirte"]["mcu"] == "pico":
+    if board_mapping.get_mcu() == "pico":
         await board.pwm_write(board, pin, value)
     else:
         await board.analog_write(board, pin, value)
