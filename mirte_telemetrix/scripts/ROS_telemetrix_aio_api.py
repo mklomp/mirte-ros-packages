@@ -79,7 +79,13 @@ if devices["mirte"]["type"] == "breadboard":
     if "mcu" in devices["mirte"]:
         if devices["mirte"]["mcu"] == "stm32":
             board_mapping = mappings.stm32
-        elif devices["mirte"]["mcu"] == "nano":
+        elif (
+            "nano"
+            in devices["mirte"][
+                "mcu"
+            ]  # will trigger for nano, nano_old and nanoatmega328
+            or devices["mirte"]["mcu"] == "uno"  # uno has the same pinout
+        ):
             board_mapping = mappings.nanoatmega328
         elif devices["mirte"]["mcu"] == "pico":
             board_mapping = mappings.pico

@@ -1,4 +1,6 @@
 nano_map = {
+    "RX": 0,  # Uno naming
+    "TX": 1,  # Uno naming
     "RX0": 0,
     "TX1": 1,
     "D2": 2,
@@ -39,6 +41,8 @@ def connector_to_pins(connector):
 def pin_name_to_pin_number(pin):
     if pin in nano_map:
         return nano_map[pin]
+    if pin.isdigit():  # when using just the pin number
+        return int(pin)
     raise RuntimeError(f"Unknown conversion from pin {pin} to an IO number")
 
 
