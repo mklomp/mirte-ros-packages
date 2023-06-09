@@ -41,7 +41,7 @@ def connector_to_pins(connector):
 def pin_name_to_pin_number(pin):
     if pin in nano_map:
         return nano_map[pin]
-    if pin.isdigit():  # when using just the pin number
+    if str(pin).isdigit():  # when using just the pin number
         return int(pin)
     raise RuntimeError(f"Unknown conversion from pin {pin} to an IO number")
 

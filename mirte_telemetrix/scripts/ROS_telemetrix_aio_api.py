@@ -28,7 +28,7 @@ async def set_pin_mode_analog_output(board, pin):
 
 async def analog_write(board, pin, value):
     if board_mapping.get_mcu() == "pico":
-        await board.pwm_write(board, pin, value)
+        await board.pwm_write(pin, value)
     else:
         await board.analog_write(board, pin, value)
 
@@ -99,7 +99,10 @@ def get_pin_numbers(component):
     pins = {}
     if "connector" in component:
         pins = board_mapping.connector_to_pins(component["connector"])
-
+    if "pins" in component:
+        pins = component["pins"]
+    if "pin" in component:
+        pins["pin"] = component["pin"]
     # convert pin naming to numbers
     pin_numbers = {}
     for item in pins:

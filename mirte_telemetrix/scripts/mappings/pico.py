@@ -2,13 +2,14 @@
 
 
 def pin_name_to_pin_number(pin):  # pico has no mapping
+    pin = str(pin)
     if pin.startswith("GP"):
         pin = pin[2:]
     if pin.isdigit():
         return int(pin)
 
     raise RuntimeError(
-        f"Unknown conversion from pin {pin} to an IO number, {int(pin)} == { pin}"
+        f"Unknown conversion from pin {pin} to an IO number."
     )
 
 
@@ -17,7 +18,7 @@ def get_analog_offset():
 
 
 def get_max_pwm_value():
-    return 255
+    return 100
 
 
 def get_mcu():
