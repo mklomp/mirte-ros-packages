@@ -8,9 +8,7 @@ def pin_name_to_pin_number(pin):  # pico has no mapping
     if pin.isdigit():
         return int(pin)
 
-    raise RuntimeError(
-        f"Unknown conversion from pin {pin} to an IO number."
-    )
+    raise RuntimeError(f"Unknown conversion from pin {pin} to an IO number.")
 
 
 def get_analog_offset():
