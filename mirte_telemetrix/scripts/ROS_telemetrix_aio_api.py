@@ -342,15 +342,28 @@ class EncoderSensorMonitor(SensorMonitor):
         self.max_freq = -1
         self.last_publish_value = Encoder()
         self.speed_count = 0
+        self.last_step = 0
 
     def get_data(self, req):
         return GetEncoderResponse(self.last_publish_value.value)
 
     async def start(self):
         if board_mapping.get_mcu() == "pico":
-            await self.board.set_pin_mode_encoder(
-                self.pins["pin"], 0, self.publish_data, False
-            )
+            if "A" in self.pins or "trigger" in self.pins or "digital" in self.pins:
+                if "trigger" in self.pins:
+                    self.pins["A"] = self.pins["trigger"]
+                    self.pins["B"] = self.pins["echo"]
+                if "digital" in self.pins:
+                    self.pins["A"] = self.pins["digital"]
+                    self.pins["B"] = self.pins["analog"]
+
+                await self.board.set_pin_mode_encoder(
+                    self.pins["A"], self.pins["B"], self.publish_data, True
+                )
+            else:
+                await self.board.set_pin_mode_encoder(
+                    self.pins["pin"], 0, self.publish_data, False
+                )
         else:
             await self.board.set_pin_mode_encoder(
                 self.pins["pin"], 2, self.ticks_per_wheel, self.publish_data
@@ -365,10 +378,14 @@ class EncoderSensorMonitor(SensorMonitor):
         self.speed_pub.publish(encoder)
 
     async def publish_data(self, data):
-        self.speed_count = self.speed_count + 1
         encoder = Encoder()
         encoder.header = self.get_header()
         encoder.value = data[2]
+
+        difference = self.last_step - encoder.value
+        self.speed_count = self.speed_count + difference
+        self.last_step = encoder.value
+
         await self.publish(encoder)
 
 
