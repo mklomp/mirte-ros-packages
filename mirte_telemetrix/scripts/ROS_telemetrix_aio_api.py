@@ -374,6 +374,7 @@ class EncoderSensorMonitor(SensorMonitor):
     async def publish_data(self, data):
         encoder = Encoder()
         encoder.header = self.get_header()
+        encoder.value = data[2]
 
         # Invert encoder pulses when quadrate is wired incorrectly
         if self.inverted:
