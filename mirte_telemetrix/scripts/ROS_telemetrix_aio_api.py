@@ -343,20 +343,14 @@ class EncoderSensorMonitor(SensorMonitor):
         self.last_publish_value = Encoder()
         self.speed_count = 0
         self.last_step = 0
+        self.inverted = sensor["inverted"] if "inverted" in sensor else False
 
     def get_data(self, req):
         return GetEncoderResponse(self.last_publish_value.value)
 
     async def start(self):
         if board_mapping.get_mcu() == "pico":
-            if "A" in self.pins or "trigger" in self.pins or "digital" in self.pins:
-                if "trigger" in self.pins:
-                    self.pins["A"] = self.pins["trigger"]
-                    self.pins["B"] = self.pins["echo"]
-                if "digital" in self.pins:
-                    self.pins["A"] = self.pins["digital"]
-                    self.pins["B"] = self.pins["analog"]
-
+            if "A" in self.pins:  # Only yet Pico support for quadrature encoder
                 await self.board.set_pin_mode_encoder(
                     self.pins["A"], self.pins["B"], self.publish_data, True
                 )
@@ -380,7 +374,10 @@ class EncoderSensorMonitor(SensorMonitor):
     async def publish_data(self, data):
         encoder = Encoder()
         encoder.header = self.get_header()
-        encoder.value = data[2]
+
+        # Invert encoder pulses when quadrate is wired incorrectly
+        if self.inverted:
+            encoder.value = -encoder.value
 
         difference = self.last_step - encoder.value
         self.speed_count = self.speed_count + difference
@@ -419,6 +416,7 @@ class PWMMotor:
         self.name = motor_obj["name"]
         self.prev_motor_speed = 0
         self.initialized = False
+        self.inverted = motor_obj["inverted"] if "inverted" in motor_obj else False
 
     async def start(self):
         server = rospy.Service(
@@ -457,6 +455,8 @@ class PWMMotor:
             self.initialized = True
 
     async def set_speed(self, speed):
+        if self.inverted:
+            speed = -speed
         if self.prev_motor_speed != speed:
             if speed == 0:
                 await self.board.digital_write(self.pins["1a"], 0)

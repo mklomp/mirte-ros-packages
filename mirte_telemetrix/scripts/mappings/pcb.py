@@ -4,12 +4,12 @@ import mappings.stm32
 
 
 mirte_pico_pcb_map06 = {
-    "IR1": {"digital": "16", "analog": "26"},
-    "IR2": {"digital": "17", "analog": "27"},
-    "SRF1": {"trigger": "7", "echo": "6"},
-    "SRF2": {"trigger": "9", "echo": "8"},
-    "I2C1": {"scl": "5", "sda": "4"},
-    "I2C2": {"scl": "11", "sda": "10"},
+    "IR1": {"digital": "16", "analog": "26", "A": "16", "B": "26"},
+    "IR2": {"digital": "17", "analog": "27", "A": "17", "B": "27"},
+    "SRF1": {"trigger": "7", "echo": "6", "A": "7", "B": "6"},
+    "SRF2": {"trigger": "9", "echo": "8", "A": "9", "B": "8"},
+    "I2C1": {"scl": "5", "sda": "4", "A": "5", "B": "4"},
+    "I2C2": {"scl": "11", "sda": "10", "A": "11", "B": "10"},
     "ENC1": {"pin": "15"},
     "ENC2": {"pin": "14"},
     "Keypad": {"pin": "28"},
