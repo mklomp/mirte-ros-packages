@@ -69,6 +69,8 @@
   <xacro:wheel name="right_wheel" parent="link_chassis" radius="${params['wheel_radius']}" mass="${params['wheel_mass']}">
     <origin rpy="0 0 0" xyz="${params['wheel_center_x_offset']} ${-1*params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}"/>
     <joint_options>
+   
+    
       <limit effort="10" velocity="8"/>
       <dynamics damping="0.0" friction="0.0"/>
     </joint_options>
@@ -83,6 +85,12 @@
     <origin rpy="0 0 -0.45" xyz="0.085 -0.04 0.022" />
   </xacro:ultrasonic_sensor>
 -->
-
-
+<gazebo>
+  <!-- <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+    <robotNamespace>/mirte-control</robotNamespace>
+  </plugin> -->
+ <plugin name="gazebo_ros_controller_manager" filename="libgazebo_ros_controller_manager.so">
+    </plugin>
+</gazebo>
+  <xacro:include filename="$(find mirte_gazebo)/urdf/diffdrive.xacro"/>
 </robot>

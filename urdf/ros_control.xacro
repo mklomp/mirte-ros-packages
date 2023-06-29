@@ -33,10 +33,9 @@
 
 <gazebo>
     <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
-        <robotNamespace>/mirte</robotNamespace>
+        <robotNamespace>/mirte-control</robotNamespace>
         
     </plugin>
-<!--    <plugin name="gazebo_ros_controller_manager" filename="libgazebo_ros_controller_manager.so">
-    </plugin> -->
+  
 </gazebo>
 </robot>

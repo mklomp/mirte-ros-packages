@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<robot>  
+ 
+  <gazebo>
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <alwaysOn>false</alwaysOn>
+      <legacyMode>false</legacyMode>
+      <updateRate>20</updateRate>
+      <leftJoint>joint_left_wheel</leftJoint>
+      <rightJoint>joint_right_wheel</rightJoint>
+      <wheelSeparation>5</wheelSeparation>
+      <wheelDiameter>2</wheelDiameter>
+      <torque>20</torque>
+      <commandTopic>/mirte_control/base_controller/cmd_vel</commandTopic>
+      <odometryTopic>/mirte_control/base_controller/odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
+    </plugin>
+  </gazebo>
+ 
+</robot>
