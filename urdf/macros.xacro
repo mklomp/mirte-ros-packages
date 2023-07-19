@@ -37,8 +37,7 @@
       <collision name="link_${name}_collision">
         <origin rpy="0 1.5707 1.5707" xyz="0 0 0" />
         <geometry>
-          <mesh filename="file://$(find mirte_gazebo)/meshes/mirte_wheel.stl"
-          scale="0.001 0.001 0.001" rpy="0 0 1.57079633" />
+         <cylinder length="0.015" radius="${radius}"/>
         </geometry>
       </collision>
       <visual name="link_${name}_visual">
@@ -93,7 +92,7 @@
       </xacro:inertia_sphere>
     </link>
     <gazebo reference="link_${name}">
-      <gravity>1</gravity>
+      <gravity>0</gravity>
     </gazebo>
     <joint name="fixed" type="fixed">
       <parent link="${parent}" />
