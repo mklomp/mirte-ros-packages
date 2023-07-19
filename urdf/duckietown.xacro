@@ -1,96 +1,179 @@
 <?xml version="1.0"?>
-<robot name="duckietown" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+name="duckietown">
   <xacro:include filename="$(find mirte_gazebo)/urdf/tile.xacro" />
   <!-- this dummy base is used to link all tiles to -->
   <link name="dummy_link">
     <inertial>
       <mass value="10.0" />
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0"
+      izz="1.0" />
     </inertial>
   </link>
   <!-- <xacro:tile name="straight_1" material="DT/Straight" size="0.6" x="0" y="0"/>
   <xacro:tile name="curve_1" material="DT/Curve" size="0.6" x="1" y="0" yaw="90"/>
   <xacro:tile name="curve_2" material="DT/Curve" size="0.6" x="1" y="-1"/>
   <xacro:tile name="straight_2" material="DT/Straight" size="0.6" x="0" y="-1"/> -->
-  <xacro:tile name="tile_0_0" material="DT/asphalt" size="0.6" x="0" y="0" yaw="0" />
-  <xacro:tile name="tile_1_0" material="DT/asphalt" size="0.6" x="1" y="0" yaw="0" />
-  <xacro:tile name="tile_2_0" material="DT/asphalt" size="0.6" x="2" y="0" yaw="0" />
-  <xacro:tile name="tile_3_0" material="DT/asphalt" size="0.6" x="3" y="0" yaw="0" />
-  <xacro:tile name="tile_4_0" material="DT/asphalt" size="0.6" x="4" y="0" yaw="0" />
-  <xacro:tile name="tile_5_0" material="DT/asphalt" size="0.6" x="5" y="0" yaw="0" />
-  <xacro:tile name="tile_6_0" material="DT/asphalt" size="0.6" x="6" y="0" yaw="0" />
-  <xacro:tile name="tile_7_0" material="DT/asphalt" size="0.6" x="7" y="0" yaw="0" />
-  <xacro:tile name="tile_8_0" material="DT/asphalt" size="0.6" x="8" y="0" yaw="0" />
-  <xacro:tile name="tile_0_1" material="DT/asphalt" size="0.6" x="0" y="1" yaw="0" />
-  <xacro:tile name="tile_1_1" material="DT/curve_left" size="0.6" x="1" y="1" yaw="270" />
-  <xacro:tile name="tile_2_1" material="DT/curve_left" size="0.6" x="2" y="1" yaw="0" />
-  <xacro:tile name="tile_3_1" material="DT/asphalt" size="0.6" x="3" y="1" yaw="0" />
-  <xacro:tile name="tile_4_1" material="DT/curve_left" size="0.6" x="4" y="1" yaw="270" />
-  <xacro:tile name="tile_5_1" material="DT/straight" size="0.6" x="5" y="1" yaw="270" />
-  <xacro:tile name="tile_6_1" material="DT/straight" size="0.6" x="6" y="1" yaw="270" />
-  <xacro:tile name="tile_7_1" material="DT/curve_left" size="0.6" x="7" y="1" yaw="0" />
-  <xacro:tile name="tile_8_1" material="DT/asphalt" size="0.6" x="8" y="1" yaw="0" />
-  <xacro:tile name="tile_0_2" material="DT/asphalt" size="0.6" x="0" y="2" yaw="0" />
-  <xacro:tile name="tile_1_2" material="DT/straight" size="0.6" x="1" y="2" yaw="180" />
-  <xacro:tile name="tile_2_2" material="DT/curve_right" size="0.6" x="2" y="2" yaw="270" />
-  <xacro:tile name="tile_3_2" material="DT/straight" size="0.6" x="3" y="2" yaw="270" />
-  <xacro:tile name="tile_4_2" material="DT/curve_right" size="0.6" x="4" y="2" yaw="180" />
-  <xacro:tile name="tile_5_2" material="DT/asphalt" size="0.6" x="5" y="2" yaw="0" />
-  <xacro:tile name="tile_6_2" material="DT/curve_right" size="0.6" x="6" y="2" yaw="0" />
-  <xacro:tile name="tile_7_2" material="DT/curve_left" size="0.6" x="7" y="2" yaw="90" />
-  <xacro:tile name="tile_8_2" material="DT/asphalt" size="0.6" x="8" y="2" yaw="0" />
-  <xacro:tile name="tile_0_3" material="DT/asphalt" size="0.6" x="0" y="3" yaw="0" />
-  <xacro:tile name="tile_1_3" material="DT/straight" size="0.6" x="1" y="3" yaw="180" />
-  <xacro:tile name="tile_2_3" material="DT/asphalt" size="0.6" x="2" y="3" yaw="0" />
-  <xacro:tile name="tile_3_3" material="DT/asphalt" size="0.6" x="3" y="3" yaw="0" />
-  <xacro:tile name="tile_4_3" material="DT/asphalt" size="0.6" x="4" y="3" yaw="0" />
-  <xacro:tile name="tile_5_3" material="DT/asphalt" size="0.6" x="5" y="3" yaw="0" />
-  <xacro:tile name="tile_6_3" material="DT/straight" size="0.6" x="6" y="3" yaw="0" />
-  <xacro:tile name="tile_7_3" material="DT/asphalt" size="0.6" x="7" y="3" yaw="0" />
-  <xacro:tile name="tile_8_3" material="DT/asphalt" size="0.6" x="8" y="3" yaw="0" />
-  <xacro:tile name="tile_0_4" material="DT/asphalt" size="0.6" x="0" y="4" yaw="0" />
-  <xacro:tile name="tile_1_4" material="DT/straight" size="0.6" x="1" y="4" yaw="180" />
-  <xacro:tile name="tile_2_4" material="DT/asphalt" size="0.6" x="2" y="4" yaw="0" />
-  <xacro:tile name="tile_3_4" material="DT/asphalt" size="0.6" x="3" y="4" yaw="0" />
-  <xacro:tile name="tile_4_4" material="DT/curve_right" size="0.6" x="4" y="4" yaw="0" />
-  <xacro:tile name="tile_5_4" material="DT/straight" size="0.6" x="5" y="4" yaw="90" />
-  <xacro:tile name="tile_6_4" material="DT/curve_left" size="0.6" x="6" y="4" yaw="90" />
-  <xacro:tile name="tile_7_4" material="DT/asphalt" size="0.6" x="7" y="4" yaw="0" />
-  <xacro:tile name="tile_8_4" material="DT/asphalt" size="0.6" x="8" y="4" yaw="0" />
-  <xacro:tile name="tile_0_5" material="DT/asphalt" size="0.6" x="0" y="5" yaw="0" />
-  <xacro:tile name="tile_1_5" material="DT/straight" size="0.6" x="1" y="5" yaw="180" />
-  <xacro:tile name="tile_2_5" material="DT/asphalt" size="0.6" x="2" y="5" yaw="0" />
-  <xacro:tile name="tile_3_5" material="DT/curve_right" size="0.6" x="3" y="5" yaw="0" />
-  <xacro:tile name="tile_4_5" material="DT/curve_left" size="0.6" x="4" y="5" yaw="90" />
-  <xacro:tile name="tile_5_5" material="DT/asphalt" size="0.6" x="5" y="5" yaw="0" />
-  <xacro:tile name="tile_6_5" material="DT/asphalt" size="0.6" x="6" y="5" yaw="0" />
-  <xacro:tile name="tile_7_5" material="DT/asphalt" size="0.6" x="7" y="5" yaw="0" />
-  <xacro:tile name="tile_8_5" material="DT/asphalt" size="0.6" x="8" y="5" yaw="0" />
-  <xacro:tile name="tile_0_6" material="DT/asphalt" size="0.6" x="0" y="6" yaw="0" />
-  <xacro:tile name="tile_1_6" material="DT/straight" size="0.6" x="1" y="6" yaw="180" />
-  <xacro:tile name="tile_2_6" material="DT/asphalt" size="0.6" x="2" y="6" yaw="0" />
-  <xacro:tile name="tile_3_6" material="DT/straight" size="0.6" x="3" y="6" yaw="0" />
-  <xacro:tile name="tile_4_6" material="DT/asphalt" size="0.6" x="4" y="6" yaw="0" />
-  <xacro:tile name="tile_5_6" material="DT/asphalt" size="0.6" x="5" y="6" yaw="0" />
-  <xacro:tile name="tile_6_6" material="DT/asphalt" size="0.6" x="6" y="6" yaw="0" />
-  <xacro:tile name="tile_7_6" material="DT/asphalt" size="0.6" x="7" y="6" yaw="0" />
-  <xacro:tile name="tile_8_6" material="DT/asphalt" size="0.6" x="8" y="6" yaw="0" />
-  <xacro:tile name="tile_0_7" material="DT/asphalt" size="0.6" x="0" y="7" yaw="0" />
-  <xacro:tile name="tile_1_7" material="DT/curve_left" size="0.6" x="1" y="7" yaw="180" />
-  <xacro:tile name="tile_2_7" material="DT/straight" size="0.6" x="2" y="7" yaw="90" />
-  <xacro:tile name="tile_3_7" material="DT/curve_left" size="0.6" x="3" y="7" yaw="90" />
-  <xacro:tile name="tile_4_7" material="DT/asphalt" size="0.6" x="4" y="7" yaw="0" />
-  <xacro:tile name="tile_5_7" material="DT/asphalt" size="0.6" x="5" y="7" yaw="0" />
-  <xacro:tile name="tile_6_7" material="DT/asphalt" size="0.6" x="6" y="7" yaw="0" />
-  <xacro:tile name="tile_7_7" material="DT/asphalt" size="0.6" x="7" y="7" yaw="0" />
-  <xacro:tile name="tile_8_7" material="DT/asphalt" size="0.6" x="8" y="7" yaw="0" />
-  <xacro:tile name="tile_0_8" material="DT/asphalt" size="0.6" x="0" y="8" yaw="0" />
-  <xacro:tile name="tile_1_8" material="DT/asphalt" size="0.6" x="1" y="8" yaw="0" />
-  <xacro:tile name="tile_2_8" material="DT/asphalt" size="0.6" x="2" y="8" yaw="0" />
-  <xacro:tile name="tile_3_8" material="DT/asphalt" size="0.6" x="3" y="8" yaw="0" />
-  <xacro:tile name="tile_4_8" material="DT/asphalt" size="0.6" x="4" y="8" yaw="0" />
-  <xacro:tile name="tile_5_8" material="DT/asphalt" size="0.6" x="5" y="8" yaw="0" />
-  <xacro:tile name="tile_6_8" material="DT/asphalt" size="0.6" x="6" y="8" yaw="0" />
-  <xacro:tile name="tile_7_8" material="DT/asphalt" size="0.6" x="7" y="8" yaw="0" />
-  <xacro:tile name="tile_8_8" material="DT/asphalt" size="0.6" x="8" y="8" yaw="0" />
+  <xacro:tile name="tile_0_0" material="DT/asphalt" size="0.6"
+  x="0" y="0" yaw="0" />
+  <xacro:tile name="tile_1_0" material="DT/asphalt" size="0.6"
+  x="1" y="0" yaw="0" />
+  <xacro:tile name="tile_2_0" material="DT/asphalt" size="0.6"
+  x="2" y="0" yaw="0" />
+  <xacro:tile name="tile_3_0" material="DT/asphalt" size="0.6"
+  x="3" y="0" yaw="0" />
+  <xacro:tile name="tile_4_0" material="DT/asphalt" size="0.6"
+  x="4" y="0" yaw="0" />
+  <xacro:tile name="tile_5_0" material="DT/asphalt" size="0.6"
+  x="5" y="0" yaw="0" />
+  <xacro:tile name="tile_6_0" material="DT/asphalt" size="0.6"
+  x="6" y="0" yaw="0" />
+  <xacro:tile name="tile_7_0" material="DT/asphalt" size="0.6"
+  x="7" y="0" yaw="0" />
+  <xacro:tile name="tile_8_0" material="DT/asphalt" size="0.6"
+  x="8" y="0" yaw="0" />
+  <xacro:tile name="tile_0_1" material="DT/asphalt" size="0.6"
+  x="0" y="1" yaw="0" />
+  <xacro:tile name="tile_1_1" material="DT/curve_left" size="0.6"
+  x="1" y="1" yaw="270" />
+  <xacro:tile name="tile_2_1" material="DT/curve_left" size="0.6"
+  x="2" y="1" yaw="0" />
+  <xacro:tile name="tile_3_1" material="DT/asphalt" size="0.6"
+  x="3" y="1" yaw="0" />
+  <xacro:tile name="tile_4_1" material="DT/curve_left" size="0.6"
+  x="4" y="1" yaw="270" />
+  <xacro:tile name="tile_5_1" material="DT/straight" size="0.6"
+  x="5" y="1" yaw="270" />
+  <xacro:tile name="tile_6_1" material="DT/straight" size="0.6"
+  x="6" y="1" yaw="270" />
+  <xacro:tile name="tile_7_1" material="DT/curve_left" size="0.6"
+  x="7" y="1" yaw="0" />
+  <xacro:tile name="tile_8_1" material="DT/asphalt" size="0.6"
+  x="8" y="1" yaw="0" />
+  <xacro:tile name="tile_0_2" material="DT/asphalt" size="0.6"
+  x="0" y="2" yaw="0" />
+  <xacro:tile name="tile_1_2" material="DT/straight" size="0.6"
+  x="1" y="2" yaw="180" />
+  <xacro:tile name="tile_2_2" material="DT/curve_right" size="0.6"
+  x="2" y="2" yaw="270" />
+  <xacro:tile name="tile_3_2" material="DT/straight" size="0.6"
+  x="3" y="2" yaw="270" />
+  <xacro:tile name="tile_4_2" material="DT/curve_right" size="0.6"
+  x="4" y="2" yaw="180" />
+  <xacro:tile name="tile_5_2" material="DT/asphalt" size="0.6"
+  x="5" y="2" yaw="0" />
+  <xacro:tile name="tile_6_2" material="DT/curve_right" size="0.6"
+  x="6" y="2" yaw="0" />
+  <xacro:tile name="tile_7_2" material="DT/curve_left" size="0.6"
+  x="7" y="2" yaw="90" />
+  <xacro:tile name="tile_8_2" material="DT/asphalt" size="0.6"
+  x="8" y="2" yaw="0" />
+  <xacro:tile name="tile_0_3" material="DT/asphalt" size="0.6"
+  x="0" y="3" yaw="0" />
+  <xacro:tile name="tile_1_3" material="DT/straight" size="0.6"
+  x="1" y="3" yaw="180" />
+  <xacro:tile name="tile_2_3" material="DT/asphalt" size="0.6"
+  x="2" y="3" yaw="0" />
+  <xacro:tile name="tile_3_3" material="DT/asphalt" size="0.6"
+  x="3" y="3" yaw="0" />
+  <xacro:tile name="tile_4_3" material="DT/asphalt" size="0.6"
+  x="4" y="3" yaw="0" />
+  <xacro:tile name="tile_5_3" material="DT/asphalt" size="0.6"
+  x="5" y="3" yaw="0" />
+  <xacro:tile name="tile_6_3" material="DT/straight" size="0.6"
+  x="6" y="3" yaw="0" />
+  <xacro:tile name="tile_7_3" material="DT/asphalt" size="0.6"
+  x="7" y="3" yaw="0" />
+  <xacro:tile name="tile_8_3" material="DT/asphalt" size="0.6"
+  x="8" y="3" yaw="0" />
+  <xacro:tile name="tile_0_4" material="DT/asphalt" size="0.6"
+  x="0" y="4" yaw="0" />
+  <xacro:tile name="tile_1_4" material="DT/straight" size="0.6"
+  x="1" y="4" yaw="180" />
+  <xacro:tile name="tile_2_4" material="DT/asphalt" size="0.6"
+  x="2" y="4" yaw="0" />
+  <xacro:tile name="tile_3_4" material="DT/asphalt" size="0.6"
+  x="3" y="4" yaw="0" />
+  <xacro:tile name="tile_4_4" material="DT/curve_right" size="0.6"
+  x="4" y="4" yaw="0" />
+  <xacro:tile name="tile_5_4" material="DT/straight" size="0.6"
+  x="5" y="4" yaw="90" />
+  <xacro:tile name="tile_6_4" material="DT/curve_left" size="0.6"
+  x="6" y="4" yaw="90" />
+  <xacro:tile name="tile_7_4" material="DT/asphalt" size="0.6"
+  x="7" y="4" yaw="0" />
+  <xacro:tile name="tile_8_4" material="DT/asphalt" size="0.6"
+  x="8" y="4" yaw="0" />
+  <xacro:tile name="tile_0_5" material="DT/asphalt" size="0.6"
+  x="0" y="5" yaw="0" />
+  <xacro:tile name="tile_1_5" material="DT/straight" size="0.6"
+  x="1" y="5" yaw="180" />
+  <xacro:tile name="tile_2_5" material="DT/asphalt" size="0.6"
+  x="2" y="5" yaw="0" />
+  <xacro:tile name="tile_3_5" material="DT/curve_right" size="0.6"
+  x="3" y="5" yaw="0" />
+  <xacro:tile name="tile_4_5" material="DT/curve_left" size="0.6"
+  x="4" y="5" yaw="90" />
+  <xacro:tile name="tile_5_5" material="DT/asphalt" size="0.6"
+  x="5" y="5" yaw="0" />
+  <xacro:tile name="tile_6_5" material="DT/asphalt" size="0.6"
+  x="6" y="5" yaw="0" />
+  <xacro:tile name="tile_7_5" material="DT/asphalt" size="0.6"
+  x="7" y="5" yaw="0" />
+  <xacro:tile name="tile_8_5" material="DT/asphalt" size="0.6"
+  x="8" y="5" yaw="0" />
+  <xacro:tile name="tile_0_6" material="DT/asphalt" size="0.6"
+  x="0" y="6" yaw="0" />
+  <xacro:tile name="tile_1_6" material="DT/straight" size="0.6"
+  x="1" y="6" yaw="180" />
+  <xacro:tile name="tile_2_6" material="DT/asphalt" size="0.6"
+  x="2" y="6" yaw="0" />
+  <xacro:tile name="tile_3_6" material="DT/straight" size="0.6"
+  x="3" y="6" yaw="0" />
+  <xacro:tile name="tile_4_6" material="DT/asphalt" size="0.6"
+  x="4" y="6" yaw="0" />
+  <xacro:tile name="tile_5_6" material="DT/asphalt" size="0.6"
+  x="5" y="6" yaw="0" />
+  <xacro:tile name="tile_6_6" material="DT/asphalt" size="0.6"
+  x="6" y="6" yaw="0" />
+  <xacro:tile name="tile_7_6" material="DT/asphalt" size="0.6"
+  x="7" y="6" yaw="0" />
+  <xacro:tile name="tile_8_6" material="DT/asphalt" size="0.6"
+  x="8" y="6" yaw="0" />
+  <xacro:tile name="tile_0_7" material="DT/asphalt" size="0.6"
+  x="0" y="7" yaw="0" />
+  <xacro:tile name="tile_1_7" material="DT/curve_left" size="0.6"
+  x="1" y="7" yaw="180" />
+  <xacro:tile name="tile_2_7" material="DT/straight" size="0.6"
+  x="2" y="7" yaw="90" />
+  <xacro:tile name="tile_3_7" material="DT/curve_left" size="0.6"
+  x="3" y="7" yaw="90" />
+  <xacro:tile name="tile_4_7" material="DT/asphalt" size="0.6"
+  x="4" y="7" yaw="0" />
+  <xacro:tile name="tile_5_7" material="DT/asphalt" size="0.6"
+  x="5" y="7" yaw="0" />
+  <xacro:tile name="tile_6_7" material="DT/asphalt" size="0.6"
+  x="6" y="7" yaw="0" />
+  <xacro:tile name="tile_7_7" material="DT/asphalt" size="0.6"
+  x="7" y="7" yaw="0" />
+  <xacro:tile name="tile_8_7" material="DT/asphalt" size="0.6"
+  x="8" y="7" yaw="0" />
+  <xacro:tile name="tile_0_8" material="DT/asphalt" size="0.6"
+  x="0" y="8" yaw="0" />
+  <xacro:tile name="tile_1_8" material="DT/asphalt" size="0.6"
+  x="1" y="8" yaw="0" />
+  <xacro:tile name="tile_2_8" material="DT/asphalt" size="0.6"
+  x="2" y="8" yaw="0" />
+  <xacro:tile name="tile_3_8" material="DT/asphalt" size="0.6"
+  x="3" y="8" yaw="0" />
+  <xacro:tile name="tile_4_8" material="DT/asphalt" size="0.6"
+  x="4" y="8" yaw="0" />
+  <xacro:tile name="tile_5_8" material="DT/asphalt" size="0.6"
+  x="5" y="8" yaw="0" />
+  <xacro:tile name="tile_6_8" material="DT/asphalt" size="0.6"
+  x="6" y="8" yaw="0" />
+  <xacro:tile name="tile_7_8" material="DT/asphalt" size="0.6"
+  x="7" y="8" yaw="0" />
+  <xacro:tile name="tile_8_8" material="DT/asphalt" size="0.6"
+  x="8" y="8" yaw="0" />
 </robot>

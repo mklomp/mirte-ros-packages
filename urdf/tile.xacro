@@ -1,12 +1,15 @@
+<?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:macro name="tile" params="name material size x y yaw=0">
     <link name="${name}">
       <inertial>
         <mass value="10.0" />
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0"
+        izz="1.0" />
       </inertial>
       <visual>
-        <origin xyz="${x * size} ${y * size} 0" rpy="0 0 ${pi / 180 * yaw}" />
+        <origin xyz="${x * size} ${y * size} 0"
+        rpy="0 0 ${pi / 180 * yaw}" />
         <geometry>
           <box size="${size} ${size} .02" />
         </geometry>

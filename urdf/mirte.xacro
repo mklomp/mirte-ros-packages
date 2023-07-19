@@ -1,29 +1,35 @@
 <?xml version="1.0"?>
-<robot name="mirte" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mirte">
   <xacro:include filename="$(find mirte_gazebo)/urdf/materials.xacro" />
   <xacro:include filename="$(find mirte_gazebo)/urdf/macros.xacro" />
   <xacro:include filename="$(find mirte_gazebo)/urdf/ros_control.xacro" />
   <xacro:include filename="$(find mirte_gazebo)/urdf/lidar.xacro" />
   <xacro:include filename="$(find mirte_gazebo)/urdf/camera.xacro" />
   <!--  <xacro:include filename="$(find mirte_gazebo)/urdf/ultrasonic.xacro"/> -->
-  <xacro:property name="yaml_param_file" value="$(find mirte_gazebo)/config/mirte_dimensions.yaml" />
-  <xacro:property name="params" value="${load_yaml(yaml_param_file)}" />
+  <xacro:property name="yaml_param_file"
+  value="$(find mirte_gazebo)/config/mirte_dimensions.yaml" />
+  <xacro:property name="params"
+  value="${load_yaml(yaml_param_file)}" />
   <link name="link_chassis">
     <!-- pose and inertial -->
     <pose>0 0 0.015 0 0 0</pose>
-    <xacro:inertia_box x="${params['base_len']}" y="${params['base_width']}" z="${params['base_height']}" mass="${params['base_mass']}">
+    <xacro:inertia_box x="${params['base_len']}"
+    y="${params['base_width']}" z="${params['base_height']}"
+    mass="${params['base_mass']}">
       <origin rpy="0 0 0" xyz="0 0 0.015" />
     </xacro:inertia_box>
     <!-- body -->
     <collision name="collision_chassis">
       <geometry>
-        <mesh filename="file://$(find mirte_gazebo)/meshes/mirte_base.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633" />
+        <mesh filename="file://$(find mirte_gazebo)/meshes/mirte_base.stl"
+        scale="0.001 0.001 0.001" rpy="0 0 1.57079633" />
       </geometry>
     </collision>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <mesh filename="file://$(find mirte_gazebo)/meshes/mirte_base.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633" />
+        <mesh filename="file://$(find mirte_gazebo)/meshes/mirte_base.stl"
+        scale="0.001 0.001 0.001" rpy="0 0 1.57079633" />
       </geometry>
       <material name="blue" />
     </visual>
@@ -39,20 +45,29 @@
     <parent link="base_link" />
     <child link="link_chassis" />
   </joint>
-  <xacro:caster name="caster_wheel_back" parent="link_chassis" radius="${params['caster_wheel_radius']}" mass="${params['caster_wheel_mass']}">
-    <origin rpy="0 0 0" xyz="${params['caster_wheel_center_x_offset']} ${params['caster_wheel_center_y_offset']} ${params['caster_wheel_center_z_offset']}" />
+  <xacro:caster name="caster_wheel_back" parent="link_chassis"
+  radius="${params['caster_wheel_radius']}"
+  mass="${params['caster_wheel_mass']}">
+    <origin rpy="0 0 0"
+    xyz="${params['caster_wheel_center_x_offset']} ${params['caster_wheel_center_y_offset']} ${params['caster_wheel_center_z_offset']}" />
   </xacro:caster>
   <!-- NOTE: xacro parser adds joint_ -->
-  <xacro:wheel name="left_wheel" parent="link_chassis" radius="${params['wheel_radius']}" mass="${params['wheel_mass']}">
-    <origin rpy="0 0 0" xyz="${params['wheel_center_x_offset']} ${params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}" />
+  <xacro:wheel name="left_wheel" parent="link_chassis"
+  radius="${params['wheel_radius']}"
+  mass="${params['wheel_mass']}">
+    <origin rpy="0 0 0"
+    xyz="${params['wheel_center_x_offset']} ${params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}" />
     <joint_options>
       <limit effort="10" velocity="8" />
       <dynamics damping="0.0" friction="0.0" />
     </joint_options>
   </xacro:wheel>
   <!-- NOTE: xacro parser adds joint_ -->
-  <xacro:wheel name="right_wheel" parent="link_chassis" radius="${params['wheel_radius']}" mass="${params['wheel_mass']}">
-    <origin rpy="3.14 0 0" xyz="${params['wheel_center_x_offset']} ${-1*params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}" />
+  <xacro:wheel name="right_wheel" parent="link_chassis"
+  radius="${params['wheel_radius']}"
+  mass="${params['wheel_mass']}">
+    <origin rpy="3.14 0 0"
+    xyz="${params['wheel_center_x_offset']} ${-1*params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}" />
     <joint_options>
       <limit effort="10" velocity="8" />
       <dynamics damping="0.0" friction="0.0" />
@@ -71,7 +86,8 @@
     <!-- <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
     <robotNamespace>/mirte-control</robotNamespace>
   </plugin> -->
-    <plugin name="gazebo_ros_controller_manager" filename="libgazebo_ros_controller_manager.so"></plugin>
+    <plugin name="gazebo_ros_controller_manager"
+    filename="libgazebo_ros_controller_manager.so" />
   </gazebo>
   <xacro:include filename="$(find mirte_gazebo)/urdf/diffdrive.xacro" />
 </robot>
