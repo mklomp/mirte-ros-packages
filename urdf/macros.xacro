@@ -28,7 +28,7 @@
     </inertial>
   </xacro:macro>
   <xacro:macro name="wheel"
-  params="name parent radius mass *origin **content">
+  params="name parent radius mass visualRot *origin **content">
     <link name="link_${name}">
       <xacro:inertia_cylinder r="${radius}" h="0.015"
       mass="${mass}">
@@ -37,14 +37,25 @@
       <collision name="link_${name}_collision">
         <origin rpy="0 1.5707 1.5707" xyz="0 0 0" />
         <geometry>
-         <cylinder length="0.015" radius="${radius}"/>
+          <cylinder length="0.015" radius="${radius}" />
         </geometry>
       </collision>
-      <visual name="link_${name}_visual">
-        <origin rpy="0 1.5707 1.5707" xyz="0 0 0" />
+      <!-- <visual name="link_${name}_visual">
+        <origin rpy="0 1.5707 1.5707"  xyz="-0 0 0" />
         <geometry>
-          <mesh filename="file://$(find mirte_gazebo)/meshes/mirte_wheel.stl"
-          scale="0.001 0.001 0.001" rpy="0 0 1.57079633" />
+
+          <cylinder color="pink" length="0.015" radius="${radius}"/>
+               
+
+        </geometry>
+        <material name="red" />
+      </visual> -->
+      <visual name="link_${name}_visual">
+        <origin rpy="0 1.5707 ${1.5707 + visualRot*pi}"
+        xyz="-0 0.0 0" />
+        <geometry>
+          <mesh filename="file://$(find mirte_gazebo)/meshes/wheel.stl"
+          scale="1 1 1" rpy="0 0 ${pi*0 + visualRot*pi}" />
         </geometry>
       </visual>
     </link>
