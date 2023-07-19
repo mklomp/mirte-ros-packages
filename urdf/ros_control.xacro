@@ -1,12 +1,8 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-
-
-<!-- TODO: currewntly this is also defined in the macros.xacro
+  <!-- TODO: currewntly this is also defined in the macros.xacro
  I think it should be over here -->
-
-
-<!--
+  <!--
 <transmission name="left_wheel_transmission">
   <type>transmission_interface/SimpleTransmission</type>
   <joint name="joint_left_wheel">
@@ -29,13 +25,9 @@
   </actuator>
 </transmission>
 -->
-
-
-<gazebo>
+  <gazebo>
     <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
-        <robotNamespace>/mirte-control</robotNamespace>
-        
+      <robotNamespace>/mirte-control</robotNamespace>
     </plugin>
-  
-</gazebo>
+  </gazebo>
 </robot>

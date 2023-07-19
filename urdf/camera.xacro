@@ -1,13 +1,10 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-
-    <joint name="joint_camera" type="fixed">
-        <origin xyz="0.1 0 0.035" rpy="0 0 0" />
-        <parent link="link_chassis" />
-        <child link="camera_link" />
-    </joint>
-
-    <link name="camera_link"></link>
-
+  <joint name="joint_camera" type="fixed">
+    <origin xyz="0.1 0 0.035" rpy="0 0 0" />
+    <parent link="link_chassis" />
+    <child link="camera_link" />
+  </joint>
+  <link name="camera_link"></link>
   <gazebo reference="camera_link">
     <sensor type="camera" name="camera1">
       <update_rate>30</update_rate>
@@ -42,5 +39,4 @@
       </plugin>
     </sensor>
   </gazebo>
-
 </robot>
