@@ -9,7 +9,7 @@
   <gazebo reference="lidar_link">
     <sensor name="lidar" type="ray">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>true</visualize>
+      <visualize>false</visualize>
       <update_rate>15</update_rate>
       <ray>
         <scan>
@@ -31,10 +31,10 @@
           <stddev>0.01</stddev>
         </noise>
       </ray>
-      <plugin name="laser_controller"
+      <plugin name="ultra_controller"
       filename="libgazebo_ros_laser.so">
         <topicName>/mirte/scan</topicName>
-        <frameName>lidar_link</frameName>
+        <frameName>lidar_link2</frameName>
       </plugin>
     </sensor>
   </gazebo>
