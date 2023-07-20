@@ -33,7 +33,7 @@
       </ray>
       <plugin name="ultra_controller" filename="libgazebo_ros_laser.so">
         <topicName>/mirte/scan</topicName>
-        <frameName>lidar_link2</frameName>
+        <frameName>lidar_link</frameName>
       </plugin>
     </sensor>
   </gazebo>
