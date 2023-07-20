@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <joint name="lidar" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0 0.1" />
-    <parent link="link_chassis" />
-    <child link="lidar_link" />
+    <origin rpy="0 0 0" xyz="0 0 0.1"/>
+    <parent link="link_chassis"/>
+    <child link="lidar_link"/>
   </joint>
-  <link name="lidar_link" />
+  <link name="lidar_link"/>
   <gazebo reference="lidar_link">
     <sensor name="lidar" type="ray">
       <pose>0 0 0 0 0 0</pose>
@@ -31,8 +31,7 @@
           <stddev>0.01</stddev>
         </noise>
       </ray>
-      <plugin name="ultra_controller"
-      filename="libgazebo_ros_laser.so">
+      <plugin name="ultra_controller" filename="libgazebo_ros_laser.so">
         <topicName>/mirte/scan</topicName>
         <frameName>lidar_link2</frameName>
       </plugin>
