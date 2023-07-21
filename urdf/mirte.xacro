@@ -1,12 +1,28 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mirte">
+  <xacro:arg name="sonar_enable" default="true"/>
+  <xacro:arg name="intensity_enable" default="true"/>
+  <xacro:arg name="camera_enable" default="true"/>
+  <xacro:arg name="lidar_enable" default="true"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/materials.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/macros.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/ros_control.xacro"/>
-  <xacro:include filename="$(find mirte_gazebo)/urdf/lidar.xacro"/>
-  <xacro:include filename="$(find mirte_gazebo)/urdf/ir.xacro"/>
-  <!-- <xacro:include filename="$(find mirte_gazebo)/urdf/camera.xacro" /> -->
-  <xacro:include filename="$(find mirte_gazebo)/urdf/ultrasonic.xacro"/>
+  <test value="$(arg sonar_enable)" name="sonar_enable"/>
+  <test value="$(arg intensity_enable)" name="intensity_enable"/>
+  <test value="$(arg camera_enable)" name="camera_enable"/>
+  <test value="$(arg lidar_enable)" name="lidar_enable"/>
+  <xacro:if value="$(arg lidar_enable)">
+    <xacro:include filename="$(find mirte_gazebo)/urdf/lidar.xacro"/>
+  </xacro:if>
+  <xacro:if value="$(arg intensity_enable)">
+    <xacro:include filename="$(find mirte_gazebo)/urdf/ir.xacro"/>
+  </xacro:if>
+  <xacro:if value="$(arg camera_enable)">
+    <xacro:include filename="$(find mirte_gazebo)/urdf/camera.xacro"/>
+  </xacro:if>
+  <xacro:if value="$(arg sonar_enable)">
+    <xacro:include filename="$(find mirte_gazebo)/urdf/ultrasonic.xacro"/>
+  </xacro:if>
   <xacro:property name="yaml_param_file" value="$(find mirte_gazebo)/config/mirte_dimensions.yaml"/>
   <xacro:property name="params" value="${xacro.load_yaml(yaml_param_file)}"/>
   <link name="link_chassis">
@@ -59,18 +75,22 @@
       <dynamics damping="0.0" friction="0.0"/>
     </joint_options>
   </xacro:wheel>
-  <!-- <xacro:ultrasonic_sensor name="left">
-    <origin rpy="0 0 .45" xyz="0.085 0.04 0.022"/>
-  </xacro:ultrasonic_sensor>
-  <xacro:ultrasonic_sensor name="right">
-    <origin rpy="0 0 -0.45" xyz="0.085 -0.04 0.022"/>
-  </xacro:ultrasonic_sensor> -->
-  <xacro:ir_sensor name="left">
-    <origin rpy="0 ${radians(90)} 0" xyz="0.0785 0.022 0.002"/>
-  </xacro:ir_sensor>
-  <xacro:ir_sensor name="right">
-    <origin rpy="0 ${radians(90)} 0" xyz="0.0785 -0.022 0.002"/>
-  </xacro:ir_sensor>
+  <xacro:if value="$(arg sonar_enable)">
+    <xacro:ultrasonic_sensor name="left">
+      <origin rpy="0 0 .45" xyz="0.085 0.04 0.022"/>
+    </xacro:ultrasonic_sensor>
+    <xacro:ultrasonic_sensor name="right">
+      <origin rpy="0 0 -0.45" xyz="0.085 -0.04 0.022"/>
+    </xacro:ultrasonic_sensor>
+  </xacro:if>
+  <xacro:if value="$(arg intensity_enable)">
+    <xacro:ir_sensor name="left">
+      <origin rpy="0 ${radians(90)} 0" xyz="0.0785 0.022 0.002"/>
+    </xacro:ir_sensor>
+    <xacro:ir_sensor name="right">
+      <origin rpy="0 ${radians(90)} 0" xyz="0.0785 -0.022 0.002"/>
+    </xacro:ir_sensor>
+  </xacro:if>
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/mirte</robotNamespace>
