@@ -6,6 +6,9 @@
   <material name="blue">
     <color rgba="0.203125 0.23828125 0.28515625 1.0"/>
   </material>
+  <material name="yellow">
+    <color rgba="1 1 0 1.0"/>
+  </material>
   <material name="green">
     <color rgba="0.0 0.8 0.0 1.0"/>
   </material>
@@ -57,5 +60,15 @@
     <mu1>0.0</mu1>
     <mu2>0.0</mu2>
     <material>Gazebo/Red</material>
+  </gazebo>
+  <gazebo reference="base_ir_left">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/Purple</material>
+  </gazebo>
+  <gazebo reference="base_ir_right">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/Purple</material>
   </gazebo>
 </robot>

@@ -4,6 +4,7 @@
   <xacro:include filename="$(find mirte_gazebo)/urdf/macros.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/ros_control.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/lidar.xacro"/>
+  <xacro:include filename="$(find mirte_gazebo)/urdf/ir.xacro"/>
   <!-- <xacro:include filename="$(find mirte_gazebo)/urdf/camera.xacro" /> -->
   <xacro:include filename="$(find mirte_gazebo)/urdf/ultrasonic.xacro"/>
   <xacro:property name="yaml_param_file" value="$(find mirte_gazebo)/config/mirte_dimensions.yaml"/>
@@ -58,12 +59,18 @@
       <dynamics damping="0.0" friction="0.0"/>
     </joint_options>
   </xacro:wheel>
-  <xacro:ultrasonic_sensor name="left">
+  <!-- <xacro:ultrasonic_sensor name="left">
     <origin rpy="0 0 .45" xyz="0.085 0.04 0.022"/>
   </xacro:ultrasonic_sensor>
   <xacro:ultrasonic_sensor name="right">
     <origin rpy="0 0 -0.45" xyz="0.085 -0.04 0.022"/>
-  </xacro:ultrasonic_sensor>
+  </xacro:ultrasonic_sensor> -->
+  <xacro:ir_sensor name="left">
+    <origin rpy="0 ${radians(90)} 0" xyz="0.0785 0.022 0.002"/>
+  </xacro:ir_sensor>
+  <xacro:ir_sensor name="right">
+    <origin rpy="0 ${radians(90)} 0" xyz="0.0785 -0.022 0.002"/>
+  </xacro:ir_sensor>
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/mirte</robotNamespace>
