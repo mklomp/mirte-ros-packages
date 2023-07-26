@@ -30,7 +30,7 @@
     </link>
     <gazebo reference="base_sonar_${name}">
       <sensor type="ray" name="range_sensor_${name}">
-        <visualize>true</visualize>
+        <visualize>false</visualize>
         <ray>
           <scan>
             <horizontal>

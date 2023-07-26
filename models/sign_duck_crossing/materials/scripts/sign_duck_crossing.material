@@ -1,0 +1,14 @@
+material sign_duck_crossing/sign_duck_crossing
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture sign_duck_crossing.png
+                scale 1 1
+            }
+        }
+    }
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="sign_4_way_intersect">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <pose>0 0 0 0 0 0</pose>
+
+            <scale>4.34593654932638 4.34593654932638 4.34593654932638</scale>
+            <!-- <scale>0.0254 0.0254 0.0254</scale> -->
+            <uri>model://sign_4_way_intersect/meshes/sign_4_way_intersect.obj</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <pose>0 0 0 0 0 0</pose>
+            <scale>4.34593654932638 4.34593654932638 4.34593654932638</scale>
+
+            <!-- <scale>0.0254 0.0254 0.0254</scale> -->
+            <uri>model://sign_4_way_intersect/meshes/sign_4_way_intersect.obj</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

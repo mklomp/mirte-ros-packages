@@ -1,0 +1,14 @@
+material barrier/barrier
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture barrier.png
+                scale 1 1
+            }
+        }
+    }
+}

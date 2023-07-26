@@ -1,0 +1,14 @@
+material house/house
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture house.png
+                scale 1 1
+            }
+        }
+    }
+}

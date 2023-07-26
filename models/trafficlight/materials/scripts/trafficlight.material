@@ -1,0 +1,14 @@
+material trafficlight/trafficlight
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture trafficlight.png
+                scale 1 1
+            }
+        }
+    }
+}

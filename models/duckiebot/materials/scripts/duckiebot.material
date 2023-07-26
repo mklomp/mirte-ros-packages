@@ -1,0 +1,14 @@
+material duckiebot/duckiebot
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture duckiebot.png
+                scale 1 1
+            }
+        }
+    }
+}

@@ -1,0 +1,14 @@
+material tree/tree
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture tree.png
+                scale 1 1
+            }
+        }
+    }
+}

@@ -1,0 +1,14 @@
+material building/building
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture building.png
+                scale 1 1
+            }
+        }
+    }
+}

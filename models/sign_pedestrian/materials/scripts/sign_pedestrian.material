@@ -1,0 +1,14 @@
+material sign_pedestrian/sign_pedestrian
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture sign_pedestrian.png
+                scale 1 1
+            }
+        }
+    }
+}

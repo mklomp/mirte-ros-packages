@@ -1,0 +1,14 @@
+material bus/bus
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture bus.png
+                scale 1 1
+            }
+        }
+    }
+}

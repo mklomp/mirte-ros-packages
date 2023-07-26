@@ -1,6 +1,8 @@
 <sdf version='1.7' xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:include filename="$(find mirte_gazebo)/urdf/tileWorld.xacro"/>
+  <xacro:include filename="$(find mirte_gazebo)/urdf/duckieModels.xacro" /> 
+
   <world name='default'>
     <light name='sun' type='directional'>
       <cast_shadows>1</cast_shadows>
@@ -90,7 +92,46 @@
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
     <!-- TILEWORLD -->
+    <!-- <xacro:duckieModel name="duck" type="duckie" size="0.6" x="8" y="8" yaw="0"/>    
+    <xacro:duckieModel name="barr" type="barrier" size="0.6" x="1" y="8" yaw="0"/>    
+
+
+
+
+
+
+
+
+    <xacro:duckieModel name="name_sign_blank" type="sign_blank" size="0.6" x="0" y="0" yaw="0"/>
+    <xacro:duckieModel name="name_bus" type="bus" size="0.6" x="2" y="2" yaw="0"/>
+    <xacro:duckieModel name="name_cone" type="cone" size="0.6" x="4" y="4" yaw="0"/>
+    <xacro:duckieModel name="name_house" type="house" size="0.6" x="6" y="6" yaw="0"/>
+    <xacro:duckieModel name="name_truck" type="truck" size="0.6" x="8" y="8" yaw="0"/>
+    <xacro:duckieModel name="name_building" type="building" size="0.6" x="10" y="10" yaw="0"/>
+    <xacro:duckieModel name="name_tree" type="tree" size="0.6" x="12" y="12" yaw="0"/>
+    <xacro:duckieModel name="name_duckiebot" type="duckiebot" size="0.6" x="14" y="14" yaw="0"/>
+    <xacro:duckieModel name="name_sign_no_right_turn" type="sign_no_right_turn" size="0.6" x="16" y="16" yaw="0"/>
+    <xacro:duckieModel name="name_sign_T_intersect" type="sign_T_intersect" size="0.6" x="18" y="18" yaw="0"/>
+    <xacro:duckieModel name="name_sign_duck_crossing" type="sign_duck_crossing" size="0.6" x="20" y="20" yaw="0"/>
+    <xacro:duckieModel name="name_sign_right_T_intersect" type="sign_right_T_intersect" size="0.6" x="22" y="22" yaw="0"/>
+    <xacro:duckieModel name="name_sign_4_way_intersect" type="sign_4_way_intersect" size="0.6" x="24" y="24" yaw="0"/>
+    <xacro:duckieModel name="name_sign_t_light_ahead" type="sign_t_light_ahead" size="0.6" x="26" y="26" yaw="0"/>
+    <xacro:duckieModel name="name_sign_pedestrian" type="sign_pedestrian" size="0.6" x="28" y="28" yaw="0"/>
+    <xacro:duckieModel name="name_sign_stop" type="sign_stop" size="0.6" x="30" y="30" yaw="0"/>
+    <xacro:duckieModel name="name_sign_oneway_left" type="sign_oneway_left" size="0.6" x="32" y="32" yaw="0"/>
+    <xacro:duckieModel name="name_sign_oneway_right" type="sign_oneway_right" size="0.6" x="34" y="34" yaw="0"/>
+    <xacro:duckieModel name="name_trafficlight" type="trafficlight" size="0.6" x="36" y="36" yaw="0"/>
+    <xacro:duckieModel name="name_sign_no_left_turn" type="sign_no_left_turn" size="0.6" x="38" y="38" yaw="0"/>
+    <xacro:duckieModel name="name_sign_left_T_intersect" type="sign_left_T_intersect" size="0.6" x="40" y="40" yaw="0"/>
+    <xacro:duckieModel name="name_sign_yield" type="sign_yield" size="0.6" x="42" y="42" yaw="0"/>
+    <xacro:duckieModel name="name_sign_do_not_enter" type="sign_do_not_enter" size="0.6" x="44" y="44" yaw="0"/>
     
+ -->
+
+
+
+
+
     <state world_name='default'>
       <sim_time>61 903000000</sim_time>
       <real_time>72 695968912</real_time>
@@ -107,7 +148,37 @@
         </link>
       </model>
       <!-- TILESTATE -->
-      
+<!--       
+      <xacro:duckieState name="duck" type="duckie" size="0.6" x="8" y="8" yaw="0"/>
+      <xacro:duckieState name="barr" type="barrier" size="0.6" x="1" y="8" yaw="0"/>
+
+
+
+      <xacro:duckieState name="name_sign_blank" type="sign_blank" size="0.6" x="2" y="2"  yaw="0"/>        
+      <xacro:duckieState name="name_bus" type="bus" size="0.6" x="4" y="4"  yaw="0"/>        
+      <xacro:duckieState name="name_cone" type="cone" size="0.6" x="6" y="6"  yaw="0"/>        
+      <xacro:duckieState name="name_house" type="house" size="0.6" x="8" y="8"  yaw="0"/>        
+      <xacro:duckieState name="name_truck" type="truck" size="0.6" x="10" y="10"  yaw="0"/>        
+      <xacro:duckieState name="name_building" type="building" size="0.6" x="12" y="12"  yaw="0"/>        
+      <xacro:duckieState name="name_tree" type="tree" size="0.6" x="14" y="14"  yaw="0"/>        
+      <xacro:duckieState name="name_duckiebot" type="duckiebot" size="0.6" x="16" y="16"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_no_right_turn" type="sign_no_right_turn" size="0.6" x="18" y="18"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_T_intersect" type="sign_T_intersect" size="0.6" x="20" y="20"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_duck_crossing" type="sign_duck_crossing" size="0.6" x="22" y="22"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_right_T_intersect" type="sign_right_T_intersect" size="0.6" x="24" y="24"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_4_way_intersect" type="sign_4_way_intersect" size="0.6" x="26" y="26"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_t_light_ahead" type="sign_t_light_ahead" size="0.6" x="28" y="28"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_pedestrian" type="sign_pedestrian" size="0.6" x="30" y="30"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_stop" type="sign_stop" size="0.6" x="32" y="32"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_oneway_left" type="sign_oneway_left" size="0.6" x="34" y="34"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_oneway_right" type="sign_oneway_right" size="0.6" x="36" y="36"  yaw="0"/>        
+      <xacro:duckieState name="name_trafficlight" type="trafficlight" size="0.6" x="38" y="38"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_no_left_turn" type="sign_no_left_turn" size="0.6" x="40" y="40"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_left_T_intersect" type="sign_left_T_intersect" size="0.6" x="42" y="42"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_yield" type="sign_yield" size="0.6" x="44" y="44"  yaw="0"/>        
+      <xacro:duckieState name="name_sign_do_not_enter" type="sign_do_not_enter" size="0.6" x="46" y="46"  yaw="0"/>         -->
+
+
       <light name='sun'>
         <pose>0 0 10 0 -0 0</pose>
       </light>

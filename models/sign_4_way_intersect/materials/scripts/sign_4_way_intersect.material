@@ -1,0 +1,14 @@
+material sign_4_way_intersect/sign_4_way_intersect
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture sign_4_way_intersect.png
+                scale 1 1
+            }
+        }
+    }
+}

@@ -1,0 +1,14 @@
+material truck/truck
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture truck.png
+                scale 1 1
+            }
+        }
+    }
+}

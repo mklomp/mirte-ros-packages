@@ -1,0 +1,14 @@
+material sign_oneway_left/sign_oneway_left
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture sign_oneway_left.png
+                scale 1 1
+            }
+        }
+    }
+}

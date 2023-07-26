@@ -1,0 +1,14 @@
+material sign_left_T_intersect/sign_left_T_intersect
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture sign_left_T_intersect.png
+                scale 1 1
+            }
+        }
+    }
+}

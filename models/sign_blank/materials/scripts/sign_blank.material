@@ -1,0 +1,14 @@
+material sign_blank/sign_blank
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture sign_blank.png
+                scale 1 1
+            }
+        }
+    }
+}
