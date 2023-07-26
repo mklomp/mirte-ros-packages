@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="duckietown">
+<model xmlns:xacro="http://www.ros.org/wiki/xacro" name="duckietown">
+  <static>true</static>
   <xacro:include filename="$(find mirte_gazebo)/urdf/tile.xacro"/>
   <!-- this dummy base is used to link all tiles to -->
   <link name="dummy_link">
@@ -93,4 +94,4 @@
   <xacro:tile name="tile_6_8" material="DT/asphalt" size="0.6" x="6" y="8" yaw="0"/>
   <xacro:tile name="tile_7_8" material="DT/asphalt" size="0.6" x="7" y="8" yaw="0"/>
   <xacro:tile name="tile_8_8" material="DT/asphalt" size="0.6" x="8" y="8" yaw="0"/>
-</robot>
+</model>

@@ -1,75 +1,71 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:macro name="tileWorld" params="name material size x y yaw=0">
-        <model name='unit_box_${name}'>
-            <static>1</static>
-
-            <pose>${x * size} ${y * size} 0. 0 -0 ${pi / 180 * yaw}</pose>
-            <link name='link'>
-                <inertial>
-                    <mass>1</mass>
-                    <inertia>
-                        <ixx>0.</ixx>
-                        <ixy>0</ixy>
-                        <ixz>0</ixz>
-                        <iyy>0</iyy>
-                        <iyz>0</iyz>
-                        <izz>0</izz>
-                    </inertia>
-                    <pose>0 0 0 0 -0 0</pose>
-                </inertial>
-                <collision name='collision'>
-                    <geometry>
-                        <box>
-                            <size>${size} ${size} 0.01</size>
-                        </box>
-                    </geometry>
-                    <max_contacts>10</max_contacts>
-                    <surface>
-                        <contact>
-                            <ode />
-                        </contact>
-                        <bounce />
-                        <friction>
-                            <torsional>
-                                <ode />
-                            </torsional>
-                            <ode />
-                        </friction>
-                    </surface>
-                </collision>
-                <visual name='visual'>
-                    <geometry>
-                        <box>
-                            <size>${size} ${size} 0.01</size>
-                        </box>
-                    </geometry>
-                    <material>
-                        <script>
-                            <name>${material}</name>
-                            <uri>file://$(find mirte_gazebo)/media/materials/scripts/duckietown.material</uri>
-                        </script>
-                    </material>
-                </visual>
-                <self_collide>0</self_collide>
-                <enable_wind>0</enable_wind>
-                <kinematic>0</kinematic>
-            </link>
-        </model>
-    </xacro:macro>
-    <xacro:macro name="tileState" params="name material size x y yaw=0">
-        <model name='unit_box_${name}'>
-            <!-- <origin xyz="${x * size} ${y * size} 0" rpy="0 0 ${pi / 180 * yaw}"/> -->
-            <pose>${x * size} ${y * size} 0 -1e-05 -0 ${pi / 180 * yaw}</pose>
-            <size>${size} ${size} 0.01</size>
-            <link name='link'>
-                <!-- <origin xyz="${x * size} ${y * size} 0" rpy="0 0 ${pi / 180 * yaw}"/> -->
-
-                <pose>${x * size} ${y * size}  0 -1e-05 -0 ${pi / 180 * yaw}</pose>
-                <velocity>0 0 0 0 -0 0</velocity>
-                <acceleration>0.00 0.00 -9.78158 -0.00 0.0 1e-06</acceleration>
-                <wrench>0.000 0.00 -9.78158 0 -0 0</wrench>
-            </link>
-        </model>
-    </xacro:macro>
+  <xacro:macro name="tileWorld" params="name material size x y yaw=0">
+    <model name="unit_box_${name}">
+      <static>1</static>
+      <pose>${x * size} ${y * size} 0. 0 -0 ${pi / 180 * yaw}</pose>
+      <link name="link">
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0</iyy>
+            <iyz>0</iyz>
+            <izz>0</izz>
+          </inertia>
+          <pose>0 0 0 0 -0 0</pose>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>${size} ${size} 0.01</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>${size} ${size} 0.01</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>${material}</name>
+              <uri>file://$(find mirte_gazebo)/media/materials/scripts/duckietown.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+  </xacro:macro>
+  <xacro:macro name="tileState" params="name material size x y yaw=0">
+    <model name="unit_box_${name}">
+      <pose>${x * size} ${y * size} 0 -1e-05 -0 ${pi / 180 * yaw}</pose>
+      <size>${size} ${size} 0.01</size>
+      <link name="link">
+        <pose>${x * size} ${y * size}  0 -1e-05 -0 ${pi / 180 * yaw}</pose>
+        <velocity>0 0 0 0 -0 0</velocity>
+        <acceleration>0.00 0.00 -9.78158 -0.00 0.0 1e-06</acceleration>
+        <wrench>0.000 0.00 -9.78158 0 -0 0</wrench>
+      </link>
+    </model>
+  </xacro:macro>
 </robot>
