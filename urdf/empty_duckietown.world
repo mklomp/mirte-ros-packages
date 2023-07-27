@@ -1,10 +1,9 @@
-<sdf version='1.7' xmlns:xacro="http://www.ros.org/wiki/xacro">
-
+<?xml version="1.0"?>
+<sdf xmlns:xacro="http://www.ros.org/wiki/xacro" version="1.7">
   <xacro:include filename="$(find mirte_gazebo)/urdf/tileWorld.xacro"/>
-  <xacro:include filename="$(find mirte_gazebo)/urdf/duckieModels.xacro" /> 
-
-  <world name='default'>
-    <light name='sun' type='directional'>
+  <xacro:include filename="$(find mirte_gazebo)/urdf/duckieModels.xacro"/>
+  <world name="default">
+    <light name="sun" type="directional">
       <cast_shadows>1</cast_shadows>
       <pose>0 0 10 0 -0 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
@@ -22,10 +21,10 @@
         <falloff>0</falloff>
       </spot>
     </light>
-    <model name='ground_plane'>
+    <model name="ground_plane">
       <static>1</static>
-      <link name='link'>
-        <collision name='collision'>
+      <link name="link">
+        <collision name="collision">
           <geometry>
             <plane>
               <normal>0 0 1</normal>
@@ -50,7 +49,7 @@
           </surface>
           <max_contacts>10</max_contacts>
         </collision>
-        <visual name='visual'>
+        <visual name="visual">
           <cast_shadows>0</cast_shadows>
           <geometry>
             <plane>
@@ -72,8 +71,8 @@
     </model>
     <gravity>0 0 -9.8</gravity>
     <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
-    <atmosphere type='adiabatic'/>
-    <physics type='ode'>
+    <atmosphere type="adiabatic"/>
+    <physics type="ode">
       <max_step_size>0.001</max_step_size>
       <real_time_factor>1</real_time_factor>
       <real_time_update_rate>1000</real_time_update_rate>
@@ -127,20 +126,15 @@
     <xacro:duckieModel name="name_sign_do_not_enter" type="sign_do_not_enter" size="0.6" x="44" y="44" yaw="0"/>
     
  -->
-
-
-
-
-
-    <state world_name='default'>
+    <state world_name="default">
       <sim_time>61 903000000</sim_time>
       <real_time>72 695968912</real_time>
       <wall_time>1689943562 810051807</wall_time>
       <iterations>61903</iterations>
-      <model name='ground_plane'>
+      <model name="ground_plane">
         <pose>0 0 0 0 -0 0</pose>
         <scale>1 1 1</scale>
-        <link name='link'>
+        <link name="link">
           <pose>0 0 0 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
@@ -148,7 +142,7 @@
         </link>
       </model>
       <!-- TILESTATE -->
-<!--       
+      <!--       
       <xacro:duckieState name="duck" type="duckie" size="0.6" x="8" y="8" yaw="0"/>
       <xacro:duckieState name="barr" type="barrier" size="0.6" x="1" y="8" yaw="0"/>
 
@@ -177,20 +171,16 @@
       <xacro:duckieState name="name_sign_left_T_intersect" type="sign_left_T_intersect" size="0.6" x="42" y="42"  yaw="0"/>        
       <xacro:duckieState name="name_sign_yield" type="sign_yield" size="0.6" x="44" y="44"  yaw="0"/>        
       <xacro:duckieState name="name_sign_do_not_enter" type="sign_do_not_enter" size="0.6" x="46" y="46"  yaw="0"/>         -->
-
-
-      <light name='sun'>
+      <light name="sun">
         <pose>0 0 10 0 -0 0</pose>
       </light>
     </state>
-    
-    <gui fullscreen='0'>
-      <camera name='user_camera'>
+    <gui fullscreen="0">
+      <camera name="user_camera">
         <pose>6.19973 -3.5522 2.66438 0 0.439643 2.80819</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
     </gui>
   </world>
-  
 </sdf>
