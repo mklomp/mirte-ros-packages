@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.8
 import asyncio
+import nest_asyncio
 import os, os.path
 import sys
 import time
@@ -12,6 +13,7 @@ from inspect import signature
 from tmx_pico_aio import tmx_pico_aio
 from telemetrix_aio import telemetrix_aio
 
+nest_asyncio.apply()
 
 # Import the right Telemetrix AIO
 devices = rospy.get_param("/mirte/device")
@@ -518,6 +520,7 @@ class Oled(_SSD1306):
         board,
         oled_obj,
         port,
+        loop,
         addr=0x3C,
         external_vcc=False,
         reset=None,
@@ -527,6 +530,11 @@ class Oled(_SSD1306):
         self.addr = addr
         self.temp = bytearray(2)
         self.i2c_port = port
+        self.failed = False
+        self.loop = loop
+        self.init_awaits = []
+        self.write_commands = []
+
         # Add an extra byte to the data buffer to hold an I2C data/command byte
         # to use hardware-compatible I2C transactions.  A memoryview of the
         # buffer is used to mask this byte from the framebuffer operations
@@ -544,7 +552,7 @@ class Oled(_SSD1306):
             for item in pins:
                 pin_numbers[item] = board_mapping.pin_name_to_pin_number(pins[item])
             self.i2c_port = board_mapping.get_I2C_port(pin_numbers["sda"])
-            asyncio.run(
+            self.init_awaits.append(
                 self.board.set_pin_mode_i2c(
                     i2c_port=self.i2c_port,
                     sda_gpio=pin_numbers["sda"],
@@ -552,7 +560,7 @@ class Oled(_SSD1306):
                 )
             )
         else:
-            asyncio.run(self.board.set_pin_mode_i2c(i2c_port=self.i2c_port))
+            self.init_awaits.append(self.board.set_pin_mode_i2c(i2c_port=self.i2c_port))
         time.sleep(1)
         super().__init__(
             memoryview(self.buffer)[1:],
@@ -570,8 +578,16 @@ class Oled(_SSD1306):
             self.set_oled_image_service,
         )
 
-    # TODO: make faster with asyncio
-    def set_oled_image_service(self, req):
+        for ev in self.init_awaits:
+            await ev
+        for cmd in self.write_commands:
+            out = await self.board.i2c_write(60, cmd, i2c_port=self.i2c_port)
+            if not out:
+                print("write failed start")
+                self.failed = True
+                return
+
+    async def set_oled_image_service_async(self, req):
         if req.type == "text":
             text = req.value.replace("\\n", "\n")
             image = Image.new("1", (128, 64))
@@ -587,10 +603,10 @@ class Oled(_SSD1306):
                 draw.text((1, y_text), line, font=font, fill=255)
                 y_text += height
             self.image(image)
-            self.show()
+            await self.show_async()
 
         if req.type == "image":
-            self.show_png(
+            await self.show_png(
                 "/usr/local/src/mirte/mirte-oled-images/images/" + req.value + ".png"
             )  # open color image
 
@@ -606,7 +622,16 @@ class Oled(_SSD1306):
                 ]
             )
             for i in range(number_of_images):
-                self.show_png(folder + req.value + "_" + str(i) + ".png")
+                await self.show_png(folder + req.value + "_" + str(i) + ".png")
+
+    def set_oled_image_service(self, req):
+        if self.failed:
+            print("oled writing failed")
+            return SetOLEDImageResponse(False)
+
+        asyncio.run_coroutine_threadsafe(
+            self.set_oled_image_service_async(req), self.loop
+        )
 
         return SetOLEDImageResponse(True)
 
@@ -633,7 +658,49 @@ class Oled(_SSD1306):
     def write_cmd(self, cmd):
         self.temp[0] = 0x80
         self.temp[1] = cmd
-        asyncio.run(self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port))
+        self.write_commands.append([0x80, cmd])
+
+    async def write_cmd_async(self, cmd):
+        if self.failed:
+            return
+        self.temp[0] = 0x80
+        self.temp[1] = cmd
+        out = await self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port)
+        if not out:
+            print("failed write oled 2")
+            self.failed = True
+
+    async def show_async(self):
+        """Update the display"""
+        xpos0 = 0
+        xpos1 = self.width - 1
+        if self.width == 64:
+            # displays with width of 64 pixels are shifted by 32
+            xpos0 += 32
+            xpos1 += 32
+        if self.width == 72:
+            # displays with width of 72 pixels are shifted by 28
+            xpos0 += 28
+            xpos1 += 28
+        await self.write_cmd_async(0x21)  # SET_COL_ADDR)
+        await self.write_cmd_async(xpos0)
+        await self.write_cmd_async(xpos1)
+        await self.write_cmd_async(0x22)  # SET_PAGE_ADDR)
+        await self.write_cmd_async(0)
+        await self.write_cmd_async(self.pages - 1)
+        await self.write_framebuf_async()
+
+    async def write_framebuf_async(self):
+        if self.failed:
+            return
+        for i in range(64):
+            buf = self.buffer[i * 16 : (i + 1) * 16 + 1]
+            buf[0] = 0x40
+            out = await self.board.i2c_write(60, buf, i2c_port=self.i2c_port)
+            if not out:
+                print("failed write_cmd")
+                self.failed = True
+                break
 
     def write_framebuf(self):
         for i in range(
@@ -641,13 +708,13 @@ class Oled(_SSD1306):
         ):  # TODO: can we have higher i2c buffer (limited by firmata 64 bits and wire 32 bits, so actually 16 bits since we need 1 bit)
             buf = self.buffer[i * 16 : (i + 1) * 16 + 1]
             buf[0] = 0x40
-            asyncio.run(self.board.i2c_write(60, buf, i2c_port=self.i2c_port))
+            self.write_commands.append(buf)
 
-    def show_png(self, file):
+    async def show_png(self, file):
         image_file = Image.open(file)  # open color image
         image_file = image_file.convert("1", dither=Image.NONE)
         self.image(image_file)
-        self.show()
+        await self.show_async()
 
 
 async def handle_set_led_value(req):
@@ -743,7 +810,7 @@ def actuators(loop, board, device):
         oled_id = 0
         for oled in oleds:
             oled_obj = Oled(
-                128, 64, board, oleds[oled], port=oled_id
+                128, 64, board, oleds[oled], port=oled_id, loop=loop
             )  # get_pin_numbers(oleds[oled]))
             oled_id = oled_id + 1
             servers.append(loop.create_task(oled_obj.start()))
@@ -900,11 +967,11 @@ async def shutdown(loop, board):
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
 
     # Initialize the telemetrix board
     if board_mapping.get_mcu() == "pico":
-        board = tmx_pico_aio.TmxPicoAio(allow_i2c_errors=True)
+        board = tmx_pico_aio.TmxPicoAio(allow_i2c_errors=True, loop=loop)
     else:
         board = telemetrix_aio.TelemetrixAIO()
 
