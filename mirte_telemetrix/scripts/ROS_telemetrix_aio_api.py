@@ -859,6 +859,32 @@ def sensors(loop, board, device):
     if rospy.has_param("/mirte/device/mirte/max_frequency"):
         max_freq = rospy.get_param("/mirte/device/mirte/max_frequency")
 
+    # For now, we need to set the analog scan interval to teh max_freq. When we set
+    # this to 0, we do get the updates from telemetrix as fast as possible. In that
+    # case the aiorospy creates a latency for the analog sensors (data will be
+    # updated with a delay). This also happens when you try to implement this with
+    # nest_asyncio icw rospy services.
+    # Maybe there is a better solution for this, to make sure that we get the
+    # data here asap.
+    if board_mapping.get_mcu() == "pico":
+        if max_freq <= 1:
+            tasks.append(loop.create_task(board.set_scan_delay(1)))
+        else:
+            try:
+                tasks.append(
+                    loop.create_task(board.set_scan_delay(int(1000.0 / max_freq)))
+                )
+            except:
+                print("failed scan delay")
+                pass
+    else:
+        if max_freq <= 0:
+            tasks.append(loop.create_task(board.set_analog_scan_interval(0)))
+        else:
+            tasks.append(
+                loop.create_task(board.set_analog_scan_interval(int(1000.0 / max_freq)))
+            )
+
     # initialze distance sensors
     if rospy.has_param("/mirte/distance"):
         distance_sensors = rospy.get_param("/mirte/distance")
@@ -920,30 +946,7 @@ def sensors(loop, board, device):
     # server = aiorospy.AsyncService('/mirte/get_pin_value', GetPinValue, handle_get_pin_value)
     # tasks.append(loop.create_task(server.start()))
 
-    # For now, we need to set the analog scan interval to teh max_freq. When we set
-    # this to 0, we do get the updates from telemetrix as fast as possible. In that
-    # case the aiorospy creates a latency for the analog sensors (data will be
-    # updated with a delay). This also happens when you try to implement this with
-    # nest_asyncio icw rospy services.
-    # Maybe there is a better solution for this, to make sure that we get the
-    # data here asap.
-    if board_mapping.get_mcu() == "pico":
-        if max_freq <= 1:
-            tasks.append(loop.create_task(board.set_scan_delay(1)))
-        else:
-            try:
-                tasks.append(
-                    loop.create_task(board.set_scan_delay(int(1000.0 / max_freq)))
-                )
-            except:
-                pass
-    else:
-        if max_freq <= 0:
-            tasks.append(loop.create_task(board.set_analog_scan_interval(0)))
-        else:
-            tasks.append(
-                loop.create_task(board.set_analog_scan_interval(int(1000.0 / max_freq)))
-            )
+   
 
     return tasks
 
