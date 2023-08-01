@@ -691,6 +691,7 @@ class Oled(_SSD1306):
         await self.write_framebuf_async()
 
     async def write_framebuf_async(self):
+        # TODO: only update pixels that are changed
         if self.failed:
             return
         for i in range(64):
