@@ -582,8 +582,10 @@ class Oled(_SSD1306):
             await ev
         for cmd in self.write_commands:
             out = await self.board.i2c_write(60, cmd, i2c_port=self.i2c_port)
-            if not out:
-                print("write failed start")
+            if (
+                out == False
+            ):  # pico returns true/false, arduino returns always none, only catch false
+                print("write failed start", self.oled_obj["name"])
                 self.failed = True
                 return
 
@@ -604,7 +606,6 @@ class Oled(_SSD1306):
                 y_text += height
             self.image(image)
             await self.show_async()
-
         if req.type == "image":
             await self.show_png(
                 "/usr/local/src/mirte/mirte-oled-images/images/" + req.value + ".png"
@@ -629,10 +630,10 @@ class Oled(_SSD1306):
             print("oled writing failed")
             return SetOLEDImageResponse(False)
 
-        asyncio.run_coroutine_threadsafe(
-            self.set_oled_image_service_async(req), self.loop
-        )
-
+        try:
+            self.loop.run_until_complete(self.set_oled_image_service_async(req))
+        except Exception as e:
+            print(e)
         return SetOLEDImageResponse(True)
 
     def show(self):
@@ -666,12 +667,13 @@ class Oled(_SSD1306):
         self.temp[0] = 0x80
         self.temp[1] = cmd
         out = await self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port)
-        if not out:
+        if out == False:
             print("failed write oled 2")
             self.failed = True
 
     async def show_async(self):
         """Update the display"""
+        # TODO: only update pixels that are changed
         xpos0 = 0
         xpos1 = self.width - 1
         if self.width == 64:
@@ -682,31 +684,40 @@ class Oled(_SSD1306):
             # displays with width of 72 pixels are shifted by 28
             xpos0 += 28
             xpos1 += 28
-        await self.write_cmd_async(0x21)  # SET_COL_ADDR)
-        await self.write_cmd_async(xpos0)
-        await self.write_cmd_async(xpos1)
-        await self.write_cmd_async(0x22)  # SET_PAGE_ADDR)
-        await self.write_cmd_async(0)
-        await self.write_cmd_async(self.pages - 1)
-        await self.write_framebuf_async()
 
-    async def write_framebuf_async(self):
-        # TODO: only update pixels that are changed
+        try:
+            cmds = [
+                self.write_cmd_async(0x21),  # SET_COL_ADDR)
+                self.write_cmd_async(xpos0),
+                self.write_cmd_async(xpos1),
+                self.write_cmd_async(0x22),  # SET_PAGE_ADDR)
+                self.write_cmd_async(0),
+                self.write_cmd_async(self.pages - 1),
+                *self.write_framebuf_async(),
+            ]
+            await asyncio.gather(*cmds)
+        except Exception as e:
+            print(e)
+
+    def write_framebuf_async(self):
         if self.failed:
             return
-        for i in range(64):
+
+        async def task(self, i):
             buf = self.buffer[i * 16 : (i + 1) * 16 + 1]
             buf[0] = 0x40
             out = await self.board.i2c_write(60, buf, i2c_port=self.i2c_port)
-            if not out:
-                print("failed write_cmd")
+            if out == False:
+                print("failed wrcmd")
                 self.failed = True
-                break
+
+        tasks = []
+        for i in range(64):
+            tasks.append(task(self, i))
+        return tasks
 
     def write_framebuf(self):
-        for i in range(
-            64
-        ):  # TODO: can we have higher i2c buffer (limited by firmata 64 bits and wire 32 bits, so actually 16 bits since we need 1 bit)
+        for i in range(64):
             buf = self.buffer[i * 16 : (i + 1) * 16 + 1]
             buf[0] = 0x40
             self.write_commands.append(buf)
@@ -947,8 +958,6 @@ def sensors(loop, board, device):
     # server = aiorospy.AsyncService('/mirte/get_pin_value', GetPinValue, handle_get_pin_value)
     # tasks.append(loop.create_task(server.start()))
 
-   
-
     return tasks
 
 
@@ -975,7 +984,10 @@ if __name__ == "__main__":
 
     # Initialize the telemetrix board
     if board_mapping.get_mcu() == "pico":
-        board = tmx_pico_aio.TmxPicoAio(allow_i2c_errors=True, loop=loop)
+        board = tmx_pico_aio.TmxPicoAio(
+            allow_i2c_errors=True, loop=loop, autostart=False
+        )
+        loop.run_until_complete(board.start_aio())
     else:
         board = telemetrix_aio.TelemetrixAIO()
 
