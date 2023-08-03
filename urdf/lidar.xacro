@@ -1,16 +1,29 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <joint name="lidar" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0 0.1"/>
+    <origin rpy="0 0 0" xyz="0.012 0 0.105"/>
     <parent link="link_chassis"/>
     <child link="lidar_link"/>
   </joint>
-  <link name="lidar_link"/>
+  <link name="lidar_link">
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 -0.03"/>
+    <geometry>
+      <mesh filename="file://$(find mirte_gazebo)/meshes/lidar.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 -0.03"/>
+    <geometry>
+      <mesh filename="file://$(find mirte_gazebo)/meshes/lidar.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633"/>
+    </geometry>
+  </collision>
+  </link>
   <gazebo reference="lidar_link">
     <sensor name="lidar" type="ray">
       <pose>0 0 0 0 0 0</pose>
       <visualize>false</visualize>
-      <update_rate>15</update_rate>
+      <update_rate>10</update_rate>
       <ray>
         <scan>
           <horizontal>
@@ -21,9 +34,9 @@
           </horizontal>
         </scan>
         <range>
-          <min>0.2</min>
+          <min>0.15</min> <!-- bit more than the actual min range of the lidar, but otherwise it will detect the mirte itself-->
           <max>12</max>
-          <resolution>0.1</resolution>
+          <resolution>0.01</resolution>
         </range>
         <noise>
           <type>gaussian</type>
