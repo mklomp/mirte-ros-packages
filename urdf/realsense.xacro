@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find realsense_gazebo_plugin)/urdf/realsense-RS200.macro.xacro"/>
+  <xacro:realsense-rs200 prefix="mirte_" parent="link_chassis">
+    <origin xyz="0.1 0 0.035" rpy="0 0 0"/>
+  </xacro:realsense-rs200>
+</robot>

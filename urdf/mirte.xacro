@@ -4,6 +4,7 @@
   <xacro:arg name="intensity_enable" default="true"/>
   <xacro:arg name="camera_enable" default="true"/>
   <xacro:arg name="lidar_enable" default="true"/>
+  <xacro:arg name="realsense_enable" default="true"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/materials.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/macros.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/ros_control.xacro"/>
@@ -22,6 +23,9 @@
   </xacro:if>
   <xacro:if value="$(arg sonar_enable)">
     <xacro:include filename="$(find mirte_gazebo)/urdf/ultrasonic.xacro"/>
+  </xacro:if>
+  <xacro:if value="$(arg realsense_enable)">
+    <xacro:include filename="$(find mirte_gazebo)/urdf/realsense.xacro"/>
   </xacro:if>
   <xacro:property name="yaml_param_file" value="$(find mirte_gazebo)/config/mirte_dimensions.yaml"/>
   <xacro:property name="params" value="${xacro.load_yaml(yaml_param_file)}"/>
