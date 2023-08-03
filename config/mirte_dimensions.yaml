@@ -11,4 +11,4 @@ caster_wheel_radius: 0.005
 caster_wheel_center_x_offset: -0.085715
 caster_wheel_center_y_offset: 0
 caster_wheel_center_z_offset: -0.035
-caster_wheel_mass: 1.02 # to fix realsense weight
+caster_wheel_mass: .12 # to fix realsense weight
