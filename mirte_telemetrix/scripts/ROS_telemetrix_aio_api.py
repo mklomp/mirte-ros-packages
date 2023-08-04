@@ -399,8 +399,7 @@ class Servo:
         return SetServoAngleResponse(True)
 
 
-# TODO: create motor classs and inherit from that one
-class PWMMotor:
+class Motor:
     def __init__(self, board, motor_obj):
         self.board = board
         self.pins = get_pin_numbers(motor_obj)
@@ -425,6 +424,8 @@ class PWMMotor:
         asyncio.run(self.set_speed(req.speed))
         return SetMotorSpeedResponse(True)
 
+
+class PPMotor(Motor):
     # Ideally one would initialize the pins in the constructor. But
     # since some mcu's have some voltage on pins when they are not
     # initialized yet icw some motor controllers that use the
@@ -433,36 +434,80 @@ class PWMMotor:
     # When setting this on the mcu itself the this will be done fast
     # enough. But using telemetrix is a bit too slow fow this. We
     # therefore set the pin type on first move, and do this in a way
-    # where is creates a movement in teh same direction.
+    # where it creates a movement in the same direction.
     async def init_motors(self, speed):
         if not self.initialized:
             if speed > 0:
-                await self.board.set_pin_mode_digital_output(self.pins["1a"])
-                await set_pin_mode_analog_output(self.board, self.pins["1b"])
+                await set_pin_mode_analog_output(self.board, self.pins["p2"])
+                await set_pin_mode_analog_output(self.board, self.pins["p1"])
             if speed < 0:
-                await set_pin_mode_analog_output(self.board, self.pins["1b"])
-                await self.board.set_pin_mode_digital_output(self.pins["1a"])
+                await set_pin_mode_analog_output(self.board, self.pins["p1"])
+                await set_pin_mode_analog_output(self.board, self.pins["p2"])
             self.initialized = True
 
     async def set_speed(self, speed):
         if self.prev_motor_speed != speed:
             if speed == 0:
-                await self.board.digital_write(self.pins["1a"], 0)
-                await analog_write(self.board, self.pins["1b"], 0)
+                await analog_write(self.board, self.pins["p2"], 0)
+                await analog_write(self.board, self.pins["p1"], 0)
             elif speed > 0:
                 await self.init_motors(speed)
-                await self.board.digital_write(self.pins["1a"], 0)
+                await analog_write(self.board, self.pins["p2"], 0)
                 await analog_write(
                     self.board,
-                    self.pins["1b"],
+                    self.pins["p1"],
                     int(min(speed, 100) / 100.0 * board_mapping.get_max_pwm_value()),
                 )
             elif speed < 0:
                 await self.init_motors(speed)
-                await self.board.digital_write(self.pins["1a"], 1)
+                await analog_write(self.board, self.pins["p1"], 0)
                 await analog_write(
                     self.board,
-                    self.pins["1b"],
+                    self.pins["p2"],
+                    int(min(-speed, 100) / 100.0 * board_mapping.get_max_pwm_value()),
+                )
+            self.prev_motor_speed = speed
+
+
+class DPMotor(Motor):
+    # Ideally one would initialize the pins in the constructor. But
+    # since some mcu's have some voltage on pins when they are not
+    # initialized yet icw some motor controllers that use the
+    # difference between the pins to determine speed and direction
+    # the motor will briefly move when initializing. This is unwanted.
+    # When setting this on the mcu itself the this will be done fast
+    # enough. But using telemetrix is a bit too slow fow this. We
+    # therefore set the pin type on first move, and do this in a way
+    # where it creates a movement in the same direction.
+    async def init_motors(self, speed):
+        if not self.initialized:
+            if speed > 0:
+                await self.board.set_pin_mode_digital_output(self.pins["d1"])
+                await set_pin_mode_analog_output(self.board, self.pins["p1"])
+            if speed < 0:
+                await set_pin_mode_analog_output(self.board, self.pins["p1"])
+                await self.board.set_pin_mode_digital_output(self.pins["d1"])
+            self.initialized = True
+
+    async def set_speed(self, speed):
+        if self.prev_motor_speed != speed:
+            if speed == 0:
+                await self.board.digital_write(self.pins["d1"], 0)
+                await analog_write(self.board, self.pins["p1"], 0)
+            elif speed > 0:
+                await self.init_motors(speed)
+                await self.board.digital_write(self.pins["d1"], 0)
+                await analog_write(
+                    self.board,
+                    self.pins["p1"],
+                    int(min(speed, 100) / 100.0 * board_mapping.get_max_pwm_value()),
+                )
+            elif speed < 0:
+                await self.init_motors(speed)
+                await self.board.digital_write(self.pins["d1"], 1)
+                await analog_write(
+                    self.board,
+                    self.pins["p1"],
                     int(
                         board_mapping.get_max_pwm_value()
                         - min(abs(speed), 100)
@@ -473,19 +518,12 @@ class PWMMotor:
             self.prev_motor_speed = speed
 
 
-class L298NMotor:
-    def __init__(self, board, pins):
-        self.board = board
-        self.pins = pins
-        self.prev_motor_speed = 0
-        self.loop = asyncio.get_event_loop()
-        self.initialized = False
-
+class DDPMotor(Motor):
     async def init_motors(self):
         if not self.initialized:
-            await set_pin_mode_analog_output(self.board, self.pins["en"])
-            await self.board.set_pin_mode_digital_output(self.pins["in1"])
-            await self.board.set_pin_mode_digital_output(self.pins["in2"])
+            await set_pin_mode_analog_output(self.board, self.pins["p1"])
+            await self.board.set_pin_mode_digital_output(self.pins["d1"])
+            await self.board.set_pin_mode_digital_output(self.pins["d2"])
             self.initialized = True
 
     async def set_speed(self, speed):
@@ -494,19 +532,19 @@ class L298NMotor:
         if self.prev_motor_speed != speed:
             await self.init_motors()
             if speed >= 0:
-                await self.board.digital_write(self.pins["in1"], 0)
-                await self.board.digital_write(self.pins["in2"], 1)
+                await self.board.digital_write(self.pins["d1"], 0)
+                await self.board.digital_write(self.pins["d2"], 1)
                 await analog_write(
                     self.board,
-                    self.pins["en"],
+                    self.pins["p1"],
                     int(min(speed, 100) / 100.0 * board_mapping.get_max_pwm_value()),
                 )
             elif speed < 0:
-                await self.board.digital_write(self.pins["in2"], 0)
-                await self.board.digital_write(self.pins["in1"], 1)
+                await self.board.digital_write(self.pins["d2"], 0)
+                await self.board.digital_write(self.pins["d1"], 1)
                 await analog_write(
                     self.board,
-                    self.pins["en"],
+                    self.pins["p1"],
                     int(
                         min(abs(speed), 100) / 100.0 * board_mapping.get_max_pwm_value()
                     ),
@@ -844,10 +882,14 @@ def actuators(loop, board, device):
         motors = {k: v for k, v in motors.items() if v["device"] == device}
         for motor in motors:
             motor_obj = {}
-            if motors[motor]["type"] == "l298n":
-                motor_obj = L298NMotor(board, motors[motor])
+            if motors[motor]["type"] == "ddp":
+                motor_obj = DDPMotor(board, motors[motor])
+            elif motors[motor]["type"] == "dp":
+                motor_obj = DPMotor(board, motors[motor])
+            elif motors[motor]["type"] == "pp":
+                motor_obj = PPMotor(board, motors[motor])
             else:
-                motor_obj = PWMMotor(board, motors[motor])
+                rospy.loginfo("Unsupported motor interface (ddp, dp, or pp)")
             servers.append(loop.create_task(motor_obj.start()))
 
     if rospy.has_param("/mirte/servo"):
