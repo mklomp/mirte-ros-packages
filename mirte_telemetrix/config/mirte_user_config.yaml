@@ -2,7 +2,7 @@ device:
   mirte:
     type: breadboard
     mcu: pico
-    max_frequency: 50
+#    max_frequency: 50
 distance:
   left:
     name: left
