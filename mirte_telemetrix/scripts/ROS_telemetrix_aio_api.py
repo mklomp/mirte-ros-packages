@@ -60,7 +60,7 @@ executor = ThreadPoolExecutor(10)
 import mappings.default
 import mappings.nanoatmega328
 import mappings.pico
-import mappings.stm32
+import mappings.blackpill_f103c8
 import mappings.pcb
 
 board_mapping = mappings.default
@@ -70,26 +70,26 @@ devices = rospy.get_param("/mirte/device")
 if devices["mirte"]["type"] == "pcb":
     board_mapping = mappings.pcb
     if "version" in devices["mirte"]:
-        if "mcu" in devices["mirte"]:  # pcb 0.4 allows for nano or stm32
+        if "board" in devices["mirte"]:
             board_mapping.set_version(
-                devices["mirte"]["version"], devices["mirte"]["mcu"]
+                devices["mirte"]["version"], devices["mirte"]["board"]
             )
         else:
             board_mapping.set_version(devices["mirte"]["version"])
 
 if devices["mirte"]["type"] == "breadboard":
-    if "mcu" in devices["mirte"]:
-        if devices["mirte"]["mcu"] == "stm32":
-            board_mapping = mappings.stm32
+    if "board" in devices["mirte"]:
+        if devices["mirte"]["board"] == "blackpill_f103c8":
+            board_mapping = mappings.blackpill_f103c8
         elif (
-            "nano"
+            "nanoatmega328"
             in devices["mirte"][
-                "mcu"
-            ]  # will trigger for nano, nano_old and nanoatmega328
-            or devices["mirte"]["mcu"] == "uno"  # uno has the same pinout
+                "board"
+            ]  # will trigger for nanoatmega328new and nanoatmega328
+            or devices["mirte"]["board"] == "uno"  # uno has the same pinout
         ):
             board_mapping = mappings.nanoatmega328
-        elif devices["mirte"]["mcu"] == "pico":
+        elif devices["mirte"]["board"] == "pico":
             board_mapping = mappings.pico
         else:
             board_mapping = mappings.default
@@ -868,7 +868,7 @@ def actuators(loop, board, device):
 # the data.
 def sensors(loop, board, device):
     tasks = []
-    max_freq = 10
+    max_freq = 30
     if rospy.has_param("/mirte/device/mirte/max_frequency"):
         max_freq = rospy.get_param("/mirte/device/mirte/max_frequency")
 

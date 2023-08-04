@@ -14,7 +14,7 @@ def pin_name_to_pin_number(pin):
 
 
 def get_mcu():
-    return "none"
+    return "unknown"
 
 
 def get_I2C_port(sda):

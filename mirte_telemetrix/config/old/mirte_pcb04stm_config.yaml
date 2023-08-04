@@ -2,7 +2,7 @@ device:
   mirte:
     type: pcb
     version: 0.4
-    mcu: stm32
+    board: blackpill_f103c8
     samping_interval: 10
 distance:
   left:

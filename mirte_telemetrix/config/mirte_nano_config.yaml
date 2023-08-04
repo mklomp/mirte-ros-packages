@@ -1,7 +1,8 @@
 device:
   mirte:
     type: breadboard
-    mcu: nanoatmega328
+    board: nanoatmega328
+#    max_frequency: 50
 distance:
   left:
     name: left

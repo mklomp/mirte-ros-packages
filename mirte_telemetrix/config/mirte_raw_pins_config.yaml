@@ -1,7 +1,8 @@
 device:
   mirte:
     type: breadboard
-    mcu: raw             # current setup is an example for the arduino nano
+    board: raw             # current setup is an example for the arduino nano
+#    max_frequency: 50
 distance:
   left:
     name: left
