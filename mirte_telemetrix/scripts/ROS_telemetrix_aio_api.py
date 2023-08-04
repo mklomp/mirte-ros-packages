@@ -533,15 +533,16 @@ class DDPMotor(Motor):
             await self.init_motors()
             if speed >= 0:
                 await self.board.digital_write(self.pins["d1"], 0)
-                await self.board.digital_write(self.pins["d2"], 1)
+                await self.board.digital_write(self.pins["d2"], 0)
                 await analog_write(
                     self.board,
                     self.pins["p1"],
                     int(min(speed, 100) / 100.0 * board_mapping.get_max_pwm_value()),
                 )
+                await self.board.digital_write(self.pins["d2"], 1)
             elif speed < 0:
                 await self.board.digital_write(self.pins["d2"], 0)
-                await self.board.digital_write(self.pins["d1"], 1)
+                await self.board.digital_write(self.pins["d1"], 0)
                 await analog_write(
                     self.board,
                     self.pins["p1"],
@@ -549,6 +550,7 @@ class DDPMotor(Motor):
                         min(abs(speed), 100) / 100.0 * board_mapping.get_max_pwm_value()
                     ),
                 )
+                await self.board.digital_write(self.pins["d1"], 1)
             self.prev_motor_speed = speed
 
 
