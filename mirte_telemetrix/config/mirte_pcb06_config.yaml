@@ -69,22 +69,22 @@ motor:
     name: left
     device: mirte
     connector: MC1-A
-    type: l9110s
+    type: pp
   right:
     name: right
     device: mirte
     connector: MC1-B
-    type: l9110s
+    type: pp
 # These motors have the same pins as the line intensity sensors. So
 # when uncommenting these, please comment the intensity sensors.
 #  left2:
 #    name: left2
 #    device: mirte
 #    connector: MC2-A
-#    type: l9110s
+#    type: pp
 #  right2:
 #    name: right2
 #    device: mirte
 #    connector: MC2-B
-#    type: l9110s
+#    type: pp
 # TODO: add obstacle detection

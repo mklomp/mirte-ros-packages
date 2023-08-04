@@ -1,7 +1,7 @@
 device:
   mirte:
     type: breadboard
-    mcu: pico
+    board: pico
 #    max_frequency: 50
 distance:
   left:
@@ -87,31 +87,31 @@ motor:
   left:
     name: left
     device: mirte
-    type: l9110s
+    type: pp
     pins:
-      1a: GP19
-      1b: GP18      
+      p1: GP19
+      p2: GP18
   right:
     name: right
     device: mirte
-    type: l9110s
+    type: pp
     pins:
-      1a: GP21
-      1b: GP20
+      p1: GP21
+      p2: GP20
 # These motors have the same pins as the line intensity sensors. So
 # when uncommenting these, please comment the intensity sensors.
 #  left2:
 #    name: left2
 #    device: mirte
-#    type: l9110s
+#    type: pp
 #    pins:
-#      1a: GP26
-#      1b: GP16
+#      p1: GP26
+#      p2: GP16
 #  right2:
 #    name: right2
 #    device: mirte
-#    type: l9110s
+#    type: pp
 #    pins:
-#      1a: GP27
-#      1b: GP17
+#      p1: GP27
+#      p2: GP17
 # TODO: add obstacle detection
