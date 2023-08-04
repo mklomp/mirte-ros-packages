@@ -1,7 +1,8 @@
 device:
   mirte:
     type: breadboard
-    mcu: stm32
+    board: blackpill_f103c8
+#    max_frequency: 50
 distance:
   left:
     name: left
