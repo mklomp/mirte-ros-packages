@@ -1,0 +1,14 @@
+material duckie/duckie
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture duckie.png
+                scale 1 1
+            }
+        }
+    }
+}
