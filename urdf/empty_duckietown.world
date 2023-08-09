@@ -2,6 +2,8 @@
 <sdf xmlns:xacro="http://www.ros.org/wiki/xacro" version="1.7">
   <xacro:include filename="$(find mirte_gazebo)/urdf/tileWorld.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/duckieModels.xacro"/>
+  <xacro:include filename="$(find mirte_gazebo)/urdf/includedMacro.xacro"/>
+
   <world name="default">
     <light name="sun" type="directional">
       <cast_shadows>1</cast_shadows>

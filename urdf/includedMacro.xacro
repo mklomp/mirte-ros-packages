@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="includedModel" params="name type size x y yaw=0 static=1 scale=1">
+    <model name="model_${name}">
+      <xacro:property name="model_scale" value="${1}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+
+      <static>${static}</static>
+      <origin xyz="${size} ${y * size} 0"/>
+      <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} 0 -0  ${radians(yaw)}</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <scale>${scale} ${ scale} ${ scale}</scale>
+              <uri>model://person_walking/meshes/walking.dae</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <!-- <origin xyz="${x * size} ${y * size} 0"/> -->
+          <geometry>
+            <mesh>
+              <scale>${size * model_scale * scale} ${size * model_scale * scale} ${size * model_scale * scale}</scale>
+              <uri>model://person_walking/meshes/walking.dae</uri>
+              <!-- <pose>${x * size} ${y * size}  ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0 0</pose> -->
+            </mesh>
+          </geometry>
+          <!-- <material>
+            <script>
+              <name>${type}/${type}</name>
+              <uri>file://$(find mirte_gazebo)/models/${type}/materials/scripts/${type}.material</uri>
+            </script>
+          </material> -->
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <!-- <pose>${x * size} ${y * size}  ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0 0</pose> -->
+    </model>
+  </xacro:macro>
+  <xacro:macro name="includedState" params="name type size x y yaw=0 static=1 scale=1">
+    <xacro:property name="model_scale" value="${1}"/>
+    <xacro:property name="z_offset" value="${0}"/>
+    <!-- START GENERATED SCALES AND OFFSETS-->
+  
+    <!-- END GENERATED -->
+    <model name="model_${name}">
+      <pose>${x * size} ${y * size}  ${z_offset*size * model_scale * scale + 0.01} 0 -0 ${radians(yaw)}</pose>
+      <scale>${model_scale* size * scale} ${model_scale* size * scale} ${model_scale* size * scale}</scale>
+      <link name="link">
+        <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} 0 -0  ${radians(yaw)}</pose>
+        <velocity>0 0 0 0 -0 0</velocity>
+        <acceleration>0 0 0 0 -0 0</acceleration>
+        <wrench>0 0 0 0 -0 0</wrench>
+      </link>
+    </model>
+  </xacro:macro>
+</robot>
