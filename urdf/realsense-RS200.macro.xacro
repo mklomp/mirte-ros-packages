@@ -130,7 +130,7 @@
           </image>
           <clip>
             <near>0.1</near>
-            <far>100</far>
+            <far>1</far>
           </clip>
           <noise>
             <type>gaussian</type>
@@ -155,7 +155,7 @@
           </image>
           <clip>
             <near>0.1</near>
-            <far>100</far>
+            <far>1</far>
           </clip>
           <noise>
             <type>gaussian</type>
@@ -182,7 +182,7 @@
           </image>
           <clip>
             <near>0.1</near>
-            <far>100</far>
+            <far>20</far>
           </clip>
           <noise>
             <type>gaussian</type>
