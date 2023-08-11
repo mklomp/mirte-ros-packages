@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot>
   <gazebo>
-    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+    <!-- <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
       <publishWheelTF>false</publishWheelTF>
       <publishOdomTF>false</publishOdomTF>
       <wheelAcceleration>0</wheelAcceleration>
@@ -24,6 +24,6 @@
       /mirte/base_controller/odomasdf</odometryTopic>
       <odometryFrame>odom</odometryFrame>
       <robotBaseFrame>base_footprint</robotBaseFrame>
-    </plugin>
+    </plugin> -->
   </gazebo>
 </robot>

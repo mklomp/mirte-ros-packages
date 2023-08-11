@@ -63,11 +63,11 @@
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="joint_${name}">
         <hardwareInterface>
-        hardware_interface/VelocityJointInterface</hardwareInterface>
+          hardware_interface/VelocityJointInterface</hardwareInterface>
       </joint>
       <actuator name="motor_${name}">
         <hardwareInterface>
-        hardware_interface/VelocityJointInterface</hardwareInterface>
+          hardware_interface/VelocityJointInterface</hardwareInterface>
         <mechanicalReduction>120</mechanicalReduction>
       </actuator>
     </transmission>
