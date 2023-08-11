@@ -30,30 +30,22 @@
     </link>
     <gazebo reference="base_ir_${name}">
       <sensor type="camera" name="camera_ir_${name}">
-        <update_rate>10</update_rate>
+        <update_rate>5</update_rate>
         <camera name="head">
           <horizontal_fov>1.2</horizontal_fov>
           <image>
-            <width>5</width>
-            <height>5</height>
-            <format>R8G8B8</format>
+            <width>1</width>
+            <height>1</height>
+            <format>L8</format>
           </image>
           <clip>
             <near>0.0001</near>
-            <far>300</far>
+            <far>1</far>
           </clip>
-          <distortion>
-            <k1>0.0</k1>
-            <k2>0.0</k2>
-            <k3>0.0</k3>
-            <p1>0.0</p1>
-            <p2>0.0</p2>
-          </distortion>
         </camera>
         <plugin name="camera_controller_ir_${name}" filename="libgazebo_ros_camera.so">
           <camera_name>camera_ir</camera_name>
           <frame_name>base_ir_${name}</frame_name>
-          <hack_baseline>0.07</hack_baseline>
           <frameName>base_ir_${name}</frameName>
           <cameraName>camera_ir_${name}</cameraName>
         </plugin>

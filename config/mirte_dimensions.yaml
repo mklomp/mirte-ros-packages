@@ -6,9 +6,11 @@ wheel_radius: 0.0325
 wheel_mass: 0.1
 wheel_center_x_offset: 0.010305 # eyeballed offsets
 wheel_center_y_offset: 0.06385 # eyeballed offsets
-wheel_center_z_offset: -0.0075
+wheel_center_z_offset: 0.015
 caster_wheel_radius: 0.005
 caster_wheel_center_x_offset: -0.085715
 caster_wheel_center_y_offset: 0
-caster_wheel_center_z_offset: -0.035
+caster_wheel_center_z_offset: -0.011 # TODO: check that the base is still level
 caster_wheel_mass: .12 # to fix realsense weight
+
+cmd_vel_timeout: 0.1 # TODO: geen idee of dit nou echt werkt...
