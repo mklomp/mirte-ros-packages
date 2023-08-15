@@ -31,6 +31,14 @@
         <geometry>
           <cylinder length="0.015" radius="${radius}"/>
         </geometry>
+        <!-- <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+            </ode>
+          </friction>
+        </surface> -->
       </collision>
       <!-- <visual name="link_${name}_visual">
         <origin rpy="0 1.5707 1.5707"  xyz="-0 0 0" />
@@ -68,7 +76,7 @@
       <actuator name="motor_${name}">
         <hardwareInterface>
           hardware_interface/VelocityJointInterface</hardwareInterface>
-        <mechanicalReduction>120</mechanicalReduction>
+        <mechanicalReduction>1</mechanicalReduction>
       </actuator>
     </transmission>
   </xacro:macro>
@@ -79,6 +87,14 @@
         <geometry>
           <sphere radius="${radius}"/>
         </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.01</mu>
+              <mu2>0.01</mu2>
+            </ode>
+          </friction>
+        </surface>
       </collision>
       <visual>
         <xacro:insert_block name="origin"/>
