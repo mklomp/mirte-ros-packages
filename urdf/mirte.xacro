@@ -38,7 +38,7 @@
     <!-- body -->
     <collision name="collision_chassis">
       <geometry>
-        <mesh filename="file://$(find mirte_gazebo)/meshes/mirte_base_coll.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633"/>
+        <mesh filename="file://$(find mirte_gazebo)/meshes/mirte_base.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633"/>
       </geometry>
     </collision>
     <visual>
