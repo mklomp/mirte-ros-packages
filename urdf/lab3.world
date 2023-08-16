@@ -134,7 +134,7 @@
 <xacro:tileWorld name="tile_7_4" material="RCJ/floor" size="0.5" x="7" y="4" yaw="0"/>
 <xacro:tileWorld name="tile_0_5" material="RCJ/floor" size="0.5" x="0" y="5" yaw="0"/>
 <xacro:tileWorld name="tile_1_5" material="RCJ/circle_corner" size="0.5" x="1" y="5" yaw="180"/>
-<xacro:tileWorld name="tile_2_5" material="RCJ/straight" size="0.5" x="2" y="5" yaw="90"/>
+<xacro:tileWorld name="tile_2_5" material="RCJ/black" size="0.5" x="2" y="5" yaw="90"/>
 <xacro:tileWorld name="tile_3_5" material="RCJ/straight" size="0.5" x="3" y="5" yaw="90"/>
 <xacro:tileWorld name="tile_4_5" material="RCJ/circle_corner" size="0.5" x="4" y="5" yaw="90"/>
 <xacro:tileWorld name="tile_5_5" material="RCJ/floor" size="0.5" x="5" y="5" yaw="0"/>
@@ -240,7 +240,7 @@
 <xacro:tileState name="tile_7_4" material="RCJ/floor" size="0.5" x="7" y="4" yaw="0"/>
 <xacro:tileState name="tile_0_5" material="RCJ/floor" size="0.5" x="0" y="5" yaw="0"/>
 <xacro:tileState name="tile_1_5" material="RCJ/circle_corner" size="0.5" x="1" y="5" yaw="180"/>
-<xacro:tileState name="tile_2_5" material="RCJ/straight" size="0.5" x="2" y="5" yaw="90"/>
+<xacro:tileState name="tile_2_5" material="RCJ/black" size="0.5" x="2" y="5" yaw="90"/>
 <xacro:tileState name="tile_3_5" material="RCJ/straight" size="0.5" x="3" y="5" yaw="90"/>
 <xacro:tileState name="tile_4_5" material="RCJ/circle_corner" size="0.5" x="4" y="5" yaw="90"/>
 <xacro:tileState name="tile_5_5" material="RCJ/floor" size="0.5" x="5" y="5" yaw="0"/>
