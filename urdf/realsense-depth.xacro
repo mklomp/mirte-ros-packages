@@ -46,16 +46,16 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
     <joint name="${prefix}depth_joint" type="fixed">
       <parent link="${prefix}rs200_camera" />
       <child link="${prefix}depth" />
-      <origin xyz="0 -0.03 0.004" rpy="0 0 0" />
+      <origin xyz="0 -0 0.004" rpy="0 0 0" />
     </joint>
 
     <gazebo reference="${prefix}depth">
       <sensor name="depth_camera" type="depth">
         <always_on>true</always_on>
-        <visualize>true</visualize>
-        <update_rate>5</update_rate>
+        <visualize>False</visualize>
+        <update_rate>10</update_rate>
         <camera name="camera">
-          <horizontal_fov>1.5</horizontal_fov>
+          <horizontal_fov>2.5</horizontal_fov>
           <image>
             <width>640</width>
             <height>480</height>
