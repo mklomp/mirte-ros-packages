@@ -4,7 +4,6 @@
     <model name="model_${name}">
       <xacro:property name="model_scale" value="${1}"/>
       <xacro:property name="z_offset" value="${0}"/>
-
       <static>${static}</static>
       <origin xyz="${size} ${y * size} 0"/>
       <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} 0 -0  ${radians(yaw)}</pose>
@@ -57,7 +56,6 @@
     <xacro:property name="model_scale" value="${1}"/>
     <xacro:property name="z_offset" value="${0}"/>
     <!-- START GENERATED SCALES AND OFFSETS-->
-  
     <!-- END GENERATED -->
     <model name="model_${name}">
       <pose>${x * size} ${y * size}  ${z_offset*size * model_scale * scale + 0.01} 0 -0 ${radians(yaw)}</pose>
