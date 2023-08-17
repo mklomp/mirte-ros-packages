@@ -1,8 +1,7 @@
 mirte:
   joint_state_controller:
     type: joint_state_controller/JointStateController
-    publish_rate: 20  
-
+    publish_rate: 20
   mobile_base_controller:
     type: "diff_drive_controller/DiffDriveController"
     left_wheel: 'joint_left_wheel'
