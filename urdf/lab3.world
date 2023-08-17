@@ -148,11 +148,10 @@
     <xacro:tileWorld name="tile_6_6" material="RCJ/floor" size="0.5" x="6" y="6" yaw="0"/>
     <xacro:tileWorld name="tile_7_6" material="RCJ/floor" size="0.5" x="7" y="6" yaw="0"/>
     <state world_name="default">
-      <sim_time>61 903000000</sim_time>
-      <real_time>72 695968912</real_time>
-      <wall_time>1689943562 810051807</wall_time>
-      <iterations>61903</iterations>
-      <model name="ground_plane">
+ <sim_time>0</sim_time>
+      <real_time>0</real_time>
+      <wall_time>0</wall_time>
+      <iterations>0</iterations>      <model name="ground_plane">
         <pose>0 0 0 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name="link">
