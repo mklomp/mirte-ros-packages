@@ -8,7 +8,7 @@
             * Infrared 2 camera
             * Virtual depth coordinate frame
         Configured to work with Gazebo if desired.
-    Modified by Arend-Jan van Hilten to not visualize the color image, copied from
+    Modified by Arend-Jan van Hilten to not use the other sensors and change depth cam to gazebo depth cam, copied from
 https://github.com/SyrianSpock/realsense_gazebo_plugin
 -->
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
@@ -18,7 +18,7 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://realsense_gazebo_plugin/models/realsense_camera/meshes/realsense.dae"/>
+          <mesh filename="package://mirte_gazebo/models/realsense_camera/meshes/realsense.dae"/>
         </geometry>
       </visual>
       <collision>
