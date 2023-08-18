@@ -48,8 +48,9 @@ import textwrap
 
 from PIL import Image, ImageDraw, ImageFont
 
-# font = ImageFont.truetype("/usr/share/fonts/truetype/terminus.ttf", 12)
-font = ImageFont.truetype("/usr/share/fonts/dejavu/DejaVuSans.ttf", 12)
+# Currently loading the PIL default font, which is
+# monospace, so works with python textwrap
+font = ImageFont.load_default()
 
 from adafruit_ssd1306 import _SSD1306
 from concurrent.futures import ThreadPoolExecutor
