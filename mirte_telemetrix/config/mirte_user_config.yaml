@@ -87,17 +87,17 @@ motor:
   left:
     name: left
     device: mirte
-    type: pp
+    type: dp
     pins:
-      p1: GP19
-      p2: GP18
+      d1: GP19
+      p1: GP18
   right:
     name: right
     device: mirte
-    type: pp
+    type: dp
     pins:
-      p1: GP21
-      p2: GP20
+      d1: GP21
+      p1: GP20
 # These motors have the same pins as the line intensity sensors. So
 # when uncommenting these, please comment the intensity sensors.
 #  left2:
