@@ -103,4 +103,13 @@
     <!-- <plugin name="gazebo_ros_controller_manager" filename="libgazebo_ros_controller_manager.so"/> -->
   </gazebo>
   <xacro:include filename="$(find mirte_gazebo)/urdf/diffdrive.xacro"/>
+  <gazebo>
+    <plugin name="p3d" filename="libgazebo_ros_p3d.so">
+      <!-- <robotNamespace>/prius</robotNamespace> -->
+      <bodyName>base_link</bodyName>
+      <topicName>base_pose_ground_truth</topicName>
+      <frameName>map</frameName>
+      <updateRate>10.0</updateRate>
+    </plugin>
+  </gazebo>
 </robot>
