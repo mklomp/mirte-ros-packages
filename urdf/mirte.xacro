@@ -52,6 +52,20 @@
   <gazebo reference="link_chassis">
     <gravity>0</gravity>
   </gazebo>
+  <gazebo reference="link_chassis">
+    <sensor name="gripper_contact_sensor" type="contact">
+      <always_on>true</always_on>
+      <update_rate>30.0</update_rate>
+      <contact>
+        <collision>base_link_fixed_joint_lump__collision_chassis_collision</collision>
+        <!-- See https://github.com/gazebosim/sdformat/issues/333 for why the strange naming. Get the correct name by running xacro mirte.xacro > test.txt && gz sdf -p test.txt > robot.xml and look for the name-->
+      </contact>
+      <plugin name="gripper_bumper" filename="libgazebo_ros_bumper.so">
+        <bumperTopicName>gripper_contact_sensor_state</bumperTopicName>
+        <frameName>gripper</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
   <link name="base_link"/>
   <gazebo reference="base_link">
     <gravity>0</gravity>
