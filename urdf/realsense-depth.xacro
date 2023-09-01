@@ -61,7 +61,7 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
           <collision>base_link_fixed_joint_lump__realsense_collision_collision_${lidar + 2*ir + 2}</collision>
         </contact>
         <plugin name="gripper_bumper" filename="libgazebo_ros_bumper.so">
-          <bumperTopicName>realsense_bumper</bumperTopicName>
+          <bumperTopicName>realsense_contact</bumperTopicName>
           <frameName>${prefix}rs200_camera</frameName>
         </plugin>
       </sensor>
