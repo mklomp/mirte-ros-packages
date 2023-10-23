@@ -12,8 +12,7 @@
     <node name="mirte_telemetrix_mirte" output="screen"
           pkg="mirte_telemetrix"
           type="ROS_telemetrix_aio_api.py"
-          respawn="true"
-          respawn_delay="5"/>
+          respawn="true"/>
 
     <!-- ROS control hardware interface for differential
          drive robot. -->
