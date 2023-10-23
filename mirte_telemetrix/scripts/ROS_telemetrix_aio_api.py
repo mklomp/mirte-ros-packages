@@ -1030,6 +1030,8 @@ async def shutdown(loop, board):
         loop.stop()
         print("Telemetrix shutdown nicely")
         rospy.signal_shutdown(0)
+        time.sleep(1)
+        exit(0)
 
 
 if __name__ == "__main__":
