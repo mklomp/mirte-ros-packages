@@ -174,16 +174,17 @@ private:
     _wheel_encoder[1] = _wheel_encoder[1] + msg.value;
   }
 
-  // Reconnecting to services code:
+  // Thread and function to restart service clients when the service server has
+  // restarted
   std::future<void> reconnect_thread;
   void init_service_clients();
   void start_reconnect();
-  void reconnect();
 }; // class
 
 void MyRobotHWInterface::init_service_clients() {
   ros::service::waitForService("/mirte/set_left_speed");
   ros::service::waitForService("/mirte/set_right_speed");
+  // TODO: mutex
   this->left_client = nh.serviceClient<mirte_msgs::SetMotorSpeed>(
       "/mirte/set_left_speed", true);
   this->right_client = nh.serviceClient<mirte_msgs::SetMotorSpeed>(
@@ -242,26 +243,18 @@ MyRobotHWInterface::MyRobotHWInterface()
 void MyRobotHWInterface::start_reconnect() {
   using namespace std::chrono_literals;
 
-  // Use wait_for() with zero milliseconds to check thread status.
-  auto status = this->reconnect_thread.wait_for(0ms);
+  if (this->reconnect_thread.valid()) { // does it already exist or not?
 
-  // Print status.
-  if (status == std::future_status::ready) {
-    std::cout << "Thread finished" << std::endl;
-  } else {
-    std::cout << "Thread still running" << std::endl;
-    return;
+    // Use wait_for() with zero milliseconds to check thread status.
+    auto status = this->reconnect_thread.wait_for(0ms);
+    // Print status.
+    if (status != std::future_status::ready) { // Still running
+      return;
+    }
   }
-
   /* Run some task on new thread. The launch policy std::launch::async
      makes sure that the task is run asynchronously on a new thread. */
-  this->reconnect_thread =
-      std::async(std::launch::async, [this] { this->reconnect(); });
-}
 
-void MyRobotHWInterface::reconnect() {
-  auto was_running = this->running_;
-  this->running_ = false; // Very crude mutex
-  this->init_service_clients();
-  this->running_ = was_running;
+  this->reconnect_thread =
+      std::async(std::launch::async, [this] { this->init_service_clients(); });
 }
