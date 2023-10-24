@@ -29,6 +29,10 @@
 #include <cmath>
 #include <sstream>
 
+#include <chrono>
+#include <future>
+#include <thread>
+
 const unsigned int NUM_JOINTS = 2;
 
 /// \brief Hardware interface for a robot
@@ -55,7 +59,9 @@ public:
           std::max(std::min(int(cmd[0] / (6 * M_PI) * 100), 100), -100);
       if (left_speed != _last_cmd[0]) {
         left_motor_service.request.speed = left_speed;
-        left_client.call(left_motor_service);
+        if (!left_client.call(left_motor_service)) {
+          this->start_reconnect();
+        }
         _last_cmd[0] = left_speed;
       }
 
@@ -63,7 +69,9 @@ public:
           std::max(std::min(int(cmd[1] / (6 * M_PI) * 100), 100), -100);
       if (right_speed != _last_cmd[1]) {
         right_motor_service.request.speed = right_speed;
-        right_client.call(right_motor_service);
+        if (!right_client.call(right_motor_service)) {
+          this->start_reconnect();
+        }
         _last_cmd[1] = right_speed;
       }
       // Set the direction in so the read() can use it
@@ -166,7 +174,21 @@ private:
     _wheel_encoder[1] = _wheel_encoder[1] + msg.value;
   }
 
+  // Reconnecting to services code:
+  std::future<void> reconnect_thread;
+  void init_service_clients();
+  void start_reconnect();
+  void reconnect();
 }; // class
+
+void MyRobotHWInterface::init_service_clients() {
+  ros::service::waitForService("/mirte/set_left_speed");
+  ros::service::waitForService("/mirte/set_right_speed");
+  this->left_client = nh.serviceClient<mirte_msgs::SetMotorSpeed>(
+      "/mirte/set_left_speed", true);
+  this->right_client = nh.serviceClient<mirte_msgs::SetMotorSpeed>(
+      "/mirte/set_right_speed", true);
+}
 
 MyRobotHWInterface::MyRobotHWInterface()
     : running_(true), private_nh("~"),
@@ -212,12 +234,34 @@ MyRobotHWInterface::MyRobotHWInterface()
       nh.subscribe("/mirte/encoder/right", 1,
                    &MyRobotHWInterface::rightWheelEncoderCallback, this);
 
-  ros::service::waitForService("/mirte/set_left_speed");
-  ros::service::waitForService("/mirte/set_right_speed");
-  left_client = nh.serviceClient<mirte_msgs::SetMotorSpeed>(
-      "/mirte/set_left_speed", true);
-  right_client = nh.serviceClient<mirte_msgs::SetMotorSpeed>(
-      "/mirte/set_right_speed", true);
+  this->init_service_clients();
   // TODO: checl ion isvalis when running
   // https://answers.ros.org/question/281411/persistent-service-initialization/
+}
+
+void MyRobotHWInterface::start_reconnect() {
+  using namespace std::chrono_literals;
+
+  // Use wait_for() with zero milliseconds to check thread status.
+  auto status = this->reconnect_thread.wait_for(0ms);
+
+  // Print status.
+  if (status == std::future_status::ready) {
+    std::cout << "Thread finished" << std::endl;
+  } else {
+    std::cout << "Thread still running" << std::endl;
+    return;
+  }
+
+  /* Run some task on new thread. The launch policy std::launch::async
+     makes sure that the task is run asynchronously on a new thread. */
+  this->reconnect_thread =
+      std::async(std::launch::async, [this] { this->reconnect(); });
+}
+
+void MyRobotHWInterface::reconnect() {
+  auto was_running = this->running_;
+  this->running_ = false; // Very crude mutex
+  this->init_service_clients();
+  this->running_ = was_running;
 }
