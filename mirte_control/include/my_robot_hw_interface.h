@@ -31,9 +31,8 @@
 
 #include <chrono>
 #include <future>
-#include <thread>
 #include <mutex>
-
+#include <thread>
 
 const unsigned int NUM_JOINTS = 2;
 
@@ -47,8 +46,8 @@ public:
    */
   void write() {
     if (running_) {
-      // make sure the clients don't get overwritten while calling them 
-      const std::lock_guard<std::mutex> lock(this->service_clients_mutex); 
+      // make sure the clients don't get overwritten while calling them
+      const std::lock_guard<std::mutex> lock(this->service_clients_mutex);
 
       // cmd[0] = ros_control calculated speed of left motor in rad/s
       // cmd[1] = ros_control calculated speed of right motor in rad/s
@@ -193,10 +192,10 @@ void MyRobotHWInterface::init_service_clients() {
   ros::service::waitForService("/mirte/set_right_speed");
   {
     const std::lock_guard<std::mutex> lock(this->service_clients_mutex);
-  this->left_client = nh.serviceClient<mirte_msgs::SetMotorSpeed>(
-      "/mirte/set_left_speed", true);
-  this->right_client = nh.serviceClient<mirte_msgs::SetMotorSpeed>(
-      "/mirte/set_right_speed", true);
+    this->left_client = nh.serviceClient<mirte_msgs::SetMotorSpeed>(
+        "/mirte/set_left_speed", true);
+    this->right_client = nh.serviceClient<mirte_msgs::SetMotorSpeed>(
+        "/mirte/set_right_speed", true);
   }
 }
 
@@ -254,14 +253,16 @@ void MyRobotHWInterface::start_reconnect() {
 
     // Use wait_for() with zero milliseconds to check thread status.
     auto status = this->reconnect_thread.wait_for(0ms);
-    
-    if (status != std::future_status::ready) { // Still running -> already reconnecting
+
+    if (status !=
+        std::future_status::ready) { // Still running -> already reconnecting
       return;
     }
   }
 
-  /* Run the reconnection on a different thread to not pause the ros-control loop. 
-    The launch policy std::launch::async makes sure that the task is run asynchronously on a new thread. */
+  /* Run the reconnection on a different thread to not pause the ros-control
+    loop. The launch policy std::launch::async makes sure that the task is run
+    asynchronously on a new thread. */
 
   this->reconnect_thread =
       std::async(std::launch::async, [this] { this->init_service_clients(); });
