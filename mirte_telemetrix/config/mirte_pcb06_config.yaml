@@ -44,6 +44,7 @@ oled:
 #    name: left
 #    device: mirte
 #    connector: Servo1
+servo:  
   right:
     name: right
     device: mirte
