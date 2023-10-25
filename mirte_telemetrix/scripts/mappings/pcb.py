@@ -3,33 +3,6 @@ import mappings.nanoatmega328
 import mappings.blackpill_f103c8
 
 
-mirte_pico_pcb_map08 = {
-    "IR1": {"digital": "16", "analog": "26"},
-    "IR2": {"digital": "17", "analog": "27"},
-    "SRF1": {"trigger": "7", "echo": "6"},
-    "SRF2": {"trigger": "9", "echo": "8"},
-    "I2C1": {"scl": "5", "sda": "4"},
-    "I2C2": {"scl": "11", "sda": "10"},
-    "ENC1": {"pin": "15"},
-    "ENC2": {"pin": "14"},
-    "Keypad": {"pin": "28"},
-    "Servo1": {"pin": "14"},
-    "Servo2": {"pin": "15"},
-    "Servo3": {"pin": "12"},
-    "Servo4": {"pin": "13"},
-    "LED": {"pin": "25"},  # Does not work with the Pico W
-    "MC1-A": generate_motor_mapping("19", "18"),
-    "MC1-B": generate_motor_mapping("21", "20"),
-    "MC2-A": generate_motor_mapping("16", "26"),
-    "MC2-B": generate_motor_mapping("17", "27"),
-}
-
-
-version = 0.8
-board_mapping = mappings.pico
-connector_mapping = mirte_pico_pcb_map08
-
-
 def get_mcu():
     return board_mapping.get_mcu()
 
@@ -98,6 +71,32 @@ def generate_motor_mapping(pin_a, pin_b):
 
     return {"p1": pin_a, "p2": pin_b, "d1": pin_b, "d2": pin_a}
 
+
+mirte_pico_pcb_map08 = {
+    "IR1": {"digital": "16", "analog": "26"},
+    "IR2": {"digital": "17", "analog": "27"},
+    "SRF1": {"trigger": "7", "echo": "6"},
+    "SRF2": {"trigger": "9", "echo": "8"},
+    "I2C1": {"scl": "5", "sda": "4"},
+    "I2C2": {"scl": "11", "sda": "10"},
+    "ENC1": {"pin": "15"},
+    "ENC2": {"pin": "14"},
+    "Keypad": {"pin": "28"},
+    "Servo1": {"pin": "14"},
+    "Servo2": {"pin": "15"},
+    "Servo3": {"pin": "12"},
+    "Servo4": {"pin": "13"},
+    "LED": {"pin": "25"},  # Does not work with the Pico W
+    "MC1-A": generate_motor_mapping("19", "18"),
+    "MC1-B": generate_motor_mapping("21", "20"),
+    "MC2-A": generate_motor_mapping("16", "26"),
+    "MC2-B": generate_motor_mapping("17", "27"),
+}
+
+
+version = 0.8
+board_mapping = mappings.pico
+connector_mapping = mirte_pico_pcb_map08
 
 # mappings for older pcbs
 mirte_pico_pcb_map06 = {
