@@ -672,8 +672,10 @@ class Oled(_SSD1306):
         try:
             # the ros service is started on a different thread than the asyncio loop
             # When using the normal loop.run_until_complete() function, both threads join in and the oled communication will get broken faster
-            future = asyncio.run_coroutine_threadsafe(self.set_oled_image_service_async(req), self.loop) 
-            future.result() # wait for it to be done
+            future = asyncio.run_coroutine_threadsafe(
+                self.set_oled_image_service_async(req), self.loop
+            )
+            future.result()  # wait for it to be done
         except Exception as e:
             print(e)
         return SetOLEDImageResponse(True)
