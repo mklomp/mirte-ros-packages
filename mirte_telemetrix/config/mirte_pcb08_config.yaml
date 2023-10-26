@@ -58,7 +58,6 @@ servo:
     name: arm
     device: mirte
     connector: Servo4
-
 keypad:
   yellow:
     name: keypad
