@@ -61,13 +61,13 @@ def get_max_pwm_value():
 
 def generate_motor_mapping(pin_a, pin_b):
     # pin a has preference for pwm
+    # Different controllers(single pwm with direction, 2 pwm channels, 2 digital channels, 2 digital + 1 pwm) use different pin names.
     # This will make sure, dp, pp and dd is always possible when using a connector without knowing what type of control
     #     	A	B
     # pp	P1	P2
     # dp	P1	D1
-    # dd	D2	D1 # Not available
-    # ddp   TODO connectors
-    # Downside: when changing from pp/dp to dd, the direction will change
+    # dd	D2	D1 # Not (yet) available the ROS_telemetrix code. Downside when adding this: when changing from pp/dp to dd, the direction will change. Only fix is to let this system know the type of controller.
+    # ddp   TODO connectors, as there is no third pin on a motor connector.
 
     return {"p1": pin_a, "p2": pin_b, "d1": pin_b, "d2": pin_a}
 

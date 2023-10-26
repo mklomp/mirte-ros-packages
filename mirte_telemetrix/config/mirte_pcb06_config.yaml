@@ -39,7 +39,7 @@ oled:
     name: right
     device: mirte
     connector: I2C1
-# Servo on GP2 doens't work with the v0.6 pcb, next version this should be fixed
+# Servo on GP2 doesn't work with the v0.6 pcb, next version this should be fixed
 #  left:
 #    name: left
 #    device: mirte
