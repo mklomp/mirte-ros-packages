@@ -383,14 +383,12 @@ class Servo:
         self.board = board
         self.pins = get_pin_numbers(servo_obj)
         self.name = servo_obj["name"]
+        self.min_pulse = 544
         if "min_pulse" in servo_obj:
             self.min_pulse = servo_obj["min_pulse"]
-        else:
-            self.min_pulse = 544
+        self.max_pulse = 2400
         if "max_pulse" in servo_obj:
             self.max_pulse = servo_obj["max_pulse"]
-        else:
-            self.max_pulse = 2400
 
     async def stop(self):
         await board.detach_servo(self.pins["pin"])
