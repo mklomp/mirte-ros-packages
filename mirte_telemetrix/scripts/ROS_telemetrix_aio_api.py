@@ -1,6 +1,5 @@
 #!/usr/bin/env python3.8
 import asyncio
-import nest_asyncio
 import os, os.path
 import sys
 import time
@@ -13,7 +12,6 @@ from inspect import signature
 from tmx_pico_aio import tmx_pico_aio
 from telemetrix_aio import telemetrix_aio
 
-nest_asyncio.apply()
 
 # Import the right Telemetrix AIO
 devices = rospy.get_param("/mirte/device")
@@ -53,9 +51,6 @@ from PIL import Image, ImageDraw, ImageFont
 font = ImageFont.load_default()
 
 from adafruit_ssd1306 import _SSD1306
-from concurrent.futures import ThreadPoolExecutor
-
-executor = ThreadPoolExecutor(10)
 
 
 import mappings.default
@@ -675,7 +670,10 @@ class Oled(_SSD1306):
             return SetOLEDImageResponse(False)
 
         try:
-            self.loop.run_until_complete(self.set_oled_image_service_async(req))
+            # the ros service is started on a different thread than the asyncio loop
+            # When using the normal loop.run_until_complete() function, both threads join in and the oled communication will get broken faster
+            future = asyncio.run_coroutine_threadsafe(self.set_oled_image_service_async(req), self.loop) 
+            future.result() # wait for it to be done
         except Exception as e:
             print(e)
         return SetOLEDImageResponse(True)
