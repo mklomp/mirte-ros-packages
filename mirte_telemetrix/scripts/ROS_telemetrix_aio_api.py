@@ -378,12 +378,18 @@ class Servo:
         self.board = board
         self.pins = get_pin_numbers(servo_obj)
         self.name = servo_obj["name"]
+        self.min_pulse = 544
+        if "min_pulse" in servo_obj:
+            self.min_pulse = servo_obj["min_pulse"]
+        self.max_pulse = 2400
+        if "max_pulse" in servo_obj:
+            self.max_pulse = servo_obj["max_pulse"]
 
     async def stop(self):
         await board.detach_servo(self.pins["pin"])
 
     async def start(self):
-        await board.set_pin_mode_servo(self.pins["pin"])
+        await board.set_pin_mode_servo(self.pins["pin"], self.min_pulse, self.max_pulse)
         server = rospy.Service(
             "/mirte/set_" + self.name + "_servo_angle",
             SetServoAngle,
