@@ -47,8 +47,7 @@ servo:
     name: left
     device: mirte
     connector: Servo1
-servo:
-  left:
+  right:
     name: right
     device: mirte
     connector: Servo2
