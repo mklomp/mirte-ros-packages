@@ -15,21 +15,27 @@ KeypadMonitor::get_keypad_monitors(ros::NodeHandle &nh, TMX &tmx,
                                    Mirte_Board &board) {
   // nh->getparam("sensor_port", sensor_port);
   XmlRpc::XmlRpcValue keypads;
-  nh.getParam("/mirte/keypad", keypads);
+  if (!nh.getParam("/mirte/keypad", keypads)) {
+    ROS_ERROR("No keypads found");
+    return std::vector<KeypadMonitor *>();
+  }
   std::vector<KeypadMonitor *> sensors;
-  for (int i = 0; i < keypads.size(); i++) {
-    XmlRpc::XmlRpcValue keypad = keypads[i];
+  std::cout << keypads.size() << std::endl;
+
+  for (auto &keypad_it : keypads) {
+    std::cout << keypad_it.first << std::endl;
+    auto keypad = keypad_it.second;
+    auto name = keypad_it.first;
+    std::cout << "asdf" << std::endl;
     if (!keypad.hasMember("device") || keypad["device"] != "mirte") {
       continue;
     }
-    if (!(keypad.hasMember("port") || keypad.hasMember("pin")) ||
-        !keypad.hasMember("name")) {
+    if (!(keypad.hasMember("port") || keypad.hasMember("pins"))) {
       ROS_ERROR("Keypad missing port or name");
       continue;
     }
     auto pins = board.resolvePins(keypad);
-    KeypadMonitor *monitor = new KeypadMonitor(
-        tmx, nh, board, pins, keypad["name"].operator std::string &());
+    KeypadMonitor *monitor = new KeypadMonitor(tmx, nh, board, pins, name);
     sensors.push_back(monitor);
   }
 
@@ -59,6 +65,8 @@ KeypadMonitor::KeypadMonitor(TMX &tmx, ros::NodeHandle &nh, Mirte_Board &board,
 }
 
 void KeypadMonitor::callback(uint16_t value) {
+  std::cout << "callback" << std::endl;
+  std::cout << value << std::endl;
   this->value = value;
   this->publish();
 }

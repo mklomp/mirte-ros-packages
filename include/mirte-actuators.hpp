@@ -1,8 +1,11 @@
 #pragma once
 #include <mirte-board.hpp>
+#include <mirte_msgs/Keypad.h>
 #include <mirte_msgs/SetMotorSpeed.h>
+
 #include <ros/ros.h>
 #include <tmx.hpp>
+
 class Mirte_Actuator;
 class Mirte_Actuators {
 public:

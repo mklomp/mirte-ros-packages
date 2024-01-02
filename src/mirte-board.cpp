@@ -13,5 +13,6 @@ std::vector<uint8_t> Mirte_Board::resolvePins(XmlRpc::XmlRpcValue keypad) {
   if (keypad.hasMember("pin")) {
     pins.push_back(2);
   }
+  pins.push_back(28);
   return pins;
 }
