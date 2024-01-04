@@ -1,9 +1,9 @@
 #pragma once
+#include <functional>
 #include <ros/ros.h>
+#include <thread>
 #include <tmx.hpp>
 #include <vector>
-#include <thread>
-#include <functional>
 class Mirte_Ping {
 public:
   Mirte_Ping(TMX &tmx, ros::NodeHandle &nh, std::function<void()> stop_func);

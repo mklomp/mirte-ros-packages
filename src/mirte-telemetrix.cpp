@@ -1,7 +1,7 @@
 #include "mirte-actuators.hpp"
 #include "mirte-board.hpp"
-#include "mirte-sensors.hpp"
 #include "mirte-ping.hpp"
+#include "mirte-sensors.hpp"
 #include <ros/ros.h>
 #include <tmx.hpp>
 int main(int argc, char **argv) {
