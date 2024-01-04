@@ -139,6 +139,8 @@ add_executable(${PROJECT_NAME}_node
    src/mirte-telemetrix.cpp
    src/mirte-sensors.cpp
    src/mirte-board.cpp
+   src/mirte-actuators.cpp
+   src/mirte-ping.cpp
    libs/tmx-cpp/src/tmx.cpp
     libs/tmx-cpp/src/buffer_build.cpp
     libs/tmx-cpp/src/sensors.cpp
