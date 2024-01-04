@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.9)
 project(mirte_telemetrix)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -135,6 +135,11 @@ libs/tmx-cpp/libs/async_serial/
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+include(CheckIPOSupported)
+check_ipo_supported(RESULT supported OUTPUT error)
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++ -Wswitch-enum") # -Wall -Wextra -Wpedantic -Werror")
+
 add_executable(${PROJECT_NAME}_node
    src/mirte-telemetrix.cpp
    src/mirte-sensors.cpp
@@ -167,6 +172,15 @@ target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
   Boost::system Boost::thread
 )
+
+if( supported )
+  if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    message(STATUS "IPO / LTO enabled")
+    set_property(TARGET ${PROJECT_NAME}_node PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    endif()
+else()
+    message(STATUS "IPO / LTO not supported: <${error}>")
+endif()
 
 #############
 ## Install ##
