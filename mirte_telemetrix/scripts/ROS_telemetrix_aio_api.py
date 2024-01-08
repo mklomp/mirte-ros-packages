@@ -627,7 +627,7 @@ class Oled(_SSD1306):
         for cmd in self.write_commands:
             # // TODO: arduino will just stop forwarding i2c write messages after a single failed message. No feedback from it yet.
             out = await self.board.i2c_write(60, cmd, i2c_port=self.i2c_port)
-            if(out is None):
+            if out is None:
                 await asyncio.sleep(0.1)
             if (
                 out == False
@@ -719,7 +719,7 @@ class Oled(_SSD1306):
         self.temp[0] = 0x80
         self.temp[1] = cmd
         out = await self.board.i2c_write(60, self.temp, i2c_port=self.i2c_port)
-        if(out is None):
+        if out is None:
             await asyncio.sleep(0.01)
         if out == False:
             print("failed write oled 2")
@@ -758,11 +758,12 @@ class Oled(_SSD1306):
             buf = self.buffer[i * 16 : (i + 1) * 16 + 1]
             buf[0] = 0x40
             out = await self.board.i2c_write(60, buf, i2c_port=self.i2c_port)
-            if(out is None):
+            if out is None:
                 await asyncio.sleep(0.1)
             if out == False:
                 print("failed wrcmd")
                 self.failed = True
+
         for i in range(64):
             await task(self, i)
 
@@ -875,7 +876,7 @@ def actuators(loop, board, device):
         oled_id = 0
         for oled in oleds:
             oled_settings = oleds[oled]
-            if  "name" not in oled_settings:
+            if "name" not in oled_settings:
                 oled_settings["name"] = oled
             oled_obj = Oled(
                 128, 64, board, oleds[oled], port=oled_id, loop=loop
