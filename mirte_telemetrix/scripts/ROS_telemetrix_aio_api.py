@@ -628,7 +628,7 @@ class Oled(_SSD1306):
             # // TODO: arduino will just stop forwarding i2c write messages after a single failed message. No feedback from it yet.
             out = await self.board.i2c_write(60, cmd, i2c_port=self.i2c_port)
             if out is None:
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.01)
             if (
                 out == False
             ):  # pico returns true/false, arduino returns always none, only catch false
@@ -759,7 +759,7 @@ class Oled(_SSD1306):
             buf[0] = 0x40
             out = await self.board.i2c_write(60, buf, i2c_port=self.i2c_port)
             if out is None:
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.01)
             if out == False:
                 print("failed wrcmd")
                 self.failed = True
