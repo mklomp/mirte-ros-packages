@@ -2,13 +2,13 @@
 #include "mirte-board.hpp"
 #include "mirte-ping.hpp"
 #include "mirte-sensors.hpp"
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 #include <tmx.hpp>
 int main(int argc, char **argv) {
   // Initialize the ROS node
   try {
 
-    ros::init(argc, argv, "my_node");
+    ros::init(argc, argv, "mirte_telemetrix");
     TMX tmx("/dev/ttyACM0");
     tmx.sendMessage(TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
     tmx.setScanDelay(10);

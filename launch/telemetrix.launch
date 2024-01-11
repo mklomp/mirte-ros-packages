@@ -7,7 +7,7 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     config = os.path.join(
-        get_package_share_directory('mirte_telemetrix'),
+        get_package_share_directory('mirte-telemetrix-cpp'),
         'config',
         'mirte_user_config.yaml'
         )
@@ -15,7 +15,7 @@ def generate_launch_description():
     node=Node(
         package = 'mirte_telemetrix',
         name = 'mirte_telemetrix',
-        executable = 'mirte_telemetrix',
+        executable = 'mirte_telemetrix_node',
         parameters = [config],
         output='screen',
         emulate_tty=True
