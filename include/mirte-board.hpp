@@ -1,12 +1,12 @@
 #pragma once
 #include "rclcpp/rclcpp.hpp"
 #include <tmx.hpp>
-#include <xmlrpcpp/XmlRpcValue.h>
+
 class Mirte_Board {
 public:
-  Mirte_Board(TMX &tmx, ros::NodeHandle &nh);
-  TMX *tmx;
-  ros::NodeHandle *nh;
+  Mirte_Board(std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh);
+  std::shared_ptr<TMX> tmx;
+  std::shared_ptr<rclcpp::Node> nh;
   int get_adc_bits() { return 12; }
-  std::vector<uint8_t> resolvePins(XmlRpc::XmlRpcValue keypad);
+  std::vector<uint8_t> resolvePins(rclcpp::Parameter keypad);
 };

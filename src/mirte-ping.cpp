@@ -1,9 +1,9 @@
 #include "mirte-ping.hpp"
 
-Mirte_Ping::Mirte_Ping(TMX &tmx, ros::NodeHandle &nh,
+Mirte_Ping::Mirte_Ping(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, 
                        std::function<void()> stop_func) {
-  this->tmx = &tmx;
-  this->nh = &nh;
+  this->tmx = tmx;
+  this->nh = nh;
   this->ping_thread = std::thread(&Mirte_Ping::ping_task, this);
   this->tmx->add_callback(
       TMX::MESSAGE_IN_TYPE::PONG_REPORT,
