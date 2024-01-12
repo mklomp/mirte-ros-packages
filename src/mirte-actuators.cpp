@@ -46,13 +46,14 @@ std::vector<Mirte_Actuator *> Motor::get_motors(
   return motors;
 }
 bool Motor::service_callback(
-  mirte_msgs::srv::SetMotorSpeed::Request & req,
-  mirte_msgs::srv::SetMotorSpeed::Response & res)
+  const std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Request> req,
+  std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Response> res)
 {
-  this->set_speed(req.speed);
-  // res.success = true;
+  this->set_speed(req->speed);
+  res->status = true;
   return true;
 }
+
 
 void Motor::motor_callback(const std_msgs::msg::Int32 & msg)
 {

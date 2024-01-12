@@ -74,7 +74,7 @@ void KeypadMonitor::callback(uint16_t value) {
 }
 
 bool KeypadMonitor::keypad_callback(const std::shared_ptr<mirte_msgs::srv::GetKeypad::Request> req,
-                                    std::shared_ptr<mirte_msgs::srv::GetKeypad::Response> &res) {
+                                    std::shared_ptr<mirte_msgs::srv::GetKeypad::Response> res) {
   res->data = this->last_debounced_key;
   return true;
 }

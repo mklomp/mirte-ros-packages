@@ -49,8 +49,8 @@ public:
     std::vector<uint8_t> pins, std::string name);
   rclcpp::Service<mirte_msgs::srv::SetMotorSpeed>::SharedPtr motor_service;
   bool service_callback(
-    mirte_msgs::srv::SetMotorSpeed::Request & req,
-    mirte_msgs::srv::SetMotorSpeed::Response & res);
+   const std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Request> req,
+  std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Response> res);
   void motor_callback(const std_msgs::msg::Int32 & msg);
   int last_speed = 0;
   rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr ros_client;

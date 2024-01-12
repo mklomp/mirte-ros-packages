@@ -54,7 +54,7 @@ public:
   rclcpp::Service<mirte_msgs::srv::GetKeypad>::SharedPtr keypad_service;
   bool keypad_callback(
     const std::shared_ptr<mirte_msgs::srv::GetKeypad::Request> req,
-    std::shared_ptr<mirte_msgs::srv::GetKeypad::Response> & res);
+    std::shared_ptr<mirte_msgs::srv::GetKeypad::Response> res);
   void callback(uint16_t value);
   uint16_t value;
   std::string last_key;
