@@ -1,18 +1,20 @@
-
-
 #include "mirte-sensors.hpp"
 #include "rclcpp/rclcpp.hpp"
-Mirte_Sensors::Mirte_Sensors(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, 
-    std::shared_ptr<Mirte_Board> board) {
+Mirte_Sensors::Mirte_Sensors(
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+  std::shared_ptr<Mirte_Board> board)
+{
   this->tmx = tmx;
   this->nh = nh;
   this->board = board;
   auto keypads = KeypadMonitor::get_keypad_monitors(nh, tmx, board);
   this->sensors.insert(this->sensors.end(), keypads.begin(), keypads.end());
 }
+
 std::vector<KeypadMonitor *>
-KeypadMonitor::get_keypad_monitors( std::shared_ptr<rclcpp::Node> nh,std::shared_ptr<TMX> tmx,
-    std::shared_ptr<Mirte_Board> board) {
+KeypadMonitor::get_keypad_monitors(
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board)
+{
   // nh->getparam("sensor_port", sensor_port);
   rclcpp::Parameter keypads;
   // if (!nh.getParam("/mirte/keypad", keypads)) {
@@ -43,9 +45,11 @@ KeypadMonitor::get_keypad_monitors( std::shared_ptr<rclcpp::Node> nh,std::shared
   // TODO: schedule periodic publishing
 }
 
-Mirte_Sensor::Mirte_Sensor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, 
-    std::shared_ptr<Mirte_Board> board,
-                           std::vector<uint8_t> pins, std::string name) {
+Mirte_Sensor::Mirte_Sensor(
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+  std::shared_ptr<Mirte_Board> board,
+  std::vector<uint8_t> pins, std::string name)
+{
   this->tmx = tmx;
   this->nh = nh;
   this->pins = pins;
@@ -53,33 +57,41 @@ Mirte_Sensor::Mirte_Sensor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX
   this->board = board;
 }
 
-KeypadMonitor::KeypadMonitor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, 
-    std::shared_ptr<Mirte_Board> board,
-                             std::vector<uint8_t> pins, std::string name)
-    : Mirte_Sensor(nh, tmx,  board, pins, name) {
+KeypadMonitor::KeypadMonitor(
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+  std::shared_ptr<Mirte_Board> board,
+  std::vector<uint8_t> pins, std::string name)
+: Mirte_Sensor(nh, tmx, board, pins, name)
+{
 
   keypad_pub = nh->create_publisher<mirte_msgs::msg::Keypad>("/mirte/keypad/" + name, 1);
   keypad_pressed_pub =
-      nh->create_publisher<mirte_msgs::msg::Keypad>("/mirte/keypad/" + name + "_pressed", 1);
+    nh->create_publisher<mirte_msgs::msg::Keypad>("/mirte/keypad/" + name + "_pressed", 1);
   keypad_service =
-      nh->create_service<mirte_msgs::srv::GetKeypad>(name + "_get", std::bind( &KeypadMonitor::keypad_callback, this, std::placeholders::_1, std::placeholders::_2));
+    nh->create_service<mirte_msgs::srv::GetKeypad>(
+    name + "_get",
+    std::bind(&KeypadMonitor::keypad_callback, this, std::placeholders::_1, std::placeholders::_2));
   tmx->setPinMode(pins[0], TMX::PIN_MODES::ANALOG_INPUT, true, 0);
   tmx->add_analog_callback(
-      pins[0], [this](auto pin, auto value) { this->callback(value); });
+    pins[0], [this](auto pin, auto value) {this->callback(value);});
 }
 
-void KeypadMonitor::callback(uint16_t value) {
+void KeypadMonitor::callback(uint16_t value)
+{
   this->value = value;
   this->publish();
 }
 
-bool KeypadMonitor::keypad_callback(const std::shared_ptr<mirte_msgs::srv::GetKeypad::Request> req,
-                                    std::shared_ptr<mirte_msgs::srv::GetKeypad::Response> res) {
+bool KeypadMonitor::keypad_callback(
+  const std::shared_ptr<mirte_msgs::srv::GetKeypad::Request> req,
+  std::shared_ptr<mirte_msgs::srv::GetKeypad::Response> res)
+{
   res->data = this->last_debounced_key;
   return true;
 }
 
-void KeypadMonitor::publish() {
+void KeypadMonitor::publish()
+{
   mirte_msgs::msg::Keypad msg;
 
   std::string key = "";
@@ -103,7 +115,7 @@ void KeypadMonitor::publish() {
   }
 
   std::string debounced_key = "";
-  if (nh->now().seconds() - this->last_debounce_time >  0.1) {
+  if (nh->now().seconds() - this->last_debounce_time > 0.1) {
     debounced_key = key;
   }
 
@@ -114,7 +126,8 @@ void KeypadMonitor::publish() {
 
   // # check if we need to send a pressed message
   if (this->last_debounced_key != "" &&
-      this->last_debounced_key != debounced_key) { // TODO: check this
+    this->last_debounced_key != debounced_key)     // TODO: check this
+  {
     mirte_msgs::msg::Keypad pressed;
     // pressed.header = this->get_header();
     pressed.key = this->last_debounced_key;

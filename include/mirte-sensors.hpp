@@ -10,7 +10,7 @@ class Mirte_Sensors
 {
 public:
   Mirte_Sensors(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, 
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
     std::shared_ptr<Mirte_Board> board);
   std::shared_ptr<TMX> tmx;
   std::shared_ptr<rclcpp::Node> nh;
@@ -36,7 +36,7 @@ public:
     return header;
   }
   Mirte_Sensor(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, 
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
     std::shared_ptr<Mirte_Board> board,
     std::vector<uint8_t> pins, std::string name);
 };
@@ -45,7 +45,7 @@ class KeypadMonitor : public Mirte_Sensor
 {
 public:
   KeypadMonitor(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, 
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
     std::shared_ptr<Mirte_Board> board,
     std::vector<uint8_t> pins, std::string name);
   void publish();
@@ -63,6 +63,6 @@ public:
 
   static std::vector<KeypadMonitor *>
   get_keypad_monitors(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, 
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
     std::shared_ptr<Mirte_Board> board);
 };
