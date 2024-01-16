@@ -3,26 +3,53 @@ mirte_telemetrix:
     device:
       mirte:
         type: breadboard
-        mcu: pico
+        board: pico
         max_frequency: 100
 #    distance:
-#      -  name: left
-#         device: mirte
-#         pins:
-#           trigger: 7
-#           echo: 6
-    motor:
+#      left:
+#        name: left
+#        device: mirte
+#        pins:
+#          trigger: 7
+#          echo: 6
+#    keypad:
+#      yellow:
+#        name: yellow
+#        device: mirte
+#        pins:
+#          pin: GP28
+    intensity:
       left:
         name: left
         device: mirte
-        type: l9110s
         pins:
-          1a: 18             # pin needs PWM
-          1b: 19             # pin needs PWM
-      right:
-        name: right
+          analog: GP27
+#          digital: GP17
+#    oled:
+#      left:
+#        name: left
+#        device: mirte
+#        pins:
+#          scl: 5
+#          sda: 4
+    servo:
+      left:
+        name: left
         device: mirte
-        type: l9110s
         pins:
-          1a: 20            # pin needs PWM
-          1b: 21            # pin needs PWM
+          pin: GP15
+#    motor:
+#      left:
+#        name: left
+#        device: mirte
+#        type: pp
+#        pins:
+#          p1: 18             # pin needs PWM
+#          p2: 19             # pin needs PWM
+#      right:
+#        name: right
+#        device: mirte
+#        type: pp
+#        pins:
+#          p1: 20            # pin needs PWM
+#          p2: 21            # pin needs PWM

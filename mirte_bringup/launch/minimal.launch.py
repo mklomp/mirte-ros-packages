@@ -7,15 +7,15 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
     ld = LaunchDescription()
 
-    telemetrix=IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            PathJoinSubstitution([
-                FindPackageShare('mirte_telemetrix'),
-                'launch',
-                'telemetrix.launch'
-            ])
-        ])
-    )
+#    telemetrix=IncludeLaunchDescription(
+#        PythonLaunchDescriptionSource([
+#            PathJoinSubstitution([
+#                FindPackageShare('mirte_telemetrix'),
+#                'launch',
+#                'telemetrix.launch'
+#            ])
+#        ])
+#    )
 
 
     diff_drive_control=IncludeLaunchDescription(

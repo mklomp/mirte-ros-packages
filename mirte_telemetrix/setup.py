@@ -2,17 +2,17 @@ from setuptools import setup
 from glob import glob
 
 package_name = 'mirte_telemetrix'
+submodules = 'mirte_telemetrix/mappings'
 
 setup(
     name=package_name,
     version='0.0.0',
-    packages=[package_name],
+    packages=[package_name, submodules],
     data_files=[
-        ('share/ament_index/resource_index/packages',
-            ['resource/' + package_name]),
+        ('share/ament_index/resource_index/packages',['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/config', glob('config/*')),
-        ('share/' + package_name + '/launch', glob('launch/*')),
+        ('share/' + package_name + '/launch', glob('launch/*'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -23,7 +23,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'mirte_telemetrix = mirte_telemetrix.ROS_telemetrix_api:main',
+            'mirte_async = mirte_telemetrix.asynctest:main',
+            'mirte_telemetrix = mirte_telemetrix.ROS_telemetrix_aio_api:start',
         ],
     },
 )
