@@ -18,12 +18,12 @@ mirte_telemetrix:
 #        device: mirte
 #        pins:
 #          pin: GP28
-    intensity:
-      left:
-        name: left
-        device: mirte
-        pins:
-          analog: GP27
+#    intensity:
+#      left:
+#        name: left
+#        device: mirte
+#        pins:
+#          analog: GP27
 #          digital: GP17
 #    oled:
 #      left:
@@ -32,24 +32,24 @@ mirte_telemetrix:
 #        pins:
 #          scl: 5
 #          sda: 4
-    servo:
-      left:
-        name: left
-        device: mirte
-        pins:
-          pin: GP15
-#    motor:
+#    servo:
 #      left:
 #        name: left
 #        device: mirte
-#        type: pp
 #        pins:
-#          p1: 18             # pin needs PWM
-#          p2: 19             # pin needs PWM
-#      right:
-#        name: right
-#        device: mirte
-#        type: pp
-#        pins:
-#          p1: 20            # pin needs PWM
-#          p2: 21            # pin needs PWM
+#          pin: GP15
+    motor:
+      left:
+        name: left
+        device: mirte
+        type: pp
+        pins:
+          p1: 18             # pin needs PWM
+          p2: 19             # pin needs PWM
+      right:
+        name: right
+        device: mirte
+        type: pp
+        pins:
+          p1: 20            # pin needs PWM
+          p2: 21            # pin needs PWM

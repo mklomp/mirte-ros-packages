@@ -1098,7 +1098,7 @@ async def rosspin():
 
 
 
-async def main(arg=None):
+def main(arg=None):
     loop = asyncio.new_event_loop()
 
     print("main1")
@@ -1108,7 +1108,8 @@ async def main(arg=None):
         board = tmx_pico_aio.TmxPicoAio(
             allow_i2c_errors=True,
             loop=loop,
-            autostart=False
+            autostart=False,
+#            com_port="/dev/ttyUSB0"
         )
         loop.run_until_complete(board.start_aio())
     else:
@@ -1154,13 +1155,13 @@ async def main(arg=None):
 #    loop.run_forever()
 
     try:
-        task_ros2 = asyncio.create_task(rosspin())
+#        task_ros2 = asyncio.create_task(rosspin())
         # task_mavsdk = asyncio.create_task(run(minimal_publisher))
         #asyncio.run(task_ros2)
-        await asyncio.gather(task_ros2)
+#        await asyncio.gather(task_ros2)
         #loop.run_until_complete(rosspin())
-        #loop.run_forever()   # this will make teh sensors work
-        #rclpy.spin(node)      # this will make the actuators work
+#        loop.run_forever()   # this will make teh sensors work
+        rclpy.spin(node)      # this will make the actuators work
        
         print("main3")
 
@@ -1173,8 +1174,8 @@ async def main(arg=None):
     shutdown(loop, board)
 
 def start():
-   asyncio.run(main())
-
+   main()
+#   asyncio.run(main())
 
 if __name__ == "__main__":
-   start()
+   main()
