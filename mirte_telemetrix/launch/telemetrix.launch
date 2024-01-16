@@ -15,7 +15,7 @@ def generate_launch_description():
     node=Node(
         package = 'mirte_telemetrix',
         name = 'mirte_telemetrix',
-        executable = 'mirte_ros2',
+        executable = 'mirte_telemetrix',
         parameters = [config],
         output='screen',
         emulate_tty=True
