@@ -1,14 +1,11 @@
 #include "mirte-board.hpp"
 
-Mirte_Board_pico::Mirte_board_pico(std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh)
-: Mirte_Board(tmx, nh)
+Mirte_Board_pico::Mirte_Board_pico(
+  // std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh
+  )
+// : Mirte_Board(tmx, nh)
 {
 
-}
-
-int Mirte_Board_pico::get_adc_bits()
-{
-  return 12;
 }
 
 int Mirte_Board_pico::resolvePin(std::string pin_name)

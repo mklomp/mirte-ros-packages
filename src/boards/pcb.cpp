@@ -1,9 +1,9 @@
 #include <mirte-board.hpp>
 #include <pcbs/v08.hpp>
 Mirte_Board_pcb::Mirte_Board_pcb(
-  std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh,
+  // std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh,
   std::shared_ptr<Mirte_Board> mcu)
-: Mirte_Board(tmx, nh)
+// : Mirte_Board(tmx, nh)
 {
   this->mcu = mcu;
 }

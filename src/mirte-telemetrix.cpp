@@ -48,8 +48,8 @@ void mirte_node::start(std::shared_ptr<rclcpp::Node> s_node)
   s_tmx->setScanDelay(10);
   // auto s_node = std::make_shared<rclcpp::Node>(this);
   // Your code here
-  Mirte_Board_pico board(s_tmx, s_node);
-  auto s_board = std::make_shared<Mirte_Board>((Mirte_Board)board);
+  Mirte_Board_pico board;//(/*s_tmx, s_node*/);
+  auto s_board = std::make_shared<Mirte_Board>(&board);
   Mirte_Sensors monitor(s_node, s_tmx, s_board);
   Mirte_Actuators actuators(s_node, s_tmx, s_board, std::make_shared<Parser>(p));
 

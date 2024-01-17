@@ -1,9 +1,10 @@
 #include <mirte-board.hpp>
 #include <util.hpp>
 Mirte_Board_atmega328p::Mirte_Board_atmega328p(
-  std::shared_ptr<TMX> tmx,
-  std::shared_ptr<rclcpp::Node> nh)
-: Mirte_board(tmx, nh)
+  // std::shared_ptr<TMX> tmx,
+  // std::shared_ptr<rclcpp::Node> nh
+  )
+// : Mirte_Board(tmx, nh)
 {
 }
 
