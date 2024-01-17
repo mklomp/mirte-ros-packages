@@ -8,6 +8,7 @@
 #include "std_msgs/msg/int32.hpp"
 #include "std_msgs/msg/header.hpp"
 #include <tmx.hpp>
+#include "parsers/actuators.hpp"
 class Mirte_Actuator;
 class Mirte_Actuators
 {

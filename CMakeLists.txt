@@ -50,6 +50,8 @@ add_executable(${PROJECT_NAME}_node
    src/mirte-board.cpp
    src/mirte-actuators.cpp
    src/mirte-ping.cpp
+   src/parsers/actuators.cpp
+   src/parsers/parsers.cpp
    libs/tmx-cpp/src/tmx.cpp
     libs/tmx-cpp/src/buffer_build.cpp
     libs/tmx-cpp/src/sensors.cpp
@@ -95,4 +97,12 @@ install(TARGETS
 # ament_export_targets(
 #   ${PROJECT_NAME}_node HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
+)
+install(DIRECTORY
+  config
+  DESTINATION share/${PROJECT_NAME}/
+)
 ament_package()

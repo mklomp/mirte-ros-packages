@@ -8,6 +8,7 @@ Mirte_Actuators::Mirte_Actuators(
   this->nh = nh;
   this->board = board;
   this->actuators = Motor::get_motors(nh, tmx, board);
+  parse_servo_data(nh);
 }
 
 Mirte_Actuator::Mirte_Actuator(
@@ -27,6 +28,7 @@ std::vector<Mirte_Actuator *> Motor::get_motors(
 {
   std::vector<Mirte_Actuator *> motors;
   rclcpp::Parameter motors_config;
+
   // nh.getParam("/mirte/motor", motors_config);
   // for (auto &motor_it : motors_config) {
   //   std::cout << motor_it.first << std::endl;
