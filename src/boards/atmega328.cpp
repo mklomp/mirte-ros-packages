@@ -8,6 +8,7 @@ Mirte_Board_atmega328p::Mirte_Board_atmega328p(
 {
 }
 
+
 int Mirte_Board_atmega328p::resolvePin(std::string pin_name)
 {
   int pin = -1;
@@ -32,4 +33,15 @@ int Mirte_Board_atmega328p::resolvePin(std::string pin_name)
   }
   std::cerr << "Not implemented: atmega328p::resolvePin : " << pin_name << std::endl;
   return -1;
+}
+
+std::map<std::string, int> Mirte_Board_atmega328p::resolveConnector(std::string connector)
+{
+  std::cerr << "Not implemented: atmega328p::resolveConnector : " << connector << std::endl;
+  return {};
+}
+
+int Mirte_Board_atmega328p::get_adc_bits()
+{
+  return 12;
 }

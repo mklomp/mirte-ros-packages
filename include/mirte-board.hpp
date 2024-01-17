@@ -22,23 +22,18 @@ public:
 class Mirte_Board_atmega328p : public Mirte_Board
 {
 public:
-  Mirte_Board_atmega328p(
-    // std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh
-    );
+  Mirte_Board_atmega328p();
   std::map<std::string, int> resolveConnector(std::string connector);
   int resolvePin(std::string pin);
-  int get_adc_bits()
-  {
-    return 12;
-  }
+  int get_adc_bits();
 };
-
 class Mirte_Board_pico : public Mirte_Board
 {
 public:
-  Mirte_Board_pico(
-    // std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh
-    );
+  // Mirte_Board_pico(
+  //   // std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh
+  //   );
+  Mirte_Board_pico();
   std::map<std::string, int> resolveConnector(std::string connector);
   int resolvePin(std::string pin);
   int get_adc_bits() {return 12;}
@@ -47,9 +42,10 @@ public:
 class Mirte_Board_pcb : public Mirte_Board
 {
 public:
-  Mirte_Board_pcb(
-    // std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh,
-    std::shared_ptr<Mirte_Board> mcu);
+  Mirte_Board_pcb(std::shared_ptr<Mirte_Board> mcu);
+  // Mirte_Board_pcb(
+  //   // std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh,
+  //   std::shared_ptr<Mirte_Board> mcu);
   std::shared_ptr<Mirte_Board> mcu; // to look up pins
   std::map<std::string, int> resolveConnector(std::string connector);
   int resolvePin(std::string pin);

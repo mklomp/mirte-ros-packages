@@ -1,12 +1,10 @@
 #include <mirte-board.hpp>
-#include <mirte-node.hpp>
-#include <rclcpp/parameter.hpp>
-Mirte_Board::Mirte_Board(
-  // std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh
-  ) {
-  // this->tmx = tmx;
-  // this->nh = nh;
-}
+// Mirte_Board::Mirte_Board(
+//   // std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh
+//   ) {
+//   // this->tmx = tmx;
+//   // this->nh = nh;
+// }
 
 
 // uint8_t Mirte_Board::resolvePin(std::string pin) {
@@ -17,3 +15,4 @@ Mirte_Board::Mirte_Board(
 //     std::map<std::string, int> pins;
 //     return pins;
 //   }
+

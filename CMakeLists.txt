@@ -46,15 +46,17 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++ -Wswitch-enum") # -Wall -Wextr
 
 add_executable(${PROJECT_NAME}_node
    src/test.cpp
-   src/mirte-sensors.cpp
    src/mirte-board.cpp
+   src/boards/atmega328.cpp
+   src/boards/pico.cpp
+   src/boards/pcb.cpp
+
    src/mirte-actuators.cpp
+   src/mirte-sensors.cpp
+
    src/mirte-ping.cpp
    src/parsers/actuators.cpp
    src/parsers/parsers.cpp
-   src/boards/atmega328.cpp
-    src/boards/pico.cpp
-    src/boards/pcb.cpp
    libs/tmx-cpp/src/tmx.cpp
     libs/tmx-cpp/src/buffer_build.cpp
     libs/tmx-cpp/src/sensors.cpp
