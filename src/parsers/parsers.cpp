@@ -54,12 +54,18 @@ Parser::Parser(std::shared_ptr<rclcpp::Node> nh)
   this->params = parameter_overrides;
 }
 
+/**
+ * get the parameters starting with name
+ * removes the name from the key, including the dot
+ * 
+*/
 std::map<std::string, rclcpp::ParameterValue> Parser::get_params_name(std::string name)
 {
   std::map<std::string, rclcpp::ParameterValue> out_params;
   for (auto & servo_it : this->params) {
     if (servo_it.first.rfind(name, 0) == 0) {
-      out_params[servo_it.first] = servo_it.second;
+      std::string key = servo_it.first.substr(name.length() + 1);
+      out_params[key] = servo_it.second;
     }
   }
   return out_params;
@@ -77,4 +83,9 @@ std::set<std::string> Parser::get_params_keys(std::string name)
     }
   }
   return out_params;
+}
+
+std::string Parser::build_param_name(std::string name, std::string key)
+{
+  return name + "." + key;
 }

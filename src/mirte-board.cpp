@@ -6,14 +6,12 @@ Mirte_Board::Mirte_Board(std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node>
   this->nh = nh;
 }
 
-std::vector<uint8_t> Mirte_Board::resolvePins(rclcpp::Parameter keypad) {
-  std::vector<uint8_t> pins;
-  // if (keypad.hasMember("port")) {
-  //   pins.push_back(1);
-  // }
-  // if (keypad.hasMember("pin")) {
-  //   pins.push_back(2);
-  // }
-  pins.push_back(28);
-  return pins;
+
+uint8_t Mirte_Board::resolvePin(std::string pin) {
+  return 1;
 }
+
+  std::map<std::string, int> Mirte_Board::resolveConnector(std::string connector){
+    std::map<std::string, int> pins;
+    return pins;
+  }

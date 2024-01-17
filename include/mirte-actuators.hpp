@@ -15,7 +15,7 @@ class Mirte_Actuators
 public:
   Mirte_Actuators(
     std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
-    std::shared_ptr<Mirte_Board> board);
+    std::shared_ptr<Mirte_Board> board, std::shared_ptr<Parser> parser);
   std::shared_ptr<TMX> tmx;
   std::shared_ptr<rclcpp::Node> nh;
   std::shared_ptr<Mirte_Board> board;

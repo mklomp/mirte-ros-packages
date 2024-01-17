@@ -52,6 +52,9 @@ add_executable(${PROJECT_NAME}_node
    src/mirte-ping.cpp
    src/parsers/actuators.cpp
    src/parsers/parsers.cpp
+   src/boards/atmega328.cpp
+    src/boards/pico.cpp
+    src/boards/pcb.cpp
    libs/tmx-cpp/src/tmx.cpp
     libs/tmx-cpp/src/buffer_build.cpp
     libs/tmx-cpp/src/sensors.cpp
