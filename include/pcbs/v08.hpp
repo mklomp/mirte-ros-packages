@@ -1,17 +1,13 @@
+#pragma once
 #include <map>
 #include <vector>
 #include <string>
+#include "mirte-board.hpp"
 
 
 #define generate_motor_mapping(pin1, pin2) {{"P1", pin1}, {"P2", pin2}, {"D1", pin2}, {"D2", pin1}}
-// constexpr std::map<std::string, std::string> generate_motor_mapping(
-//   std::string pin1,
-//   std::string pin2)
-// {
-//   return {{"pin1", pin1}, {"pin2", pin2}};
-// }
 
-const std::map<std::string, std::map<std::string, std::string>> mirte_pico_pcb_map08 = {
+const connector_map mirte_pico_pcb_map08 = {
   {"IR1", {{"digital", "16"}, {"analog", "26"}}},
   {"IR2", {{"digital", "17"}, {"analog", "27"}}},
   {"SRF1", {{"trigger", "7"}, {"echo", "6"}}},

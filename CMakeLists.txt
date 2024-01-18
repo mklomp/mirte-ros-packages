@@ -45,7 +45,8 @@ check_ipo_supported(RESULT supported OUTPUT error)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++ -Wswitch-enum") # -Wall -Wextra -Wpedantic -Werror")
 
 add_executable(${PROJECT_NAME}_node
-   src/test.cpp
+  #  src/test.cpp
+  src/mirte-telemetrix.cpp
    src/mirte-board.cpp
    src/boards/atmega328.cpp
    src/boards/pico.cpp

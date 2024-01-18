@@ -34,24 +34,21 @@ void mirte_node::start(std::shared_ptr<rclcpp::Node> s_node)
 {
   Parser p(s_node);
   // parse_servo_data(s_node);
-  auto s = p.get_params_name("servo");
-  for (auto & servo_it : s) {
-    std::cout << servo_it.first << std::endl;
+  auto p_s = std::make_shared<Parser>(p);
+    std::shared_ptr<Mirte_Board> s_board = Mirte_Board::create(p_s);
+  auto s= s_board->resolveConnector("LED") ;
+  std::cout << "LED" << std::endl;
+  for (auto i : s) {
+    std::cout << i.first << " " << i.second << std::endl;
   }
-  std::cout << "2"<<std::endl;
-  auto s2 = p.get_params_keys("servo");
-  for (auto & servo_it : s2) {
-    std::cout << servo_it << std::endl;
-  }
+  return;
   auto s_tmx = std::make_shared<TMX>("/dev/null");
   s_tmx->sendMessage(TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
   s_tmx->setScanDelay(10);
   // auto s_node = std::make_shared<rclcpp::Node>(this);
   // Your code here
-  Mirte_Board_pico board;//(/*s_tmx, s_node*/);
-  auto s_board = std::make_shared<Mirte_Board>(&board);
   Mirte_Sensors monitor(s_node, s_tmx, s_board);
-  Mirte_Actuators actuators(s_node, s_tmx, s_board, std::make_shared<Parser>(p));
+  Mirte_Actuators actuators(s_node, s_tmx, s_board, p_s);
 
   // Mirte_Ping ping( s_node,s_tmx, [&]() {
   //     std::cout << "stop" << std::endl;

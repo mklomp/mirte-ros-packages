@@ -10,10 +10,9 @@ Mirte_Board_atmega328p::Mirte_Board_atmega328p(
 
 
 int Mirte_Board_atmega328p::resolvePin(std::string pin_name)
-{
-  int pin = -1;
-  if ((pin = try_parse_int(pin_name)) != -1) {
-    return pin;
+{ 
+  if (auto pin = try_parse_int(pin_name)) {
+    return pin.value();
   }
   if (starts_with(pin_name, "RX")) {
     return 0;
@@ -22,13 +21,13 @@ int Mirte_Board_atmega328p::resolvePin(std::string pin_name)
     return 1;
   }
   if (starts_with(pin_name, "A")) {
-    if (pin = try_parse_int(pin_name.substr(1)) != -1) {
-      return pin + 14;
+    if (auto pin = try_parse_int(pin_name.substr(1))  ) {
+      return pin.value() + 14;
     }
   }
   if (starts_with(pin_name, "D")) {
-    if (pin = try_parse_int(pin_name.substr(1)) != -1) {
-      return std::clamp(pin, 0, 13);
+    if (auto pin = try_parse_int(pin_name.substr(1))  ) {
+      return std::clamp(pin.value(), 0, 13);
     }
   }
   std::cerr << "Not implemented: atmega328p::resolvePin : " << pin_name << std::endl;

@@ -5,7 +5,7 @@
       left:
         name: left
         device: mirte
-        pi.ns:
+        pins:
           trigger: GP9
           echo: GP8
       right:
@@ -16,7 +16,8 @@
           echo: GP6
     device:
       mirte:
-        type: breadboard
+        type: pcb
+        version: 0.8
         board: pico
 
     #encoder:

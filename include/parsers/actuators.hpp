@@ -1,5 +1,6 @@
 #pragma once
 #include "parsers/parsers.hpp"
+#include "mirte-board.hpp"
 
 class Servo_data
 {
