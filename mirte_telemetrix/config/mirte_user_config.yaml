@@ -18,13 +18,13 @@ mirte_telemetrix:
 #        device: mirte
 #        pins:
 #          pin: GP28
-#    intensity:
-#      left:
-#        name: left
-#        device: mirte
-#        pins:
-#          analog: GP27
-#          digital: GP17
+    intensity:
+      left:
+        name: left
+        device: mirte
+        pins:
+          analog: GP27
+          digital: GP17
 #    oled:
 #      left:
 #        name: left

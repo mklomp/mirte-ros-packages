@@ -63,8 +63,6 @@ async def analog_write(board, pin, value):
     else:
         await board.analog_write(pin, value)
 
-print("Hier")
-
 # Import ROS message types
 from std_msgs.msg import Header, Int32
 from sensor_msgs.msg import Range
@@ -84,7 +82,6 @@ font = ImageFont.load_default()
 
 from adafruit_ssd1306 import _SSD1306
 
-print("en hier")
 
 import mirte_telemetrix.mappings.default
 import mirte_telemetrix.mappings.nanoatmega328
@@ -92,7 +89,6 @@ import mirte_telemetrix.mappings.pico
 import mirte_telemetrix.mappings.blackpill_f103c8
 import mirte_telemetrix.mappings.pcb
 
-print("error?")
 
 board_mapping = mirte_telemetrix.mappings.default
 
@@ -121,7 +117,6 @@ if devices["mirte"]["type"].get_parameter_value().string_value == "breadboard":
             board_mapping = mirte_telemetrix.mappings.pico
         else:
             board_mapping = mirte_telemetrix.mappings.default
-print("3")
 
 
 def get_pin_numbers(component):
@@ -1101,7 +1096,6 @@ async def rosspin():
 def main(arg=None):
     loop = asyncio.new_event_loop()
 
-    print("main1")
 
     # Initialize the telemetrix board
     if board_mapping.get_mcu() == "pico":
@@ -1147,7 +1141,6 @@ def main(arg=None):
     for task in all_tasks:
         loop.run_until_complete(task)
 
-    print("main2")
 
     # Is equivalent to rclpy.spin(node) in a sense that this
     # will just keep the node running only in a asyncio
@@ -1160,15 +1153,12 @@ def main(arg=None):
         #asyncio.run(task_ros2)
 #        await asyncio.gather(task_ros2)
         #loop.run_until_complete(rosspin())
-#        loop.run_forever()   # this will make teh sensors work
-        rclpy.spin(node)      # this will make the actuators work
-       
-        print("main3")
+        loop.run_forever()   # this will make teh sensors work
+#        rclpy.spin(node)      # this will make the actuators work
 
     except:
         pass
     finally:
-        print("ffddfffd")
         node.on_shutdown()
 
     shutdown(loop, board)
