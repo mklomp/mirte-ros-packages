@@ -8,7 +8,8 @@ Mirte_Actuators::Mirte_Actuators(
   this->nh = nh;
   this->board = board;
   this->actuators = Motor::get_motors(nh, tmx, board);
-  parse_servo_data(parser, board);
+  auto servos = Servo_data::parse_servo_data(parser, board);
+  auto motors = Motor_data::parse_motor_data(parser, board);
 }
 
 Mirte_Actuator::Mirte_Actuator(

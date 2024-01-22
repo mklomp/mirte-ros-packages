@@ -47,7 +47,7 @@ void mirte_node::start(std::shared_ptr<rclcpp::Node> s_node)
   s_tmx->setScanDelay(10);
   // auto s_node = std::make_shared<rclcpp::Node>(this);
   // Your code here
-  Mirte_Sensors monitor(s_node, s_tmx, s_board);
+  Mirte_Sensors monitor(s_node, s_tmx, s_board, p_s);
   Mirte_Actuators actuators(s_node, s_tmx, s_board, p_s);
 
   // Mirte_Ping ping( s_node,s_tmx, [&]() {

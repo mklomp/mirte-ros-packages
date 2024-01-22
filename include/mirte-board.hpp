@@ -5,7 +5,8 @@ using connector_map = std::map<std::string, pin_map>;
 
 #ifndef MIRTE_BOARD_HPP
 #define MIRTE_BOARD_HPP
-#include "rclcpp/rclcpp.hpp"
+#include <ros.hpp>
+
 #include <tmx.hpp>
 #include <memory>
 #include <vector>

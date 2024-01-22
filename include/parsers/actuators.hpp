@@ -5,16 +5,24 @@
 class Servo_data
 {
 public:
-  std::string name;
-  pin_t pin;
-  int min_pulse;
-  int max_pulse;
+  std::string name = "";
+  pin_t pin = -1;
+  int min_pulse = 0;
+  int max_pulse = 0;
   Servo_data(std::string name, pin_t pin, int min_pulse, int max_pulse)
   {
     this->name = name;
     this->pin = pin;
     this->min_pulse = min_pulse;
     this->max_pulse = max_pulse;
+  }
+  Servo_data() {}
+  static std::vector<std::shared_ptr<Servo_data>> parse_servo_data(
+    std::shared_ptr<Parser> parser,
+    std::shared_ptr<Mirte_Board> board);
+  bool check()
+  {
+    return pin != -1 && name != "";
   }
 };
 
@@ -38,12 +46,25 @@ public:
     this->type = type;
   }
   Motor_data() {}
+
+  static std::vector<std::shared_ptr<Motor_data>> parse_motor_data(
+    std::shared_ptr<Parser> parser,
+    std::shared_ptr<Mirte_Board> board);
+  bool check()
+  {
+    switch (type) {
+      case Motor_type::PP:
+        return P1 != -1 && P2 != -1 && name != "";
+        break;
+      case Motor_type::DP:
+        return P1 != -1 && D1 != -1 && name != "";
+        break;
+      case Motor_type::DDP:
+        return P1 != -1 && D2 != -1 && D1 != -1 && name != "";
+        break;
+      default:
+        return false;
+        break;
+    }
+  }
 };
-
-std::vector<std::shared_ptr<Servo_data>> parse_servo_data(
-  std::shared_ptr<Parser> parser,
-  std::shared_ptr<Mirte_Board> board);
-
-std::vector<std::shared_ptr<Motor_data>> parse_motor_data(
-  std::shared_ptr<Parser> parser,
-  std::shared_ptr<Mirte_Board> board);

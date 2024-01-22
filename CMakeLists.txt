@@ -10,7 +10,8 @@ add_compile_options(-std=c++17)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(mirte_msgs REQUIRED)
-
+find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 
 ###########
@@ -58,6 +59,7 @@ add_executable(${PROJECT_NAME}_node
    src/mirte-ping.cpp
    src/parsers/actuators.cpp
    src/parsers/parsers.cpp
+   src/parsers/sensors.cpp
    libs/tmx-cpp/src/tmx.cpp
     libs/tmx-cpp/src/buffer_build.cpp
     libs/tmx-cpp/src/sensors.cpp
@@ -66,7 +68,7 @@ add_executable(${PROJECT_NAME}_node
 )
 ament_target_dependencies(
   ${PROJECT_NAME}_node
-   std_msgs mirte_msgs rclcpp
+   std_msgs mirte_msgs rclcpp sensor_msgs
 #  DEPENDS system_lib
 ) 
 find_package(Boost REQUIRED COMPONENTS system thread)
