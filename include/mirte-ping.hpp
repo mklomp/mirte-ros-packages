@@ -1,16 +1,14 @@
 #pragma once
-#include <functional>
-#include <thread>
-#include <vector>
 #include "rclcpp/rclcpp.hpp"
-#include <tmx.hpp>
+#include <functional>
 #include <memory>
-class Mirte_Ping
-{
+#include <thread>
+#include <tmx.hpp>
+#include <vector>
+class Mirte_Ping {
 public:
-  Mirte_Ping(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
-    std::function<void()> stop_func);
+  Mirte_Ping(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+             std::function<void()> stop_func);
   std::shared_ptr<TMX> tmx;
   std::shared_ptr<rclcpp::Node> nh;
   void ping_task();

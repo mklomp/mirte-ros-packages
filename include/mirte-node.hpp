@@ -4,12 +4,10 @@
 #include "mirte-ping.hpp"
 #include "mirte-sensors.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include <tmx.hpp>
 #include <memory>
+#include <tmx.hpp>
 
-
-class mirte_node : public rclcpp::Node
-{
+class mirte_node : public rclcpp::Node {
 private:
   /* data */
 
