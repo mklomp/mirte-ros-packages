@@ -169,8 +169,8 @@ IntensityMonitor::get_intensity_monitors(node_handle nh,
   auto irs = Intensity_data::parse_intensity_data(parser, board);
   for (auto ir : irs) {
     if (ir->a_pin != -1) {
-      // sensors.push_back(std::make_shared<Analog_IntensityMonitor>(nh, tmx,
-      // board, ir));
+      sensors.push_back(
+          std::make_shared<Analog_IntensityMonitor>(nh, tmx, board, ir));
     }
     if (ir->d_pin != -1) {
       sensors.push_back(
@@ -186,8 +186,8 @@ void Digital_IntensityMonitor::callback(uint16_t value) {
 }
 
 void Digital_IntensityMonitor::publish() {
-  std_msgs_bool msg;
-  msg.data = this->value;
+  mirte_msgs_intensity_digital msg;
+  msg.value = this->value;
   this->intensity_pub->publish(msg);
 }
 
@@ -198,8 +198,14 @@ Digital_IntensityMonitor::Digital_IntensityMonitor(
     : IntensityMonitor(nh, tmx, board, {intensity_data->d_pin},
                        intensity_data->name) {
   this->intensity_data = intensity_data;
-  intensity_pub = nh->create_publisher<std_msgs_bool>(
+  intensity_pub = nh->create_publisher<mirte_msgs_intensity_digital>(
       "/mirte/intensity/" + intensity_data->name + "_digital", 1);
+
+  this->intensity_service =
+      nh->create_service<mirte_msgs_get_intensity_digital>(
+          "/mirte/get_intensity_" + intensity_data->name + "_digital",
+          std::bind(&Digital_IntensityMonitor::service_callback, this,
+                    std::placeholders::_1, std::placeholders::_2));
   tmx->setPinMode(intensity_data->d_pin, TMX::PIN_MODES::DIGITAL_INPUT, true,
                   0);
   tmx->add_digital_callback(
@@ -207,3 +213,47 @@ Digital_IntensityMonitor::Digital_IntensityMonitor(
       [this](auto pin, auto value) { this->callback(value); });
 }
 
+Analog_IntensityMonitor::Analog_IntensityMonitor(
+    node_handle nh, std::shared_ptr<TMX> tmx,
+    std::shared_ptr<Mirte_Board> board,
+    std::shared_ptr<Intensity_data> intensity_data)
+    : IntensityMonitor(nh, tmx, board, {intensity_data->a_pin},
+                       intensity_data->name) {
+  this->intensity_data = intensity_data;
+  intensity_pub = nh->create_publisher<mirte_msgs_intensity>(
+      "/mirte/intensity/" + intensity_data->name, 1);
+
+  this->intensity_service = nh->create_service<mirte_msgs_get_intensity>(
+      "/mirte/get_intensity_" + intensity_data->name,
+      std::bind(&Analog_IntensityMonitor::service_callback, this,
+                std::placeholders::_1, std::placeholders::_2));
+  tmx->setPinMode(intensity_data->a_pin, TMX::PIN_MODES::ANALOG_INPUT, true, 0);
+  tmx->add_analog_callback(intensity_data->a_pin, [this](auto pin, auto value) {
+    this->callback(value);
+  });
+}
+
+void Analog_IntensityMonitor::callback(uint16_t value) {
+  this->value = value;
+  this->publish();
+}
+
+void Analog_IntensityMonitor::publish() {
+  mirte_msgs_intensity msg;
+  msg.value = this->value;
+  this->intensity_pub->publish(msg);
+}
+
+bool Digital_IntensityMonitor::service_callback(
+    const std::shared_ptr<mirte_msgs_get_intensity_digital::Request> req,
+    std::shared_ptr<mirte_msgs_get_intensity_digital::Response> res) {
+  res->data = this->value;
+  return true;
+}
+
+bool Analog_IntensityMonitor::service_callback(
+    const std::shared_ptr<mirte_msgs_get_intensity::Request> req,
+    std::shared_ptr<mirte_msgs_get_intensity::Response> res) {
+  res->data = this->value;
+  return true;
+}

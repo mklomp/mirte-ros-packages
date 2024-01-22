@@ -31,12 +31,12 @@ void mirte_node::start(std::shared_ptr<rclcpp::Node> s_node) {
   // parse_servo_data(s_node);
   auto p_s = std::make_shared<Parser>(p);
   std::shared_ptr<Mirte_Board> s_board = Mirte_Board::create(p_s);
-  auto s = s_board->resolveConnector("LED");
-  std::cout << "LED" << std::endl;
-  for (auto i : s) {
-    std::cout << i.first << " " << i.second << std::endl;
-  }
-  return;
+  // auto s = s_board->resolveConnector("LED");
+  // std::cout << "LED" << std::endl;
+  // for (auto i : s) {
+  //   std::cout << i.first << " " << i.second << std::endl;
+  // }
+  // return;
   auto s_tmx = std::make_shared<TMX>("/dev/null");
   s_tmx->sendMessage(TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
   s_tmx->setScanDelay(10);

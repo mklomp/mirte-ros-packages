@@ -102,5 +102,25 @@ public:
   void publish();
   void callback(uint16_t value);
   bool value;
-  publisher<std_msgs_bool> intensity_pub;
+  publisher<mirte_msgs_intensity_digital> intensity_pub;
+
+  service<mirte_msgs_get_intensity_digital> intensity_service;
+  bool service_callback(
+      const std::shared_ptr<mirte_msgs_get_intensity_digital::Request> req,
+      std::shared_ptr<mirte_msgs_get_intensity_digital::Response> res);
+};
+
+class Analog_IntensityMonitor : public IntensityMonitor {
+public:
+  Analog_IntensityMonitor(node_handle nh, std::shared_ptr<TMX> tmx,
+                          std::shared_ptr<Mirte_Board> board,
+                          std::shared_ptr<Intensity_data> intensity_data);
+  void publish();
+  void callback(uint16_t value);
+  uint16_t value;
+  publisher<mirte_msgs_intensity> intensity_pub;
+  service<mirte_msgs_get_intensity> intensity_service;
+  bool
+  service_callback(const std::shared_ptr<mirte_msgs_get_intensity::Request> req,
+                   std::shared_ptr<mirte_msgs_get_intensity::Response> res);
 };
