@@ -24,29 +24,21 @@ mirte_node::mirte_node(/* args */)
 
 }
 
-mirte_node::~mirte_node() {}
+mirte_node::~mirte_node() { this->s_tmx->stop(); }
 
 void mirte_node::start(std::shared_ptr<rclcpp::Node> s_node) {
   Parser p(s_node);
-  // parse_servo_data(s_node);
   auto p_s = std::make_shared<Parser>(p);
   std::shared_ptr<Mirte_Board> s_board = Mirte_Board::create(p_s);
-  // auto s = s_board->resolveConnector("LED");
-  // std::cout << "LED" << std::endl;
-  // for (auto i : s) {
-  //   std::cout << i.first << " " << i.second << std::endl;
-  // }
-  // return;
-  auto s_tmx = std::make_shared<TMX>("/dev/null");
+  auto s_tmx = std::make_shared<TMX>("/dev/ttyACM0");
   s_tmx->sendMessage(TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
   s_tmx->setScanDelay(10);
-  // auto s_node = std::make_shared<rclcpp::Node>(this);
-  // Your code here
-  Mirte_Sensors monitor(s_node, s_tmx, s_board, p_s);
-  Mirte_Actuators actuators(s_node, s_tmx, s_board, p_s);
-
-  // Mirte_Ping ping( s_node,s_tmx, [&]() {
-  //     std::cout << "stop" << std::endl;
-  //     rclcpp::shutdown();
-  //   });
+  this->actuators =
+      std::make_shared<Mirte_Actuators>(s_node, s_tmx, s_board, p_s);
+  this->monitor = std::make_shared<Mirte_Sensors>(s_node, s_tmx, s_board, p_s);
+  std::cout << "done adding" << std::endl;
+  this->ping = std::make_shared<Mirte_Ping>(s_node, s_tmx, [&]() {
+    std::cout << "stop" << std::endl;
+    rclcpp::shutdown();
+  });
 }

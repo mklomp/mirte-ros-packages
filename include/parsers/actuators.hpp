@@ -6,7 +6,7 @@ class Servo_data
 {
 public:
   std::string name = "";
-  pin_t pin = -1;
+  pin_t pin =(pin_t)-1;
   int min_pulse = 0;
   int max_pulse = 0;
   Servo_data(std::string name, pin_t pin, int min_pulse, int max_pulse)
@@ -22,7 +22,7 @@ public:
     std::shared_ptr<Mirte_Board> board);
   bool check()
   {
-    return pin != -1 && name != "";
+    return pin !=(pin_t)-1 && name != "";
   }
 };
 
@@ -30,10 +30,10 @@ class Motor_data
 {
 public:
   std::string name;
-  pin_t P1 = -1;
-  pin_t P2 = -1;
-  pin_t D1 = -1;
-  pin_t D2 = -1;
+  pin_t P1 =(pin_t)-1;
+  pin_t P2 =(pin_t)-1;
+  pin_t D1 =(pin_t)-1;
+  pin_t D2 =(pin_t)-1;
   bool inverted = false;
   enum class Motor_type
   {
@@ -54,13 +54,13 @@ public:
   {
     switch (type) {
       case Motor_type::PP:
-        return P1 != -1 && P2 != -1 && name != "";
+        return P1 != (pin_t)-1 && P2 != (pin_t)-1 && name != "";
         break;
       case Motor_type::DP:
-        return P1 != -1 && D1 != -1 && name != "";
+        return P1 != (pin_t)-1 && D1 !=(pin_t)-1 && name != "";
         break;
       case Motor_type::DDP:
-        return P1 != -1 && D2 != -1 && D1 != -1 && name != "";
+        return P1 !=(pin_t)-1 && D2 !=(pin_t)-1 && D1 !=(pin_t)-1 && name != "";
         break;
       default:
         return false;

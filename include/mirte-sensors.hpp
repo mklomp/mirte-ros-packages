@@ -13,6 +13,17 @@ public:
   node_handle nh;
   std::shared_ptr<Mirte_Board> board;
   std::vector<std::shared_ptr<Mirte_Sensor>> sensors;
+  rclcpp::TimerBase::SharedPtr timer;
+  void publish();
+  void stop();
+
+  service<mirte_msgs_get_pin_value> pin_service;
+  enum class PIN_USE { DIGITAL_IN, DIGITAL_OUT, ANALOG_IN, ANALOG_OUT, UNUSED };
+  std::map<pin_t, std::tuple<PIN_USE, int, bool, bool>>
+      pin_map; // pin -> (is_digital, value,analog_cb, digital_cb )
+  bool
+  pin_callback(const std::shared_ptr<mirte_msgs_get_pin_value::Request> req,
+               std::shared_ptr<mirte_msgs_get_pin_value::Response> res);
 };
 
 class Mirte_Sensor {
@@ -23,6 +34,7 @@ public:
   std::vector<uint8_t> pins;
   virtual void publish() = 0;
   std::string name;
+  virtual void stop() {}
   auto get_header() {
     std_msgs::msg::Header header;
     header.stamp = nh->now();

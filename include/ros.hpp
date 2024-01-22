@@ -38,6 +38,9 @@ using mirte_msgs_get_intensity_digital = mirte_msgs::srv::GetIntensityDigital;
 #include "mirte_msgs/srv/get_intensity.hpp"
 using mirte_msgs_get_intensity = mirte_msgs::srv::GetIntensity;
 
+#include "mirte_msgs/srv/get_pin_value.hpp"
+using mirte_msgs_get_pin_value = mirte_msgs::srv::GetPinValue;
+
 #elif TMX_ROS_VERSION == 1
 
 #endif

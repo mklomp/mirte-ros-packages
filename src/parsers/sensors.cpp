@@ -5,10 +5,10 @@ std::vector<std::shared_ptr<Sonar_data>> Sonar_data::parse_sonar_data(
   std::shared_ptr<Mirte_Board> board)
 {
   std::vector<std::shared_ptr<Sonar_data>> sonars;
-  for (auto name : parser->get_params_keys("sonar")) {
+  for (auto name : parser->get_params_keys("distance")) {
     Sonar_data sonar_data;
     sonar_data.name = name;
-    auto sonar_key = parser->build_param_name("sonar", name);
+    auto sonar_key = parser->build_param_name("distance", name);
     auto sonar_config = parser->get_params_name(sonar_key);
     auto sonar_keys = parser->get_params_keys(sonar_key);
     if (sonar_config.count("connector")) {

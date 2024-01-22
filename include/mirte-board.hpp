@@ -23,6 +23,7 @@ public:
   // std::shared_ptr<TMX> tmx;
   // std::shared_ptr<rclcpp::Node> nh;
   virtual int get_adc_bits() = 0;
+  virtual int get_max_pwm() = 0;
   // std::vector<uint8_t> resolvePins(std::string pin);
   virtual int resolvePin(std::string pin) = 0;
   virtual std::map<std::string, int>
@@ -36,6 +37,7 @@ public:
   std::map<std::string, int> resolveConnector(std::string connector);
   int resolvePin(std::string pin);
   int get_adc_bits();
+  int get_max_pwm() { return 255; }
 };
 class Mirte_Board_pico : public Mirte_Board {
 public:
@@ -46,6 +48,7 @@ public:
   std::map<std::string, int> resolveConnector(std::string connector);
   int resolvePin(std::string pin);
   int get_adc_bits() { return 12; }
+  int get_max_pwm() { return 20000; } // TODO: check with actual board
 };
 
 class Mirte_Board_pcb : public Mirte_Board {
@@ -58,6 +61,7 @@ public:
   std::map<std::string, int> resolveConnector(std::string connector);
   int resolvePin(std::string pin);
   int get_adc_bits() { return mcu->get_adc_bits(); }
+  int get_max_pwm() { return mcu->get_max_pwm(); }
   std::string version;
   connector_map connectors = mirte_pico_pcb_map08;
 };

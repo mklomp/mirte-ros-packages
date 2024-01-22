@@ -60,18 +60,20 @@ std::vector<std::shared_ptr<Motor_data>> Motor_data::parse_motor_data(
     Motor_data motor_data;
     motor_data.name = name;
     if (motor_keys.count("pins")) {
+      std::cout << name << "pins" << std::endl;
       auto pins_config = parser->get_params_name(parser->build_param_name(motor_key, "pins"));
       for (auto pin_key : parser->get_params_keys(parser->build_param_name(motor_key, "pins"))) {
-        if ("P1" == pin_key) {
+        boost::algorithm::to_lower(pin_key);
+        if ("p1" == pin_key) {
           motor_data.P1 = board->resolvePin(pins_config[pin_key].get<std::string>());
         }
-        if ("P2" == pin_key) {
+        if ("p2" == pin_key) {
           motor_data.P2 = board->resolvePin(pins_config[pin_key].get<std::string>());
         }
-        if ("D1" == pin_key) {
+        if ("p1" == pin_key) {
           motor_data.D1 = board->resolvePin(pins_config[pin_key].get<std::string>());
         }
-        if ("D2" == pin_key) {
+        if ("p2" == pin_key) {
           motor_data.D2 = board->resolvePin(pins_config[pin_key].get<std::string>());
         }
       }
