@@ -12,6 +12,7 @@ import io
 from inspect import signature
 from tmx_pico_aio import tmx_pico_aio
 from telemetrix_aio import telemetrix_aio
+import threading
 
 
 rclpy.init(args=sys.argv)
@@ -1153,15 +1154,31 @@ def main(arg=None):
         #asyncio.run(task_ros2)
 #        await asyncio.gather(task_ros2)
         #loop.run_until_complete(rosspin())
+        spin(node)
         loop.run_forever()   # this will make teh sensors work
 #        rclpy.spin(node)      # this will make the actuators work
-
     except:
         pass
     finally:
         node.on_shutdown()
 
     shutdown(loop, board)
+
+
+def spin(node: Node):
+    # cancel = node.create_guard_condition(lambda: None)
+    def _spin(node: Node,
+              future: asyncio.Future,
+              event_loop: asyncio.AbstractEventLoop):
+        while not future.cancelled():
+            rclpy.spin_once(node)
+        if not future.cancelled():
+            event_loop.call_soon_threadsafe(future.set_result, None)
+    event_loop = asyncio.get_event_loop()
+    spin_task = event_loop.create_future()
+    spin_thread = threading.Thread(target=_spin, args=(node, spin_task, event_loop))
+    spin_thread.start()
+
 
 def start():
    main()
