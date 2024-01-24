@@ -1,6 +1,6 @@
 #include "mirte-sensors.hpp"
 #include "parsers/sensors.hpp"
-Mirte_Sensors::Mirte_Sensors(node_handle nh, std::shared_ptr<TMX> tmx,
+Mirte_Sensors::Mirte_Sensors(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
                              std::shared_ptr<Mirte_Board> board,
                              std::shared_ptr<Parser> parser) {
   this->tmx = tmx;
@@ -18,15 +18,15 @@ Mirte_Sensors::Mirte_Sensors(node_handle nh, std::shared_ptr<TMX> tmx,
       std::chrono::milliseconds(1000 / parser->get_frequency()),
       std::bind(&Mirte_Sensors::publish, this));
 
-  this->pin_service = nh->create_service<mirte_msgs_get_pin_value>(
+  this->pin_service = nh->create_service<mirte_msgs::srv::GetPinValue>(
       "/mirte/get_pin_value",
       std::bind(&Mirte_Sensors::pin_callback, this, std::placeholders::_1,
                 std::placeholders::_2));
 }
 
 bool Mirte_Sensors::pin_callback(
-    const std::shared_ptr<mirte_msgs_get_pin_value::Request> req,
-    std::shared_ptr<mirte_msgs_get_pin_value::Response> res) {
+    const std::shared_ptr<mirte_msgs::srv::GetPinValue::Request> req,
+    std::shared_ptr<mirte_msgs::srv::GetPinValue::Response> res) {
   // calculate time for this function
   auto start2 = std::chrono::system_clock::now();
   bool is_digital = starts_with(req->type, "d") || starts_with(req->type, "D");
@@ -118,7 +118,7 @@ void Mirte_Sensors::stop() {
 }
 
 std::vector<std::shared_ptr<KeypadMonitor>>
-KeypadMonitor::get_keypad_monitors(node_handle nh, std::shared_ptr<TMX> tmx,
+KeypadMonitor::get_keypad_monitors(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
                                    std::shared_ptr<Mirte_Board> board,
                                    std::shared_ptr<Parser> parser) {
   std::vector<std::shared_ptr<KeypadMonitor>> sensors;
@@ -131,7 +131,7 @@ KeypadMonitor::get_keypad_monitors(node_handle nh, std::shared_ptr<TMX> tmx,
   // TODO: schedule periodic publishing
 }
 
-Mirte_Sensor::Mirte_Sensor(node_handle nh, std::shared_ptr<TMX> tmx,
+Mirte_Sensor::Mirte_Sensor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
                            std::shared_ptr<Mirte_Board> board,
                            std::vector<uint8_t> pins, std::string name) {
   this->tmx = tmx;
@@ -141,7 +141,7 @@ Mirte_Sensor::Mirte_Sensor(node_handle nh, std::shared_ptr<TMX> tmx,
   this->board = board;
 }
 
-KeypadMonitor::KeypadMonitor(node_handle nh, std::shared_ptr<TMX> tmx,
+KeypadMonitor::KeypadMonitor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
                              std::shared_ptr<Mirte_Board> board,
                              std::shared_ptr<Keypad_data> keypad_data)
     : Mirte_Sensor(nh, tmx, board, {keypad_data->pin}, keypad_data->name) {
@@ -219,7 +219,7 @@ void KeypadMonitor::publish() {
 }
 
 std::vector<std::shared_ptr<SonarMonitor>>
-SonarMonitor::get_sonar_monitors(node_handle nh, std::shared_ptr<TMX> tmx,
+SonarMonitor::get_sonar_monitors(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
                                  std::shared_ptr<Mirte_Board> board,
                                  std::shared_ptr<Parser> parser) {
   std::vector<std::shared_ptr<SonarMonitor>> sensors;
@@ -231,15 +231,15 @@ SonarMonitor::get_sonar_monitors(node_handle nh, std::shared_ptr<TMX> tmx,
   return sensors;
 }
 
-SonarMonitor::SonarMonitor(node_handle nh, std::shared_ptr<TMX> tmx,
+SonarMonitor::SonarMonitor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
                            std::shared_ptr<Mirte_Board> board,
                            std::shared_ptr<Sonar_data> sonar_data)
     : Mirte_Sensor(nh, tmx, board, {sonar_data->trigger, sonar_data->echo},
                    sonar_data->name) {
   this->sonar_data = sonar_data;
-  sonar_pub = nh->create_publisher<sensor_msgs_range>(
+  sonar_pub = nh->create_publisher<sensor_msgs::msg::Range>(
       "/mirte/distance/" + sonar_data->name, 1);
-  this->sonar_service = nh->create_service<mirte_msgs_get_distance>(
+  this->sonar_service = nh->create_service<mirte_msgs::srv::GetDistance>(
       "/mirte/get_distance_" + sonar_data->name,
       std::bind(&SonarMonitor::service_callback, this, std::placeholders::_1,
                 std::placeholders::_2));
@@ -252,9 +252,9 @@ void SonarMonitor::callback(uint16_t value) {
   this->publish();
 }
 void SonarMonitor::publish() {
-  sensor_msgs_range msg;
+  sensor_msgs::msg::Range msg;
   msg.header = this->get_header();
-  msg.radiation_type = sensor_msgs_range::ULTRASOUND;
+  msg.radiation_type = sensor_msgs::msg::Range::ULTRASOUND;
   msg.field_of_view = M_PI * 0.5; // 90 degrees, TODO: check real value
   msg.min_range = 0.02;
   msg.max_range = 1.5;
@@ -263,26 +263,26 @@ void SonarMonitor::publish() {
 }
 
 bool SonarMonitor::service_callback(
-    const std::shared_ptr<mirte_msgs_get_distance::Request> req,
-    std::shared_ptr<mirte_msgs_get_distance::Response> res) {
+    const std::shared_ptr<mirte_msgs::srv::GetDistance::Request> req,
+    std::shared_ptr<mirte_msgs::srv::GetDistance::Response> res) {
   res->data = this->value / 1000.0;
   return true;
 }
 
 std::vector<std::shared_ptr<IntensityMonitor>>
-IntensityMonitor::get_intensity_monitors(node_handle nh,
+IntensityMonitor::get_intensity_monitors(std::shared_ptr<rclcpp::Node> nh,
                                          std::shared_ptr<TMX> tmx,
                                          std::shared_ptr<Mirte_Board> board,
                                          std::shared_ptr<Parser> parser) {
   std::vector<std::shared_ptr<IntensityMonitor>> sensors;
   auto irs = Intensity_data::parse_intensity_data(parser, board);
   for (auto ir : irs) {
-    if (ir->a_pin != -1) {
+    if (ir->a_pin != (pin_t)-1) {
       sensors.push_back(
           std::make_shared<Analog_IntensityMonitor>(nh, tmx, board, ir));
       std::cout << "add analog intensity" << ir->name << std::endl;
     }
-    if (ir->d_pin != -1) {
+    if (ir->d_pin != (pin_t)-1) {
       sensors.push_back(
           std::make_shared<Digital_IntensityMonitor>(nh, tmx, board, ir));
       std::cout << "add digital intensity" << ir->name << std::endl;
@@ -297,23 +297,23 @@ void Digital_IntensityMonitor::callback(uint16_t value) {
 }
 
 void Digital_IntensityMonitor::publish() {
-  mirte_msgs_intensity_digital msg;
+  mirte_msgs::msg::IntensityDigital msg;
   msg.value = this->value;
   this->intensity_pub->publish(msg);
 }
 
 Digital_IntensityMonitor::Digital_IntensityMonitor(
-    node_handle nh, std::shared_ptr<TMX> tmx,
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
     std::shared_ptr<Mirte_Board> board,
     std::shared_ptr<Intensity_data> intensity_data)
     : IntensityMonitor(nh, tmx, board, {intensity_data->d_pin},
                        intensity_data->name) {
   this->intensity_data = intensity_data;
-  intensity_pub = nh->create_publisher<mirte_msgs_intensity_digital>(
+  intensity_pub = nh->create_publisher<mirte_msgs::msg::IntensityDigital>(
       "/mirte/intensity/" + intensity_data->name + "_digital", 1);
 
   this->intensity_service =
-      nh->create_service<mirte_msgs_get_intensity_digital>(
+      nh->create_service<mirte_msgs::srv::GetIntensityDigital>(
           "/mirte/get_intensity_" + intensity_data->name + "_digital",
           std::bind(&Digital_IntensityMonitor::service_callback, this,
                     std::placeholders::_1, std::placeholders::_2));
@@ -325,16 +325,16 @@ Digital_IntensityMonitor::Digital_IntensityMonitor(
 }
 
 Analog_IntensityMonitor::Analog_IntensityMonitor(
-    node_handle nh, std::shared_ptr<TMX> tmx,
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
     std::shared_ptr<Mirte_Board> board,
     std::shared_ptr<Intensity_data> intensity_data)
     : IntensityMonitor(nh, tmx, board, {intensity_data->a_pin},
                        intensity_data->name) {
   this->intensity_data = intensity_data;
-  intensity_pub = nh->create_publisher<mirte_msgs_intensity>(
+  intensity_pub = nh->create_publisher<mirte_msgs::msg::Intensity>(
       "/mirte/intensity/" + intensity_data->name, 1);
 
-  this->intensity_service = nh->create_service<mirte_msgs_get_intensity>(
+  this->intensity_service = nh->create_service<mirte_msgs::srv::GetIntensity>(
       "/mirte/get_intensity_" + intensity_data->name,
       std::bind(&Analog_IntensityMonitor::service_callback, this,
                 std::placeholders::_1, std::placeholders::_2));
@@ -350,21 +350,21 @@ void Analog_IntensityMonitor::callback(uint16_t value) {
 }
 
 void Analog_IntensityMonitor::publish() {
-  mirte_msgs_intensity msg;
+  mirte_msgs::msg::Intensity msg;
   msg.value = this->value;
   this->intensity_pub->publish(msg);
 }
 
 bool Digital_IntensityMonitor::service_callback(
-    const std::shared_ptr<mirte_msgs_get_intensity_digital::Request> req,
-    std::shared_ptr<mirte_msgs_get_intensity_digital::Response> res) {
+    const std::shared_ptr<mirte_msgs::srv::GetIntensityDigital::Request> req,
+    std::shared_ptr<mirte_msgs::srv::GetIntensityDigital::Response> res) {
   res->data = this->value;
   return true;
 }
 
 bool Analog_IntensityMonitor::service_callback(
-    const std::shared_ptr<mirte_msgs_get_intensity::Request> req,
-    std::shared_ptr<mirte_msgs_get_intensity::Response> res) {
+    const std::shared_ptr<mirte_msgs::srv::GetIntensity::Request> req,
+    std::shared_ptr<mirte_msgs::srv::GetIntensity::Response> res) {
   res->data = this->value;
   return true;
 }

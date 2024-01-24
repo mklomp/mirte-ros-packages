@@ -5,15 +5,13 @@ using connector_map = std::map<std::string, pin_map>;
 
 #ifndef MIRTE_BOARD_HPP
 #define MIRTE_BOARD_HPP
-#include <ros.hpp>
 
 #include "parsers/parsers.hpp"
+#include <map>     // for map, map<>::value_compare
+#include <memory>  // for shared_ptr, __shared_ptr_access
+#include <string>  // for string, basic_string, operator<
 #include "pcbs/v06.hpp"
 #include "pcbs/v08.hpp"
-#include "util.hpp"
-#include <memory>
-#include <tmx.hpp>
-#include <vector>
 
 class Mirte_Board {
 public:

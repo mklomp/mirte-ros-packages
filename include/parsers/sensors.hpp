@@ -1,8 +1,11 @@
 #pragma once
 
-#include "parsers.hpp"
+#include "parsers/parsers.hpp"
 #include "mirte-board.hpp"
-
+#include <memory>
+#include <tmx.hpp>
+#include <vector>
+#include <string>
 class Sonar_data
 {
 public:
@@ -21,7 +24,7 @@ public:
     std::shared_ptr<Mirte_Board> board);
   bool check()
   {
-    return trigger != -1 && echo != -1 && name != "";
+    return trigger != (pin_t)-1 && echo != (pin_t)-1 && name != "";
   }
 };
 
@@ -29,8 +32,8 @@ class Intensity_data
 {
 public:
   std::string name = "";
-  pin_t a_pin = -1;
-  pin_t d_pin = -1;
+  pin_t a_pin = (pin_t)-1;
+  pin_t d_pin = (pin_t)-1;
   Intensity_data(std::string name, pin_t a_pin, pin_t d_pin)
   {
     this->name = name;
@@ -43,7 +46,7 @@ public:
     std::shared_ptr<Mirte_Board> board);
   bool check()
   {
-    return (a_pin != -1 || d_pin != -1) && name != "";
+    return (a_pin != (pin_t)-1 || d_pin != (pin_t)-1) && name != "";
   }
 };
 
@@ -51,7 +54,7 @@ public:
 class Keypad_data {
 public:
   std::string name;
-  pin_t pin = -1;
+  pin_t pin = (pin_t)-1;
   Keypad_data(std::string name, pin_t pin)
   {
     this->name = name;
@@ -63,6 +66,6 @@ public:
     std::shared_ptr<Mirte_Board> board);
   bool check()
   {
-    return pin!=-1 && name != "";
+    return pin!=(pin_t)-1 && name != "";
   }
 };
