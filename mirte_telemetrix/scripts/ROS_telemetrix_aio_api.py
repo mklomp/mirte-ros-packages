@@ -348,10 +348,10 @@ class ColorSensorMonitor(SensorMonitor):
     async def publish_data(self, data):
         color = Color()
         color.header = self.get_header()
-        color.r = (data[0] | data[1] << 8)/(255*255/100)
-        color.g = (data[2] | data[3] << 8)/(255*255/100)
-        color.b = (data[4] | data[5] << 8)/(255*255/100)
-        #w = (data[6] | data[7] << 8)/(255*255/100)
+        color.r = (data[0] | data[1] << 8)
+        color.g = (data[2] | data[3] << 8)
+        color.b = (data[4] | data[5] << 8)
+        color.w = (data[6] | data[7] << 8)
         await self.publish(color)
 
 
