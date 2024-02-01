@@ -47,6 +47,7 @@ oled:
     pins:
       sda: GP10
       scl: GP11
+color:
   right:
     name: right
     device: mirte

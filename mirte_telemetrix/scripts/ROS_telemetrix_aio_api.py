@@ -325,6 +325,36 @@ class AnalogIntensitySensorMonitor(SensorMonitor):
         await self.publish(intensity)
 
 
+class ColorSensorMonitor(SensorMonitor):
+    def __init__(self, board, sensor, port):
+        pub = rospy.Publisher(
+            "/mirte/color/" + sensor["name"], Color, queue_size=100
+        )
+        srv = rospy.Service(
+            "/mirte/get_color_" + sensor["name"], GetColor, self.get_data
+        )
+        super().__init__(board, sensor, pub)
+        self.port = port
+        self.last_publish_value = Color()
+
+    def get_data(self, req):
+        return GetColorResponse(self.last_publish_value.value)
+
+    async def start(self):
+        await self.board.set_pin_mode_i2c(self.port, 4, 5)
+        await asyncio.sleep(0.1)
+        await self.board.sensors.add_veml6040(self.port, self.publish_data)
+
+    async def publish_data(self, data):
+        color = Color()
+        color.header = self.get_header()
+        color.r = (data[0] | data[1] << 8)/(255*255/100)
+        color.g = (data[2] | data[3] << 8)/(255*255/100)
+        color.b = (data[4] | data[5] << 8)/(255*255/100)
+        #w = (data[6] | data[7] << 8)/(255*255/100)
+        await self.publish(color)
+
+
 class EncoderSensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
         pub = rospy.Publisher(
@@ -988,6 +1018,19 @@ def sensors(loop, board, device):
                     board, intensity_sensors[sensor]
                 )
                 tasks.append(loop.create_task(monitor.start()))
+
+    # Initialize color sensors
+    if rospy.has_param("/mirte/color"):
+        color_sensors = rospy.get_param("/mirte/color")
+        color_sensors = {
+            k: v for k, v in color_sensors.items() if v["device"] == device
+        }
+        sensor_id = 0
+        for sensor in color_sensors:
+            color_sensors[sensor]["max_frequency"] = max_freq
+            monitor = ColorSensorMonitor(board, color_sensors[sensor], port=sensor_id)
+            sensor_id = sensor_id + 1
+            tasks.append(loop.create_task(monitor.start()))
 
     # Initialize keypad sensors
     if rospy.has_param("/mirte/keypad"):
