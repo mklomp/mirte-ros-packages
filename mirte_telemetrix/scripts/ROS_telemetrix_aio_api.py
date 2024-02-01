@@ -338,7 +338,7 @@ class ColorSensorMonitor(SensorMonitor):
         self.last_publish_value = Color()
 
     def get_data(self, req):
-        return GetColorResponse(self.last_publish_value.value)
+        return GetColorResponse(self.last_publish_value)
 
     async def start(self):
         await self.board.set_pin_mode_i2c(self.port, 4, 5)
