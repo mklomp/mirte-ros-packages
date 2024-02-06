@@ -53,6 +53,7 @@ find_package(catkin REQUIRED COMPONENTS
    FILES
    Encoder.msg
    Color.msg
+   ColorStamped.msg
    Intensity.msg
    IntensityDigital.msg
    Keypad.msg

@@ -328,7 +328,7 @@ class AnalogIntensitySensorMonitor(SensorMonitor):
 class ColorSensorMonitor(SensorMonitor):
     def __init__(self, board, sensor, port):
         pub = rospy.Publisher(
-            "/mirte/color/" + sensor["name"], Color, queue_size=100
+            "/mirte/color/" + sensor["name"], ColorStamped, queue_size=100
         )
         srv = rospy.Service(
             "/mirte/get_color_" + sensor["name"], GetColor, self.get_data
@@ -346,13 +346,15 @@ class ColorSensorMonitor(SensorMonitor):
         await self.board.sensors.add_veml6040(self.port, self.publish_data)
 
     async def publish_data(self, data):
+        color_stamped = ColorStamped()
+        color_stamped.header = self.get_header()
         color = Color()
-        color.header = self.get_header()
         color.r = (data[0] | data[1] << 8)
         color.g = (data[2] | data[3] << 8)
         color.b = (data[4] | data[5] << 8)
         color.w = (data[6] | data[7] << 8)
-        await self.publish(color)
+        color_stamped.color = color
+        await self.publish(color_stamped)
 
 
 class EncoderSensorMonitor(SensorMonitor):

@@ -1,2 +1,2 @@
 ---
-mirte_msgs/Color color
+mirte_msgs/ColorStamped color
