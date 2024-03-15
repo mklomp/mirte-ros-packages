@@ -25,7 +25,6 @@ class MyNode(Node):
     def on_shutdown(self):
        print("doing this")
 
-#node = rclpy.create_node('mirte_telemetrix', automatically_declare_parameters_from_overrides=True)
 node = MyNode()
 
 def helper_fnc(test_str, sep, value):
@@ -1070,28 +1069,8 @@ def shutdown(loop, board):
         loop.stop()
         print("Loop shutdown nicely")
         node.destroy_node()
-#        rclpy.shutdown()
         time.sleep(1)
         exit(0)
-
-
-def test():
-   print("halloooo")
-
-async def spinonce():
-    rclpy.spin_once(node, timeout_sec=0)
-
-
-async def rosspin():
-   while True:
-      print("hallo")
-      await spin_once()
-      await asyncio.sleep(0.0)
-
-
-
-
-
 
 
 def main(arg=None):
@@ -1104,14 +1083,10 @@ def main(arg=None):
             allow_i2c_errors=True,
             loop=loop,
             autostart=False,
-#            com_port="/dev/ttyUSB0"
         )
         loop.run_until_complete(board.start_aio())
     else:
         board = telemetrix_aio.TelemetrixAIO()
-
-    # needed for the loop.run_forevr() 
-    time.sleep(2)
 
     # Catch signals to exit properly
     # We need to do it this way instead of usgin the try/catch
@@ -1143,20 +1118,11 @@ def main(arg=None):
         loop.run_until_complete(task)
 
 
-    # Is equivalent to rclpy.spin(node) in a sense that this
-    # will just keep the node running only in a asyncio
-    # way.
-#    loop.run_forever()
-
+    # In ROS2 we need a seperate thread to run the spin
+    # to be able to also have async working properly.
     try:
-#        task_ros2 = asyncio.create_task(rosspin())
-        # task_mavsdk = asyncio.create_task(run(minimal_publisher))
-        #asyncio.run(task_ros2)
-#        await asyncio.gather(task_ros2)
-        #loop.run_until_complete(rosspin())
         spin(node)
-        loop.run_forever()   # this will make teh sensors work
-#        rclpy.spin(node)      # this will make the actuators work
+        loop.run_forever()
     except:
         pass
     finally:
@@ -1166,7 +1132,6 @@ def main(arg=None):
 
 
 def spin(node: Node):
-    # cancel = node.create_guard_condition(lambda: None)
     def _spin(node: Node,
               future: asyncio.Future,
               event_loop: asyncio.AbstractEventLoop):
@@ -1182,7 +1147,6 @@ def spin(node: Node):
 
 def start():
    main()
-#   asyncio.run(main())
 
 if __name__ == "__main__":
    main()
