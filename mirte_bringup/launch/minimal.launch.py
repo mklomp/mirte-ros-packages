@@ -21,7 +21,7 @@ def generate_launch_description():
     diff_drive_control=IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
-                FindPackageShare('ros2_control_demo_example_2'),
+                FindPackageShare('mirte_control'),
                 'launch',
                 'diffbot.launch.py'
             ])
