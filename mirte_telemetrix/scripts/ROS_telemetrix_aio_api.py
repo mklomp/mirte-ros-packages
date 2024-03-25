@@ -349,10 +349,10 @@ class ColorSensorMonitor(SensorMonitor):
         color_stamped = ColorStamped()
         color_stamped.header = self.get_header()
         color = Color()
-        color.r = (data[0] | data[1] << 8)
-        color.g = (data[2] | data[3] << 8)
-        color.b = (data[4] | data[5] << 8)
-        color.w = (data[6] | data[7] << 8)
+        color.r = data[0] | data[1] << 8
+        color.g = data[2] | data[3] << 8
+        color.b = data[4] | data[5] << 8
+        color.w = data[6] | data[7] << 8
         color_stamped.color = color
         await self.publish(color_stamped)
 
