@@ -375,15 +375,22 @@ class EncoderSensorMonitor(SensorMonitor):
         self.max_freq = -1
         self.last_publish_value = Encoder()
         self.speed_count = 0
+        self.last_step = 0
+        self.inverted = sensor["inverted"] if "inverted" in sensor else False
 
     def get_data(self, req):
         return GetEncoderResponse(self.last_publish_value.value)
 
     async def start(self):
         if board_mapping.get_mcu() == "pico":
-            await self.board.set_pin_mode_encoder(
-                self.pins["pin"], 0, self.publish_data, False
-            )
+            if "A" in self.pins:  # Only yet Pico support for quadrature encoder
+                await self.board.set_pin_mode_encoder(
+                    self.pins["A"], self.pins["B"], self.publish_data, True
+                )
+            else:
+                await self.board.set_pin_mode_encoder(
+                    self.pins["pin"], 0, self.publish_data, False
+                )
         else:
             await self.board.set_pin_mode_encoder(
                 self.pins["pin"], 2, self.ticks_per_wheel, self.publish_data
@@ -398,10 +405,18 @@ class EncoderSensorMonitor(SensorMonitor):
         self.speed_pub.publish(encoder)
 
     async def publish_data(self, data):
-        self.speed_count = self.speed_count + 1
         encoder = Encoder()
         encoder.header = self.get_header()
         encoder.value = data[2]
+
+        # Invert encoder pulses when quadrate is wired incorrectly
+        if self.inverted:
+            encoder.value = -encoder.value
+
+        difference = self.last_step - encoder.value
+        self.speed_count = self.speed_count + difference
+        self.last_step = encoder.value
+
         await self.publish(encoder)
 
 
@@ -440,6 +455,7 @@ class Motor:
         self.name = motor_obj["name"]
         self.prev_motor_speed = 0
         self.initialized = False
+        self.inverted = motor_obj["inverted"] if "inverted" in motor_obj else False
 
     async def start(self):
         server = rospy.Service(
@@ -480,6 +496,8 @@ class PPMotor(Motor):
             self.initialized = True
 
     async def set_speed(self, speed):
+        if self.inverted:
+            speed = -speed
         if self.prev_motor_speed != speed:
             if speed == 0:
                 await analog_write(self.board, self.pins["p2"], 0)
