@@ -2,34 +2,47 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mirte">
   <xacro:macro name="inertia_box" params="x y z mass *origin">
     <inertial>
-      <mass value="${mass}"/>
+      <mass><value>${mass}</value></mass>
       <xacro:insert_block name="origin"/>
-      <inertia ixx="${mass / 12.0 * (y*y + z*z)}" ixy="0.0" ixz="0.0" iyy="${mass / 12.0 * (z*z + x*x)}" iyz="0.0" izz="${mass / 12.0 * (y*y + x*x)}"/>
+      <inertia>
+      <ixx>${mass / 12.0 * (y*y + z*z)}</ixx><ixy>0.0</ixy><ixz>0.0</ixz><iyy>${mass / 12.0 * (z*z + x*x)}</iyy><iyz>0.0</iyz><izz>${mass / 12.0 * (y*y + x*x)}</izz>
+      </inertia>
     </inertial>
   </xacro:macro>
-  <xacro:macro name="inertia_cylinder" params="r h mass *origin">
+  <xacro:macro name="inertia_cylinder" params="r h mass">
     <inertial>
-      <mass value="${mass}"/>
-      <xacro:insert_block name="origin"/>
-      <inertia ixx="${mass / 12 * (3*r*r + h*h)}" ixy="0" ixz="0" iyy="${mass / 12 * (3*r*r + h*h)}" iyz="0" izz="${mass / 2 * r * r}"/>
+      <mass><value>${mass}</value></mass>
+      <!-- <xacro:insert_block name="origin"/> -->
+      <inertia><ixx>${mass / 12 * (3*r*r + h*h)}</ixx><ixy>0</ixy><ixz>0</ixz><iyy>${mass / 12 * (3*r*r + h*h)}</iyy><iyz>0</iyz><izz>${mass / 2 * r * r}</izz>
+      </inertia>
     </inertial>
   </xacro:macro>
   <xacro:macro name="inertia_sphere" params="r mass *origin">
     <inertial>
-      <mass value="${mass}"/>
+      <mass><value>${mass}</value></mass>
       <xacro:insert_block name="origin"/>
-      <inertia ixx="${2/5 * mass * r*r}" ixy="0" ixz="0" iyy="${2/5 * mass * r*r}" iyz="0" izz="${2/5 * mass * r*r}"/>
+      <inertia>
+       <ixx>${2/5 * mass * r*r}</ixx>
+       <ixy>0</ixy> 
+       <ixz>0</ixz> 
+       <iyy>${2/5 * mass * r*r}</iyy> 
+       <iyz>0</iyz> 
+       <izz>${2/5 * mass * r*r}</izz>
+       </inertia>
     </inertial>
   </xacro:macro>
-  <xacro:macro name="wheel" params="name parent radius mass visualRot *origin **content">
+  <xacro:macro name="wheel" params="name parent radius mass visualRot *pose **content">
     <link name="link_${name}">
+    <pose>0 1.5707 1.5707 0 0 0</pose>
       <xacro:inertia_cylinder r="${radius}" h="0.015" mass="${mass}">
-        <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+        
       </xacro:inertia_cylinder>
       <collision name="link_${name}_collision">
-        <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+        <origin> <rpy>0 1.5707 1.5707</rpy><xyz>0 0 0</xyz></origin>
         <geometry>
-          <cylinder length="0.015" radius="${radius}"/>
+          <cylinder>
+          <length>0.015</length> <radius>${radius}</radius>
+          </cylinder>
         </geometry>
         <!-- <surface>
           <friction>
@@ -53,18 +66,19 @@
       <visual name="link_${name}_visual">
         <origin rpy="0 1.5707 ${1.5707 + visualRot*pi}" xyz="-0 0.0 0"/>
         <geometry>
-          <mesh filename="file://$(find mirte_gazebo)/meshes/wheel.stl" scale="1 1 1" rpy="0 0 ${pi*0 + visualRot*pi}"/>
+        <pose>0 0 ${pi*0 + visualRot*pi}</pose>
+        <mesh>
+        <uri>file://$(find mirte_gazebo)/meshes/wheel.stl</uri>
+        <scale>1 1 1</scale> 
+        </mesh>
         </geometry>
       </visual>
     </link>
-    <gazebo reference="link_${name}">
-      <gravity>0</gravity>
-    </gazebo>
-    <joint name="joint_${name}" type="continuous">
-      <xacro:insert_block name="origin"/>
-      <child link="link_${name}"/>
-      <parent link="${parent}"/>
-      <axis rpy="0 0 0" xyz="0 1 0"/>
+    <joint name="joint_${name}" type="revolute">
+      <!-- <xacro:insert_block name="origposein"/> -->
+      <child>link_${name}</child>
+      <parent>${parent}</parent>
+      <axis><rpy>0 0 0</rpy><xyz>0 1 0</xyz></axis>
       <xacro:insert_block name="content"/>
     </joint>
     <transmission name="trans_${name}">
@@ -82,10 +96,10 @@
   </xacro:macro>
   <xacro:macro name="caster" params="name parent radius mass *origin">
     <link name="link_${name}">
-      <collision>
+      <collision name="link_${name}_collision">
         <xacro:insert_block name="origin"/>
         <geometry>
-          <sphere radius="${radius}"/>
+          <sphere> <radius>${radius}</radius></sphere>
         </geometry>
         <surface>
           <friction>
@@ -96,12 +110,13 @@
           </friction>
         </surface>
       </collision>
-      <visual>
+      <visual name="vis_${name}_sphere">
         <xacro:insert_block name="origin"/>
         <geometry>
-          <sphere radius="${radius}"/>
+          <sphere> <radius>${radius}</radius></sphere>
         </geometry>
-        <material name="red"/>
+        <material>
+        <name>red</name></material>
       </visual>
       <xacro:inertia_sphere r="${radius}" mass="${mass}">
         <xacro:insert_block name="origin"/>
@@ -111,8 +126,8 @@
       <gravity>0</gravity>
     </gazebo>
     <joint name="fixed" type="fixed">
-      <parent link="${parent}"/>
-      <child link="link_${name}"/>
+      <parent>${parent}</parent>
+      <child>link_${name}</child>
     </joint>
   </xacro:macro>
 </robot>

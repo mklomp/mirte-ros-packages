@@ -5,7 +5,7 @@
       <static>1</static>
       <pose>${x * size} ${y * size} 0. 0 -0 ${pi / 180 * yaw}</pose>
       <link name="link">
-        <inertial>
+        <!-- <inertial>
           <mass>1</mass>
           <inertia>
             <ixx>0.</ixx>
@@ -16,7 +16,7 @@
             <izz>0</izz>
           </inertia>
           <pose>0 0 0 0 -0 0</pose>
-        </inertial>
+        </inertial> -->
         <collision name="collision">
           <geometry>
             <box>
@@ -44,10 +44,17 @@
             </box>
           </geometry>
           <material>
-            <script>
+           
+      <albedo_map>file://$(find mirte_gazebo)/media/materials/textures/${material}.png</albedo_map>
+    
+    <!-- <ambient>1 0 0 1</ambient>
+  <diffuse>1 0 0 1</diffuse>
+  <specular>0.1 0.1 0.1 1</specular> -->
+
+            <!-- <script>
               <name>${material}</name>
               <uri>file://$(find mirte_gazebo)/media/materials/scripts/duckietown.material</uri>
-            </script>
+            </script> -->
           </material>
         </visual>
         <self_collide>0</self_collide>

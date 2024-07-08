@@ -4,7 +4,7 @@
   <xacro:include filename="$(find mirte_gazebo)/urdf/duckieModels.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/includedMacro.xacro"/>
   <world name="default">
-    <light name="sun" type="directional">
+    <!-- <light name="sun" type="directional">
       <cast_shadows>0</cast_shadows>
       <pose>0 0 10 0 -0 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
@@ -21,8 +21,8 @@
         <outer_angle>0</outer_angle>
         <falloff>0</falloff>
       </spot>
-    </light>
-    <model name="ground_plane">
+    </light> -->
+    <!-- <model name="ground_plane">
       <static>1</static>
       <link name="link">
         <collision name="collision">
@@ -69,8 +69,8 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-    </model>
-    <gravity>0 0 -9.8</gravity>
+    </model> -->
+    <!-- <gravity>0 0 -9.8</gravity>
     <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
     <atmosphere type="adiabatic"/>
     <physics type="ode">
@@ -148,10 +148,10 @@
     <xacro:tileWorld name="tile_6_6" material="RCJ/floor" size="0.5" x="6" y="6" yaw="0"/>
     <xacro:tileWorld name="tile_7_6" material="RCJ/floor" size="0.5" x="7" y="6" yaw="0"/>
     <state world_name="default">
-      <sim_time>0</sim_time>
+      <!- - <sim_time>0</sim_time>
       <real_time>0</real_time>
       <wall_time>0</wall_time>
-      <iterations>0</iterations>
+      <iterations>0</iterations> - ->
       <model name="ground_plane">
         <pose>0 0 0 0 -0 0</pose>
         <scale>1 1 1</scale>
@@ -217,17 +217,23 @@
       <xacro:tileState name="tile_4_6" material="RCJ/floor" size="0.5" x="4" y="6" yaw="0"/>
       <xacro:tileState name="tile_5_6" material="RCJ/floor" size="0.5" x="5" y="6" yaw="0"/>
       <xacro:tileState name="tile_6_6" material="RCJ/floor" size="0.5" x="6" y="6" yaw="0"/>
-      <xacro:tileState name="tile_7_6" material="RCJ/floor" size="0.5" x="7" y="6" yaw="0"/>
-      <light name="sun">
+      <xacro:tileState name="tile_7_6" material="RCJ/floor" size="0.5" x="7" y="6" yaw="0"/> -->
+      <!-- <light name="sun">
         <pose>0 0 10 0 -0 0</pose>
-      </light>
-    </state>
-    <gui fullscreen="0">
+      </light> -->
+    <!-- </state> -->
+    <!-- <gui fullscreen="0">
       <camera name="user_camera">
         <pose>2.48203 2.4474 8.36958 -0 1.48 -3.13919</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
-    </gui>
+    </gui> -->
   </world>
+  <plugin
+  filename="ignition-gazebo-user-commands-system"
+  name="ignition::gazebo::systems::UserCommands">
+</plugin>
+    <!-- <xacro:include filename="$(find mirte_gazebo)/urdf/mirte.xacro"/> -->
+
 </sdf>

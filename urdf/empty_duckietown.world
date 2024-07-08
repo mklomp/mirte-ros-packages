@@ -4,7 +4,7 @@
   <xacro:include filename="$(find mirte_gazebo)/urdf/duckieModels.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/includedMacro.xacro"/>
   <world name="default">
-    <light name="sun" type="directional">
+    <!-- <light name="sun" type="directional">
       <cast_shadows>0</cast_shadows>
       <pose>0 0 10 0 -0 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
@@ -21,8 +21,8 @@
         <outer_angle>0</outer_angle>
         <falloff>0</falloff>
       </spot>
-    </light>
-    <model name="ground_plane">
+    </light> -->
+    <!-- <model name="ground_plane">
       <static>1</static>
       <link name="link">
         <collision name="collision">
@@ -69,7 +69,19 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-    </model>
+    </model> -->
+    <include>
+  <uri>
+    https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane
+  </uri>
+</include>
+
+<include>
+  <uri>
+    https://fuel.gazebosim.org/1.0/OpenRobotics/models/Sun
+  </uri>
+</include>
+
     <gravity>0 0 -9.8</gravity>
     <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
     <atmosphere type="adiabatic"/>
@@ -92,7 +104,7 @@
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
     <!-- TILEWORLD -->
-    <state world_name="default">
+    <!-- <state world_name="default">
       <sim_time>0</sim_time>
       <real_time>0</real_time>
       <wall_time>0</wall_time>
@@ -107,11 +119,11 @@
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
-      <!-- TILESTATE -->
+      - TILESTATE -
       <light name="sun">
         <pose>0 0 10 0 -0 0</pose>
       </light>
-    </state>
+    </state> -->
     <gui fullscreen="0">
       <camera name='user_camera'>
         <pose>2.48203 2.4474 8.36958 -0 1.48 -3.13919</pose>
