@@ -31,14 +31,14 @@
        </inertia>
     </inertial>
   </xacro:macro>
-  <xacro:macro name="wheel" params="name parent radius mass visualRot *pose **content">
+  <xacro:macro name="wheel" params="name parent radius mass visualRot  *pose **content">
     <link name="link_${name}">
-    <pose>0 1.5707 1.5707 0 0 0</pose>
+  <xacro:insert_block name="pose"/>
       <xacro:inertia_cylinder r="${radius}" h="0.015" mass="${mass}">
         
       </xacro:inertia_cylinder>
       <collision name="link_${name}_collision">
-        <origin> <rpy>0 1.5707 1.5707</rpy><xyz>0 0 0</xyz></origin>
+        <!-- <origin> <rpy>0 1.5707 1.5707</rpy><xyz>0 0 0</xyz></origin> -->
         <geometry>
           <cylinder>
           <length>0.015</length> <radius>${radius}</radius>
@@ -64,9 +64,9 @@
         <material name="red" />
       </visual> -->
       <visual name="link_${name}_visual">
-        <origin rpy="0 1.5707 ${1.5707 + visualRot*pi}" xyz="-0 0.0 0"/>
+        <!-- <origin rpy="0 1.5707 ${1.5707 + visualRot*pi}" xyz="-0 0.0 0"/> -->
         <geometry>
-        <pose>0 0 ${pi*0 + visualRot*pi}</pose>
+        <!-- <pose>0 0 ${pi*0 + visualRot*pi}</pose> -->
         <mesh>
         <uri>file://$(find mirte_gazebo)/meshes/wheel.stl</uri>
         <scale>1 1 1</scale> 
@@ -94,10 +94,11 @@
       </actuator>
     </transmission>
   </xacro:macro>
-  <xacro:macro name="caster" params="name parent radius mass *origin">
+  <xacro:macro name="caster" params="name parent radius mass *pose">
     <link name="link_${name}">
+            <xacro:insert_block name="pose"/>
+
       <collision name="link_${name}_collision">
-        <xacro:insert_block name="origin"/>
         <geometry>
           <sphere> <radius>${radius}</radius></sphere>
         </geometry>
@@ -111,7 +112,9 @@
         </surface>
       </collision>
       <visual name="vis_${name}_sphere">
-        <xacro:insert_block name="origin"/>
+              <origin/>
+
+        <!-- <xacro:insert_block name="origin"/> -->
         <geometry>
           <sphere> <radius>${radius}</radius></sphere>
         </geometry>
@@ -119,7 +122,8 @@
         <name>red</name></material>
       </visual>
       <xacro:inertia_sphere r="${radius}" mass="${mass}">
-        <xacro:insert_block name="origin"/>
+        <!-- <xacro:insert_block name="origin"/> -->
+        <origin/>
       </xacro:inertia_sphere>
     </link>
     <gazebo reference="link_${name}">

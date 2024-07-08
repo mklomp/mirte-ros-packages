@@ -83,11 +83,14 @@
     <child>link_chassis</child>
   </joint>
   <xacro:caster name="caster_wheel_back" parent="link_chassis" radius="${params['caster_wheel_radius']}" mass="${params['caster_wheel_mass']}">
-    <origin rpy="0 0 0" xyz="${params['caster_wheel_center_x_offset']} ${params['caster_wheel_center_y_offset']} ${params['caster_wheel_center_z_offset']}"/>
+  <pose>${params['caster_wheel_center_x_offset']} ${params['caster_wheel_center_y_offset']} ${params['caster_wheel_center_z_offset']} 0 0 0</pose>
+    
   </xacro:caster>
   <!-- NOTE: xacro parser adds joint_ -->
   <xacro:wheel name="left_wheel" parent="link_chassis" radius="${params['wheel_radius']}" visualRot="1" mass="${params['wheel_mass']}">
-    <origin><rpy>0 0 0</rpy><xyz>${params['wheel_center_x_offset']} ${params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}</xyz></origin>
+        <pose>${params['wheel_center_x_offset']} ${params['wheel_center_y_offset']} ${params['wheel_center_z_offset']} ${pi/2} ${pi/2} 0</pose>
+
+    <!-- <origin><rpy>0 0 0</rpy><xyz>${params['wheel_center_x_offset']} ${params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}</xyz></origin> -->
     <joint_options>
       <limit effort="10" velocity="8"/>
       <dynamics damping="0.0" friction="0.0"/>
@@ -95,7 +98,7 @@
   </xacro:wheel>
   <!-- NOTE: xacro parser adds joint_ -->
   <xacro:wheel name="right_wheel" parent="link_chassis" radius="${params['wheel_radius']}" mass="${params['wheel_mass']}" visualRot="0">
-      <pose>${params['wheel_center_x_offset']} ${-1*params['wheel_center_y_offset']} ${params['wheel_center_z_offset']} 0 0 0</pose>
+      <pose>${params['wheel_center_x_offset']} ${-1*params['wheel_center_y_offset']} ${params['wheel_center_z_offset']} ${pi/2} ${pi/2} ${pi}</pose>
       <!-- <origin><rpy>0 0 0</rpy><xyz></xyz></origin> -->
 
     <!-- <origin rpy="0 0 0" xyz="${params['wheel_center_x_offset']} ${-1*params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}"/> -->
