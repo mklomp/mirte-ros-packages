@@ -71,17 +71,15 @@
       </link>
     </model> -->
     <include>
-  <uri>
+      <uri>
     https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane
   </uri>
-</include>
-
-<include>
-  <uri>
+    </include>
+    <include>
+      <uri>
     https://fuel.gazebosim.org/1.0/OpenRobotics/models/Sun
   </uri>
-</include>
-
+    </include>
     <gravity>0 0 -9.8</gravity>
     <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
     <atmosphere type="adiabatic"/>
@@ -125,7 +123,7 @@
       </light>
     </state> -->
     <gui fullscreen="0">
-      <camera name='user_camera'>
+      <camera name="user_camera">
         <pose>2.48203 2.4474 8.36958 -0 1.48 -3.13919</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>

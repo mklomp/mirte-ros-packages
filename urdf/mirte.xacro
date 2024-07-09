@@ -1,70 +1,71 @@
 <?xml version="1.0"?>
-<sdf xmlns:xacro="http://www.ros.org/wiki/xacro"  version="1.9">
-<model name="mirte">
-  <xacro:arg name="sonar_enable" default="false"/>
-  <xacro:arg name="intensity_enable" default="false"/>
-  <xacro:arg name="camera_enable" default="false"/>
-  <xacro:arg name="lidar_enable" default="false"/>
-  <xacro:arg name="realsense_enable" default="false"/>
-  <!-- <xacro:include filename="$(find mirte_gazebo)/urdf/materials.xacro"/> -->
-  <xacro:include filename="$(find mirte_gazebo)/urdf/macros.xacro"/>
-  <!-- <xacro:include filename="$(find mirte_gazebo)/urdf/ros_control.xacro"/> -->
-  <test value="$(arg sonar_enable)" name="sonar_enable"/>
-  <test value="$(arg intensity_enable)" name="intensity_enable"/>
-  <test value="$(arg camera_enable)" name="camera_enable"/>
-  <test value="$(arg lidar_enable)" name="lidar_enable"/>
-  <xacro:if value="$(arg lidar_enable)">
-    <xacro:include filename="$(find mirte_gazebo)/urdf/lidar.xacro"/>
-  </xacro:if>
-  <xacro:if value="$(arg intensity_enable)">
-    <xacro:include filename="$(find mirte_gazebo)/urdf/ir.xacro"/>
-  </xacro:if>
-  <xacro:if value="$(arg camera_enable)">
-    <xacro:include filename="$(find mirte_gazebo)/urdf/camera.xacro"/>
-  </xacro:if>
-  <xacro:if value="$(arg sonar_enable)">
-    <xacro:include filename="$(find mirte_gazebo)/urdf/ultrasonic.xacro"/>
-  </xacro:if>
-  <xacro:if value="$(arg realsense_enable)">
-    <xacro:include filename="$(find mirte_gazebo)/urdf/realsense.xacro"/>
-  </xacro:if>
-  <xacro:property name="yaml_param_file" value="$(find mirte_gazebo)/config/mirte_dimensions.yaml"/>
-  <xacro:property name="params" value="${xacro.load_yaml(yaml_param_file)}"/>
-
-
-  <link name="link_chassis">
-    <!-- pose and inertial -->
-    <pose>0 0 0.015 0 0 0</pose>
-    <xacro:inertia_box x="${params['base_len']}" y="${params['base_width']}" z="${params['base_height']}" mass="${params['base_mass']}">
-      <origin>
-       <rpy>0 0 0</rpy><xyz>0 0 0.015</xyz></origin>
-    </xacro:inertia_box>
-    <!-- body -->
-    <collision name="collision_chassis">
-      <geometry>
-      <pose>0 0 1.57079633</pose>
-        <mesh>
-        <uri>file://$(find mirte_gazebo)/meshes/mirte_base.stl</uri>
-        <scale>0.001 0.001 0.001</scale> 
-        </mesh>
-      </geometry>
-    </collision>
-    <visual name="mirte-base">
-    <origin>
-       <rpy>0 0 0</rpy><xyz>0 0 0</xyz></origin>
-      
-      <geometry>
-      <pose>0 0 1.57079633</pose>
-        <mesh>
-        <uri>file://$(find mirte_gazebo)/meshes/mirte_base.stl</uri>
-        <scale>0.001 0.001 0.001</scale> 
-        </mesh>
-      </geometry>
-      <material><name>blue</name></material>
-    </visual>
-  
-  
-    <!-- <sensor name="chassis_contact_sensor" type="contact">
+<sdf xmlns:xacro="http://www.ros.org/wiki/xacro" version="1.9">
+  <model name="mirte">
+    <xacro:arg name="sonar_enable" default="false"/>
+    <xacro:arg name="intensity_enable" default="false"/>
+    <xacro:arg name="camera_enable" default="false"/>
+    <xacro:arg name="lidar_enable" default="false"/>
+    <xacro:arg name="realsense_enable" default="false"/>
+    <!-- <xacro:include filename="$(find mirte_gazebo)/urdf/materials.xacro"/> -->
+    <xacro:include filename="$(find mirte_gazebo)/urdf/macros.xacro"/>
+    <!-- <xacro:include filename="$(find mirte_gazebo)/urdf/ros_control.xacro"/> -->
+    <test value="$(arg sonar_enable)" name="sonar_enable"/>
+    <test value="$(arg intensity_enable)" name="intensity_enable"/>
+    <test value="$(arg camera_enable)" name="camera_enable"/>
+    <test value="$(arg lidar_enable)" name="lidar_enable"/>
+    <xacro:if value="$(arg lidar_enable)">
+      <xacro:include filename="$(find mirte_gazebo)/urdf/lidar.xacro"/>
+    </xacro:if>
+    <xacro:if value="$(arg intensity_enable)">
+      <xacro:include filename="$(find mirte_gazebo)/urdf/ir.xacro"/>
+    </xacro:if>
+    <xacro:if value="$(arg camera_enable)">
+      <xacro:include filename="$(find mirte_gazebo)/urdf/camera.xacro"/>
+    </xacro:if>
+    <xacro:if value="$(arg sonar_enable)">
+      <xacro:include filename="$(find mirte_gazebo)/urdf/ultrasonic.xacro"/>
+    </xacro:if>
+    <xacro:if value="$(arg realsense_enable)">
+      <xacro:include filename="$(find mirte_gazebo)/urdf/realsense.xacro"/>
+    </xacro:if>
+    <xacro:property name="yaml_param_file" value="$(find mirte_gazebo)/config/mirte_dimensions.yaml"/>
+    <xacro:property name="params" value="${xacro.load_yaml(yaml_param_file)}"/>
+    <link name="link_chassis">
+      <!-- pose and inertial -->
+      <pose>0 0 0.015 0 0 0</pose>
+      <xacro:inertia_box x="${params['base_len']}" y="${params['base_width']}" z="${params['base_height']}" mass="${params['base_mass']}">
+        <origin>
+          <rpy>0 0 0</rpy>
+          <xyz>0 0 0.015</xyz>
+        </origin>
+      </xacro:inertia_box>
+      <!-- body -->
+      <collision name="collision_chassis">
+        <geometry>
+          <pose>0 0 1.57079633</pose>
+          <mesh>
+            <uri>file://$(find mirte_gazebo)/meshes/mirte_base.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="mirte-base">
+        <origin>
+          <rpy>0 0 0</rpy>
+          <xyz>0 0 0</xyz>
+        </origin>
+        <geometry>
+          <pose>0 0 1.57079633</pose>
+          <mesh>
+            <uri>file://$(find mirte_gazebo)/meshes/mirte_base.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <name>blue</name>
+        </material>
+      </visual>
+      <!-- <sensor name="chassis_contact_sensor" type="contact">
       <always_on>true</always_on>
       <update_rate>30.0</update_rate>
       <contact>
@@ -76,61 +77,58 @@
         <frameName>link_chassis</frameName>
       </plugin> - ->
     </sensor> -->
-</link> 
-  <link name="base_link"/>
-  <joint name="base_joint" type="fixed">
-    <parent>base_link</parent>
-    <child>link_chassis</child>
-  </joint>
-  <xacro:caster name="caster_wheel_back" parent="link_chassis" radius="${params['caster_wheel_radius']}" mass="${params['caster_wheel_mass']}">
-  <pose>${params['caster_wheel_center_x_offset']} ${params['caster_wheel_center_y_offset']} ${params['caster_wheel_center_z_offset']} 0 0 0</pose>
-    
-  </xacro:caster>
-  <!-- NOTE: xacro parser adds joint_ -->
-  <xacro:wheel name="left_wheel" parent="link_chassis" radius="${params['wheel_radius']}" visualRot="1" mass="${params['wheel_mass']}">
-        <pose>${params['wheel_center_x_offset']} ${params['wheel_center_y_offset']} ${params['wheel_center_z_offset']} ${pi/2} ${pi/2} 0</pose>
-
-    <!-- <origin><rpy>0 0 0</rpy><xyz>${params['wheel_center_x_offset']} ${params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}</xyz></origin> -->
-    <joint_options>
-      <limit effort="10" velocity="8"/>
-      <dynamics damping="0.0" friction="0.0"/>
-    </joint_options>
-  </xacro:wheel>
-  <!-- NOTE: xacro parser adds joint_ -->
-  <xacro:wheel name="right_wheel" parent="link_chassis" radius="${params['wheel_radius']}" mass="${params['wheel_mass']}" visualRot="0">
+    </link>
+    <link name="base_link"/>
+    <joint name="base_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>link_chassis</child>
+    </joint>
+    <xacro:caster name="caster_wheel_back" parent="link_chassis" radius="${params['caster_wheel_radius']}" mass="${params['caster_wheel_mass']}">
+      <pose>${params['caster_wheel_center_x_offset']} ${params['caster_wheel_center_y_offset']} ${params['caster_wheel_center_z_offset']} 0 0 0</pose>
+    </xacro:caster>
+    <!-- NOTE: xacro parser adds joint_ -->
+    <xacro:wheel name="left_wheel" parent="link_chassis" radius="${params['wheel_radius']}" visualRot="1" mass="${params['wheel_mass']}">
+      <pose>${params['wheel_center_x_offset']} ${params['wheel_center_y_offset']} ${params['wheel_center_z_offset']} ${pi/2} ${pi/2} 0</pose>
+      <!-- <origin><rpy>0 0 0</rpy><xyz>${params['wheel_center_x_offset']} ${params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}</xyz></origin> -->
+      <joint_options>
+        <limit effort="10" velocity="8"/>
+        <dynamics damping="0.0" friction="0.0"/>
+      </joint_options>
+    </xacro:wheel>
+    <!-- NOTE: xacro parser adds joint_ -->
+    <xacro:wheel name="right_wheel" parent="link_chassis" radius="${params['wheel_radius']}" mass="${params['wheel_mass']}" visualRot="0">
       <pose>${params['wheel_center_x_offset']} ${-1*params['wheel_center_y_offset']} ${params['wheel_center_z_offset']} ${pi/2} ${pi/2} ${pi}</pose>
       <!-- <origin><rpy>0 0 0</rpy><xyz></xyz></origin> -->
-
-    <!-- <origin rpy="0 0 0" xyz="${params['wheel_center_x_offset']} ${-1*params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}"/> -->
-    <joint_options>
-      <limit effort="10" velocity="8"/>
-      <dynamics damping="0.0" friction="0.0"/>
-    </joint_options>
-  </xacro:wheel>
-  <xacro:if value="$(arg sonar_enable)">
-    <xacro:ultrasonic_sensor name="left">
-      <origin rpy="0 0 .45" xyz="0.085 0.04 0.022"/>
-    </xacro:ultrasonic_sensor>
-    <xacro:ultrasonic_sensor name="right">
-      <origin rpy="0 0 -0.45" xyz="0.085 -0.04 0.022"/>
-    </xacro:ultrasonic_sensor>
-  </xacro:if>
-  <xacro:if value="$(arg intensity_enable)">
-    <xacro:ir_sensor name="left">
-      <origin rpy="0 ${radians(90)} 0" xyz="0.0785 0.022 0.002"/>
-    </xacro:ir_sensor>
-    <xacro:ir_sensor name="right">
-      <origin rpy="0 ${radians(90)} 0" xyz="0.0785 -0.022 0.002"/>
-    </xacro:ir_sensor>
-  </xacro:if>
-  <!-- <gazebo>
+      <!-- <origin rpy="0 0 0" xyz="${params['wheel_center_x_offset']} ${-1*params['wheel_center_y_offset']} ${params['wheel_center_z_offset']}"/> -->
+      <joint_options>
+        <limit effort="10" velocity="8"/>
+        <dynamics damping="0.0" friction="0.0"/>
+      </joint_options>
+    </xacro:wheel>
+    <xacro:if value="$(arg sonar_enable)">
+      <xacro:ultrasonic_sensor name="left">
+        <origin rpy="0 0 .45" xyz="0.085 0.04 0.022"/>
+      </xacro:ultrasonic_sensor>
+      <xacro:ultrasonic_sensor name="right">
+        <origin rpy="0 0 -0.45" xyz="0.085 -0.04 0.022"/>
+      </xacro:ultrasonic_sensor>
+    </xacro:if>
+    <xacro:if value="$(arg intensity_enable)">
+      <xacro:ir_sensor name="left">
+        <origin rpy="0 ${radians(90)} 0" xyz="0.0785 0.022 0.002"/>
+      </xacro:ir_sensor>
+      <xacro:ir_sensor name="right">
+        <origin rpy="0 ${radians(90)} 0" xyz="0.0785 -0.022 0.002"/>
+      </xacro:ir_sensor>
+    </xacro:if>
+    <!-- <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/mirte</robotNamespace>
       <!- - <parameters>$(find mirte_gazebo)/config/mirte_diff_drive.yaml</parameters> -->
     <!-- </plugin> -->
     <!-- <plugin name="gazebo_ros_controller_manager" filename="libgazebo_ros_controller_manager.so"/> - ->
   </gazebo> -->
-  <!-- <xacro:include filename="$(find mirte_gazebo)/urdf/diffdrive.xacro"/>
+    <!-- <xacro:include filename="$(find mirte_gazebo)/urdf/diffdrive.xacro"/>
   <gazebo>
     <plugin name="p3d" filename="libgazebo_ros_p3d.so">
       <!- -  <robotNamespace>/prius</robotNamespace> - ->

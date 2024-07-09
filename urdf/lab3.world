@@ -243,7 +243,5 @@
     <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands">
     </plugin>
   </world>
-
   <!-- <xacro:include filename="$(find mirte_gazebo)/urdf/mirte.xacro"/> -->
-
 </sdf>

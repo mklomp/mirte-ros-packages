@@ -2,38 +2,55 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mirte">
   <xacro:macro name="inertia_box" params="x y z mass *origin">
     <inertial>
-      <mass><value>${mass}</value></mass>
+      <mass>
+        <value>${mass}</value>
+      </mass>
       <xacro:insert_block name="origin"/>
       <inertia>
-      <ixx>${mass / 12.0 * (y*y + z*z)}</ixx><ixy>0.0</ixy><ixz>0.0</ixz><iyy>${mass / 12.0 * (z*z + x*x)}</iyy><iyz>0.0</iyz><izz>${mass / 12.0 * (y*y + x*x)}</izz>
+        <ixx>${mass / 12.0 * (y*y + z*z)}</ixx>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyy>${mass / 12.0 * (z*z + x*x)}</iyy>
+        <iyz>0.0</iyz>
+        <izz>${mass / 12.0 * (y*y + x*x)}</izz>
       </inertia>
     </inertial>
   </xacro:macro>
   <xacro:macro name="inertia_cylinder" params="r h mass">
     <inertial>
-      <mass><value>${mass}</value></mass>
+      <mass>
+        <value>${mass}</value>
+      </mass>
       <!-- <xacro:insert_block name="origin"/> -->
-      <inertia><ixx>${mass / 12 * (3*r*r + h*h)}</ixx><ixy>0</ixy><ixz>0</ixz><iyy>${mass / 12 * (3*r*r + h*h)}</iyy><iyz>0</iyz><izz>${mass / 2 * r * r}</izz>
+      <inertia>
+        <ixx>${mass / 12 * (3*r*r + h*h)}</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>${mass / 12 * (3*r*r + h*h)}</iyy>
+        <iyz>0</iyz>
+        <izz>${mass / 2 * r * r}</izz>
       </inertia>
     </inertial>
   </xacro:macro>
   <xacro:macro name="inertia_sphere" params="r mass *origin">
     <inertial>
-      <mass><value>${mass}</value></mass>
+      <mass>
+        <value>${mass}</value>
+      </mass>
       <xacro:insert_block name="origin"/>
       <inertia>
-       <ixx>${2/5 * mass * r*r}</ixx>
-       <ixy>0</ixy> 
-       <ixz>0</ixz> 
-       <iyy>${2/5 * mass * r*r}</iyy> 
-       <iyz>0</iyz> 
-       <izz>${2/5 * mass * r*r}</izz>
-       </inertia>
+        <ixx>${2/5 * mass * r*r}</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>${2/5 * mass * r*r}</iyy>
+        <iyz>0</iyz>
+        <izz>${2/5 * mass * r*r}</izz>
+      </inertia>
     </inertial>
   </xacro:macro>
   <xacro:macro name="wheel" params="name parent radius mass visualRot  *pose **content">
     <link name="link_${name}">
-  <xacro:insert_block name="pose"/>
+      <xacro:insert_block name="pose"/>
       <xacro:inertia_cylinder r="${radius}" h="0.015" mass="${mass}">
         
       </xacro:inertia_cylinder>
@@ -41,7 +58,8 @@
         <!-- <origin> <rpy>0 1.5707 1.5707</rpy><xyz>0 0 0</xyz></origin> -->
         <geometry>
           <cylinder>
-          <length>0.015</length> <radius>${radius}</radius>
+            <length>0.015</length>
+            <radius>${radius}</radius>
           </cylinder>
         </geometry>
         <!-- <surface>
@@ -66,11 +84,11 @@
       <visual name="link_${name}_visual">
         <!-- <origin rpy="0 1.5707 ${1.5707 + visualRot*pi}" xyz="-0 0.0 0"/> -->
         <geometry>
-        <!-- <pose>0 0 ${pi*0 + visualRot*pi}</pose> -->
-        <mesh>
-        <uri>file://$(find mirte_gazebo)/meshes/wheel.stl</uri>
-        <scale>1 1 1</scale> 
-        </mesh>
+          <!-- <pose>0 0 ${pi*0 + visualRot*pi}</pose> -->
+          <mesh>
+            <uri>file://$(find mirte_gazebo)/meshes/wheel.stl</uri>
+            <scale>1 1 1</scale>
+          </mesh>
         </geometry>
       </visual>
     </link>
@@ -78,7 +96,10 @@
       <!-- <xacro:insert_block name="origposein"/> -->
       <child>link_${name}</child>
       <parent>${parent}</parent>
-      <axis><rpy>0 0 0</rpy><xyz>0 1 0</xyz></axis>
+      <axis>
+        <rpy>0 0 0</rpy>
+        <xyz>0 1 0</xyz>
+      </axis>
       <xacro:insert_block name="content"/>
     </joint>
     <transmission name="trans_${name}">
@@ -96,11 +117,12 @@
   </xacro:macro>
   <xacro:macro name="caster" params="name parent radius mass *pose">
     <link name="link_${name}">
-            <xacro:insert_block name="pose"/>
-
+      <xacro:insert_block name="pose"/>
       <collision name="link_${name}_collision">
         <geometry>
-          <sphere> <radius>${radius}</radius></sphere>
+          <sphere>
+            <radius>${radius}</radius>
+          </sphere>
         </geometry>
         <surface>
           <friction>
@@ -112,14 +134,16 @@
         </surface>
       </collision>
       <visual name="vis_${name}_sphere">
-              <origin/>
-
+        <origin/>
         <!-- <xacro:insert_block name="origin"/> -->
         <geometry>
-          <sphere> <radius>${radius}</radius></sphere>
+          <sphere>
+            <radius>${radius}</radius>
+          </sphere>
         </geometry>
         <material>
-        <name>red</name></material>
+          <name>red</name>
+        </material>
       </visual>
       <xacro:inertia_sphere r="${radius}" mass="${mass}">
         <!-- <xacro:insert_block name="origin"/> -->

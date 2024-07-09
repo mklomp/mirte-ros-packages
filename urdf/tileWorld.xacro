@@ -44,13 +44,10 @@
             </box>
           </geometry>
           <material>
-           
-      <albedo_map>file://$(find mirte_gazebo)/media/materials/textures/${material}.png</albedo_map>
-    
-    <!-- <ambient>1 0 0 1</ambient>
+            <albedo_map>file://$(find mirte_gazebo)/media/materials/textures/${material}.png</albedo_map>
+            <!-- <ambient>1 0 0 1</ambient>
   <diffuse>1 0 0 1</diffuse>
   <specular>0.1 0.1 0.1 1</specular> -->
-
             <!-- <script>
               <name>${material}</name>
               <uri>file://$(find mirte_gazebo)/media/materials/scripts/duckietown.material</uri>
