@@ -1,0 +1,14 @@
+material cone/cone
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture cone.png
+                scale 1 1
+            }
+        }
+    }
+}

@@ -1,6 +1,6 @@
 # Blender 4.1.1
 # www.blender.org
-mtllib cone.mtl
+mtllib test.mtl
 o cone/cone
 v -5.478200 0.000001 10.000000
 v 0.000000 0.000001 10.000000

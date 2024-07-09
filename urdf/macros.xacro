@@ -48,7 +48,7 @@
       </inertia>
     </inertial>
   </xacro:macro>
-  <xacro:macro name="wheel" params="name parent radius mass visualRot  *pose **content">
+  <xacro:macro name="wheel" params="name parent radius mass visualRot mult=1  *pose **content">
     <link name="link_${name}">
       <xacro:insert_block name="pose"/>
       <xacro:inertia_cylinder r="${radius}" h="0.015" mass="${mass}">
@@ -98,7 +98,7 @@
       <parent>${parent}</parent>
       <axis>
         <rpy>0 0 0</rpy>
-        <xyz>0 1 0</xyz>
+        <xyz>0 0 ${mult}</xyz>
       </axis>
       <xacro:insert_block name="content"/>
     </joint>
