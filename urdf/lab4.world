@@ -4,6 +4,17 @@
   <xacro:include filename="$(find mirte_gazebo)/urdf/duckieModels.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/includedMacro.xacro"/>
   <world name="default">
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics">
+    </plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands">
+    </plugin>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+    <!-- </plugin>
     <light name="sun" type="directional">
       <cast_shadows>0</cast_shadows>
       <pose>0 0 10 0 -0 0</pose>
@@ -69,7 +80,7 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-    </model>
+    </model> -->
     <gravity>0 0 -9.8</gravity>
     <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
     <atmosphere type="adiabatic"/>
@@ -281,10 +292,10 @@
     <xacro:duckieModel name="obj_4_0_5_4" type="cone" size="0.5" x="4.0" y="5.4" yaw="0" static="${True}" scale="${0.1}"/>
     <xacro:duckieModel name="obj_4_4_5_0" type="cone" size="0.5" x="4.4" y="5.0" yaw="0" static="${True}" scale="${0.1}"/>
     <state world_name="default">
-      <sim_time>0</sim_time>
+      <!-- <sim_time>0</sim_time>
       <real_time>0</real_time>
       <wall_time>0</wall_time>
-      <iterations>0</iterations>
+      <iterations>0</iterations> -->
       <model name="ground_plane">
         <pose>0 0 0 0 -0 0</pose>
         <scale>1 1 1</scale>
@@ -484,16 +495,18 @@
       <xacro:duckieState name="obj_4_3_5_3" type="cone" size="0.5" x="4.3" y="5.3" yaw="0" static="${True}" scale="${0.1}"/>
       <xacro:duckieState name="obj_4_0_5_4" type="cone" size="0.5" x="4.0" y="5.4" yaw="0" static="${True}" scale="${0.1}"/>
       <xacro:duckieState name="obj_4_4_5_0" type="cone" size="0.5" x="4.4" y="5.0" yaw="0" static="${True}" scale="${0.1}"/>
-      <light name="sun">
+      <!-- <light name="sun">
         <pose>0 0 10 0 -0 0</pose>
-      </light>
+      </light> -->
     </state>
-    <gui fullscreen="0">
+    <!-- <gui fullscreen="0">
       <camera name="user_camera">
         <pose>2.48203 2.4474 8.36958 -0 1.48 -3.13919</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
-    </gui>
+    </gui> -->
+    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands">
+    </plugin>
   </world>
 </sdf>
