@@ -19,9 +19,9 @@
     <xacro:if value="$(arg intensity_enable)">
       <xacro:include filename="$(find mirte_gazebo)/urdf/ir.xacro"/>
     </xacro:if>
-    <xacro:if value="$(arg camera_enable)">
+    <!-- <xacro:if value="$(arg camera_enable)">
       <xacro:include filename="$(find mirte_gazebo)/urdf/camera.xacro"/>
-    </xacro:if>
+    </xacro:if> -->
     <xacro:if value="$(arg sonar_enable)">
       <xacro:include filename="$(find mirte_gazebo)/urdf/ultrasonic.xacro"/>
     </xacro:if>

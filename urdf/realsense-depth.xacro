@@ -42,7 +42,7 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
       <xacro:insert_block name="origin"/>
     </joint>
     <!-- Virtual links representing the cameras positons and orientations-->
-    <link name="${prefix}depth"/>
+    
     <!-- Joints positioning the virtual links with respect to the camera main link-->
     <joint name="${prefix}depth_joint" type="fixed">
       <parent>${prefix}rs200_camera</parent>
@@ -71,6 +71,7 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
       </sensor>
     </gazebo> -->
     <!-- <gazebo reference="${prefix}depth"> -->
+    <link name="${prefix}depth">
     <sensor name="camera_sensor_depth" type="camera">
   <always_on>true</always_on>
   <visualize>true</visualize>
@@ -90,7 +91,7 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
             <far>2</far>
           </clip>  </camera>
 </sensor>
-      <sensor name="depth_camera1" type="depth_camera">
+      <sensor name="depth_camera1" type="depth">
           <update_rate>10</update_rate>
           <topic>depth_camera</topic>
           <camera>
@@ -106,6 +107,7 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
             </clip>
           </camera>
           </sensor>
+          </link>
         <!-- <plugin name="depth_camera_controller" filename="libgazebo_ros_depth_camera.so">
           <alwaysOn>1</alwaysOn>
           <updateRate>10.0</updateRate>
