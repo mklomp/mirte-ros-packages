@@ -102,7 +102,7 @@
       <elevation>0</elevation>
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
-    <xacro:tileWorld name="tile_0_0" material="DT/floor" size="0.5" x="0" y="0" yaw="0"/>
+    <xacro:tileWorld name="tile_0_0" material="tile" size="0.5" x="0" y="0" yaw="0"/>
     <xacro:tileWorld name="tile_1_0" material="DT/floor" size="0.5" x="1" y="0" yaw="0"/>
     <xacro:tileWorld name="tile_2_0" material="DT/floor" size="0.5" x="2" y="0" yaw="0"/>
     <xacro:tileWorld name="tile_3_0" material="DT/floor" size="0.5" x="3" y="0" yaw="0"/>
