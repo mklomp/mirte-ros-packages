@@ -86,7 +86,7 @@
         <geometry>
           <!-- <pose>0 0 ${pi*0 + visualRot*pi}</pose> -->
           <mesh>
-            <uri>file://$(find mirte_gazebo)/meshes/wheel.stl</uri>
+            <uri>models://wheel/wheel.obj</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>

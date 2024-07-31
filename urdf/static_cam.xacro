@@ -1,0 +1,56 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mirte">
+    <xacro:macro name="static_cam" params="">
+
+        <model name="top_down_cam">
+        <static>true</static>
+            <link name="top_down_link">
+            <static>1</static>
+                <sensor name="top_down_camera_sensor" type="camera">
+                    <always_on>true</always_on>
+                    <visualize>true</visualize>
+                    <update_rate>10</update_rate>
+                    <topic>top_down_camera/image_raw</topic>
+                    <gz_frame_id>top_down_camera_rgb_frame</gz_frame_id>
+                    <camera name="top_down_camera">
+                        <camera_info_topic>camera/camera_info</camera_info_topic>
+                        <!-- <horizontal_fov>2.5</horizontal_fov> -->
+                        <image>
+                            <width>640</width>
+                            <height>640</height>
+                            <format>R8G8B8</format>
+                        </image>
+                        <clip>
+                            <near>0.02</near>
+                            <far>6</far>
+                        </clip>
+                    </camera>
+                </sensor>
+                <static>1</static>
+                <pose>1.688 1.36 4 0 1.57 0</pose>
+
+                <link name="top_down_link">
+                <static>1</static>
+                    <collision name="collision_tile_7_4">
+                        <geometry>
+                            <mesh>
+                                <scale>0.5 0.5 0.5</scale>
+                                <!-- <scale>0.0254 0.0254 0.0254</scale> -->
+                                <uri>model://floor/meshes/floor.obj</uri>
+                            </mesh>
+                        </geometry>
+                    </collision>
+                    <visual name="visual_tile_7_4">
+                        <geometry>
+                            <mesh>
+                                <pose>1.688 1.36 4 0 1.57 0</pose>
+                                <scale>0.5 0.5 0.5</scale>
+                                <!-- <scale>0.0254 0.0254 0.0254</scale> -->
+                                <uri>model://floor/meshes/floor.obj</uri>
+                            </mesh>
+                        </geometry>
+                    </visual>
+                </link>
+            </link>
+        </model>
+    </xacro:macro>
+</robot>

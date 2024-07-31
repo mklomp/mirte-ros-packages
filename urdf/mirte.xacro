@@ -57,13 +57,12 @@
         <geometry>
           <pose>0 0 1.57079633</pose>
           <mesh>
-            <uri>file://$(find mirte_gazebo)/meshes/mirte_base.stl</uri>
+            <uri>model://mirte_base/mirte_base.obj</uri>
+            <color>0 0 1 1</color>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
-        <material>
-          <name>blue</name>
-        </material>
+
       </visual>
       <!-- <sensor name="chassis_contact_sensor" type="contact">
       <always_on>true</always_on>

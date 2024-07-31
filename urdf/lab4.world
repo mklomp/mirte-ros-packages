@@ -3,6 +3,7 @@
   <xacro:include filename="$(find mirte_gazebo)/urdf/tileWorld.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/duckieModels.xacro"/>
   <xacro:include filename="$(find mirte_gazebo)/urdf/includedMacro.xacro"/>
+  <xacro:include filename="$(find mirte_gazebo)/urdf/static_cam.xacro"/>
   <world name="default">
     <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics">
     </plugin>
@@ -292,7 +293,7 @@
     <xacro:model name="obj_4_3_5_3" type="cone" size="0.5" x="4.3" y="5.3" yaw="0" static="${True}" scale="${0.1}"/>
     <xacro:model name="obj_4_0_5_4" type="cone" size="0.5" x="4.0" y="5.4" yaw="0" static="${True}" scale="${0.1}"/>
     <xacro:model name="obj_4_4_5_0" type="cone" size="0.5" x="4.4" y="5.0" yaw="0" static="${True}" scale="${0.1}"/>
-     
+     <xacro:static_cam/>
     <state world_name="default">
       <!-- <sim_time>0</sim_time>
       <real_time>0</real_time>
@@ -500,6 +501,7 @@
       <!-- <light name="sun">
         <pose>0 0 10 0 -0 0</pose>
       </light> -->
+      
     </state>
     <!-- <gui fullscreen="0">
       <camera name="user_camera">
@@ -529,5 +531,7 @@
         <falloff>0</falloff>
       </spot>
     </light>
+
+
   </world>
 </sdf>
