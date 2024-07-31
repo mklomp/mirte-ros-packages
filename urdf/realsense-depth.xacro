@@ -12,14 +12,31 @@
 https://github.com/SyrianSpock/realsense_gazebo_plugin
 -->
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:macro name="realsense-depth" params="prefix parent *origin">
+  <xacro:macro name="realsense-depth" params="prefix parent">
     <!-- Camera link -->
     <link name="${prefix}rs200_camera">
+            <!-- <origin rpy="${pi/2} ${pi/2} ${pi/2}" xyz="0 0 0"/> -->
+          <pose>0.1 0 0.035 0 0 0</pose>
+
       <visual name="vis_${prefix}_rs200_cam">
-        <origin rpy="0 0 0" xyz="0 0 0"/>
+      <pose>0 0 0 ${pi/2} 0 0</pose>
+       <!-- <origin>
+          <rpy>${pi/2} 0 0</rpy>
+          <xyz>0 0 0</xyz>
+        </origin>     -->
         <geometry>
-          <mesh>
-           <filename>package://mirte_gazebo/models/realsense_camera/meshes/realsense.dae</filename></mesh>
+                <!-- <origin rpy="${pi/2} ${pi/2} ${pi/2}" xyz="0 0 0"/> -->
+
+        <!-- <geometry> -->
+              <mesh>
+                              <!-- <origin rpy="${pi/2} ${pi/2} ${pi/2}" xyz="0 0 0"/> -->
+
+                <!-- <scale>0.0254 0.0254 0.0254</scale> -->
+                <!-- <uri>model://curve_left_1/meshes/curve_left_1.obj</uri> -->
+                <uri>model://realsense_camera/meshes/realsense.obj</uri>
+              </mesh>
+            <!-- </geometry> -->
+          <!-- <mesh filename="model://realsense_camera/meshes/realsense.dae"/> -->
         </geometry>
       </visual>
       <collision name="coll_${prefix}_rs200_cam">
@@ -28,8 +45,8 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
         </geometry>
       </collision>
       <inertial>
-        <mass value="0.0615752"/>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <mass value="0.0"/>
+        <!-- <origin rpy="0 0 0" xyz="0 0 0"/> -->
         <inertia>
          <ixx>9.108e-05</ixx> <ixy>0</ixy><ixz>0</ixz><iyy>2.51e-06</iyy><iyz>0</iyz><izz>8.931e-05</izz>
          </inertia>
@@ -39,7 +56,8 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
     <joint name="${prefix}realsense_joint" type="fixed">
       <parent>${parent}</parent>
       <child>${prefix}rs200_camera</child>
-      <xacro:insert_block name="origin"/>
+
+      <!-- <xacro:insert_block name="origin"/> -->
     </joint>
     <!-- Virtual links representing the cameras positons and orientations-->
     
@@ -47,7 +65,7 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
     <joint name="${prefix}depth_joint" type="fixed">
       <parent>${prefix}rs200_camera</parent>
       <child>${prefix}depth</child>
-      <origin xyz="0 -0 0.004" rpy="0 0 0"/>
+      <!-- <origin xyz="0 -0 0.004" rpy="0 0 0"/> -->
     </joint>
     <!-- <gazebo reference="${prefix}rs200_camera"> -->
     <!-- TODO: later weer terugzetten! -->

@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+
+
+THIS FILE IS NOT IN USE
 <!--Develped by Daniel Ordonez 22.05.2018 - daniels.ordonez@gmail.com
     INFORMATION:
         This xacro file a URDF representation of the intel real sense RS200 with the
@@ -15,9 +18,15 @@
     <!-- Camera link -->
     <link name="${prefix}rs200_camera">
       <visual>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-        <geometry>
-          <mesh filename="package://realsense_gazebo_plugin/models/realsense_camera/meshes/realsense.dae"/>
+    <geometry>
+        <!-- <geometry> -->
+              <mesh>
+                <!-- <scale>0.0254 0.0254 0.0254</scale> -->
+                <uri>model://curve_left_1/meshes/curve_left_1.obj</uri>
+                <!-- <uri>model://realsense_camera/meshes/realsense.obj</uri> -->
+              </mesh>
+            <!-- </geometry> -->
+          <!-- <mesh filename="model://realsense_camera/meshes/realsense.dae"/> -->
         </geometry>
       </visual>
       <collision>
