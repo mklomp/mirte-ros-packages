@@ -1,6 +1,7 @@
 #include "mirte-sensors.hpp"
 #include "parsers/sensors.hpp"
-Mirte_Sensors::Mirte_Sensors(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+Mirte_Sensors::Mirte_Sensors(std::shared_ptr<rclcpp::Node> nh,
+                             std::shared_ptr<TMX> tmx,
                              std::shared_ptr<Mirte_Board> board,
                              std::shared_ptr<Parser> parser) {
   this->tmx = tmx;
@@ -117,10 +118,9 @@ void Mirte_Sensors::stop() {
   }
 }
 
-std::vector<std::shared_ptr<KeypadMonitor>>
-KeypadMonitor::get_keypad_monitors(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
-                                   std::shared_ptr<Mirte_Board> board,
-                                   std::shared_ptr<Parser> parser) {
+std::vector<std::shared_ptr<KeypadMonitor>> KeypadMonitor::get_keypad_monitors(
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+    std::shared_ptr<Mirte_Board> board, std::shared_ptr<Parser> parser) {
   std::vector<std::shared_ptr<KeypadMonitor>> sensors;
   auto keypads = Keypad_data::parse_keypad_data(parser, board);
   for (auto keypad : keypads) {
@@ -131,7 +131,8 @@ KeypadMonitor::get_keypad_monitors(std::shared_ptr<rclcpp::Node> nh, std::shared
   // TODO: schedule periodic publishing
 }
 
-Mirte_Sensor::Mirte_Sensor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+Mirte_Sensor::Mirte_Sensor(std::shared_ptr<rclcpp::Node> nh,
+                           std::shared_ptr<TMX> tmx,
                            std::shared_ptr<Mirte_Board> board,
                            std::vector<uint8_t> pins, std::string name) {
   this->tmx = tmx;
@@ -141,7 +142,8 @@ Mirte_Sensor::Mirte_Sensor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX
   this->board = board;
 }
 
-KeypadMonitor::KeypadMonitor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+KeypadMonitor::KeypadMonitor(std::shared_ptr<rclcpp::Node> nh,
+                             std::shared_ptr<TMX> tmx,
                              std::shared_ptr<Mirte_Board> board,
                              std::shared_ptr<Keypad_data> keypad_data)
     : Mirte_Sensor(nh, tmx, board, {keypad_data->pin}, keypad_data->name) {
@@ -218,10 +220,9 @@ void KeypadMonitor::publish() {
   this->last_debounced_key = debounced_key;
 }
 
-std::vector<std::shared_ptr<SonarMonitor>>
-SonarMonitor::get_sonar_monitors(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
-                                 std::shared_ptr<Mirte_Board> board,
-                                 std::shared_ptr<Parser> parser) {
+std::vector<std::shared_ptr<SonarMonitor>> SonarMonitor::get_sonar_monitors(
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+    std::shared_ptr<Mirte_Board> board, std::shared_ptr<Parser> parser) {
   std::vector<std::shared_ptr<SonarMonitor>> sensors;
   auto sonars = Sonar_data::parse_sonar_data(parser, board);
   for (auto sonar : sonars) {
@@ -231,7 +232,8 @@ SonarMonitor::get_sonar_monitors(std::shared_ptr<rclcpp::Node> nh, std::shared_p
   return sensors;
 }
 
-SonarMonitor::SonarMonitor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+SonarMonitor::SonarMonitor(std::shared_ptr<rclcpp::Node> nh,
+                           std::shared_ptr<TMX> tmx,
                            std::shared_ptr<Mirte_Board> board,
                            std::shared_ptr<Sonar_data> sonar_data)
     : Mirte_Sensor(nh, tmx, board, {sonar_data->trigger, sonar_data->echo},

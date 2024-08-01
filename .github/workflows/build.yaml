@@ -1,0 +1,35 @@
+name: ci
+on:
+  pull_request:
+  push:
+
+jobs:
+  build_test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: 
+          - ubuntu-22.04 
+        compiler:
+          - llvm-16
+          - gcc-10
+          # you can specify the version after `-` like `llvm-13.0.0`.
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Cpp
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          cmake: true
+          ninja: false
+          vcpkg: false
+          cppcheck: false
+          clangtidy: false # instead of `true`, which chooses the default version, you can pass a specific version.
+          # ...
+      - name: Build
+        run: |
+         sudo apt install -y libboost-all-dev
+         cmake -B build .
+         cd build
+         make

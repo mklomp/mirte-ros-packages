@@ -1,11 +1,9 @@
-#include <parsers/actuators.hpp>
 #include <boost/algorithm/string.hpp>
+#include <parsers/actuators.hpp>
 
-
-std::vector<std::shared_ptr<Servo_data>> Servo_data::parse_servo_data(
-  std::shared_ptr<Parser> parser,
-  std::shared_ptr<Mirte_Board> board)
-{
+std::vector<std::shared_ptr<Servo_data>>
+Servo_data::parse_servo_data(std::shared_ptr<Parser> parser,
+                             std::shared_ptr<Mirte_Board> board) {
   std::vector<std::shared_ptr<Servo_data>> servos;
   for (auto name : parser->get_params_keys("servo")) {
     std::cout << name << std::endl;
@@ -26,11 +24,10 @@ std::vector<std::shared_ptr<Servo_data>> Servo_data::parse_servo_data(
       // pins:
       //   pin: 1
       servo_data.pin =
-        board->resolvePin(
-        parser->get_params_name(
-          parser->build_param_name(
-            servo_key,
-            "pins"))["pin"].get<std::string>());
+          board->resolvePin(parser
+                                ->get_params_name(parser->build_param_name(
+                                    servo_key, "pins"))["pin"]
+                                .get<std::string>());
     }
 
     if (servo_keys.count("min_pulse")) {
@@ -46,11 +43,9 @@ std::vector<std::shared_ptr<Servo_data>> Servo_data::parse_servo_data(
   return servos;
 }
 
-
-std::vector<std::shared_ptr<Motor_data>> Motor_data::parse_motor_data(
-  std::shared_ptr<Parser> parser,
-  std::shared_ptr<Mirte_Board> board)
-{
+std::vector<std::shared_ptr<Motor_data>>
+Motor_data::parse_motor_data(std::shared_ptr<Parser> parser,
+                             std::shared_ptr<Mirte_Board> board) {
   std::vector<std::shared_ptr<Motor_data>> motors;
   for (auto name : parser->get_params_keys("motor")) {
     auto motor_key = parser->build_param_name("motor", name);
@@ -61,20 +56,26 @@ std::vector<std::shared_ptr<Motor_data>> Motor_data::parse_motor_data(
     motor_data.name = name;
     if (motor_keys.count("pins")) {
       std::cout << name << "pins" << std::endl;
-      auto pins_config = parser->get_params_name(parser->build_param_name(motor_key, "pins"));
-      for (auto pin_key : parser->get_params_keys(parser->build_param_name(motor_key, "pins"))) {
+      auto pins_config =
+          parser->get_params_name(parser->build_param_name(motor_key, "pins"));
+      for (auto pin_key : parser->get_params_keys(
+               parser->build_param_name(motor_key, "pins"))) {
         boost::algorithm::to_lower(pin_key);
         if ("p1" == pin_key) {
-          motor_data.P1 = board->resolvePin(pins_config[pin_key].get<std::string>());
+          motor_data.P1 =
+              board->resolvePin(pins_config[pin_key].get<std::string>());
         }
         if ("p2" == pin_key) {
-          motor_data.P2 = board->resolvePin(pins_config[pin_key].get<std::string>());
+          motor_data.P2 =
+              board->resolvePin(pins_config[pin_key].get<std::string>());
         }
         if ("p1" == pin_key) {
-          motor_data.D1 = board->resolvePin(pins_config[pin_key].get<std::string>());
+          motor_data.D1 =
+              board->resolvePin(pins_config[pin_key].get<std::string>());
         }
         if ("p2" == pin_key) {
-          motor_data.D2 = board->resolvePin(pins_config[pin_key].get<std::string>());
+          motor_data.D2 =
+              board->resolvePin(pins_config[pin_key].get<std::string>());
         }
       }
     } else if (motor_keys.count("connector")) {
@@ -109,6 +110,5 @@ std::vector<std::shared_ptr<Motor_data>> Motor_data::parse_motor_data(
   }
   return motors;
 }
-
 
 // TODO: oled and module actuators

@@ -1,8 +1,7 @@
 #include <mirte-board.hpp>
 #include <pcbs/v08.hpp>
-Mirte_Board_pcb::Mirte_Board_pcb(
-  std::shared_ptr<Mirte_Board> mcu, std::string version)
-{
+Mirte_Board_pcb::Mirte_Board_pcb(std::shared_ptr<Mirte_Board> mcu,
+                                 std::string version) {
   this->mcu = mcu;
   this->version = version;
   std::cout << "Mirte_Board_pcb::Mirte_Board_pcb" << version << std::endl;
@@ -17,8 +16,8 @@ Mirte_Board_pcb::Mirte_Board_pcb(
   }
 }
 
-std::map<std::string, int> Mirte_Board_pcb::resolveConnector(std::string connector)
-{
+std::map<std::string, int>
+Mirte_Board_pcb::resolveConnector(std::string connector) {
 
   const auto pins = this->connectors.at(connector);
   std::map<std::string, int> resolved_pins;
@@ -28,7 +27,6 @@ std::map<std::string, int> Mirte_Board_pcb::resolveConnector(std::string connect
   return resolved_pins;
 }
 
-int Mirte_Board_pcb::resolvePin(std::string pin)
-{
+int Mirte_Board_pcb::resolvePin(std::string pin) {
   return mcu->resolvePin(pin);
 }

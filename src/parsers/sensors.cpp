@@ -1,9 +1,8 @@
 #include "parsers/sensors.hpp"
 
-std::vector<std::shared_ptr<Sonar_data>> Sonar_data::parse_sonar_data(
-  std::shared_ptr<Parser> parser,
-  std::shared_ptr<Mirte_Board> board)
-{
+std::vector<std::shared_ptr<Sonar_data>>
+Sonar_data::parse_sonar_data(std::shared_ptr<Parser> parser,
+                             std::shared_ptr<Mirte_Board> board) {
   std::vector<std::shared_ptr<Sonar_data>> sonars;
   for (auto name : parser->get_params_keys("distance")) {
     Sonar_data sonar_data;
@@ -19,10 +18,13 @@ std::vector<std::shared_ptr<Sonar_data>> Sonar_data::parse_sonar_data(
       sonar_data.echo = pins["echo"];
 
     } else if (sonar_keys.count("pins")) {
-      auto pins_config = parser->get_params_name(parser->build_param_name(sonar_key, "pins"));
-      for (auto pin_key : parser->get_params_keys(parser->build_param_name(sonar_key, "pins"))) {
+      auto pins_config =
+          parser->get_params_name(parser->build_param_name(sonar_key, "pins"));
+      for (auto pin_key : parser->get_params_keys(
+               parser->build_param_name(sonar_key, "pins"))) {
         if ("trigger" == pin_key) {
-          sonar_data.trigger = board->resolvePin(get_string(pins_config[pin_key]));
+          sonar_data.trigger =
+              board->resolvePin(get_string(pins_config[pin_key]));
         } else if ("echo" == pin_key) {
           sonar_data.echo = board->resolvePin(get_string(pins_config[pin_key]));
         }
@@ -35,11 +37,9 @@ std::vector<std::shared_ptr<Sonar_data>> Sonar_data::parse_sonar_data(
   return sonars;
 }
 
-
-std::vector<std::shared_ptr<Intensity_data>> Intensity_data::parse_intensity_data(
-  std::shared_ptr<Parser> parser,
-  std::shared_ptr<Mirte_Board> board)
-{
+std::vector<std::shared_ptr<Intensity_data>>
+Intensity_data::parse_intensity_data(std::shared_ptr<Parser> parser,
+                                     std::shared_ptr<Mirte_Board> board) {
   std::vector<std::shared_ptr<Intensity_data>> irs;
   for (auto name : parser->get_params_keys("intensity")) {
     Intensity_data intensity_data;
@@ -58,14 +58,16 @@ std::vector<std::shared_ptr<Intensity_data>> Intensity_data::parse_intensity_dat
         intensity_data.d_pin = pins["digital"];
       }
     } else if (intensity_keys.count("pins")) {
-      auto pins_config = parser->get_params_name(parser->build_param_name(intensity_key, "pins"));
-      for (auto pin_key :
-        parser->get_params_keys(parser->build_param_name(intensity_key, "pins")))
-      {
+      auto pins_config = parser->get_params_name(
+          parser->build_param_name(intensity_key, "pins"));
+      for (auto pin_key : parser->get_params_keys(
+               parser->build_param_name(intensity_key, "pins"))) {
         if ("analog" == pin_key) {
-          intensity_data.a_pin = board->resolvePin(get_string(pins_config[pin_key]));
+          intensity_data.a_pin =
+              board->resolvePin(get_string(pins_config[pin_key]));
         } else if ("digital" == pin_key) {
-          intensity_data.d_pin = board->resolvePin(get_string(pins_config[pin_key]));
+          intensity_data.d_pin =
+              board->resolvePin(get_string(pins_config[pin_key]));
         }
       }
     }
@@ -76,11 +78,9 @@ std::vector<std::shared_ptr<Intensity_data>> Intensity_data::parse_intensity_dat
   return irs;
 }
 
-
-std::vector<std::shared_ptr<Keypad_data>> Keypad_data::parse_keypad_data(
-  std::shared_ptr<Parser> parser,
-  std::shared_ptr<Mirte_Board> board)
-{
+std::vector<std::shared_ptr<Keypad_data>>
+Keypad_data::parse_keypad_data(std::shared_ptr<Parser> parser,
+                               std::shared_ptr<Mirte_Board> board) {
   std::vector<std::shared_ptr<Keypad_data>> out;
   for (auto name : parser->get_params_keys("keypad")) {
     Keypad_data data;
@@ -95,10 +95,10 @@ std::vector<std::shared_ptr<Keypad_data>> Keypad_data::parse_keypad_data(
       data.pin = pins["pin"];
 
     } else if (keys.count("pins")) {
-      auto pins_config = parser->get_params_name(parser->build_param_name(key, "pins"));
+      auto pins_config =
+          parser->get_params_name(parser->build_param_name(key, "pins"));
       for (auto pin_key :
-        parser->get_params_keys(parser->build_param_name(key, "pins")))
-      {
+           parser->get_params_keys(parser->build_param_name(key, "pins"))) {
         if ("pin" == pin_key) {
           data.pin = board->resolvePin(get_string(pins_config[pin_key]));
         }
