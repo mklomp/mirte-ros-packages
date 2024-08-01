@@ -8,8 +8,9 @@ Mirte_Actuators::Mirte_Actuators(std::shared_ptr<rclcpp::Node> nh,
   this->nh = nh;
   this->board = board;
   this->actuators = Motor::get_motors(nh, tmx, board, parser);
-  auto servos = Servo_data::parse_servo_data(parser, board);
-  auto motors = Motor_data::parse_motor_data(parser, board);
+  // WIP:
+  // auto servos = Servo_data::parse_servo_data(parser, board);
+  // auto motors = Motor_data::parse_motor_data(parser, board);
 }
 
 Mirte_Actuator::Mirte_Actuator(std::shared_ptr<rclcpp::Node> nh,
@@ -112,11 +113,15 @@ PPMotor::PPMotor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
   tmx->setPinMode(this->pwmA_pin, TMX::PIN_MODES::PWM_OUTPUT);
   tmx->setPinMode(this->pwmB_pin, TMX::PIN_MODES::PWM_OUTPUT);
 }
+
+void PPMotor::setA(int speed) { tmx->pwmWrite(this->pwmA_pin, speed); }
+void PPMotor::setB(int speed) { tmx->pwmWrite(this->pwmB_pin, speed); }
+
 void PPMotor::set_speed(int speed) {
   int32_t speed_ = (int32_t)((float)speed * (this->max_pwm) / 100.0);
 
-  tmx->pwmWrite(this->pwmA_pin, speed > 0 ? speed_ : 0);
-  tmx->pwmWrite(this->pwmB_pin, speed < 0 ? -speed_ : 0);
+  this->setA(speed > 0 ? speed_ : 0);
+  this->setB(speed < 0 ? -speed_ : 0);
   std::cout << "1:" << std::dec << (speed < 0 ? -speed_ : 0) << std::endl;
   std::cout << "2:" << std::dec << (speed > 0 ? speed_ : 0) << std::endl;
   std::cout << "Setting speed to " << std::dec << speed << std::endl;

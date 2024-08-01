@@ -1,5 +1,6 @@
 #include "mirte-actuators.hpp" // for Mirte_Actuators
 #include "mirte-board.hpp"     // for Mirte_Board
+#include "mirte-modules.hpp"
 #include "mirte-node.hpp"
 #include "mirte-ping.hpp"          // for Mirte_Ping
 #include "mirte-sensors.hpp"       // for Mirte_Sensors

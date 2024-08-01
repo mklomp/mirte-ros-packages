@@ -51,10 +51,12 @@ add_executable(
   src/boards/pico.cpp
   src/boards/pcb.cpp
   src/mirte-actuators.cpp
+  src/mirte-modules.cpp
   src/mirte-sensors.cpp
   src/mirte-ping.cpp
   src/parsers/actuators.cpp
   src/parsers/parsers.cpp
+  src/parsers/p_modules.cpp
   src/parsers/sensors.cpp
   libs/tmx-cpp/src/tmx.cpp
   libs/tmx-cpp/src/buffer_build.cpp

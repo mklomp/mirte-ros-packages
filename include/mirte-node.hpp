@@ -21,4 +21,5 @@ public:
   std::shared_ptr<Mirte_Sensors> monitor;
   std::shared_ptr<Mirte_Actuators> actuators;
   std::shared_ptr<Mirte_Ping> ping;
+  std::shared_ptr<Mirte_modules> modules;
 };

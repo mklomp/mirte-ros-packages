@@ -66,9 +66,13 @@ public:
   PPMotor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
           std::shared_ptr<Mirte_Board> board,
           std::shared_ptr<Motor_data> motor_data, std::string name);
+
+  PPMotor(); // Only for PCA_motor
   void set_speed(int speed);
   pin_t pwmA_pin;
   pin_t pwmB_pin;
+  void setA(int speed);
+  void setB(int speed);
 };
 
 class DPMotor : public Motor {

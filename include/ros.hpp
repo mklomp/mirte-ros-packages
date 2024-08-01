@@ -8,7 +8,8 @@
 #include "mirte_msgs/srv/get_keypad.hpp"
 #include "std_msgs/msg/header.hpp"
 // using std::shared_ptr<rclcpp::Node> = std::shared_ptr<rclcpp::Node>;
-// template <typename T> using publisher = std::shared_ptr<rclcpp::Publisher<T>>;
+// template <typename T> using publisher =
+// std::shared_ptr<rclcpp::Publisher<T>>;
 
 // template <typename T>
 // using subscriber = std::shared_ptr<rclcpp::Subscription<T>>;
@@ -33,7 +34,8 @@
 // using mirte_msgs::msg::Intensity = mirte_msgs::msg::Intensity;
 
 #include "mirte_msgs/srv/get_intensity_digital.hpp"
-// using mirte_msgs::srv::GetIntensityDigital = mirte_msgs::srv::GetIntensityDigital;
+// using mirte_msgs::srv::GetIntensityDigital =
+// mirte_msgs::srv::GetIntensityDigital;
 
 #include "mirte_msgs/srv/get_intensity.hpp"
 // using mirte_msgs::srv::GetIntensity = mirte_msgs::srv::GetIntensity;

@@ -7,11 +7,11 @@ using connector_map = std::map<std::string, pin_map>;
 #define MIRTE_BOARD_HPP
 
 #include "parsers/parsers.hpp"
-#include <map>     // for map, map<>::value_compare
-#include <memory>  // for shared_ptr, __shared_ptr_access
-#include <string>  // for string, basic_string, operator<
 #include "pcbs/v06.hpp"
 #include "pcbs/v08.hpp"
+#include <map>    // for map, map<>::value_compare
+#include <memory> // for shared_ptr, __shared_ptr_access
+#include <string> // for string, basic_string, operator<
 
 class Mirte_Board {
 public:
