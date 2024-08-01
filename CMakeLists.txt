@@ -61,6 +61,7 @@ add_executable(
   libs/tmx-cpp/src/buffer_build.cpp
   libs/tmx-cpp/src/sensors.cpp
   libs/tmx-cpp/src/modules.cpp  libs/tmx-cpp/src/modules/PCA9685.cpp
+  libs/tmx-cpp/src/modules/HiwonderServo.cpp
 
   libs/tmx-cpp/libs/async_serial/AsyncSerial.cpp
   libs/tmx-cpp/libs/async_serial/BufferedAsyncSerial.cpp)
