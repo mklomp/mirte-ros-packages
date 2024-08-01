@@ -51,6 +51,7 @@ void mirte_node::start(std::shared_ptr<rclcpp::Node> s_node) {
   this->actuators =
       std::make_shared<Mirte_Actuators>(s_node, s_tmx, s_board, p_s);
   this->monitor = std::make_shared<Mirte_Sensors>(s_node, s_tmx, s_board, p_s);
+  this->modules = std::make_shared<Mirte_modules>(s_node, s_tmx, s_board, p_s);
   std::cout << "done adding" << std::endl;
   this->ping = std::make_shared<Mirte_Ping>(s_node, s_tmx, [&]() {
     std::cout << "stop" << std::endl;

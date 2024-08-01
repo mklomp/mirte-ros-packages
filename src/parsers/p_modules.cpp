@@ -61,6 +61,7 @@ std::vector<std::shared_ptr<PCA_Motor_data>> PCA_Motor_data::parse_pca_motor_dat
         auto pca_keys = parser->get_params_keys(pca_key);
         if(pca_keys.count("motors")) {
                 auto motors_name = parser->build_param_name(pca_key, "motors");
+
                 auto motors_config = parser->get_params_name(motors_name);
                 for(auto motor_key: parser->get_params_keys(motors_name)) {
                         auto motor_config = parser->get_params_name(parser->build_param_name(motors_name, motor_key));
@@ -75,6 +76,7 @@ std::vector<std::shared_ptr<PCA_Motor_data>> PCA_Motor_data::parse_pca_motor_dat
                         }
 
                         if(motor_data.check()) {
+                          std::cout << "added pca motor " << motor_data.name << std::endl;
                                 motors.push_back(std::make_shared<PCA_Motor_data>(motor_data));
                         }
                 }

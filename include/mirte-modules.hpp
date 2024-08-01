@@ -61,9 +61,9 @@ public:
 class PCA_Motor {
 public:
   PCA_Motor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
-            std::shared_ptr<Mirte_Board> board, std::string name);
-  std::string name;
-  std::shared_ptr<PCA9685_module> pca9685;
+            std::shared_ptr<Mirte_Board> board, std::shared_ptr<PCA_Motor_data> motor_data, std::shared_ptr<PCA9685_module> pca9685);
+ std::shared_ptr< PCA_Motor_data> motor_data;
+  std::shared_ptr<PCA9685_module> pca9685_mod;
   // Stolen from mirtes-actuators.hpp::motor, but it was too shit to inherit
   // from that one as well.
   void set_speed(int speed);
