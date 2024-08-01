@@ -3,10 +3,9 @@ project(mirte_telemetrix_cpp)
 
 # Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++17)
-# find_program(iwyu_path NAMES include-what-you-use iwyu REQUIRED)
-# if(NOT iwyu_path)
-#   message(FATAL_ERROR "Could not find the program include-what-you-use")
-# endif()
+# find_program(iwyu_path NAMES include-what-you-use iwyu REQUIRED) if(NOT
+# iwyu_path) message(FATAL_ERROR "Could not find the program
+# include-what-you-use") endif()
 
 # Find catkin macros and libraries if COMPONENTS list like find_package(catkin
 # REQUIRED COMPONENTS xyz) is used, also find other catkin packages
@@ -60,9 +59,9 @@ add_executable(
   libs/tmx-cpp/src/tmx.cpp
   libs/tmx-cpp/src/buffer_build.cpp
   libs/tmx-cpp/src/sensors.cpp
-  libs/tmx-cpp/src/modules.cpp  libs/tmx-cpp/src/modules/PCA9685.cpp
+  libs/tmx-cpp/src/modules.cpp
+  libs/tmx-cpp/src/modules/PCA9685.cpp
   libs/tmx-cpp/src/modules/HiwonderServo.cpp
-
   libs/tmx-cpp/libs/async_serial/AsyncSerial.cpp
   libs/tmx-cpp/libs/async_serial/BufferedAsyncSerial.cpp)
 ament_target_dependencies(
@@ -78,17 +77,12 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} Boost::system
                       Boost::thread)
 # set_property(TARGET ${PROJECT_NAME}_node PROPERTY CXX_INCLUDE_WHAT_YOU_USE
-#                                                   ${iwyu_path})
+# ${iwyu_path})
 
-# if(supported)
-#   if(CMAKE_BUILD_TYPE STREQUAL "Release")
-#     message(STATUS "IPO / LTO enabled")
-#     set_property(TARGET ${PROJECT_NAME}_node
-#                  PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-#   endif()
-# else()
-#   message(STATUS "IPO / LTO not supported: <${error}>")
-# endif()
+# if(supported) if(CMAKE_BUILD_TYPE STREQUAL "Release") message(STATUS "IPO /
+# LTO enabled") set_property(TARGET ${PROJECT_NAME}_node PROPERTY
+# INTERPROCEDURAL_OPTIMIZATION TRUE) endif() else() message(STATUS "IPO / LTO
+# not supported: <${error}>") endif()
 
 install(
   TARGETS ${PROJECT_NAME}_node
