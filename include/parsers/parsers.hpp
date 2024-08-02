@@ -20,6 +20,7 @@ public:
   int get_frequency() {
     return 50; // TODO: make this configurable
   }
+  std::string get_last(std::string name);
 };
 
 std::string get_string(rclcpp::ParameterValue param);

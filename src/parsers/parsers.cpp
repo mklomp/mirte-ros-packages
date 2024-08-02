@@ -78,3 +78,12 @@ std::set<std::string> Parser::get_params_keys(std::string name) {
 std::string Parser::build_param_name(std::string name, std::string key) {
   return name + "." + key;
 }
+
+std::string Parser::get_last(std::string name) { // convert modules.servobus to servobus
+   auto last_dot = name.find_last_of(".");
+  if (last_dot == std::string::npos) {
+    return name;
+  }
+  auto last = name.substr(last_dot + 1);
+  return last;
+}

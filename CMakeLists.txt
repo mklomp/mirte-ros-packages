@@ -13,6 +13,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(mirte_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
 # ##############################################################################
@@ -67,7 +68,7 @@ add_executable(
   libs/tmx-cpp/libs/async_serial/AsyncSerial.cpp
   libs/tmx-cpp/libs/async_serial/BufferedAsyncSerial.cpp)
 ament_target_dependencies(
-  ${PROJECT_NAME}_node std_msgs mirte_msgs rclcpp sensor_msgs # DEPENDS
+  ${PROJECT_NAME}_node std_msgs std_srvs mirte_msgs rclcpp sensor_msgs # DEPENDS
                                                               # system_lib
 )
 find_package(Boost REQUIRED COMPONENTS system thread)

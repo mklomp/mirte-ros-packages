@@ -14,8 +14,8 @@ public:
   int frequency;
   std::vector<std::shared_ptr<PCA_Motor_data>> motors;
   std::vector<std::shared_ptr<PCA_Servo_data>> servos;
-  PCA_data(std::string name, uint8_t addr, pin_t scl, pin_t sda, uint8_t port, int frequency,
-           std::vector<std::shared_ptr<PCA_Motor_data>> motors,
+  PCA_data(std::string name, uint8_t addr, pin_t scl, pin_t sda, uint8_t port,
+           int frequency, std::vector<std::shared_ptr<PCA_Motor_data>> motors,
            std::vector<std::shared_ptr<PCA_Servo_data>> servos) {
     this->name = name;
     this->addr = addr;
@@ -77,7 +77,6 @@ public:
   bool check() { return pin != (pin_t)-1 && name != ""; }
 };
 
-
 class Hiwonder_servo_data;
 class Hiwonder_bus_data {
 public:
@@ -86,7 +85,8 @@ public:
   pin_t tx_pin = (pin_t)-1;
   pin_t rx_pin = (pin_t)-1;
   std::vector<std::shared_ptr<Hiwonder_servo_data>> servos;
-  Hiwonder_bus_data(std::string name, uint8_t uart_port, pin_t tx_pin, pin_t rx_pin,
+  Hiwonder_bus_data(std::string name, uint8_t uart_port, pin_t tx_pin,
+                    pin_t rx_pin,
                     std::vector<std::shared_ptr<Hiwonder_servo_data>> servos) {
     this->name = name;
     this->servos = servos;
@@ -98,9 +98,13 @@ public:
   static std::vector<std::shared_ptr<Hiwonder_bus_data>>
   parse_hiwonder_bus_data(std::shared_ptr<Parser> parser,
                           std::shared_ptr<Mirte_Board> board);
-  bool check() { 
+                          static std::shared_ptr<Hiwonder_bus_data> parse_single(std::shared_ptr<Parser> parser,
+                                std::shared_ptr<Mirte_Board> board,
+                                std::string bus_key);
+  bool check() {
     // TODO
-    return true; }
+    return true;
+  }
 };
 
 class Hiwonder_servo_data {
@@ -114,9 +118,9 @@ public:
   float max_angle_in = -1;
   bool invert = false;
   std::string frame_id;
-  Hiwonder_servo_data(std::string name, uint8_t id, int min_angle_out, int max_angle_out,
-                      int home_out, float min_angle_in, float max_angle_in, bool invert,
-                      std::string frame_id) {
+  Hiwonder_servo_data(std::string name, uint8_t id, int min_angle_out,
+                      int max_angle_out, int home_out, float min_angle_in,
+                      float max_angle_in, bool invert, std::string frame_id) {
     this->name = name;
     this->id = id;
     this->min_angle_out = min_angle_out;
@@ -126,7 +130,6 @@ public:
     this->max_angle_in = max_angle_in;
     this->invert = invert;
     this->frame_id = frame_id;
-    
   }
   Hiwonder_servo_data() {}
   static std::vector<std::shared_ptr<Hiwonder_servo_data>>
@@ -135,8 +138,6 @@ public:
                             std::string bus_name);
   bool check() { return name != ""; }
 };
-
-
 
 #if 0
 class Servo_data

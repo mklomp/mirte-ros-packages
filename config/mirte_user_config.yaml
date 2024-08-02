@@ -121,6 +121,43 @@
           right_front:
             pin_A: 1
             pin_B: 0
+      servo_controller:
+        device: mirte
+        type: Hiwonder_Servo
+        uart: 0
+        rx_pin: 0
+        tx_pin: 1
+        servos:
+          servoRot:
+            id: 2
+            home_out: 12000
+            min_angle_out: 3400
+            max_angle_out: 21000
+            invert: true
+          servoShoulder:
+            id: 3
+            home_out: 11450
+            min_angle_out: 2832
+            max_angle_out: 20000
+            invert: false
+          servoElbow:
+            id: 4
+            home_out: 11750
+            min_angle_out: 120
+            max_angle_out: 21000
+            invert: false
+          servoWrist:
+            id: 5
+            home_out: 12200
+            min_angle_out: 1128
+            max_angle_out: 21000
+            invert: false
+          servoGripper:
+            id: 6
+            home_out: 10524
+            min_angle_out: 6168
+            max_angle_out: 14224
+            invert: true
 
     # These motors have the same pins as the line intensity sensors. So
     # when uncommenting these, please comment the intensity sensors.
