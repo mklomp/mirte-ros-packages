@@ -7,11 +7,11 @@ class PCA_Servo_data;
 class PCA_data {
 public:
   std::string name;
-  uint8_t addr;
-  uint8_t port;
-  pin_t scl;
-  pin_t sda;
-  int frequency;
+  uint8_t addr = 0x41;
+  uint8_t port = 0xFF;
+  pin_t scl = 0xFF;
+  pin_t sda = 0xFF;
+  int frequency = 2000;
   std::vector<std::shared_ptr<PCA_Motor_data>> motors;
   std::vector<std::shared_ptr<PCA_Servo_data>> servos;
   PCA_data(std::string name, uint8_t addr, pin_t scl, pin_t sda, uint8_t port,

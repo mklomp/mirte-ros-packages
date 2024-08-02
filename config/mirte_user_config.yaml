@@ -1,19 +1,19 @@
 /**:
   ros__parameters:
   #    max_frequency: 50
-    distance:
-      left:
-        name: left
-        device: mirte
-        pins:
-          trigger: GP9
-          echo: GP8
-      right:
-        name: right
-        device: mirte
-        pins:
-          trigger: GP7
-          echo: GP6
+    # distance:
+    #   left:
+    #     name: left
+    #     device: mirte
+    #     pins:
+    #       trigger: GP9
+    #       echo: GP8
+    #   right:
+    #     name: right
+    #     device: mirte
+    #     pins:
+    #       trigger: GP7
+    #       echo: GP6
     device:
       mirte:
         type: pcb
@@ -31,76 +31,76 @@
     #    device: mirte
     #    pins:
     #      pin: GP15
-    intensity:
-      left:
-        name: left
-        device: mirte
-        pins:
-          analog: GP27
-          digital: GP17
-      right:
-        name: right
-        device: mirte
-        pins:
-          analog: GP26
-          digital: GP16
-    oled:
-      left:
-        name: left
-        device: mirte
-        pins:
-          sda: GP10
-          scl: GP11
-      right:
-        name: right
-        device: mirte
-        pins:
-          sda: GP4
-          scl: GP5
-    servo:
-      left:
-        name: left
-        device: mirte
-        pins:
-          pin: GP14
-      right:
-        name: right
-        device: mirte
-        pins:
-          pin: GP15
-      # These servo's have the same pins as the ObjectDetectors. So as
-      # soon as they are implemented, these should be commented out
-      gripper:
-        name: gripper
-        device: mirte
-        pins:
-          pin: GP12
-      arm:
-        name: arm
-        device: mirte
-        pins:
-          pin: GP13
-    keypad:
-      yellow:
-        name: yellow
-        device: mirte
-        pins:
-          pin: GP28
-    motor:
-      left:
-        name: left
-        device: mirte
-        type: pp
-        pins:
-          p1: GP18
-          p2: GP19
-      right:
-        name: right
-        device: mirte
-        type: pp
-        pins:
-          p1: GP20
-          p2: GP21
+    # intensity:
+    #   left:
+    #     name: left
+    #     device: mirte
+    #     pins:
+    #       analog: GP27
+    #       digital: GP17
+    #   right:
+    #     name: right
+    #     device: mirte
+    #     pins:
+    #       analog: GP26
+    #       digital: GP16
+    # oled:
+    #   left:
+    #     name: left
+    #     device: mirte
+    #     pins:
+    #       sda: GP10
+    #       scl: GP11
+    #   right:
+    #     name: right
+    #     device: mirte
+    #     pins:
+    #       sda: GP4
+    #       scl: GP5
+    # servo:
+    #   left:
+    #     name: left
+    #     device: mirte
+    #     pins:
+    #       pin: GP14
+    #   right:
+    #     name: right
+    #     device: mirte
+    #     pins:
+    #       pin: GP15
+    #   # These servo's have the same pins as the ObjectDetectors. So as
+    #   # soon as they are implemented, these should be commented out
+    #   gripper:
+    #     name: gripper
+    #     device: mirte
+    #     pins:
+    #       pin: GP12
+    #   arm:
+    #     name: arm
+    #     device: mirte
+    #     pins:
+    #       pin: GP13
+    # keypad:
+    #   yellow:
+    #     name: yellow
+    #     device: mirte
+    #     pins:
+    #       pin: GP28
+    # motor:
+    #   left:
+    #     name: left
+    #     device: mirte
+    #     type: pp
+    #     pins:
+    #       p1: GP18
+    #       p2: GP19
+    #   right:
+    #     name: right
+    #     device: mirte
+    #     type: pp
+    #     pins:
+    #       p1: GP20
+    #       p2: GP21
     modules:
       motorservocontroller:
         device: mirte
@@ -121,43 +121,43 @@
           right_front:
             pin_A: 1
             pin_B: 0
-      servo_controller:
-        device: mirte
-        type: Hiwonder_Servo
-        uart: 0
-        rx_pin: 0
-        tx_pin: 1
-        servos:
-          servoRot:
-            id: 2
-            home_out: 12000
-            min_angle_out: 3400
-            max_angle_out: 21000
-            invert: true
-          servoShoulder:
-            id: 3
-            home_out: 11450
-            min_angle_out: 2832
-            max_angle_out: 20000
-            invert: false
-          servoElbow:
-            id: 4
-            home_out: 11750
-            min_angle_out: 120
-            max_angle_out: 21000
-            invert: false
-          servoWrist:
-            id: 5
-            home_out: 12200
-            min_angle_out: 1128
-            max_angle_out: 21000
-            invert: false
-          servoGripper:
-            id: 6
-            home_out: 10524
-            min_angle_out: 6168
-            max_angle_out: 14224
-            invert: true
+      # servo_controller:
+      #   device: mirte
+      #   type: Hiwonder_Servo
+      #   uart: 0
+      #   rx_pin: 0
+      #   tx_pin: 1
+      #   servos:
+      #     servoRot:
+      #       id: 2
+      #       home_out: 12000
+      #       min_angle_out: 3400
+      #       max_angle_out: 21000
+      #       invert: true
+      #     servoShoulder:
+      #       id: 3
+      #       home_out: 11450
+      #       min_angle_out: 2832
+      #       max_angle_out: 20000
+      #       invert: false
+      #     servoElbow:
+      #       id: 4
+      #       home_out: 11750
+      #       min_angle_out: 120
+      #       max_angle_out: 21000
+      #       invert: false
+      #     servoWrist:
+      #       id: 5
+      #       home_out: 12200
+      #       min_angle_out: 1128
+      #       max_angle_out: 21000
+      #       invert: false
+      #     servoGripper:
+      #       id: 6
+      #       home_out: 10524
+      #       min_angle_out: 6168
+      #       max_angle_out: 14224
+      #       invert: true
 
     # These motors have the same pins as the line intensity sensors. So
     # when uncommenting these, please comment the intensity sensors.

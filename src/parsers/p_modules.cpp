@@ -35,8 +35,8 @@ PCA_data::parse_pca_data_single(std::shared_ptr<Parser> parser,
   auto pca_keys = parser->get_params_keys(pca_key);
   PCA_data pca_data;
   pca_data.name = parser->get_last( pca_key);
-  if (pca_keys.count("addr")) {
-    pca_data.addr = pca_config["addr"].get<uint8_t>();
+  if (pca_keys.count("id")) {
+    pca_data.addr = pca_config["id"].get<uint8_t>();
   }
   if (pca_keys.count("connector")) {
     auto conn_name = pca_config["connector"].get<std::string>();
@@ -44,7 +44,7 @@ PCA_data::parse_pca_data_single(std::shared_ptr<Parser> parser,
     pca_data.scl = pins["scl"];
     pca_data.sda = pins["sda"];
     boost::algorithm::to_lower(conn_name);
-    pca_data.port = conn_name == ("i2c1") ? 1 : 2;
+    pca_data.port = board->resolveI2CPort(pca_data.sda);
   }
   if (pca_keys.count("frequency")) {
     pca_data.frequency = pca_config["frequency"].get<int>();
