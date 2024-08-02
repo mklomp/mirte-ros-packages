@@ -2,7 +2,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <parsers/actuators.hpp>
-
+#include <cmath>
 std::vector<std::shared_ptr<PCA_data>> PCA_data::parse_pca_data(
     std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board) {
   std::vector<std::shared_ptr<PCA_data>> pcas;
@@ -38,6 +38,9 @@ std::vector<std::shared_ptr<PCA_data>> PCA_data::parse_pca_data(
         }
         if(pca_keys.count("connector")) {
                 auto conn_name = pca_config["connector"].get<std::string>();
+                auto pins = board->resolveConnector(conn_name);
+                pca_data.scl = pins["scl"];
+                pca_data.sda = pins["sda"];
                 boost::algorithm::to_lower(conn_name);
             pca_data.port = conn_name == ("i2c1") ? 1 : 2;
         }
@@ -74,7 +77,9 @@ std::vector<std::shared_ptr<PCA_Motor_data>> PCA_Motor_data::parse_pca_motor_dat
                         if(motor_keys.count("pin_B")) {
                                 motor_data.pinB = motor_config["pin_B"].get<pin_t>();
                         }
-
+                        if(motor_keys.count("invert")) {
+                                motor_data.invert = motor_config["invert"].get<bool>();
+                        }
                         if(motor_data.check()) {
                           std::cout << "added pca motor " << motor_data.name << std::endl;
                                 motors.push_back(std::make_shared<PCA_Motor_data>(motor_data));
@@ -114,6 +119,103 @@ std::vector<std::shared_ptr<PCA_Servo_data>> PCA_Servo_data::parse_pca_servo_dat
         }
         return servos;
 }
+
+
+std::vector<std::shared_ptr<Hiwonder_bus_data>> Hiwonder_bus_data::parse_hiwonder_bus_data(
+    std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board) {
+  std::vector<std::shared_ptr<Hiwonder_bus_data>> buses;
+  for (auto name : parser->get_params_keys("bus")) {
+    auto bus_key = parser->build_param_name("bus", name);
+    auto bus_config = parser->get_params_name(bus_key);
+    auto bus_keys = parser->get_params_keys(bus_key);
+    Hiwonder_bus_data bus_data;
+    bus_data.name = name;
+    if(bus_keys.count("uart")) {
+      bus_data.uart_port = bus_config["uart"].get<uint8_t>();
+      if(bus_data.uart_port > 1) {
+        std::cout << "Invalid uart port: " << bus_data.uart_port << std::endl;
+        continue;
+      }
+    }
+    if(bus_keys.count("rx_pin")) {
+      bus_data.rx_pin = board->resolvePin(bus_config["rx_pin"].get<std::string>());
+    }
+    if(bus_keys.count("tx_pin")) {
+      bus_data.tx_pin = board->resolvePin(bus_config["tx_pin"].get<std::string>());
+    }
+
+    if (bus_keys.count("servos")) {
+      bus_data.servos = Hiwonder_servo_data::parse_hiwonder_servo_data(parser, board, bus_key);
+    }
+     if (bus_data.check()) {
+      buses.push_back(std::make_shared<Hiwonder_bus_data>(bus_data));
+    }
+  }
+  return buses;
+}
+
+double deg_to_rad(double deg) {
+  return deg * M_PI / 180;
+}
+
+std::vector<std::shared_ptr<Hiwonder_servo_data>> Hiwonder_servo_data::parse_hiwonder_servo_data(
+    std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string bus_key) {
+  std::vector<std::shared_ptr<Hiwonder_servo_data>> servos;
+  auto bus_config = parser->get_params_name(bus_key);
+  auto bus_keys = parser->get_params_keys(bus_key);
+  if (bus_keys.count("servos")) {
+    auto servos_name = parser->build_param_name(bus_key, "servos");
+    auto servos_config = parser->get_params_name(servos_name);
+    for (auto servo_key : parser->get_params_keys(servos_name)) {
+      auto servo_config = parser->get_params_name(parser->build_param_name(servos_name, servo_key));
+      auto servo_keys = parser->get_params_keys(parser->build_param_name(servos_name, servo_key));
+      Hiwonder_servo_data servo_data;
+      servo_data.name = servo_key;
+      if (servo_keys.count("id")) {
+        servo_data.id =  servo_config["id"].get<uint8_t>();
+      }
+      if (servo_keys.count("min_angle_out")) {
+        servo_data.min_angle_out = servo_config["min_angle_out"].get<int>();
+      } else { continue;}
+      if (servo_keys.count("max_angle_out")) {
+        servo_data.max_angle_out = servo_config["max_angle_out"].get<int>();
+      } else { continue;}
+      if (servo_keys.count("home_out")) {
+        servo_data.home_out = servo_config["home_out"].get<int>();
+      } else { continue;}
+
+      if(servo_keys.count("invert")) {
+        servo_data.min_angle_in = servo_config["invert"].get<bool>();
+      }
+      if(servo_keys.count("frame")) {
+        servo_data.frame_id = servo_config["frame"].get<std::string>();
+      } else {
+        servo_data.frame_id = "servo_"+ servo_data.name;
+      }
+      // calculate min_angle_in and max_angle_in
+        double diff_min = servo_data.min_angle_out - servo_data.home_out;
+        diff_min = diff_min / 100;
+        servo_data.min_angle_in = deg_to_rad(diff_min);
+        double diff_max = servo_data.max_angle_out - servo_data.home_out;
+        diff_max = diff_max / 100;
+        servo_data.max_angle_in = deg_to_rad(diff_max); 
+        if(servo_data.invert) {
+          double t = servo_data.min_angle_in;
+          servo_data.min_angle_in = -servo_data.max_angle_in;
+          servo_data.max_angle_in = -t;
+        }
+        std::cout << "Servo: " << servo_data.name << " min_angle_in: " << servo_data.min_angle_in << " max_angle_in: " << servo_data.max_angle_in << std::endl;
+      if (servo_data.check()) {
+        servos.push_back(std::make_shared<Hiwonder_servo_data>(servo_data));
+      }
+    }
+  }
+  return servos;
+}
+
+
+
+
 
 
 

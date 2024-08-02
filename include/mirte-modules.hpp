@@ -75,3 +75,39 @@ public:
   int last_speed = 0;
   rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr ros_client;
 };
+
+class Hiwonder_servo;
+class Hiwonder_bus_module : public Mirte_module {
+public:
+  Hiwonder_bus_module(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+             std::shared_ptr<Mirte_Board> board, std::string name,
+             std::shared_ptr<Modules> modules,
+             std::shared_ptr<Hiwonder_bus_data> bus_data);
+  std::shared_ptr<HiwonderServo_module> bus;
+  std::vector<std::shared_ptr<Hiwonder_servo>> servos;
+  //   std::vector<std::shared_ptr<PCA_Servo>> servos;
+  static std::vector<std::shared_ptr<Hiwonder_bus_module>>
+  get_hiwonder_modules(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+                  std::shared_ptr<Mirte_Board> board,
+                  std::shared_ptr<Parser> parser,
+                  std::shared_ptr<Modules> modules);
+};
+
+
+class Hiwonder_servo {
+public:
+  Hiwonder_servo(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+            std::shared_ptr<Mirte_Board> board, std::shared_ptr<Hiwonder_servo_data> servo_data, std::shared_ptr<HiwonderServo_module> bus);
+ std::shared_ptr< Hiwonder_servo_data> servo_data;
+  std::shared_ptr<HiwonderServo_module> bus_mod;
+
+    void set_speed(int speed);
+  rclcpp::Service<mirte_msgs::srv::SetMotorSpeed>::SharedPtr motor_service;
+  bool service_callback(
+      const std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Request> req,
+      std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Response> res);
+  void motor_callback(const std_msgs::msg::Int32 &msg);
+  int last_speed = 0;
+  rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr ros_client;
+
+};

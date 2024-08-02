@@ -41,6 +41,7 @@ PCA_Module::PCA_Module(std::shared_ptr<rclcpp::Node> nh,
                        std::string name,
                      std::shared_ptr<Modules> modules, std::shared_ptr<PCA_data> pca_data)
     : Mirte_module(nh, tmx, board, name) {
+      tmx->setI2CPins(pca_data->scl, pca_data->sda, pca_data->port);
   this->pca9685 = std::make_shared<PCA9685_module>(pca_data->port, pca_data->addr, pca_data->frequency);
   modules->add_mod(pca9685);
   for(auto motor: pca_data->motors) {
@@ -72,7 +73,9 @@ void PCA_Motor::set_speed(int speed) {
   std::cout << "Setting speed: " << speed << std::endl;
   int32_t speed_ = (int32_t)((float)speed * (4095.0) / 100.0);
   // TODO: add invert
-
+  if(this->motor_data->invert) {
+    speed_ = -speed;
+  }
 //  if self.prev_motor_speed != speed:
 //             change_dir = sign(self.prev_motor_speed) != sign(speed)
 
@@ -111,3 +114,6 @@ bool PCA_Motor::service_callback(
   res->status = true;
   return true;
 }
+
+
+
