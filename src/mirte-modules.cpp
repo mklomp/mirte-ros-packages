@@ -193,7 +193,7 @@ Hiwonder_bus_module::get_hiwonder_modules(std::shared_ptr<rclcpp::Node> nh,
 
 void Hiwonder_bus_module::position_cb(std::vector<HiwonderServo_module::Servo_pos> pos) {
   for (auto p : pos) {
-    std::cout << "Servo: " << (int)p.id << " pos: " << p.angle << std::endl;
+    // std::cout << "Servo: " << (int)p.id << " pos: " << p.angle << std::endl;
     for(auto servo : this->servos) {
       if (servo->servo_data->id == p.id) {
         servo->position_cb(p);
@@ -274,9 +274,10 @@ bool Hiwonder_servo::enable_cb(
 
 bool Hiwonder_servo::angle_cb(
     const std::shared_ptr<mirte_msgs::srv::SetServoAngle::Request> req,
-    std::shared_ptr<mirte_msgs::srv::SetServoAngle::Response> res) {
-      auto angle = calc_angle_out(req->angle);
+    std::shared_ptr<mirte_msgs::srv::SetServoAngle::Response> res) { 
+      auto angle = calc_angle_out(req->angle); 
   this->bus_mod->set_single_servo(this->servo_data->id, angle, 100);
+  res->status = true;
   return true;
 }
 
