@@ -159,7 +159,8 @@
     <xacro:tileWorld name="tile_5_6" material="floor" size="0.5" x="5" y="6" yaw="0"/>
     <xacro:tileWorld name="tile_6_6" material="floor" size="0.5" x="6" y="6" yaw="0"/>
     <xacro:tileWorld name="tile_7_6" material="floor" size="0.5" x="7" y="6" yaw="0"/>
-    <!-- <xacro:includedModel name="obj_6_0_2_3" type="person" size="0.5" x="6.0" y="2.3" yaw="-90" static="${True}" scale="${0.2}"/> -->
+    
+    <xacro:person name="obj_6_0_2_3"   size="0.5" x="6.0" y="2.3" yaw="-90" static="${True}" scale="${0.2}"/>
     
     <xacro:model name="obj_0_5_1_5" type="cone" size="0.5" x="0.5" y="1.5" yaw="0" static="${True}" scale="${0.1}"/>
     <xacro:model name="obj_1_5_0_5" type="cone" size="0.5" x="1.5" y="0.5" yaw="0" static="${True}" scale="${0.1}"/>
