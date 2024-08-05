@@ -289,7 +289,7 @@
       </xacro:if>
       <xacro:if value="${type == 'cone'}">
         <xacro:property name="model_scale" value="${0.03172296965063494}"/>
-        <xacro:property name="z_offset" value="${0}"/>
+        <xacro:property name="z_offset" value="${3.5}"/>
       </xacro:if>
       <xacro:if value="${type == 'truck'}">
         <xacro:property name="model_scale" value="${0.1927574101731193}"/>
