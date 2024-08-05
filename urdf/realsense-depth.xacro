@@ -56,6 +56,7 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
     <joint name="${prefix}realsense_joint" type="fixed">
       <parent>${parent}</parent>
       <child>${prefix}rs200_camera</child>
+          <!-- <pose>0.1 0 0.035 0 0 0</pose> -->
 
       <!-- <xacro:insert_block name="origin"/> -->
     </joint>
@@ -90,6 +91,8 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
     </gazebo> -->
     <!-- <gazebo reference="${prefix}depth"> -->
     <link name="${prefix}depth">
+              <pose>0.1 0 0.045 0 0 0</pose>
+
     <sensor name="camera_sensor_depth" type="camera">
   <always_on>true</always_on>
   <visualize>true</visualize>
