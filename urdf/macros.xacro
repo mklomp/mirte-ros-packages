@@ -117,12 +117,12 @@
   </xacro:macro>
   <xacro:macro name="caster" params="name parent radius mass *pose">
     <link name="link_${name}">
-    <inertial>
+      <inertial>
         <mass>10.0</mass>
         <!-- <origin rpy="0 0 0" xyz="0 0 0"/> -->
         <inertia>
-         <!-- <ixx>9.108e-05</ixx> <ixy>0</ixy><ixz>0</ixz><iyy>2.51e-06</iyy><iyz>0</iyz><izz>8.931e-05</izz> -->
-         </inertia>
+          <!-- <ixx>9.108e-05</ixx> <ixy>0</ixy><ixz>0</ixz><iyy>2.51e-06</iyy><iyz>0</iyz><izz>8.931e-05</izz> -->
+        </inertia>
       </inertial>
       <xacro:insert_block name="pose"/>
       <collision name="link_${name}_collision">

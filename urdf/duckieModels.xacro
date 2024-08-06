@@ -271,142 +271,137 @@
     </model>
   </xacro:macro>
   <xacro:macro name="model" params="name type size x y yaw=0 static=1 scale=1">
-        <!-- START GENERATED SCALES AND OFFSETS-->
-<!-- 
+    <!-- START GENERATED SCALES AND OFFSETS-->
+    <!-- 
     <xacro:property name="model_scale" value="${1}"/>
       <xacro:property name="z_offset" value="${0}"/> -->
-<xacro:if value="${type == 'sign_blank'}">
-        <xacro:property name="model_scale" value="${0.19415283233733935}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'building'}">
-        <xacro:property name="model_scale" value="${0.2898550724637681}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'house'}">
-        <xacro:property name="model_scale" value="${0.20755956855837843}"/>
-        <xacro:property name="z_offset" value="${0.024247}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'cone'}">
-        <xacro:property name="model_scale" value="${0.03172296965063494}"/>
-        <xacro:property name="z_offset" value="${3.5}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'truck'}">
-        <xacro:property name="model_scale" value="${0.1927574101731193}"/>
-        <xacro:property name="z_offset" value="${1.072166}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'tree'}">
-        <xacro:property name="model_scale" value="${0.28054126509522415}"/>
-        <xacro:property name="z_offset" value="${0.003644}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'duckiebot'}">
-        <xacro:property name="model_scale" value="${8.126777732629012}"/>
-        <xacro:property name="z_offset" value="${0.03311}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_left_T_intersect'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_4_way_intersect'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_yield'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_no_right_turn'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_duck_crossing'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_no_left_turn'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_stop'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_do_not_enter'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'bus'}">
-        <xacro:property name="model_scale" value="${0.22667415295835838}"/>
-        <xacro:property name="z_offset" value="${-4.396879}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_t_light_ahead'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_right_T_intersect'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_pedestrian'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_oneway_left'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'trafficlight'}">
-        <xacro:property name="model_scale" value="${2.7362925425083047}"/>
-        <xacro:property name="z_offset" value="${0.014439}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_oneway_right'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'sign_T_intersect'}">
-        <xacro:property name="model_scale" value="${4.34593654932638}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'duckie'}">
-        <xacro:property name="model_scale" value="${0.6585788789802037}"/>
-        <xacro:property name="z_offset" value="${-0.113989}"/>
-      </xacro:if>
-      <xacro:if value="${type == 'barrier'}">
-        <xacro:property name="model_scale" value="${0.8748906386701663}"/>
-        <xacro:property name="z_offset" value="${0}"/>
-      </xacro:if>
-      <!-- END GENERATED -->
-       <model name="model_${name}">
+    <xacro:if value="${type == 'sign_blank'}">
+      <xacro:property name="model_scale" value="${0.19415283233733935}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'building'}">
+      <xacro:property name="model_scale" value="${0.2898550724637681}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'house'}">
+      <xacro:property name="model_scale" value="${0.20755956855837843}"/>
+      <xacro:property name="z_offset" value="${0.024247}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'cone'}">
+      <xacro:property name="model_scale" value="${0.03172296965063494}"/>
+      <xacro:property name="z_offset" value="${3.5}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'truck'}">
+      <xacro:property name="model_scale" value="${0.1927574101731193}"/>
+      <xacro:property name="z_offset" value="${1.072166}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'tree'}">
+      <xacro:property name="model_scale" value="${0.28054126509522415}"/>
+      <xacro:property name="z_offset" value="${0.003644}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'duckiebot'}">
+      <xacro:property name="model_scale" value="${8.126777732629012}"/>
+      <xacro:property name="z_offset" value="${0.03311}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_left_T_intersect'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_4_way_intersect'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_yield'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_no_right_turn'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_duck_crossing'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_no_left_turn'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_stop'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_do_not_enter'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'bus'}">
+      <xacro:property name="model_scale" value="${0.22667415295835838}"/>
+      <xacro:property name="z_offset" value="${-4.396879}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_t_light_ahead'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_right_T_intersect'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_pedestrian'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_oneway_left'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'trafficlight'}">
+      <xacro:property name="model_scale" value="${2.7362925425083047}"/>
+      <xacro:property name="z_offset" value="${0.014439}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_oneway_right'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'sign_T_intersect'}">
+      <xacro:property name="model_scale" value="${4.34593654932638}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'duckie'}">
+      <xacro:property name="model_scale" value="${0.6585788789802037}"/>
+      <xacro:property name="z_offset" value="${-0.113989}"/>
+    </xacro:if>
+    <xacro:if value="${type == 'barrier'}">
+      <xacro:property name="model_scale" value="${0.8748906386701663}"/>
+      <xacro:property name="z_offset" value="${0}"/>
+    </xacro:if>
+    <!-- END GENERATED -->
+    <model name="model_${name}">
       <static>${static}</static>
-                <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0  ${radians(yaw)}</pose>
-
-    <link name="link_${name}">
-
-      <collision name="collision_${name}">
-        <geometry>
-          <mesh>
-
-      <scale>${size * model_scale * scale} ${size * model_scale * scale} ${size * model_scale * scale}</scale>
-            <!-- <scale>0.0254 0.0254 0.0254</scale> -->
-            <uri>model://${type}/meshes/${type}.obj</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <visual name="visual_${name}">
-        <geometry>
-          <mesh>
       <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0  ${radians(yaw)}</pose>
-
-      <scale>${size * model_scale * scale} ${size * model_scale * scale} ${size * model_scale * scale}</scale>
-
-            <!-- <scale>0.0254 0.0254 0.0254</scale> -->
-            <uri>model://${type}/meshes/${type}.obj</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-  </model>
-  <!-- <model name="model_${name}">
+      <link name="link_${name}">
+        <collision name="collision_${name}">
+          <geometry>
+            <mesh>
+              <scale>${size * model_scale * scale} ${size * model_scale * scale} ${size * model_scale * scale}</scale>
+              <!-- <scale>0.0254 0.0254 0.0254</scale> -->
+              <uri>model://${type}/meshes/${type}.obj</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="visual_${name}">
+          <geometry>
+            <mesh>
+              <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0  ${radians(yaw)}</pose>
+              <scale>${size * model_scale * scale} ${size * model_scale * scale} ${size * model_scale * scale}</scale>
+              <!-- <scale>0.0254 0.0254 0.0254</scale> -->
+              <uri>model://${type}/meshes/${type}.obj</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <!-- <model name="model_${name}">
       <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0  ${radians(yaw)}</pose>
       <static>${static}</static>
       
@@ -417,5 +412,5 @@
         <uri>model://${type}</uri>
       </include>
     </model> -->
-    </xacro:macro>
+  </xacro:macro>
 </robot>

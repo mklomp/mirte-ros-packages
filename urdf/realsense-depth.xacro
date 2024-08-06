@@ -15,93 +15,55 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
   <xacro:macro name="realsense-depth" params="prefix parent">
     <!-- Camera link -->
     <link name="${prefix}rs200_camera">
-            <!-- <origin rpy="${pi/2} ${pi/2} ${pi/2}" xyz="0 0 0"/> -->
-          <pose>0.1 0 0.035 0 0 0</pose>
-
+      <pose>0.1 0 0.035 0 0 0</pose>
       <visual name="vis_${prefix}_rs200_cam">
-      <pose>0 0 0 ${pi/2} 0 0</pose>
-       <!-- <origin>
-          <rpy>${pi/2} 0 0</rpy>
-          <xyz>0 0 0</xyz>
-        </origin>     -->
+        <pose>0 0 0 ${pi/2} 0 0</pose>
         <geometry>
-                <!-- <origin rpy="${pi/2} ${pi/2} ${pi/2}" xyz="0 0 0"/> -->
-
-        <!-- <geometry> -->
-              <mesh>
-                              <!-- <origin rpy="${pi/2} ${pi/2} ${pi/2}" xyz="0 0 0"/> -->
-
-                <!-- <scale>0.0254 0.0254 0.0254</scale> -->
-                <!-- <uri>model://curve_left_1/meshes/curve_left_1.obj</uri> -->
-                <uri>model://realsense_camera/meshes/realsense.obj</uri>
-              </mesh>
-            <!-- </geometry> -->
-          <!-- <mesh filename="model://realsense_camera/meshes/realsense.dae"/> -->
+          <mesh>
+            <uri>model://realsense_camera/meshes/realsense.obj</uri>
+          </mesh>
         </geometry>
       </visual>
       <collision name="coll_${prefix}_rs200_cam">
         <geometry>
-          <box><size>0.0078 0.130 0.0192</size></box>
+          <box>
+            <size>0.0078 0.130 0.0192</size>
+          </box>
         </geometry>
       </collision>
       <inertial>
-        <!-- <mass value="0.0"/> -->
-        <!-- <origin rpy="0 0 0" xyz="0 0 0"/> -->
         <inertia>
-         <ixx>9.108e-05</ixx> <ixy>0</ixy><ixz>0</ixz><iyy>2.51e-06</iyy><iyz>0</iyz><izz>8.931e-05</izz>
-         </inertia>
+          <ixx>9.108e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2.51e-06</iyy>
+          <iyz>0</iyz>
+          <izz>8.931e-05</izz>
+        </inertia>
       </inertial>
     </link>
     <!-- Connect camera to parent frame-->
     <joint name="${prefix}realsense_joint" type="fixed">
       <parent>${parent}</parent>
       <child>${prefix}rs200_camera</child>
-          <!-- <pose>0.1 0 0.035 0 0 0</pose> -->
-
-      <!-- <xacro:insert_block name="origin"/> -->
     </joint>
     <!-- Virtual links representing the cameras positons and orientations-->
-    
     <!-- Joints positioning the virtual links with respect to the camera main link-->
     <joint name="${prefix}depth_joint" type="fixed">
       <parent>${prefix}rs200_camera</parent>
       <child>${prefix}depth</child>
-      <!-- <origin xyz="0 -0 0.004" rpy="0 0 0"/> -->
     </joint>
-    <!-- <gazebo reference="${prefix}rs200_camera"> -->
-    <!-- TODO: later weer terugzetten! -->
-      <!-- <sensor name="realsense_contact" type="contact">
-        <always_on>true</always_on>
-        <update_rate>30.0</update_rate>
-        <contact>
-          <xacro:property name="lidar" value="$(arg lidar_enable)"/>
-          <xacro:property name="ir" value="$(arg intensity_enable)"/>
-          <test2 name="lidar" value="$(arg lidar_enable)"/>
-          <test2 name="ir" value="$(arg intensity_enable)"/>
-          <arg val="2 + 2xir + lidar"/>
-          <!- - See https://github.com/gazebosim/sdformat/issues/333 for why the strange naming. Get the correct name by running xacro mirte.xacro > test.xml && gz sdf -p test.xml > robot.xml and look for the name- ->
-          <!- - This strange calculation should make sure that when adding/removing lidar and ir sensors, the collision name still is correct - ->
-          <collision>base_link_fixed_joint_lump__realsense_collision_collision_${lidar + 2*ir + 2}</collision>
-        </contact>
-        <plugin name="gripper_bumper" filename="libgazebo_ros_bumper.so">
-          <bumperTopicName>realsense_contact</bumperTopicName>
-          <frameName>${prefix}rs200_camera</frameName>
-        </plugin>
-      </sensor>
-    </gazebo> -->
-    <!-- <gazebo reference="${prefix}depth"> -->
     <link name="${prefix}depth">
-              <pose>0.13 0 0.045 0 0 0</pose>
-
-    <sensor name="camera_sensor_depth" type="camera">
-  <always_on>true</always_on>
-  <visualize>true</visualize>
-  <update_rate>10</update_rate>
-  <topic>camera/image_raw</topic>
-  <gz_frame_id>camera_rgb_frame</gz_frame_id>
-  <camera name="intel_realsense_r200">
-    <camera_info_topic>camera/camera_info</camera_info_topic>
-<horizontal_fov>2.5</horizontal_fov>
+      <pose>0.13 0 0.045 0 0 0</pose>
+      <sensor name="camera_sensor_depth" type="camera">
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <update_rate>10</update_rate>
+        <topic>camera/image_raw</topic>
+        <gz_frame_id>camera_rgb_frame</gz_frame_id>
+        <camera name="intel_realsense_r200">
+          <camera_info_topic>camera/camera_info</camera_info_topic>
+          <horizontal_fov>2.5</horizontal_fov>
           <image>
             <width>640</width>
             <height>480</height>
@@ -110,17 +72,17 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
           <clip>
             <near>0.02</near>
             <far>2</far>
-          </clip>  </camera>
-</sensor>
-   <sensor name="depth_camera1" type="depth_camera">
-  <always_on>true</always_on>
-  <visualize>true</visualize>
-  <update_rate>10</update_rate>
-  <topic>depth_camera</topic>
-  <gz_frame_id>camera_rgb_frame</gz_frame_id>
-  <camera name="intel_realsense_r200_depth">
-    <!-- <camera_info_topic>camera/camera_info</camera_info_topic> -->
-<horizontal_fov>2.5</horizontal_fov>
+          </clip>
+        </camera>
+      </sensor>
+      <sensor name="depth_camera1" type="depth_camera">
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <update_rate>10</update_rate>
+        <topic>depth_camera</topic>
+        <gz_frame_id>camera_rgb_frame</gz_frame_id>
+        <camera name="intel_realsense_r200_depth">
+          <horizontal_fov>2.5</horizontal_fov>
           <image>
             <width>640</width>
             <height>48</height>
@@ -129,37 +91,9 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
           <clip>
             <near>0.02</near>
             <far>2</far>
-          </clip>  </camera>
-</sensor>
-      <!-- <sensor name="depth_camera1" type="camera">
-          <update_rate>10</update_rate>
-          <!- - <topic>depth_camera</topic> - ->
-          <topic>camera/image_raw</topic>
-          <camera>
-            <horizontal_fov>2.5</horizontal_fov>
-            <image>
-              <width>512</width>
-              <height>512</height>
-              <!- - <format>R_FLOAT32</format> - ->
-            </image>
-            <clip>
-              <near>0.001</near>
-              <far>2</far>
-            </clip>
-          </camera>
-          </sensor> -->
-          </link>
-        <!-- <plugin name="depth_camera_controller" filename="libgazebo_ros_depth_camera.so">
-          <alwaysOn>1</alwaysOn>
-          <updateRate>10.0</updateRate>
-          <imageTopicName>image_raw</imageTopicName>
-          <pointCloudTopicName>points</pointCloudTopicName>
-          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-          <cameraName>depth_cam</cameraName>
-          <frameName>${prefix}depth</frameName>
-          <pointCloudCutoff>0.001</pointCloudCutoff>
-        </plugin>
+          </clip>
+        </camera>
       </sensor>
-    </gazebo> -->
+    </link>
   </xacro:macro>
 </robot>

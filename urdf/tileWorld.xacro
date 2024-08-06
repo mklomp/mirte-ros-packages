@@ -2,36 +2,31 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:macro name="tileWorld" params="name material size x y yaw=0 z_offset=0 model_scale=1 scale=1">
     <model name="unit_box_${name}">
-         <model name="model_${name}">
-      <static>1</static>
+      <model name="model_${name}">
+        <static>1</static>
+        <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0  ${radians(yaw)}</pose>
+        <link name="link_${name}">
+          <collision name="collision_${name}">
+            <geometry>
+              <mesh>
+                <scale>${size * model_scale * scale} ${size * model_scale * scale} ${size * model_scale * scale}</scale>
+                <!-- <scale>0.0254 0.0254 0.0254</scale> -->
+                <uri>model://${material}/meshes/${material}.obj</uri>
+              </mesh>
+            </geometry>
+          </collision>
+          <visual name="visual_${name}">
+            <geometry>
+              <mesh>
                 <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0  ${radians(yaw)}</pose>
-
-    <link name="link_${name}">
-
-      <collision name="collision_${name}">
-        <geometry>
-          <mesh>
-
-      <scale>${size * model_scale * scale} ${size * model_scale * scale} ${size * model_scale * scale}</scale>
-            <!-- <scale>0.0254 0.0254 0.0254</scale> -->
-            <uri>model://${material}/meshes/${material}.obj</uri>
-          </mesh>
-        </geometry>
-      </collision>
-      <visual name="visual_${name}">
-        <geometry>
-          <mesh>
-      <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0  ${radians(yaw)}</pose>
-
-      <scale>${size * model_scale * scale} ${size * model_scale * scale} ${size * model_scale * scale}</scale>
-
-            <!-- <scale>0.0254 0.0254 0.0254</scale> -->
-            <uri>model://${material}/meshes/${material}.obj</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-  </model>
+                <scale>${size * model_scale * scale} ${size * model_scale * scale} ${size * model_scale * scale}</scale>
+                <!-- <scale>0.0254 0.0254 0.0254</scale> -->
+                <uri>model://${material}/meshes/${material}.obj</uri>
+              </mesh>
+            </geometry>
+          </visual>
+        </link>
+      </model>
     </model>
   </xacro:macro>
   <xacro:macro name="tileState" params="name material size x y yaw=0">

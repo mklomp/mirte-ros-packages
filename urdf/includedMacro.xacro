@@ -1,14 +1,12 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:macro name="person" params="name size x y yaw=0 static=1 scale=1">
-        <xacro:property name="model_scale" value="${1}"/>
-      <xacro:property name="z_offset" value="${0}"/>
-
-   <model name='person_standing'>
-      <link name='link'>
+    <xacro:property name="model_scale" value="${1}"/>
+    <xacro:property name="z_offset" value="${0}"/>
+    <model name="person_standing">
+      <link name="link">
         <inertial>
-      <!-- <origin xyz="${size} ${y * size} 0"/> -->
-      <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} 0 -0  ${radians(yaw)}</pose>
+          <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} 0 -0  ${radians(yaw)}</pose>
           <mass>80</mass>
           <inertia>
             <ixx>24.879999999999999</ixx>
@@ -19,7 +17,7 @@
             <izz>2.48</izz>
           </inertia>
         </inertial>
-        <collision name='bottom'>
+        <collision name="bottom">
           <pose>0 -0.1 0.01 0 0 0</pose>
           <geometry>
             <box>
@@ -34,20 +32,20 @@
             <contact/>
           </surface>
         </collision>
-        <collision name='person'>
+        <collision name="person">
           <pose>0 0 0.02 0.04 0 0</pose>
           <geometry>
-            <mesh>              <scale>${scale} ${ scale} ${ scale}</scale>
-
+            <mesh>
+              <scale>${scale} ${ scale} ${ scale}</scale>
               <uri>model://person_standing/meshes/standing.dae</uri>
             </mesh>
           </geometry>
         </collision>
-        <visual name='visual'>
+        <visual name="visual">
           <pose>0 0 0.02 0.04 0 0</pose>
           <geometry>
-            <mesh>              <scale>${scale} ${ scale} ${ scale}</scale>
-
+            <mesh>
+              <scale>${scale} ${ scale} ${ scale}</scale>
               <uri>model://person_standing/meshes/standing.dae</uri>
             </mesh>
           </geometry>
@@ -55,13 +53,11 @@
         <pose>0 0 0 0 -0 0</pose>
         <enable_wind>false</enable_wind>
       </link>
-      <!-- <origin xyz="${size} ${y * size} 0"/> -->
       <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} 0 -0  ${radians(yaw)}</pose>
       <static>${static}</static>
       <self_collide>false</self_collide>
     </model>
   </xacro:macro>
-
   <xacro:macro name="includedModel" params="name type size x y yaw=0 static=1 scale=1">
     <model name="model_${name}">
       <xacro:property name="model_scale" value="${1}"/>
@@ -97,21 +93,13 @@
             <mesh>
               <scale>${size * model_scale * scale} ${size * model_scale * scale} ${size * model_scale * scale}</scale>
               <uri>model://person_standing/meshes/person_standing.obj</uri>
-              <!-- <pose>${x * size} ${y * size}  ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0 0</pose> -->
             </mesh>
           </geometry>
-          <!-- <material>
-            <script>
-              <name>${type}/${type}</name>
-              <uri>file://$(find mirte_gazebo)/models/${type}/materials/scripts/${type}.material</uri>
-            </script>
-          </material> -->
         </visual>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-      <!-- <pose>${x * size} ${y * size}  ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0 0</pose> -->
     </model>
   </xacro:macro>
   <xacro:macro name="includedState" params="name type size x y yaw=0 static=1 scale=1">
