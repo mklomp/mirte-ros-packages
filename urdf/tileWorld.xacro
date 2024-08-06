@@ -7,6 +7,18 @@
         <pose>${x * size} ${y * size} ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0  ${radians(yaw)}</pose>
         <link name="link_${name}">
           <collision name="collision_${name}">
+            <surface>
+              <bounce>
+                <restitution_coefficient>0.0</restitution_coefficient>
+                <threshold>1000000.0</threshold>
+              </bounce>
+              <friction>
+                <ode>
+                  <mu>1</mu>
+                  <mu2>1</mu2>
+                </ode>
+              </friction>
+            </surface>
             <geometry>
               <mesh>
                 <scale>${size * model_scale * scale} ${size * model_scale * scale} ${size * model_scale * scale}</scale>

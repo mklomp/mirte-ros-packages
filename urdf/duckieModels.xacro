@@ -122,7 +122,7 @@
             <contact>
               <ode/>
             </contact>
-            <bounce/>
+            <!-- <bounce/> -->
             <friction>
               <torsional>
                 <ode/>
