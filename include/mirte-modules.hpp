@@ -27,6 +27,7 @@ public:
   std::shared_ptr<Mirte_Board> board;
   std::vector<std::shared_ptr<Mirte_module>> modules;
   std::shared_ptr<Modules> module_sys;
+  std::shared_ptr<Sensors> sensor_sys;
 };
 
 class Mirte_module {
@@ -150,4 +151,22 @@ public:
   // angle calcs
   uint16_t calc_angle_out(float angle_in);
   float calc_angle_in(uint16_t angle_out);
+};
+
+#include "sensors/INA226.hpp"
+#include "sensor_msgs/msg/battery_state.hpp"
+class INA226_sensor : public Mirte_module {
+public:
+  INA226_sensor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+                std::shared_ptr<Mirte_Board> board, std::string name,std::shared_ptr<Sensors> modules,
+                std::shared_ptr<INA226_data> ina_data);
+  std::shared_ptr<INA226_data> ina_data;
+  std::shared_ptr<INA226_module> ina226;
+  rclcpp::Publisher<sensor_msgs::msg::BatteryState>::SharedPtr battery_pub;
+  void data_cb(float voltage, float current);
+  void publish();
+  static std::vector<std::shared_ptr<INA226_sensor>> get_ina_modules(
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+    std::shared_ptr<Mirte_Board> board, std::shared_ptr<Parser> parser,
+    std::shared_ptr<Sensors> sensors) ;
 };

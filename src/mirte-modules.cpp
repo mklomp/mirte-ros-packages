@@ -20,6 +20,11 @@ Mirte_modules::Mirte_modules(std::shared_ptr<rclcpp::Node> nh,
   std::cout << "Adding hiwonder modules" << hiwonder_mods.size() <<  std::endl;
   this->modules.insert(this->modules.end(), hiwonder_mods.begin(),
                        hiwonder_mods.end());
+
+  this->sensor_sys = std::make_shared<Sensors>(tmx);
+  auto ina_mods = INA226_sensor::get_ina_modules(nh, tmx, board, parser, this->sensor_sys);
+  this->modules.insert(this->modules.end(), ina_mods.begin(), ina_mods.end());
+  
 }
 std::vector<std::shared_ptr<PCA_Module>> PCA_Module::get_pca_modules(
     std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
@@ -308,4 +313,41 @@ float Hiwonder_servo::calc_angle_in(uint16_t angle) {
   angle_in = scale<float>(angle, this->servo_data->max_angle_out, this->servo_data->min_angle_out, this->servo_data->min_angle_in, this->servo_data->max_angle_in);
   }
   return angle_in;
+}
+
+
+
+INA226_sensor::INA226_sensor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+                std::shared_ptr<Mirte_Board> board, std::string name, std::shared_ptr<Sensors> modules,
+                std::shared_ptr<INA226_data> ina_data): Mirte_module(nh, tmx, board, name)  {
+  this->ina_data = ina_data;
+  this->ina226 = std::make_shared<INA226_module>(ina_data->addr, ina_data->bus, std::bind(&INA226_sensor::data_cb, this, _1, _2));
+  this->battery_pub = nh->create_publisher<sensor_msgs::msg::BatteryState>(
+      "mirte/power/" + this->ina_data->name, 1);
+      modules->add_sens(this->ina226);
+    // TODO: add used topic
+    // TODO: add shutdown service
+    // TODO: add auto shutdown
+                }
+
+void INA226_sensor::data_cb(float current, float voltage) {
+  auto msg = sensor_msgs::msg::BatteryState();
+  msg.voltage = voltage;
+  msg.current = current;
+  msg.header.frame_id = this->ina_data->name;
+  this->battery_pub->publish(msg);
+}
+
+std::vector<std::shared_ptr<INA226_sensor>> INA226_sensor::get_ina_modules(
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+    std::shared_ptr<Mirte_Board> board, std::shared_ptr<Parser> parser,
+    std::shared_ptr<Sensors> modules) {
+  std::vector<std::shared_ptr<INA226_sensor>> pca_modules;
+  auto pca_data = INA226_data::parse_ina226_data(parser, board);
+  for (auto pca : pca_data) {
+    auto pca_module =
+        std::make_shared<INA226_sensor>(nh, tmx, board, pca->name, modules, pca);
+    pca_modules.push_back(pca_module);
+  }
+  return pca_modules;
 }

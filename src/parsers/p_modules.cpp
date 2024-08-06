@@ -259,116 +259,54 @@ Hiwonder_servo_data::parse_hiwonder_servo_data(
   return servos;
 }
 
-#if 0
-std::vector<std::shared_ptr<Servo_data>>
-Servo_data::parse_servo_data(std::shared_ptr<Parser> parser,
-                             std::shared_ptr<Mirte_Board> board) {
-  std::vector<std::shared_ptr<Servo_data>> servos;
-  for (auto name : parser->get_params_keys("servo")) {
-    std::cout << name << std::endl;
-    auto servo_key = parser->build_param_name("servo", name);
-    auto servos_config = parser->get_params_name(servo_key);
-    auto servo_keys = parser->get_params_keys(servo_key);
-    Servo_data servo_data;
-    servo_data.name = name;
-    if (servos_config.count("connector")) {
-      std::cout << "connector" << std::endl;
-      std::string connector = servos_config["connector"].get<std::string>();
-      auto pins = board->resolveConnector(connector);
-      servo_data.pin = pins["pin"];
-    }
-    pin_t pin = -1;
-    if (servo_keys.count("pins")) {
-      std::cout << "pin" << std::endl;
-      // pins:
-      //   pin: 1
-      servo_data.pin =
-          board->resolvePin(parser
-                                ->get_params_name(parser->build_param_name(
-                                    servo_key, "pins"))["pin"]
-                                .get<std::string>());
-    }
-
-    if (servo_keys.count("min_pulse")) {
-      servo_data.min_pulse = servos_config["min_pulse"].get<int>();
-    }
-    if (servo_keys.count("max_pulse")) {
-      servo_data.max_pulse = servos_config["max_pulse"].get<int>();
-    }
-    if (servo_data.check()) {
-      servos.push_back(std::make_shared<Servo_data>(servo_data));
-    }
-  }
-  return servos;
-}
-
-std::vector<std::shared_ptr<Motor_data>>
-Motor_data::parse_motor_data(std::shared_ptr<Parser> parser,
-                             std::shared_ptr<Mirte_Board> board) {
-  std::vector<std::shared_ptr<Motor_data>> motors;
-  for (auto name : parser->get_params_keys("motor")) {
-    auto motor_key = parser->build_param_name("motor", name);
-    auto motor_config = parser->get_params_name(motor_key);
-    auto motor_keys = parser->get_params_keys(motor_key);
-
-    Motor_data motor_data;
-    motor_data.name = name;
-    if (motor_keys.count("pins")) {
-      std::cout << name << "pins" << std::endl;
-      auto pins_config =
-          parser->get_params_name(parser->build_param_name(motor_key, "pins"));
-      for (auto pin_key : parser->get_params_keys(
-               parser->build_param_name(motor_key, "pins"))) {
-        boost::algorithm::to_lower(pin_key);
-        if ("p1" == pin_key) {
-          motor_data.P1 =
-              board->resolvePin(pins_config[pin_key].get<std::string>());
-        }
-        if ("p2" == pin_key) {
-          motor_data.P2 =
-              board->resolvePin(pins_config[pin_key].get<std::string>());
-        }
-        if ("p1" == pin_key) {
-          motor_data.D1 =
-              board->resolvePin(pins_config[pin_key].get<std::string>());
-        }
-        if ("p2" == pin_key) {
-          motor_data.D2 =
-              board->resolvePin(pins_config[pin_key].get<std::string>());
-        }
-      }
-    } else if (motor_keys.count("connector")) {
-      std::string connector = motor_config["connector"].get<std::string>();
-      auto conn_pins = board->resolveConnector(connector);
-      motor_data.P1 = conn_pins["P1"];
-      motor_data.P2 = conn_pins["P2"];
-      motor_data.D1 = conn_pins["D1"];
-      motor_data.D2 = conn_pins["D2"];
-    }
-    if (motor_keys.count("type")) {
-      std::string type = motor_config["type"].get<std::string>();
+std::vector<std::shared_ptr<INA226_data>> INA226_data::parse_ina226_data(
+    std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board) {
+  std::vector<std::shared_ptr<INA226_data>> inas;
+  for (auto name : parser->get_params_keys("modules")) {
+    auto mod_key = parser->build_param_name("modules", name);
+    auto mod_config = parser->get_params_name(mod_key);
+    auto mod_keys = parser->get_params_keys(mod_key);
+    if (mod_keys.count("type")) {
+      std::string type = mod_config["type"].get<std::string>();
       boost::algorithm::to_lower(type);
-      if (type == "pp") {
-        motor_data.type = Motor_data::Motor_type::PP;
-      } else if (type == "dp") {
-        motor_data.type = Motor_data::Motor_type::DP;
-      } else if (type == "ddp") {
-        motor_data.type = Motor_data::Motor_type::DDP;
-      } else {
-        std::cout << "Unknown motor type: " << type << std::endl;
+      if (type == "ina226") {
+        auto ina_data = INA226_data::parse_ina226_data_single(parser, board, mod_key);
+        if (ina_data->check()) {
+          inas.push_back(ina_data);
+        }
       }
-    } else {
-      motor_data.type = Motor_data::Motor_type::PP;
-    }
-    if (motor_keys.count("inverted")) {
-      motor_data.inverted = motor_config["inverted"].get<bool>();
-    }
-    if (motor_data.check()) {
-      motors.push_back(std::make_shared<Motor_data>(motor_data));
     }
   }
-  return motors;
+  return inas;
 }
 
-// TODO: oled and module actuators
-#endif
+std::shared_ptr<INA226_data> INA226_data::parse_ina226_data_single(
+    std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board,
+    std::string ina_key) {
+  auto ina_config = parser->get_params_name(ina_key);
+  auto ina_keys = parser->get_params_keys(ina_key);
+  INA226_data ina_data;
+  ina_data.name = parser->get_last( ina_key);
+  if (ina_keys.count("addr")) {
+    ina_data.addr = ina_config["addr"].get<uint8_t>();
+  }
+  if (ina_keys.count("connector")) {
+    auto conn_name = ina_config["connector"].get<std::string>();
+    auto pins = board->resolveConnector(conn_name);
+    ina_data.scl = pins["scl"];
+    ina_data.sda = pins["sda"];
+    boost::algorithm::to_lower(conn_name);
+    ina_data.bus = board->resolveI2CPort(ina_data.sda);
+  }
+   if (ina_keys.count("max_current")) {
+    ina_data.max_current = ina_config["max_current"].get<float>();
+  }
+  if (ina_keys.count("max_voltage")) {
+    ina_data.max_voltage = ina_config["max_voltage"].get<float>();
+  }
+  if (ina_keys.count("min_voltage")) {
+    ina_data.min_voltage = ina_config["min_voltage"].get<float>();
+  }
+  
+   return std::make_shared<INA226_data>(ina_data);
+}

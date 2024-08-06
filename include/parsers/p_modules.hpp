@@ -139,71 +139,28 @@ public:
   bool check() { return name != ""; }
 };
 
-#if 0
-class Servo_data
-{
-public:
-  std::string name = "";
-  pin_t pin =(pin_t)-1;
-  int min_pulse = 0;
-  int max_pulse = 0;
-  Servo_data(std::string name, pin_t pin, int min_pulse, int max_pulse)
-  {
-    this->name = name;
-    this->pin = pin;
-    this->min_pulse = min_pulse;
-    this->max_pulse = max_pulse;
-  }
-  Servo_data() {}
-  static std::vector<std::shared_ptr<Servo_data>> parse_servo_data(
-    std::shared_ptr<Parser> parser,
-    std::shared_ptr<Mirte_Board> board);
-  bool check()
-  {
-    return pin !=(pin_t)-1 && name != "";
-  }
-};
 
-class Motor_data
-{
+class INA226_data {
 public:
   std::string name;
-  pin_t P1 =(pin_t)-1;
-  pin_t P2 =(pin_t)-1;
-  pin_t D1 =(pin_t)-1;
-  pin_t D2 =(pin_t)-1;
-  bool inverted = false;
-  enum class Motor_type
-  {
-    PP, DP, DDP
-  };
-  Motor_type type;
-  Motor_data(std::string name, std::vector<uint8_t> pins, Motor_type type)
-  {
+  uint8_t addr = 0x40;
+  uint8_t bus = 0; 
+  float max_current = 10;
+  float max_voltage = 14; 
+  float min_voltage = 10.5;
+  pin_t scl = 0xFF;
+  pin_t sda = 0xFF;
+  INA226_data(std::string name, uint8_t addr, uint8_t bus,
+              float max_current, float min_voltage, float max_voltage) {
     this->name = name;
-    this->type = type;
+    this->addr = addr;
+    this->bus = bus;
+    this->max_current = max_current;
+    this->max_voltage = max_voltage; 
   }
-  Motor_data() {}
-
-  static std::vector<std::shared_ptr<Motor_data>> parse_motor_data(
-    std::shared_ptr<Parser> parser,
-    std::shared_ptr<Mirte_Board> board);
-  bool check()
-  {
-    switch (type) {
-      case Motor_type::PP:
-        return P1 != (pin_t)-1 && P2 != (pin_t)-1 && name != "";
-        break;
-      case Motor_type::DP:
-        return P1 != (pin_t)-1 && D1 !=(pin_t)-1 && name != "";
-        break;
-      case Motor_type::DDP:
-        return P1 !=(pin_t)-1 && D2 !=(pin_t)-1 && D1 !=(pin_t)-1 && name != "";
-        break;
-      default:
-        return false;
-        break;
-    }
-  }
+  INA226_data() {}
+  static std::vector<std::shared_ptr<INA226_data>> parse_ina226_data(std::shared_ptr<Parser> parser,
+                    std::shared_ptr<Mirte_Board> board);
+  static std::shared_ptr<INA226_data> parse_ina226_data_single(std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string ina226_key);
+  bool check() { return name != "" && addr!=0 && bus!=0; }
 };
-#endif

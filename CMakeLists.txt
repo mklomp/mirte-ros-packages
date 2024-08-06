@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.9)
 project(mirte_telemetrix_cpp)
 
 # Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++17)
+# add_compile_options(-std=c++20)
+set(CMAKE_CXX_STANDARD 20)
+
 # find_program(iwyu_path NAMES include-what-you-use iwyu REQUIRED) if(NOT
 # iwyu_path) message(FATAL_ERROR "Could not find the program
 # include-what-you-use") endif()
@@ -58,13 +60,14 @@ add_executable(
   src/parsers/actuators.cpp
   src/parsers/parsers.cpp
   src/parsers/p_modules.cpp
-  src/parsers/sensors.cpp
+  src/parsers/p_sensors.cpp
   libs/tmx-cpp/src/tmx.cpp
   libs/tmx-cpp/src/buffer_build.cpp
   libs/tmx-cpp/src/sensors.cpp
   libs/tmx-cpp/src/modules.cpp
   libs/tmx-cpp/src/modules/PCA9685.cpp
   libs/tmx-cpp/src/modules/HiwonderServo.cpp
+  libs/tmx-cpp/src/sensors/INA226.cpp
   libs/tmx-cpp/libs/async_serial/AsyncSerial.cpp
   libs/tmx-cpp/libs/async_serial/BufferedAsyncSerial.cpp)
 ament_target_dependencies(
