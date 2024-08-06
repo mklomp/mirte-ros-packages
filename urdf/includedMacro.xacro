@@ -74,7 +74,7 @@
           <geometry>
             <mesh>
               <scale>${scale} ${ scale} ${ scale}</scale>
-              <uri>/home/arendjan/ros2/ros2_rsp/src/mirte-gazebo/models/person_standing/meshes/person_standing.obj</uri>
+              <uri>model://person_standing/meshes/person_standing.obj</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -96,7 +96,7 @@
           <geometry>
             <mesh>
               <scale>${size * model_scale * scale} ${size * model_scale * scale} ${size * model_scale * scale}</scale>
-              <uri>/home/arendjan/ros2/ros2_rsp/src/mirte-gazebo/models/person_standing/meshes/person_standing.obj</uri>
+              <uri>model://person_standing/meshes/person_standing.obj</uri>
               <!-- <pose>${x * size} ${y * size}  ${z_offset*size * model_scale * scale + 0.01} ${radians(90)} -0 0</pose> -->
             </mesh>
           </geometry>

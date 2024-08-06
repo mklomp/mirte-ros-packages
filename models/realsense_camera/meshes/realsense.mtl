@@ -9,4 +9,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 1
-map_Kd /home/arendjan/ros2/ros2_rsp/src/mirte-gazebo/models/realsense_camera/materials/textures/realsense_diffuse.png
+map_Kd ../materials/textures/realsense_diffuse.png
