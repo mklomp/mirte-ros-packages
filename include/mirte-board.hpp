@@ -37,7 +37,7 @@ public:
   int resolvePin(std::string pin);
   int get_adc_bits();
   int get_max_pwm() { return 255; }
-  uint8_t resolveI2CPort(uint8_t sda) { return 0;}
+  uint8_t resolveI2CPort(uint8_t sda) { return 0; }
 };
 class Mirte_Board_pico : public Mirte_Board {
 public:
@@ -63,7 +63,7 @@ public:
   int resolvePin(std::string pin);
   int get_adc_bits() { return mcu->get_adc_bits(); }
   int get_max_pwm() { return mcu->get_max_pwm(); }
-    uint8_t resolveI2CPort(uint8_t sda) { return mcu->resolveI2CPort(sda);}
+  uint8_t resolveI2CPort(uint8_t sda) { return mcu->resolveI2CPort(sda); }
   std::string version;
   connector_map connectors = mirte_pico_pcb_map08;
 };

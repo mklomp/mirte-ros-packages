@@ -30,13 +30,12 @@ Mirte_Board_pico::resolveConnector(std::string connector) {
   return {};
 }
 
-
 // shit implementation, needs to be better
 // i2c_port0_sda_pins = [0, 4, 8, 12, 20, 16]
 // i2c_port1_sda_pins = [2, 6, 10, 14, 26, 18]
 
 uint8_t Mirte_Board_pico::resolveI2CPort(uint8_t sda) {
-  switch(sda){
+  switch (sda) {
   case 0:
   case 4:
   case 8:
@@ -51,10 +50,10 @@ uint8_t Mirte_Board_pico::resolveI2CPort(uint8_t sda) {
   case 14:
   case 18:
   case 26:
-  return 1;
-  break;
+    return 1;
+    break;
   default:
-  return 0xFF;
-  break;
+    return 0xFF;
+    break;
   }
 }

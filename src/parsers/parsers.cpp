@@ -79,8 +79,9 @@ std::string Parser::build_param_name(std::string name, std::string key) {
   return name + "." + key;
 }
 
-std::string Parser::get_last(std::string name) { // convert modules.servobus to servobus
-   auto last_dot = name.find_last_of(".");
+std::string
+Parser::get_last(std::string name) { // convert modules.servobus to servobus
+  auto last_dot = name.find_last_of(".");
   if (last_dot == std::string::npos) {
     return name;
   }

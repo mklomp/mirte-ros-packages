@@ -1,6 +1,6 @@
 #include <functional>
 #include <mirte-modules.hpp>
-  using namespace std::placeholders; // for _1, _2, _3...
+using namespace std::placeholders; // for _1, _2, _3...
 
 Mirte_modules::Mirte_modules(std::shared_ptr<rclcpp::Node> nh,
                              std::shared_ptr<TMX> tmx,
@@ -17,14 +17,14 @@ Mirte_modules::Mirte_modules(std::shared_ptr<rclcpp::Node> nh,
 
   auto hiwonder_mods = Hiwonder_bus_module::get_hiwonder_modules(
       nh, tmx, board, parser, this->module_sys);
-  std::cout << "Adding hiwonder modules" << hiwonder_mods.size() <<  std::endl;
+  std::cout << "Adding hiwonder modules" << hiwonder_mods.size() << std::endl;
   this->modules.insert(this->modules.end(), hiwonder_mods.begin(),
                        hiwonder_mods.end());
 
   this->sensor_sys = std::make_shared<Sensors>(tmx);
-  auto ina_mods = INA226_sensor::get_ina_modules(nh, tmx, board, parser, this->sensor_sys);
+  auto ina_mods =
+      INA226_sensor::get_ina_modules(nh, tmx, board, parser, this->sensor_sys);
   this->modules.insert(this->modules.end(), ina_mods.begin(), ina_mods.end());
-  
 }
 std::vector<std::shared_ptr<PCA_Module>> PCA_Module::get_pca_modules(
     std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
@@ -166,7 +166,6 @@ Hiwonder_bus_module::Hiwonder_bus_module(
   this->enable_service = nh->create_service<std_srvs::srv::SetBool>(
       "/mirte/set_" + this->name + "_all_servos_enable",
       std::bind(&Hiwonder_bus_module::enable_cb, this, _1, _2));
-
 }
 
 bool Hiwonder_bus_module::enable_cb(
@@ -195,10 +194,11 @@ Hiwonder_bus_module::get_hiwonder_modules(std::shared_ptr<rclcpp::Node> nh,
   return hiwonder_modules;
 }
 
-void Hiwonder_bus_module::position_cb(std::vector<HiwonderServo_module::Servo_pos> pos) {
+void Hiwonder_bus_module::position_cb(
+    std::vector<HiwonderServo_module::Servo_pos> pos) {
   for (auto p : pos) {
     std::cout << "Servo: " << (int)p.id << " pos: " << p.angle << std::endl;
-    for(auto servo : this->servos) {
+    for (auto servo : this->servos) {
       if (servo->servo_data->id == p.id) {
         servo->position_cb(p);
         // servo->servo_data->angle = p.pos;
@@ -207,7 +207,8 @@ void Hiwonder_bus_module::position_cb(std::vector<HiwonderServo_module::Servo_po
   }
 }
 
-// Following 3 callbacks are probably never used, maybe use verify to check that they exist
+// Following 3 callbacks are probably never used, maybe use verify to check that
+// they exist
 void Hiwonder_bus_module::verify_cb(int id, bool status) {
   std::cout << "Servo: " << id << " status: " << status << std::endl;
 }
@@ -220,7 +221,6 @@ void Hiwonder_bus_module::offset_cb(int id, uint16_t offset) {
   std::cout << "Servo: " << id << " offset: " << offset << std::endl;
 }
 
-
 Hiwonder_servo::Hiwonder_servo(std::shared_ptr<rclcpp::Node> nh,
                                std::shared_ptr<TMX> tmx,
                                std::shared_ptr<Mirte_Board> board,
@@ -231,16 +231,16 @@ Hiwonder_servo::Hiwonder_servo(std::shared_ptr<rclcpp::Node> nh,
   // this->tmx = tmx;
   // this->nh = nh;
   // this->board = board;
-  
+
   // create enable service
   this->enable_service = nh->create_service<std_srvs::srv::SetBool>(
       "/mirte/set_" + this->servo_data->name + "_servo_enable",
       std::bind(&Hiwonder_servo::enable_cb, this, _1, _2));
-  
+
   // create angle service
   this->angle_service = nh->create_service<mirte_msgs::srv::SetServoAngle>(
       "/mirte/set_" + this->servo_data->name + "_servo_angle",
-      std::bind(&Hiwonder_servo::angle_cb, this, _1,_2));
+      std::bind(&Hiwonder_servo::angle_cb, this, _1, _2));
 
   // create range service
   this->range_service = nh->create_service<mirte_msgs::srv::GetServoRange>(
@@ -250,11 +250,9 @@ Hiwonder_servo::Hiwonder_servo(std::shared_ptr<rclcpp::Node> nh,
   // create publisher
   this->position_pub = nh->create_publisher<mirte_msgs::msg::ServoPosition>(
       "/servos/" + this->servo_data->name + "/position", 10);
-  
 }
 
-
-void Hiwonder_servo::position_cb(HiwonderServo_module::Servo_pos& pos) {
+void Hiwonder_servo::position_cb(HiwonderServo_module::Servo_pos &pos) {
   // TODO: publish current angle
   // don't forget to calculate angle
   auto angle = calc_angle_in(pos.angle);
@@ -264,8 +262,7 @@ void Hiwonder_servo::position_cb(HiwonderServo_module::Servo_pos& pos) {
   msg.header.frame_id = this->servo_data->frame_id;
   // msg.header.stamp = this->nh->now();
   this->position_pub->publish(msg);
-  }
-
+}
 
 bool Hiwonder_servo::enable_cb(
     const std::shared_ptr<std_srvs::srv::SetBool::Request> req,
@@ -279,9 +276,9 @@ bool Hiwonder_servo::enable_cb(
 bool Hiwonder_servo::angle_cb(
     const std::shared_ptr<mirte_msgs::srv::SetServoAngle::Request> req,
     std::shared_ptr<mirte_msgs::srv::SetServoAngle::Response> res) {
-      auto angle = calc_angle_out(req->angle);
+  auto angle = calc_angle_out(req->angle);
   this->bus_mod->set_single_servo(this->servo_data->id, angle, 100);
-    res->status = true;
+  res->status = true;
   return true;
 }
 
@@ -293,42 +290,53 @@ bool Hiwonder_servo::range_cb(
   return true;
 }
 
-template <typename T>
-T scale(T x, T in_min, T in_max, T out_min, T out_max) {
+template <typename T> T scale(T x, T in_min, T in_max, T out_min, T out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 uint16_t Hiwonder_servo::calc_angle_out(float angle) {
 
-  float angle_out = scale<float>(angle, this->servo_data->min_angle_in, this->servo_data->max_angle_in, this->servo_data->min_angle_out, this->servo_data->max_angle_out);
-  if(this->servo_data->invert) {
-  angle_out = scale<float>(angle, this->servo_data->min_angle_in, this->servo_data->max_angle_in, this->servo_data->max_angle_out, this->servo_data->min_angle_out);
+  float angle_out = scale<float>(
+      angle, this->servo_data->min_angle_in, this->servo_data->max_angle_in,
+      this->servo_data->min_angle_out, this->servo_data->max_angle_out);
+  if (this->servo_data->invert) {
+    angle_out = scale<float>(
+        angle, this->servo_data->min_angle_in, this->servo_data->max_angle_in,
+        this->servo_data->max_angle_out, this->servo_data->min_angle_out);
   }
-  return std::max(std::min((int)angle_out, this->servo_data->max_angle_out), this->servo_data->min_angle_out);
+  return std::max(std::min((int)angle_out, this->servo_data->max_angle_out),
+                  this->servo_data->min_angle_out);
 }
 
 float Hiwonder_servo::calc_angle_in(uint16_t angle) {
-  float angle_in = scale<float>(angle, this->servo_data->min_angle_out, this->servo_data->max_angle_out, this->servo_data->min_angle_in, this->servo_data->max_angle_in);
-  if(this->servo_data->invert) {
-  angle_in = scale<float>(angle, this->servo_data->max_angle_out, this->servo_data->min_angle_out, this->servo_data->min_angle_in, this->servo_data->max_angle_in);
+  float angle_in = scale<float>(
+      angle, this->servo_data->min_angle_out, this->servo_data->max_angle_out,
+      this->servo_data->min_angle_in, this->servo_data->max_angle_in);
+  if (this->servo_data->invert) {
+    angle_in = scale<float>(
+        angle, this->servo_data->max_angle_out, this->servo_data->min_angle_out,
+        this->servo_data->min_angle_in, this->servo_data->max_angle_in);
   }
   return angle_in;
 }
 
-
-
-INA226_sensor::INA226_sensor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
-                std::shared_ptr<Mirte_Board> board, std::string name, std::shared_ptr<Sensors> modules,
-                std::shared_ptr<INA226_data> ina_data): Mirte_module(nh, tmx, board, name)  {
+INA226_sensor::INA226_sensor(std::shared_ptr<rclcpp::Node> nh,
+                             std::shared_ptr<TMX> tmx,
+                             std::shared_ptr<Mirte_Board> board,
+                             std::string name, std::shared_ptr<Sensors> modules,
+                             std::shared_ptr<INA226_data> ina_data)
+    : Mirte_module(nh, tmx, board, name) {
   this->ina_data = ina_data;
-  this->ina226 = std::make_shared<INA226_module>(ina_data->addr, ina_data->bus, std::bind(&INA226_sensor::data_cb, this, _1, _2));
+  this->ina226 = std::make_shared<INA226_module>(
+      ina_data->addr, ina_data->bus,
+      std::bind(&INA226_sensor::data_cb, this, _1, _2));
   this->battery_pub = nh->create_publisher<sensor_msgs::msg::BatteryState>(
       "mirte/power/" + this->ina_data->name, 1);
-      modules->add_sens(this->ina226);
-    // TODO: add used topic
-    // TODO: add shutdown service
-    // TODO: add auto shutdown
-                }
+  modules->add_sens(this->ina226);
+  // TODO: add used topic
+  // TODO: add shutdown service
+  // TODO: add auto shutdown
+}
 
 void INA226_sensor::data_cb(float current, float voltage) {
   auto msg = sensor_msgs::msg::BatteryState();
@@ -345,8 +353,8 @@ std::vector<std::shared_ptr<INA226_sensor>> INA226_sensor::get_ina_modules(
   std::vector<std::shared_ptr<INA226_sensor>> pca_modules;
   auto pca_data = INA226_data::parse_ina226_data(parser, board);
   for (auto pca : pca_data) {
-    auto pca_module =
-        std::make_shared<INA226_sensor>(nh, tmx, board, pca->name, modules, pca);
+    auto pca_module = std::make_shared<INA226_sensor>(nh, tmx, board, pca->name,
+                                                      modules, pca);
     pca_modules.push_back(pca_module);
   }
   return pca_modules;

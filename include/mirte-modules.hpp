@@ -1,13 +1,13 @@
 #pragma once
+#include "mirte_msgs/msg/servo_position.hpp"
+#include "mirte_msgs/srv/get_servo_range.hpp"
 #include "mirte_msgs/srv/set_motor_speed.hpp"
+#include "mirte_msgs/srv/set_servo_angle.hpp"
 #include "parsers/p_modules.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/header.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "std_srvs/srv/set_bool.hpp"
-#include "mirte_msgs/srv/set_servo_angle.hpp"
-#include "mirte_msgs/srv/get_servo_range.hpp"
-#include "mirte_msgs/msg/servo_position.hpp"
 #include <memory>
 #include <mirte-board.hpp>
 #include <modules/PCA9685.hpp>
@@ -110,10 +110,9 @@ public:
   void offset_cb(int, uint16_t);
 
   // ROS:
-    rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr enable_service;
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr enable_service;
   bool enable_cb(const std::shared_ptr<std_srvs::srv::SetBool::Request> req,
                  std::shared_ptr<std_srvs::srv::SetBool::Response> res);
-
 };
 
 class Hiwonder_servo {
@@ -126,25 +125,26 @@ public:
   std::shared_ptr<HiwonderServo_module> bus_mod;
 
   // callbacks from the pico
-  void position_cb(HiwonderServo_module::Servo_pos& pos);
+  void position_cb(HiwonderServo_module::Servo_pos &pos);
 
   // ROS:
   //  set_x_servo_enable
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr enable_service;
   bool enable_cb(const std::shared_ptr<std_srvs::srv::SetBool::Request> req,
                  std::shared_ptr<std_srvs::srv::SetBool::Response> res);
-  
+
   // set_x_servo_angle
   rclcpp::Service<mirte_msgs::srv::SetServoAngle>::SharedPtr angle_service;
-  bool angle_cb(const std::shared_ptr<mirte_msgs::srv::SetServoAngle::Request> req,
-                 std::shared_ptr<mirte_msgs::srv::SetServoAngle::Response> res);
-            
+  bool
+  angle_cb(const std::shared_ptr<mirte_msgs::srv::SetServoAngle::Request> req,
+           std::shared_ptr<mirte_msgs::srv::SetServoAngle::Response> res);
 
   // get_x_servo_range
   rclcpp::Service<mirte_msgs::srv::GetServoRange>::SharedPtr range_service;
-  bool range_cb(const std::shared_ptr<mirte_msgs::srv::GetServoRange::Request> req,
-                 std::shared_ptr<mirte_msgs::srv::GetServoRange::Response> res);
-  
+  bool
+  range_cb(const std::shared_ptr<mirte_msgs::srv::GetServoRange::Request> req,
+           std::shared_ptr<mirte_msgs::srv::GetServoRange::Response> res);
+
   // /servos/x/position publisher
   rclcpp::Publisher<mirte_msgs::msg::ServoPosition>::SharedPtr position_pub;
 
@@ -153,20 +153,22 @@ public:
   float calc_angle_in(uint16_t angle_out);
 };
 
-#include "sensors/INA226.hpp"
 #include "sensor_msgs/msg/battery_state.hpp"
+#include "sensors/INA226.hpp"
 class INA226_sensor : public Mirte_module {
 public:
   INA226_sensor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
-                std::shared_ptr<Mirte_Board> board, std::string name,std::shared_ptr<Sensors> modules,
+                std::shared_ptr<Mirte_Board> board, std::string name,
+                std::shared_ptr<Sensors> modules,
                 std::shared_ptr<INA226_data> ina_data);
   std::shared_ptr<INA226_data> ina_data;
   std::shared_ptr<INA226_module> ina226;
   rclcpp::Publisher<sensor_msgs::msg::BatteryState>::SharedPtr battery_pub;
   void data_cb(float voltage, float current);
   void publish();
-  static std::vector<std::shared_ptr<INA226_sensor>> get_ina_modules(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
-    std::shared_ptr<Mirte_Board> board, std::shared_ptr<Parser> parser,
-    std::shared_ptr<Sensors> sensors) ;
+  static std::vector<std::shared_ptr<INA226_sensor>>
+  get_ina_modules(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+                  std::shared_ptr<Mirte_Board> board,
+                  std::shared_ptr<Parser> parser,
+                  std::shared_ptr<Sensors> sensors);
 };

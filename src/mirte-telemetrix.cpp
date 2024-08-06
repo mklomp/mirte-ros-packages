@@ -40,9 +40,10 @@ mirte_node::mirte_node(/* args */)
 }
 
 mirte_node::~mirte_node() {
-  if(this->s_tmx){
-   this->s_tmx->stop();
- } }
+  if (this->s_tmx) {
+    this->s_tmx->stop();
+  }
+}
 
 void mirte_node::start(std::shared_ptr<rclcpp::Node> s_node) {
   Parser p(s_node);
