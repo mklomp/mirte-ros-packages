@@ -58,3 +58,20 @@ public:
                     std::shared_ptr<Mirte_Board> board);
   bool check() { return pin != (pin_t)-1 && name != ""; }
 };
+
+class Encoder_data {
+public:
+  std::string name;
+  pin_t pinA = (pin_t)-1;
+  pin_t pinB = (pin_t)-1;
+  Encoder_data(std::string name, pin_t pinA, pin_t pinB) {
+    this->name = name;
+    this->pinA = pinA;
+    this->pinB = pinB;
+  }
+  Encoder_data() {}
+  static std::vector<std::shared_ptr<Encoder_data>>
+  parse_encoder_data(std::shared_ptr<Parser> parser,
+                     std::shared_ptr<Mirte_Board> board);
+  bool check() { return pinA != (pin_t)-1 && name != ""; }
+};

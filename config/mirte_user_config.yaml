@@ -20,17 +20,19 @@
         version: 0.8
         board: pico
 
-    #encoder:
-    #  left:
-    #    name: left
-    #    device: mirte
-    #    pins:
-    #      pin: GP14
-    #  right:
-    #    name: right
-    #    device: mirte
-    #    pins:
-    #      pin: GP15
+    encoder:
+     left:
+       name: left
+       device: mirte
+       pins:
+        #  pin: GP14
+         A: 15 #21
+         B: 14 #20
+     right:
+       name: right
+       device: mirte
+       pins:
+         pin: GP16
     # intensity:
     #   left:
     #     name: left
@@ -160,7 +162,7 @@
             invert: true
       power_watcher:
         device: mirte
-        type: INA2262
+        type: INA226
         connector: I2C1
         id: 64 # default 0x40
         min_voltage: 11.1 # around 10-15% battery

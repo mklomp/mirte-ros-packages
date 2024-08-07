@@ -48,7 +48,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++ -Wswitch-enum") # -Wall -Wextra
 
 add_executable(
   ${PROJECT_NAME}_node
-  # src/test.cpp
+  src/util.cpp
   src/mirte-telemetrix.cpp
   src/mirte-board.cpp
   src/boards/atmega328.cpp

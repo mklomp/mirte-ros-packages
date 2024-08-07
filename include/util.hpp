@@ -21,3 +21,12 @@ inline std::optional<double> try_parse_double(std::string str) {
 inline bool starts_with(std::string str, std::string prefix) {
   return str.rfind(prefix, 0) == 0;
 }
+
+#include <array>
+#include <cstdio>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <string>
+
+std::string exec(const char *cmd);

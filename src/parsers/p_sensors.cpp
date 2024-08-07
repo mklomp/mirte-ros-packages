@@ -110,3 +110,45 @@ Keypad_data::parse_keypad_data(std::shared_ptr<Parser> parser,
   }
   return out;
 }
+
+std::vector<std::shared_ptr<Encoder_data>>
+Encoder_data::parse_encoder_data(std::shared_ptr<Parser> parser,
+                                 std::shared_ptr<Mirte_Board> board) {
+  std::vector<std::shared_ptr<Encoder_data>> encoders;
+  for (auto name : parser->get_params_keys("encoder")) {
+    Encoder_data encoder_data;
+    encoder_data.name = name;
+    auto encoder_key = parser->build_param_name("encoder", name);
+    auto encoder_config = parser->get_params_name(encoder_key);
+    auto encoder_keys = parser->get_params_keys(encoder_key);
+    if (encoder_config.count("connector")) {
+      std::cout << "connector" << std::endl;
+      std::string connector = get_string(encoder_config["connector"]);
+      auto pins = board->resolveConnector(connector);
+      encoder_data.pinA = pins["pinA"];
+      encoder_data.pinB = pins["pinB"];
+
+    } else if (encoder_keys.count("pins")) {
+      auto pins_config = parser->get_params_name(
+          parser->build_param_name(encoder_key, "pins"));
+      for (auto pin_key : parser->get_params_keys(
+               parser->build_param_name(encoder_key, "pins"))) {
+        if ("A" == pin_key) {
+          encoder_data.pinA =
+              board->resolvePin(get_string(pins_config[pin_key]));
+        } else if ("B" == pin_key) {
+          encoder_data.pinB =
+              board->resolvePin(get_string(pins_config[pin_key]));
+        } else if ("pin" == pin_key) { // single pin encoder
+          encoder_data.pinA =
+              board->resolvePin(get_string(pins_config[pin_key]));
+          encoder_data.pinB = (pin_t)-1;
+        }
+      }
+    }
+    if (encoder_data.check()) {
+      encoders.push_back(std::make_shared<Encoder_data>(encoder_data));
+    }
+  }
+  return encoders;
+}

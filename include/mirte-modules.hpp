@@ -163,12 +163,32 @@ public:
                 std::shared_ptr<INA226_data> ina_data);
   std::shared_ptr<INA226_data> ina_data;
   std::shared_ptr<INA226_module> ina226;
-  rclcpp::Publisher<sensor_msgs::msg::BatteryState>::SharedPtr battery_pub;
+
   void data_cb(float voltage, float current);
   void publish();
+  float calc_soc(float voltage);
+  void integrate_usage(float current);
+  void check_soc(float voltage, float current);
+  void shutdown_robot();
+  void
+  shutdown_robot_cb(const std::shared_ptr<std_srvs::srv::SetBool::Request> req,
+                    std::shared_ptr<std_srvs::srv::SetBool::Response> res);
   static std::vector<std::shared_ptr<INA226_sensor>>
   get_ina_modules(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
                   std::shared_ptr<Mirte_Board> board,
                   std::shared_ptr<Parser> parser,
                   std::shared_ptr<Sensors> sensors);
+
+private:
+  float total_used_mAh = 0;
+  rclcpp::Time used_time = rclcpp::Time(0, 0);
+  rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr used_pub;
+  rclcpp::Publisher<sensor_msgs::msg::BatteryState>::SharedPtr battery_pub;
+
+  bool enable_turn_off = false;
+  bool shutdown_triggered = false;
+  rclcpp::Time turn_off_trigger_time = rclcpp::Time(0, 0);
+  bool in_power_dip = false;
+  rclcpp::Time turn_off_time = rclcpp::Time(0, 0);
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr shutdown_service;
 };

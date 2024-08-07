@@ -147,6 +147,7 @@ public:
   float max_current = 10;
   float max_voltage = 14;
   float min_voltage = 10.5;
+  float power_low_time = 5;
   pin_t scl = 0xFF;
   pin_t sda = 0xFF;
   INA226_data(std::string name, uint8_t addr, uint8_t port, float max_current,
