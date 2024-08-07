@@ -24,6 +24,8 @@ Mirte_modules::Mirte_modules(std::shared_ptr<rclcpp::Node> nh,
   this->sensor_sys = std::make_shared<Sensors>(tmx);
   auto ina_mods =
       INA226_sensor::get_ina_modules(nh, tmx, board, parser, this->sensor_sys);
+        std::cout << "Adding ina modules" << ina_mods.size() << std::endl;
+
   this->modules.insert(this->modules.end(), ina_mods.begin(), ina_mods.end());
 }
 std::vector<std::shared_ptr<PCA_Module>> PCA_Module::get_pca_modules(
@@ -197,7 +199,7 @@ Hiwonder_bus_module::get_hiwonder_modules(std::shared_ptr<rclcpp::Node> nh,
 void Hiwonder_bus_module::position_cb(
     std::vector<HiwonderServo_module::Servo_pos> pos) {
   for (auto p : pos) {
-    std::cout << "Servo: " << (int)p.id << " pos: " << p.angle << std::endl;
+    // std::cout << "Servo: " << (int)p.id << " pos: " << p.angle << std::endl;
     for (auto servo : this->servos) {
       if (servo->servo_data->id == p.id) {
         servo->position_cb(p);
@@ -326,19 +328,23 @@ INA226_sensor::INA226_sensor(std::shared_ptr<rclcpp::Node> nh,
                              std::string name, std::shared_ptr<Sensors> modules,
                              std::shared_ptr<INA226_data> ina_data)
     : Mirte_module(nh, tmx, board, name) {
+        tmx->setI2CPins(ina_data->scl, ina_data->sda, ina_data->port);
+
   this->ina_data = ina_data;
-  this->ina226 = std::make_shared<INA226_module>(
-      ina_data->addr, ina_data->bus,
+  this->ina226 = std::make_shared<INA226_module>( ina_data->port,
+      ina_data->addr,
       std::bind(&INA226_sensor::data_cb, this, _1, _2));
   this->battery_pub = nh->create_publisher<sensor_msgs::msg::BatteryState>(
-      "mirte/power/" + this->ina_data->name, 1);
+      "power/" + this->ina_data->name, 1);
   modules->add_sens(this->ina226);
+  this->data_cb(10,5 );
   // TODO: add used topic
   // TODO: add shutdown service
   // TODO: add auto shutdown
 }
 
 void INA226_sensor::data_cb(float current, float voltage) {
+  std::cout << "INA226 data: " << current << " " << voltage << std::endl;
   auto msg = sensor_msgs::msg::BatteryState();
   msg.voltage = voltage;
   msg.current = current;
@@ -353,6 +359,7 @@ std::vector<std::shared_ptr<INA226_sensor>> INA226_sensor::get_ina_modules(
   std::vector<std::shared_ptr<INA226_sensor>> pca_modules;
   auto pca_data = INA226_data::parse_ina226_data(parser, board);
   for (auto pca : pca_data) {
+    std::cout << "ina data" << pca->name << std::endl;
     auto pca_module = std::make_shared<INA226_sensor>(nh, tmx, board, pca->name,
                                                       modules, pca);
     pca_modules.push_back(pca_module);

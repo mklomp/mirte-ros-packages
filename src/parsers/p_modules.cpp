@@ -277,8 +277,10 @@ INA226_data::parse_ina226_data(std::shared_ptr<Parser> parser,
     auto mod_keys = parser->get_params_keys(mod_key);
     if (mod_keys.count("type")) {
       std::string type = mod_config["type"].get<std::string>();
+
       boost::algorithm::to_lower(type);
       if (type == "ina226") {
+        std::cout << "Found one ina" << mod_key << std::endl;
         auto ina_data =
             INA226_data::parse_ina226_data_single(parser, board, mod_key);
         if (ina_data->check()) {
@@ -307,7 +309,7 @@ INA226_data::parse_ina226_data_single(std::shared_ptr<Parser> parser,
     ina_data.scl = pins["scl"];
     ina_data.sda = pins["sda"];
     boost::algorithm::to_lower(conn_name);
-    ina_data.bus = board->resolveI2CPort(ina_data.sda);
+    ina_data.port = board->resolveI2CPort(ina_data.sda);
   }
   if (ina_keys.count("max_current")) {
     ina_data.max_current = ina_config["max_current"].get<float>();

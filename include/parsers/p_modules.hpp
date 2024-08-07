@@ -142,18 +142,18 @@ public:
 class INA226_data {
 public:
   std::string name;
-  uint8_t addr = 0x40;
-  uint8_t bus = 0;
+  uint8_t addr = 64;
+  uint8_t port = 0;
   float max_current = 10;
   float max_voltage = 14;
   float min_voltage = 10.5;
   pin_t scl = 0xFF;
   pin_t sda = 0xFF;
-  INA226_data(std::string name, uint8_t addr, uint8_t bus, float max_current,
+  INA226_data(std::string name, uint8_t addr, uint8_t port, float max_current,
               float min_voltage, float max_voltage) {
     this->name = name;
     this->addr = addr;
-    this->bus = bus;
+    this->port = port;
     this->max_current = max_current;
     this->max_voltage = max_voltage;
   }
@@ -165,5 +165,5 @@ public:
   parse_ina226_data_single(std::shared_ptr<Parser> parser,
                            std::shared_ptr<Mirte_Board> board,
                            std::string ina226_key);
-  bool check() { return name != "" && addr != 0 && bus != 0; }
+  bool check() { return name != "" && addr != 0; }
 };

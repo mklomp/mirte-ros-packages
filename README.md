@@ -26,3 +26,7 @@
 | ledstrip               | ✅                         | ❌                    |         |
 | oled module            | ✅                         | ❌                    |         |
 
+
+
+# local run:
+./mirte... --ros-args -r __node:=mirte -r __ns:=/mirte --params-file /root/ros2_ws/install/mirte_telemetrix_cpp/share/mirte_telemetrix_cpp/config/mirte_user_config.yaml 

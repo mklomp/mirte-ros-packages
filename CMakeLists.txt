@@ -4,7 +4,7 @@ project(mirte_telemetrix_cpp)
 # Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++20)
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native")
 
 # find_program(iwyu_path NAMES include-what-you-use iwyu REQUIRED) if(NOT
 # iwyu_path) message(FATAL_ERROR "Could not find the program
