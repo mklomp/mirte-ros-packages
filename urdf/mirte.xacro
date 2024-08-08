@@ -105,10 +105,10 @@
     </xacro:if>
     <xacro:if value="$(arg intensity_enable)">
       <xacro:ir_sensor name="left">
-        <origin rpy="0 ${radians(90)} 0" xyz="0.0785 0.022 0.002"/>
+        <pose>0.0785 0.022 0.002 0 ${radians(90)} 0</pose>
       </xacro:ir_sensor>
       <xacro:ir_sensor name="right">
-        <origin rpy="0 ${radians(90)} 0" xyz="0.0785 -0.022 0.002"/>
+              <pose>0.0785 -0.022 0.002 0 ${radians(90)} 0</pose>
       </xacro:ir_sensor>
     </xacro:if>
     <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
