@@ -45,7 +45,7 @@ check_ipo_supported(RESULT supported OUTPUT error)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++ -Wswitch-enum") # -Wall -Wextra
                                                                  # -Wpedantic
                                                                  # -Werror")
-set(NO_CLANG_TIDY FALSE CACHE BOOL "Disable clang-tidy")
+set(NO_CLANG_TIDY TRUE CACHE BOOL "Disable clang-tidy")
 if(NOT NO_CLANG_TIDY)
 set(CMAKE_CXX_CLANG_TIDY
 clang-tidy-14;

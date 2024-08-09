@@ -261,10 +261,10 @@ void SonarMonitor::publish() {
   sensor_msgs::msg::Range msg;
   msg.header = this->get_header();
   msg.radiation_type = sensor_msgs::msg::Range::ULTRASOUND;
-  msg.field_of_view = M_PI * 0.5; // 90 degrees, TODO: check real value
+  msg.field_of_view = M_PI / 12.0; // 15 degrees, according to the HC-SR04 datasheet
   msg.min_range = 0.02;
-  msg.max_range = 1.5;
-  msg.range = this->value / 1000.0;
+  msg.max_range = 4.5;
+  msg.range = this->value / 100.0;
   this->sonar_pub->publish(msg);
 }
 
