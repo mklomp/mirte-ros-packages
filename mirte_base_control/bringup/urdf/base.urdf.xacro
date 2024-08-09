@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!-- Basic differential drive mobile base -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="diffdrive_robot">
+
+<xacro:macro name="wheel" params="name prefix">
+
+        <joint name="${prefix}${name}_wheel_joint" type="continuous">
+      <parent link="${prefix}base_link"/>
+      <child link="${prefix}${name}_wheel"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <dynamics damping="0.2"/>
+    </joint>
+
+    <!-- left wheel Link -->
+    <link name="${prefix}${name}_wheel">
+</link>
+</xacro:macro>
+
+<xacro:macro name="joint" params="name prefix">
+      <joint name="${prefix}${name}_wheel_joint">
+        <command_interface name="velocity"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+</xacro:macro>
+
+  <xacro:arg name="prefix" default="" />
+    <link name="base_link">
+</link>
+        <xacro:wheel name="left_front" prefix="$(arg prefix)" />
+        <xacro:wheel name="right_front" prefix="$(arg prefix)" />
+        <xacro:wheel name="left_rear" prefix="$(arg prefix)" />
+        <xacro:wheel name="right_rear" prefix="$(arg prefix)" />
+
+
+
+            <ros2_control name="mecanumdrive" type="system">
+      <hardware>
+        <plugin>mirte_base_control/MirteBaseHWInterface</plugin>
+      </hardware>
+      <xacro:joint prefix="$(arg prefix)" name="left_front"  />
+        <xacro:joint prefix="$(arg prefix)" name="right_front"  />
+        <xacro:joint prefix="$(arg prefix)" name="left_rear"  />
+        <xacro:joint prefix="$(arg prefix)" name="right_rear"  />
+      <!-- <joint name="${prefix}right_wheel_joint">
+        <command_interface name="velocity"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint> -->
+    </ros2_control>
+
+  <!-- <xacro:include filename="$(find mirte_control)/urdf/diffbot_description.urdf.xacro" />
+
+  <!- -  Import Rviz colors - ->
+  <xacro:include filename="$(find mirte_control)/urdf/diffbot.materials.xacro" />
+
+  <!- - Import diffbot ros2_control description - ->
+  <xacro:include filename="$(find mirte_control)/ros2_control/diffbot.ros2_control.xacro" />
+
+  <xacro:diffbot prefix="$(arg prefix)" />
+
+  <xacro:diffbot_ros2_control
+    name="DiffBot" prefix="$(arg prefix)" /> -->
+
+
+
+</robot>

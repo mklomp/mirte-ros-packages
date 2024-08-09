@@ -1,0 +1,30 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 10  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    mirte_base_controller:
+      type: mecanum_drive_controller/MecanumDriveController
+    # :
+    #   type: mirte_base_control/MirteBaseHWInterface
+
+mirte_base_controller:
+  ros__parameters:
+    command_joint_names:
+      - left_front_wheel_joint/velocity
+      - left_rear_wheel_joint/velocity
+      - right_front_wheel_joint/velocity
+      - right_rear_wheel_joint/velocity
+      # - joint_5
+      # - joint_6
+    use_stamped_vel: false
+
+    command_interfaces:
+      - position
+      - velocity
+
+    state_interfaces:
+      - position
+      - velocity

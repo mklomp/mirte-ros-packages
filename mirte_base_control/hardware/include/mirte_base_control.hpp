@@ -49,6 +49,7 @@ namespace mirte_base_control {
 class MirteBaseHWInterface : public hardware_interface::SystemInterface {
 public:
   MirteBaseHWInterface();
+  RCLCPP_SHARED_PTR_DEFINITIONS(MirteBaseHWInterface);
 
   hardware_interface::CallbackReturn
   on_init(const hardware_interface::HardwareInfo &info) override;
@@ -64,6 +65,17 @@ public:
   // export_command_interfaces
   // read
   // write
+  std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
+
+    hardware_interface::CallbackReturn on_activate(
+    const rclcpp_lifecycle::State & previous_state) override;
+
+  hardware_interface::CallbackReturn on_deactivate(
+    const rclcpp_lifecycle::State & previous_state) override;
+
+  std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
+
+
   double calc_speed_pid(int joint, double target,
                         const rclcpp::Duration &period);
 
@@ -74,8 +86,7 @@ public:
   /*
    *
    */
-  void write(const rclcpp::Duration &period);
-
+hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::Duration & period);
   double rad_per_enc_tick() { return 2.0 * M_PI / this->ticks; }
   /**
    * Reading encoder values and setting position and velocity of encoders
@@ -84,14 +95,13 @@ public:
   /**
    * Reading encoder values and setting position and velocity of encoders
    */
-  void read(const rclcpp::Duration &period);
-
-  rclcpp::Node nh;
-  rclcpp::Node private_nh;
+hardware_interface::return_type read(const rclcpp::Time & time, const rclcpp::Duration & period);
+  std::shared_ptr<rclcpp::Node> nh;
+  // rclcpp::Node private_nh;
 
 private:
-  hardware_interface::JointStateInterface jnt_state_interface;
-  hardware_interface::VelocityJointInterface jnt_vel_interface;
+  // hardware_interface::JointStateInterface jnt_state_interface;
+  // hardware_interface::VelocityJointInterface jnt_vel_interface;
   std::vector<double> cmd;
   std::vector<double> pos;
   std::vector<double> vel;
@@ -111,31 +121,31 @@ private:
 
   rclcpp::Time curr_update_time, prev_update_time;
 
-  std::vector<rclcpp::Subscriber> wheel_encoder_subs_;
-  rclcpp::ServiceServer start_srv_;
-  rclcpp::ServiceServer stop_srv_;
+  std::vector<std::shared_ptr<rclcpp::Subscription<mirte_msgs::msg::Encoder>>> wheel_encoder_subs_;
+ std::shared_ptr< rclcpp::Service<std_srvs::srv::Empty>> start_srv_;
+ std::shared_ptr<  rclcpp::Service<std_srvs::srv::Empty>> stop_srv_;
 
-  std::vector<rclcpp::ServiceClient> service_clients;
-  std::vector<mirte_msgs::SetMotorSpeed> service_requests;
+  std::vector<std::shared_ptr<rclcpp::Client<mirte_msgs::srv::SetMotorSpeed>>> service_clients;
+  std::vector<std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Request>> service_requests;
   std::vector<std::string> joints;
-  bool enablePID;
+  bool enablePID = false;
   std::vector<std::shared_ptr<control_toolbox::Pid>> pids;
   std::shared_ptr<control_toolbox::Pid>
       reconfig_pid; // one dummy pid to use for the dynamic reconfigure
 
-  bool start_callback(std_srvs::Empty::Request & /*req*/,
-                      std_srvs::Empty::Response & /*res*/) {
+  void start_callback(std::shared_ptr<std_srvs::srv::Empty::Request> req,
+                      std::shared_ptr<std_srvs::srv::Empty::Response>res) {
     running_ = true;
-    return true;
+    // return true;
   }
 
-  bool stop_callback(std_srvs::Empty::Request & /*req*/,
-                     std_srvs::Empty::Response & /*res*/) {
+  void stop_callback(std::shared_ptr<std_srvs::srv::Empty::Request>req,
+                     std::shared_ptr<std_srvs::srv::Empty::Response> res) {
     running_ = false;
-    return true;
+    // return true;
   }
 
-  void WheelEncoderCallback(const mirte_msgs::Encoder::ConstPtr &msg,
+  void WheelEncoderCallback(std::shared_ptr<mirte_msgs::msg::Encoder> msg,
                             int joint) {
     if (msg->value < 0) {
       bidirectional = true;
