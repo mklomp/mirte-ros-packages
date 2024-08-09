@@ -33,7 +33,7 @@ jobs:
       - name: Build mirte-msgs
         run: |
           git clone https://github.com/arendjan/mirte-ros-packages.git -b ros2
-          cd mirte-ros-packages/mirte-msgs
+          cd mirte-ros-packages/mirte_msgs
           cmake -B build .
           cd build
           make
