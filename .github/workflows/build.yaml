@@ -25,11 +25,22 @@ jobs:
           ninja: false
           vcpkg: false
           cppcheck: false
-          clangtidy: false # instead of `true`, which chooses the default version, you can pass a specific version.
+          clangtidy: 14 # instead of `true`, which chooses the default version, you can pass a specific version.
           # ...
+      - name: install requirements
+        run: |
+         sudo apt install -y libboost-all-dev ament-cmake
+      - name: Build mirte-msgs
+        run: |
+          git clone https://github.com/arendjan/mirte-ros-packages.git -b ros2
+          cd mirte-ros-packages/mirte-msgs
+          cmake -B build .
+          cd build
+          make
+          make install
+          cd ../../../
       - name: Build
         run: |
-         sudo apt install -y libboost-all-dev
-         cmake -B build .
+         cmake -B build . -DNO_CLANG_TIDY=True
          cd build
          make
