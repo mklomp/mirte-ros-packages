@@ -43,7 +43,7 @@ include_directories(
 )
  
 add_executable(${PROJECT_NAME}_node
-    src/my_robot_base.cpp
+    src/my_robot_base.cpp src/mirte_base_control.cpp
 )
 ament_target_dependencies(
   ${PROJECT_NAME}_node std_msgs std_srvs mirte_msgs rclcpp sensor_msgs    ${THIS_PACKAGE_INCLUDE_DEPENDS}
