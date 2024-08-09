@@ -1,11 +1,14 @@
 #include <mirte-board.hpp>
 #include <pcbs/v08.hpp>
+
+auto const DEFAULT_VERSION = 0.8;
+
 Mirte_Board_pcb::Mirte_Board_pcb(std::shared_ptr<Mirte_Board> mcu,
                                  std::string version) {
   this->mcu = mcu;
   this->version = version;
   std::cout << "Mirte_Board_pcb::Mirte_Board_pcb" << version << std::endl;
-  auto v = try_parse_double(version).value_or(0.8);
+  auto v = try_parse_double(version).value_or(DEFAULT_VERSION);
   if (v == 0.8) {
     std::cout << "0.88888888888888" << version << std::endl;
     this->connectors = mirte_pico_pcb_map08;

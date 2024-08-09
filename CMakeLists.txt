@@ -54,7 +54,7 @@ clang-tidy-14;
 )
                      
 endif()
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(
   ${PROJECT_NAME}_node

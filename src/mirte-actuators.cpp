@@ -33,11 +33,15 @@ Motor::get_motors(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
   for (auto motor_data : motor_datas) {
     if (motor_data->check()) {
       if (motor_data->type == Motor_data::Motor_type::PP) {
-        motors.push_back(std::make_shared<PPMotor>(nh, tmx, board, motor_data,
-                                                   motor_data->name));
+        auto motor = std::make_shared<PPMotor>(nh, tmx, board, motor_data,
+                                                   motor_data->name);
+        motor->start();
+        motors.push_back(motor);
       } else if (motor_data->type == Motor_data::Motor_type::DP) {
-        motors.push_back(std::make_shared<DPMotor>(nh, tmx, board, motor_data,
-                                                   motor_data->name));
+        auto motor = std::make_shared<DPMotor>(nh, tmx, board, motor_data,
+                                                   motor_data->name);
+        motor->start();
+        motors.push_back(motor);
       } else if (motor_data->type == Motor_data::Motor_type::DDP) {
         // motors.push_back(std::make_shared<DDPMotor>(
         //     nh, tmx, board, motor_data,
@@ -85,7 +89,6 @@ DPMotor::DPMotor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
   this->dir_pin = motor_data->D1;
   tmx->setPinMode(this->pwm_pin, TMX::PIN_MODES::PWM_OUTPUT);
   tmx->setPinMode(this->dir_pin, TMX::PIN_MODES::DIGITAL_OUTPUT);
-  this->set_speed(0);
   // motor_service = nh.advertiseService(name, &Motor::service_callback, this);
   // ros_client = nh.subscribe<mirte_msgs::SetMotorSpeed>(name, 1000,
   //                                                      &Motor::motor_callback,

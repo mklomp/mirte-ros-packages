@@ -1,5 +1,5 @@
 ---
-Checks: "*,
+Checks: "cppcoreguidelines-*
         -abseil-*,
         -altera-*,
         -android-*,
@@ -13,6 +13,8 @@ Checks: "*,
         -readability-avoid-const-params-in-decls,
         -cppcoreguidelines-non-private-member-variables-in-classes,
         -misc-non-private-member-variables-in-classes,
+        -cppcoreguidelines-avoid-magic-numbers,
+        -readability-magic-numbers
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
