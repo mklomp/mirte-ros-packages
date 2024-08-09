@@ -19,7 +19,7 @@ jobs:
           required-ros-distributions: humble
       - uses: ros-tooling/action-ros-ci@v0.3
         with:
-          package-name: mirte-telemetrix-cpp
+          package-name: mirte_telemetrix_cpp
           target-ros2-distro: humble
           ref: ${{ steps.extract_branch.outputs.branch }}
           vcs-repo-file-url: "${{ github.workspace }}/.github/workflows/repos.repos"
