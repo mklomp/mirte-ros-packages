@@ -33,6 +33,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   std_srvs
   std_msgs
   control_toolbox
+  yaml_cpp_vendor
 )
 
 # find dependencies
@@ -52,6 +53,7 @@ add_library(
   ${PROJECT_NAME}
   SHARED
   hardware/mirte_base_control.cpp
+  hardware/params.cpp
 )
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 target_include_directories(${PROJECT_NAME} PUBLIC

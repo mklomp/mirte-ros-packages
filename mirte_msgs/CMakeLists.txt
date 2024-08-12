@@ -16,6 +16,7 @@ set(msg_files
   "msg/IntensityDigital.msg"
   "msg/Keypad.msg"
   "msg/ServoPosition.msg"
+  "msg/SetSpeedNamed.msg"
 )
 
 set(srv_files
@@ -32,6 +33,7 @@ set(srv_files
   "srv/SetPinValue.srv"
   "srv/SetServoAngle.srv"
   "srv/GetServoRange.srv"
+  "srv/SetSpeedMultiple.srv"
 )
 
 

@@ -17,6 +17,7 @@
 #include <mirte_msgs/srv/set_motor_speed.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_srvs/srv/empty.hpp>
+#include <mirte_msgs/srv/set_speed_multiple.hpp>
 // ros_control
 #include "hardware_interface/actuator_interface.hpp"
 #include "hardware_interface/handle.hpp"
@@ -82,7 +83,11 @@ public:
   double calc_speed_map(int joint, double target,
                         const rclcpp::Duration &period);
 
-  bool write_single(int joint, double speed, const rclcpp::Duration &period);
+  bool write_single(int joint, double speed, const rclcpp::Duration &period, bool& updated);
+
+int calculate_single_speed(int joint, double speed,const rclcpp::Duration &period);
+
+
   /*
    *
    */
@@ -125,8 +130,11 @@ private:
  std::shared_ptr< rclcpp::Service<std_srvs::srv::Empty>> start_srv_;
  std::shared_ptr<  rclcpp::Service<std_srvs::srv::Empty>> stop_srv_;
 
+  bool use_single_client = true;
   std::vector<std::shared_ptr<rclcpp::Client<mirte_msgs::srv::SetMotorSpeed>>> service_clients;
   std::vector<std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Request>> service_requests;
+  std::shared_ptr< rclcpp::Client< mirte_msgs::srv::SetSpeedMultiple> > set_speed_multiple_client;
+  std::shared_ptr< mirte_msgs::srv::SetSpeedMultiple::Request> set_speed_multiple_request;
   std::vector<std::string> joints;
   bool enablePID = false;
   std::vector<std::shared_ptr<control_toolbox::Pid>> pids;

@@ -1,6 +1,7 @@
 #include <mirte_base_control.hpp>
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
-
+#include "params.hpp"
+#include <algorithm>
 namespace mirte_base_control {
 
 bool equal_gains(control_toolbox::Pid::Gains lhs,
@@ -53,9 +54,8 @@ double MirteBaseHWInterface::calc_speed_map(int joint, double target,
   return std::max(std::min(int(target / (6.0 * M_PI) * 100), 100), -100);
 }
 
-bool MirteBaseHWInterface::write_single(int joint, double speed,
+int MirteBaseHWInterface::calculate_single_speed(int joint, double speed,
                                         const rclcpp::Duration &period) {
-                                          // std::cout << "write_single" << joint << std::endl;
   double speed_mapped;
   if (this->enablePID && false) {
     speed_mapped = this->calc_speed_pid(joint, speed, period);
@@ -63,31 +63,38 @@ bool MirteBaseHWInterface::write_single(int joint, double speed,
     speed_mapped = this->calc_speed_map(joint, speed, period);
   }
   speed_mapped = std::clamp<double>(speed_mapped, -max_speed, max_speed);
+
+  return speed_mapped;
+}
+
+bool MirteBaseHWInterface::write_single(int joint, double speed,
+                                        const rclcpp::Duration &period, bool& updated) {
+                                          // std::cout << "write_single" << joint << std::endl;
+                                          auto speed_mapped = calculate_single_speed(joint, speed, period);
   auto diff = std::abs(speed_mapped - _last_sent_cmd[joint]);
-  _last_cmd[joint] = speed_mapped;
-  if(speed_mapped != 0) {
-    // std::cout << "Sending speed " << speed_mapped << " to " << joints[joint]
-    //           << std::endl;
-  }
+  _last_cmd[joint] = speed_mapped; 
   if (diff > 1.0) {
-    // std::cout << "Sending speed " << speed_mapped << " to " << joints[joint] << "ori: " << speed
-    //           << std::endl;
-    _last_sent_cmd[joint] = speed_mapped;
-//     service_requests[joint].
-    service_requests[joint]->speed = (int)speed_mapped;
+    updated = true; 
+    _last_sent_cmd[joint] = speed_mapped; 
+    if(!this->use_single_client) {
+          service_requests[joint]->speed = (int)speed_mapped;
     service_clients[joint]->async_send_request(service_requests[joint]);
 //     TODO: loop until response is received
+
     if (!true) {
       this->start_reconnect();
       return false;
     }
+
+  } else {
+    this->set_speed_multiple_request->speeds[joint].speed = speed_mapped;
+  }
   }
   return true;
 }
 
 
-hardware_interface::return_type MirteBaseHWInterface::write(const rclcpp::Time & time, const rclcpp::Duration & period) {
-  // std::cout << "write" << std::endl;
+hardware_interface::return_type MirteBaseHWInterface::write(const rclcpp::Time & time, const rclcpp::Duration & period) { 
   if (running_) {
     // make sure the clients don't get overwritten while calling them
     const std::lock_guard<std::mutex> lock(this->service_clients_mutex);
@@ -101,12 +108,16 @@ hardware_interface::return_type MirteBaseHWInterface::write(const rclcpp::Time &
     // For 5V power bank: 255 pwm = 90 ticks/sec -> ca 2 rot/s (4*pi)
     // For 6V power supply: 255 pwm = 120 ticks/sec -> ca 3 rot/s
     // (6*pi)
-    for (size_t i = 0; i < NUM_JOINTS; i++) {
-      if (!write_single(i, cmd[i], period)) {
-        std::cout << "write failed" << std::endl;
+    bool updated = false; 
+    for (size_t i = 0; i < NUM_JOINTS; i++) { 
+      if (!write_single(i, cmd[i], period, updated)) { 
+        // TODO: add reconnect
           return hardware_interface::return_type::ERROR;
 
       }
+    } 
+    if (updated && this->use_single_client) { 
+      this->set_speed_multiple_client->async_send_request(this->set_speed_multiple_request);
     }
     // Set the direction in so the read() can use it
     // TODO: this does not work properly, because at the end of a series
@@ -114,15 +125,13 @@ hardware_interface::return_type MirteBaseHWInterface::write(const rclcpp::Time &
     for (size_t i = 0; i < NUM_JOINTS; i++) {
       _last_wheel_cmd_direction[i] = cmd[i] > 0.0 ? 1 : -1;
     }
-  }
-  // std::cout << "write done" << std::endl;
+  } 
     return hardware_interface::return_type::OK;
 
 }
 
 void MirteBaseHWInterface::read_single(int joint,
-                                       const rclcpp::Duration &period) {
-  // std::cout << "read_single" << joint << _wheel_encoder[joint] << std::endl;
+                                       const rclcpp::Duration &period) { 
  if(_last_value[joint] == 0) {
     _last_value[joint] = _wheel_encoder[joint];
     // when starting, the encoders dont have to be at 0. Without this, the odom can jump at the first loop
@@ -186,6 +195,8 @@ hardware_interface::return_type MirteBaseHWInterface::read(const rclcpp::Time & 
 using namespace std::chrono_literals;
 
 void MirteBaseHWInterface::init_service_clients() {
+      if(!this->use_single_client) {
+
   for (auto joint : this->joints) {
     auto service = (boost::format(service_format) % joint).str();
 //     RCLCPP_INFO_STREAM("Waiting for service " << service); // todo print
@@ -209,6 +220,28 @@ void MirteBaseHWInterface::init_service_clients() {
       service_clients.push_back(client);
       service_requests.push_back(std::make_shared<mirte_msgs::srv::SetMotorSpeed::Request>());
     }
+   
+  }
+  
+     } else {
+      service_clients.clear();
+      service_requests.clear();
+     this->set_speed_multiple_client = nh->create_client<mirte_msgs::srv::SetSpeedMultiple>("/mirte/set_motorservocontroller_multiple_speeds");
+    while (!this->set_speed_multiple_client->wait_for_service(1s)) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+      return;
+      // return hardware_interface::CallbackReturn::ERROR;
+    }
+  } 
+
+    this->set_speed_multiple_request = std::make_shared<mirte_msgs::srv::SetSpeedMultiple::Request>();
+    this->set_speed_multiple_request->speeds.resize(NUM_JOINTS);
+    for (size_t i = 0; i < std::min( (size_t)NUM_JOINTS, (size_t) this->set_speed_multiple_request->speeds.max_size()) ; i++) {
+      this->set_speed_multiple_request->speeds[i].speed = 0;
+      this->set_speed_multiple_request->speeds[i].name = this->joints[i];
+    }
+    this->set_speed_multiple_client->async_send_request(this->set_speed_multiple_request);
   }
 }
 
@@ -291,10 +324,10 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_init(
   {
     return hardware_interface::CallbackReturn::ERROR;
   }
-
+  
   std::cout << "starting on_init" << std::endl;
             nh = rclcpp::Node::make_shared("mirte_base_control");
-
+  
   std::cout << "on_init" << __LINE__ << std::endl;
   running_ = true;
   start_srv_ = nh->create_service<std_srvs::srv::Empty>( "start", std::bind(&MirteBaseHWInterface::start_callback, this, _1, _2));
@@ -315,8 +348,8 @@ this->ros_spin();  });
   */
 //  info.hardware_parameters.at("ticks");
   this->ticks = std::stod(info.hardware_parameters.at("ticks"));
-  
-  std::cout << "ticks == " << this->ticks << std::endl;
+  // std::string param_file = info.hardware_parameters.at("param_file");
+  // parse_params(param_file, nh);
   // std::cout << "on_init" << __LINE__ << std::endl;
   // this->NUM_JOINTS = detect_joints(nh);
 //  std::cout << "on_init" << __LINE__ << std::endl;
@@ -464,7 +497,7 @@ this->ros_spin();  });
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-void MirteBaseHWInterface ::start_reconnect() {
+void MirteBaseHWInterface::start_reconnect() {
   using namespace std::chrono_literals;
   std::cout << "start_reconnect" << std::endl;
   if (this->reconnect_thread.valid()) { // does it already exist or not?
