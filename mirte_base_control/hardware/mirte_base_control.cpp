@@ -66,12 +66,12 @@ bool MirteBaseHWInterface::write_single(int joint, double speed,
   auto diff = std::abs(speed_mapped - _last_sent_cmd[joint]);
   _last_cmd[joint] = speed_mapped;
   if(speed_mapped != 0) {
-    std::cout << "Sending speed " << speed_mapped << " to " << joints[joint]
-              << std::endl;
+    // std::cout << "Sending speed " << speed_mapped << " to " << joints[joint]
+    //           << std::endl;
   }
   if (diff > 1.0) {
-    std::cout << "Sending speed " << speed_mapped << " to " << joints[joint]
-              << std::endl;
+    // std::cout << "Sending speed " << speed_mapped << " to " << joints[joint] << "ori: " << speed
+    //           << std::endl;
     _last_sent_cmd[joint] = speed_mapped;
 //     service_requests[joint].
     service_requests[joint]->speed = (int)speed_mapped;
@@ -225,13 +225,13 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-  RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Activating ...please wait...");
+  RCLCPP_INFO(rclcpp::get_logger("MirteBaseSystemHardware"), "Activating ...please wait...");
 
   for (auto i = 0; i < 2; i++)
   {
     rclcpp::sleep_for(std::chrono::seconds(1));
     RCLCPP_INFO(
-      rclcpp::get_logger("DiffBotSystemHardware"), "%.1f seconds left...", 2 - i);
+      rclcpp::get_logger("MirteBaseSystemHardware"), "%.1f seconds left...", 2 - i);
   }
   // END: This part here is for exemplary purposes - Please do not copy to your production code
 
@@ -246,7 +246,7 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_activate(
   //   }
   // }
 
-  RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Successfully activated!");
+  RCLCPP_INFO(rclcpp::get_logger("MirteBaseSystemHardware"), "Successfully activated!");
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -255,17 +255,17 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-  RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Deactivating ...please wait...");
+  RCLCPP_INFO(rclcpp::get_logger("MirteBaseSystemHardware"), "Deactivating ...please wait...");
 
   for (auto i = 0; i < 2; i++)
   {
     rclcpp::sleep_for(std::chrono::seconds(1));
     RCLCPP_INFO(
-      rclcpp::get_logger("DiffBotSystemHardware"), "%.1f seconds left...", 2 - i);
+      rclcpp::get_logger("MirteBaseSystemHardware"), "%.1f seconds left...", 2 - i);
   }
   // END: This part here is for exemplary purposes - Please do not copy to your production code
 
-  RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Successfully deactivated!");
+  RCLCPP_INFO(rclcpp::get_logger("MirteBaseSystemHardware"), "Successfully deactivated!");
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -336,9 +336,9 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_init(
                           // normal mirte as well
                   "right"};
   if (NUM_JOINTS == 4) {
-    this->joints = {"left_front",
+    this->joints = {"left_front","right_front", 
                     "left_rear", // TODO: check ordering
-                    "right_front", "right_rear"};
+                    "right_rear" };
   }
   std::cout << "Initializing MirteBaseHWInterface with " << NUM_JOINTS
             << " joints" << std::endl;
@@ -349,7 +349,7 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_init(
     if (joint.command_interfaces.size() != 1)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger("DiffBotSystemHardware"),
+        rclcpp::get_logger("MirteBaseSystemHardware"),
         "Joint '%s' has %zu command interfaces found. 1 expected.", joint.name.c_str(),
         joint.command_interfaces.size());
       return hardware_interface::CallbackReturn::ERROR;
@@ -358,7 +358,7 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_init(
     if (joint.command_interfaces[0].name != hardware_interface::HW_IF_VELOCITY)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger("DiffBotSystemHardware"),
+        rclcpp::get_logger("MirteBaseSystemHardware"),
         "Joint '%s' have %s command interfaces found. '%s' expected.", joint.name.c_str(),
         joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_VELOCITY);
       return hardware_interface::CallbackReturn::ERROR;
@@ -367,7 +367,7 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_init(
     if (joint.state_interfaces.size() != 2)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger("DiffBotSystemHardware"),
+        rclcpp::get_logger("MirteBaseSystemHardware"),
         "Joint '%s' has %zu state interface. 2 expected.", joint.name.c_str(),
         joint.state_interfaces.size());
       return hardware_interface::CallbackReturn::ERROR;
@@ -376,7 +376,7 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_init(
     if (joint.state_interfaces[0].name != hardware_interface::HW_IF_POSITION)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger("DiffBotSystemHardware"),
+        rclcpp::get_logger("MirteBaseSystemHardware"),
         "Joint '%s' have '%s' as first state interface. '%s' expected.", joint.name.c_str(),
         joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION);
       return hardware_interface::CallbackReturn::ERROR;
@@ -385,7 +385,7 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_init(
     if (joint.state_interfaces[1].name != hardware_interface::HW_IF_VELOCITY)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger("DiffBotSystemHardware"),
+        rclcpp::get_logger("MirteBaseSystemHardware"),
         "Joint '%s' have '%s' as second state interface. '%s' expected.", joint.name.c_str(),
         joint.state_interfaces[1].name.c_str(), hardware_interface::HW_IF_VELOCITY);
       return hardware_interface::CallbackReturn::ERROR;
@@ -511,7 +511,7 @@ void MirteBaseHWInterface ::start_reconnect() {
     if (joint.command_interfaces.size() != 1)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger("DiffBotSystemHardware"),
+        rclcpp::get_logger("MirteBaseSystemHardware"),
         "Joint '%s' has %zu command interfaces found. 1 expected.", joint.name.c_str(),
         joint.command_interfaces.size());
       return hardware_interface::CallbackReturn::ERROR;
@@ -520,7 +520,7 @@ void MirteBaseHWInterface ::start_reconnect() {
     if (joint.command_interfaces[0].name != hardware_interface::HW_IF_VELOCITY)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger("DiffBotSystemHardware"),
+        rclcpp::get_logger("MirteBaseSystemHardware"),
         "Joint '%s' have %s command interfaces found. '%s' expected.", joint.name.c_str(),
         joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_VELOCITY);
       return hardware_interface::CallbackReturn::ERROR;
@@ -529,7 +529,7 @@ void MirteBaseHWInterface ::start_reconnect() {
     if (joint.state_interfaces.size() != 2)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger("DiffBotSystemHardware"),
+        rclcpp::get_logger("MirteBaseSystemHardware"),
         "Joint '%s' has %zu state interface. 2 expected.", joint.name.c_str(),
         joint.state_interfaces.size());
       return hardware_interface::CallbackReturn::ERROR;
@@ -538,7 +538,7 @@ void MirteBaseHWInterface ::start_reconnect() {
     if (joint.state_interfaces[0].name != hardware_interface::HW_IF_POSITION)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger("DiffBotSystemHardware"),
+        rclcpp::get_logger("MirteBaseSystemHardware"),
         "Joint '%s' have '%s' as first state interface. '%s' expected.", joint.name.c_str(),
         joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION);
       return hardware_interface::CallbackReturn::ERROR;
@@ -547,7 +547,7 @@ void MirteBaseHWInterface ::start_reconnect() {
     if (joint.state_interfaces[1].name != hardware_interface::HW_IF_VELOCITY)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger("DiffBotSystemHardware"),
+        rclcpp::get_logger("MirteBaseSystemHardware"),
         "Joint '%s' have '%s' as second state interface. '%s' expected.", joint.name.c_str(),
         joint.state_interfaces[1].name.c_str(), hardware_interface::HW_IF_VELOCITY);
       return hardware_interface::CallbackReturn::ERROR;
