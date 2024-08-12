@@ -122,7 +122,13 @@ hardware_interface::return_type MirteBaseHWInterface::write(const rclcpp::Time &
 
 void MirteBaseHWInterface::read_single(int joint,
                                        const rclcpp::Duration &period) {
+  // std::cout << "read_single" << joint << _wheel_encoder[joint] << std::endl;
+ if(_last_value[joint] == 0) {
+    _last_value[joint] = _wheel_encoder[joint];
+    // when starting, the encoders dont have to be at 0. Without this, the odom can jump at the first loop
+  }
   auto diff_ticks = _wheel_encoder[joint] - _last_value[joint];
+   
   _last_value[joint] = _wheel_encoder[joint];
   double radPerEncoderTick = rad_per_enc_tick();
   double distance_rad;
@@ -227,12 +233,12 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_activate(
   // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
   RCLCPP_INFO(rclcpp::get_logger("MirteBaseSystemHardware"), "Activating ...please wait...");
 
-  for (auto i = 0; i < 2; i++)
-  {
-    rclcpp::sleep_for(std::chrono::seconds(1));
-    RCLCPP_INFO(
-      rclcpp::get_logger("MirteBaseSystemHardware"), "%.1f seconds left...", 2 - i);
-  }
+  // for (auto i = 0; i < 2; i++)
+  // {
+  //   rclcpp::sleep_for(std::chrono::seconds(1));
+  //   RCLCPP_INFO(
+  //     rclcpp::get_logger("MirteBaseSystemHardware"), "%.1f seconds left...", 2 - i);
+  // }
   // END: This part here is for exemplary purposes - Please do not copy to your production code
 
   // // set some default values
@@ -255,14 +261,14 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-  RCLCPP_INFO(rclcpp::get_logger("MirteBaseSystemHardware"), "Deactivating ...please wait...");
+  // RCLCPP_INFO(rclcpp::get_logger("MirteBaseSystemHardware"), "Deactivating ...please wait...");
 
-  for (auto i = 0; i < 2; i++)
-  {
-    rclcpp::sleep_for(std::chrono::seconds(1));
-    RCLCPP_INFO(
-      rclcpp::get_logger("MirteBaseSystemHardware"), "%.1f seconds left...", 2 - i);
-  }
+  // for (auto i = 0; i < 2; i++)
+  // {
+  //   rclcpp::sleep_for(std::chrono::seconds(1));
+  //   RCLCPP_INFO(
+  //     rclcpp::get_logger("MirteBaseSystemHardware"), "%.1f seconds left...", 2 - i);
+  // }
   // END: This part here is for exemplary purposes - Please do not copy to your production code
 
   RCLCPP_INFO(rclcpp::get_logger("MirteBaseSystemHardware"), "Successfully deactivated!");
@@ -270,7 +276,9 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_deactivate(
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-
+void MirteBaseHWInterface::ros_spin() {
+  rclcpp::spin(nh);
+}
 
 using namespace std::placeholders;
 MirteBaseHWInterface::MirteBaseHWInterface(){};
@@ -295,6 +303,8 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_init(
           std::cout << "on_init" << __LINE__ << std::endl;
  std::cout << "Initializing MirteBaseHWInterface" << std::endl;
   std::cout << "on_init" << __LINE__ << std::endl;
+  this->ros_thread = std::jthread([this] {
+this->ros_spin();  });
  /*
   nh->param<double>("mobile_base_controller/wheel_radius", _wheel_diameter,
                    0.06);
@@ -303,7 +313,13 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_init(
                    2.0); // TODO: unused
   nh->param<double>("mobile_base_controller/ticks", ticks, 40.0);
   */
- std::cout << "on_init" << __LINE__ << std::endl;
+//  info.hardware_parameters.at("ticks");
+  this->ticks = std::stod(info.hardware_parameters.at("ticks"));
+  
+  std::cout << "ticks == " << this->ticks << std::endl;
+  // std::cout << "on_init" << __LINE__ << std::endl;
+  // this->NUM_JOINTS = detect_joints(nh);
+//  std::cout << "on_init" << __LINE__ << std::endl;
   this->NUM_JOINTS = info.joints.size();
   if (this->NUM_JOINTS > 2) {
     this->bidirectional = true;
@@ -425,9 +441,11 @@ hardware_interface::CallbackReturn MirteBaseHWInterface::on_init(
   for (size_t i = 0; i < NUM_JOINTS; i++) {
     auto encoder_topic =
         (boost::format(encoder_format) % this->joints[i]).str();
+        std::cout << "add encoder topic: " << encoder_topic << std::endl;
     wheel_encoder_subs_.push_back(nh->create_subscription<mirte_msgs::msg::Encoder>(
         encoder_topic, 1,
-        [this, i](const mirte_msgs::msg::Encoder::SharedPtr msg) {
+        [this, i](std::shared_ptr< mirte_msgs::msg::Encoder> msg) {
+          // std::cout << "Encoder callback: " << msg->value << std::endl;
           this->WheelEncoderCallback(msg, i);
         }));
   }

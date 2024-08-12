@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!-- Basic differential drive mobile base -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="diffdrive_robot">
+    <xacro:property name="yaml_param_file" value="$(find mirte_base_control)/config/control_master.yaml"/>
+    <xacro:property name="params" value="${xacro.load_yaml(yaml_param_file)}"/>
 
 <xacro:macro name="wheel" params="name prefix">
 
@@ -28,16 +30,24 @@
   <xacro:arg name="prefix" default="" />
     <link name="base_link">
 </link>
+<!-- same ordering as the mecanum drive controller -->
         <xacro:wheel name="left_front" prefix="$(arg prefix)" />
-        <xacro:wheel name="right_front" prefix="$(arg prefix)" />
         <xacro:wheel name="left_rear" prefix="$(arg prefix)" />
         <xacro:wheel name="right_rear" prefix="$(arg prefix)" />
+        <xacro:wheel name="right_front" prefix="$(arg prefix)" />
 
 
 
             <ros2_control name="mecanumdrive" type="system">
       <hardware>
         <plugin>mirte_base_control/MirteBaseHWInterface</plugin>
+        <param name="ticks">${params['ticks']}</param>
+        <param name="enable_pid">${params['enable_pid']}</param>
+        <param name="kp">${params['kp']}</param>
+        <param name="ki">${params['ki']}</param>
+        <param name="kd">${params['kd']}</param>
+        <param name="i_clamp">${params['i_clamp']}</param>
+        <param name="antiwindup">${params['antiwindup']}</param>
       </hardware>
       <xacro:joint prefix="$(arg prefix)" name="left_front"  />
         <xacro:joint prefix="$(arg prefix)" name="right_front"  />

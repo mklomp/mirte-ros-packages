@@ -12,6 +12,8 @@ controller_manager:
 
 mirte_base_controller:
   ros__parameters:
+    # hardware_parameters:
+    # ticks: 1320
     use_stamped_vel: false
     reference_timeout: 0.25
 

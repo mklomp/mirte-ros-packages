@@ -150,6 +150,7 @@ private:
     if (msg->value < 0) {
       bidirectional = true;
     }
+    // std::cout << "Encoder value: " << msg->value << std::endl;
     _wheel_encoder[joint] = msg->value;
     _wheel_encoder_update_time[joint] = msg->header.stamp;
   }
@@ -160,6 +161,10 @@ private:
   void init_service_clients();
   void start_reconnect();
   std::mutex service_clients_mutex;
+
+  // thread for ros spinning
+  std::jthread ros_thread;
+  void ros_spin();
 
   bool bidirectional = false; // assume it is one direction, when receiving any
                               // negative value, it will be set to true
