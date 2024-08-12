@@ -45,16 +45,16 @@ check_ipo_supported(RESULT supported OUTPUT error)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++ -Wswitch-enum") # -Wall -Wextra
                                                                  # -Wpedantic
                                                                  # -Werror")
-set(NO_CLANG_TIDY TRUE CACHE BOOL "Disable clang-tidy")
-if(NOT NO_CLANG_TIDY)
-set(CMAKE_CXX_CLANG_TIDY
-clang-tidy-14;
--format-style='file';
--header-filter=${CMAKE_CURRENT_SOURCE_DIR};
-)
-                     
-endif()
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# set(NO_CLANG_TIDY TRUE CACHE BOOL "Disable clang-tidy")
+# if(NOT NO_CLANG_TIDY)
+# set(CMAKE_CXX_CLANG_TIDY
+# clang-tidy-14;
+# -format-style='file';
+# -header-filter=${CMAKE_CURRENT_SOURCE_DIR};
+# )
+# set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# endif()
 
 add_executable(
   ${PROJECT_NAME}_node

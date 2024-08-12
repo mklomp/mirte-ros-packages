@@ -3,6 +3,7 @@
 #include "mirte_msgs/srv/get_servo_range.hpp"
 #include "mirte_msgs/srv/set_motor_speed.hpp"
 #include "mirte_msgs/srv/set_servo_angle.hpp"
+#include "mirte_msgs/srv/set_speed_multiple.hpp"
 #include "parsers/p_modules.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/header.hpp"
@@ -55,6 +56,12 @@ public:
              std::shared_ptr<PCA_data> pca_data);
   std::shared_ptr<PCA9685_module> pca9685;
   std::vector<std::shared_ptr<PCA_Motor>> motors;
+  
+  
+  std::shared_ptr<rclcpp::Service<mirte_msgs::srv::SetSpeedMultiple>> motor_service;
+  bool motor_service_cb(
+      const std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Request> req,
+      std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Response> res);
   //   std::vector<std::shared_ptr<PCA_Servo>> servos;
   static std::vector<std::shared_ptr<PCA_Module>>
   get_pca_modules(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
@@ -73,7 +80,7 @@ public:
   std::shared_ptr<PCA9685_module> pca9685_mod;
   // Stolen from mirtes-actuators.hpp::motor, but it was too shit to inherit
   // from that one as well.
-  void set_speed(int speed);
+  void set_speed(int speed, bool direct = true, std::shared_ptr<std::vector<PCA9685_module::PWM_val>> pwm_vals = {});
   rclcpp::Service<mirte_msgs::srv::SetMotorSpeed>::SharedPtr motor_service;
   bool service_callback(
       const std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Request> req,

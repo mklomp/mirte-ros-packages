@@ -21,18 +21,31 @@
         board: pico
 
     encoder:
-     left:
-       name: left
-       device: mirte
-       pins:
-        #  pin: GP14
-         A: 15 #21
-         B: 14 #20
-     right:
-       name: right
-       device: mirte
-       pins:
-         pin: GP16
+      left_front:
+        name: left_front
+        device: mirte
+        pins:
+          A: 15 #21
+          B: 14 #20
+      left_rear:
+        name: left_rear
+        device: mirte
+        pins:
+          A: 17
+          B: 16
+      right_front:
+        name: right_front
+        device: mirte
+        pins:
+          A: 19
+          B: 18
+      right_rear:
+        name: right_rear
+        device: mirte
+        pins:
+          A: 20
+          B: 21
+
     # intensity:
     #   left:
     #     name: left
