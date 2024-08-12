@@ -55,6 +55,18 @@
         
       </xacro:inertia_cylinder>
       <collision name="link_${name}_collision">
+      <surface>
+           <bounce>
+                <restitution_coefficient>0.0</restitution_coefficient>
+                <threshold>1000000.0</threshold>
+              </bounce>
+              <friction>
+                <ode>
+                  <mu>1</mu>
+                  <mu2>1</mu2>
+                </ode>
+              </friction>
+            </surface>
         <!-- <origin> <rpy>0 1.5707 1.5707</rpy><xyz>0 0 0</xyz></origin> -->
         <geometry>
           <cylinder>
@@ -62,14 +74,6 @@
             <radius>${radius}</radius>
           </cylinder>
         </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-            </ode>
-          </friction>
-        </surface>
       </collision>
       <!-- <visual name="link_${name}_visual">
         <origin rpy="0 1.5707 1.5707"  xyz="-0 0 0" />
@@ -138,6 +142,11 @@
               <mu2>0.01</mu2>
             </ode>
           </friction>
+                     <bounce>
+                <restitution_coefficient>0.0</restitution_coefficient>
+                <threshold>1000000.0</threshold>
+              </bounce>
+
         </surface>
       </collision>
       <visual name="vis_${name}_sphere">
