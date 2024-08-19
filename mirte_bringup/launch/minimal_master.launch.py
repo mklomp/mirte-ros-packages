@@ -32,7 +32,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
                 FindPackageShare('mirte_base_control'),
-                "bringup",'launch',
+                'launch',
                 'mirte_base.launch.py'
             ])
         ])
