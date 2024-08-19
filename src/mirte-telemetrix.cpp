@@ -2,10 +2,11 @@
 #include "mirte-board.hpp"     // for Mirte_Board
 #include "mirte-modules.hpp"
 #include "mirte-node.hpp"
-#include "mirte-ping.hpp"          // for Mirte_Ping
-#include "mirte-sensors.hpp"       // for Mirte_Sensors
-#include "parsers/parsers.hpp"     // for Parser
-#include "tmx.hpp"                 // for TMX, TMX::GET_PICO_UNIQUE_ID, TMX...
+#include "mirte-ping.hpp"      // for Mirte_Ping
+#include "mirte-sensors.hpp"   // for Mirte_Sensors
+#include "parsers/parsers.hpp" // for Parser
+#include "tmx.hpp"             // for TMX, TMX::GET_PICO_UNIQUE_ID, TMX...
+#include "util.hpp"
 #include <exception>               // for exception
 #include <iostream>                // for operator<<, endl, basic_ostream
 #include <memory>                  // for make_shared, shared_ptr, __shared...
@@ -21,7 +22,9 @@ int main(int argc, char **argv) {
 
     // Spin the ROS node
     auto node = std::make_shared<mirte_node>();
-    node->start(node);
+    if (!node->start(node)) {
+      return 0;
+    }
     rclcpp::spin(node);
     rclcpp::shutdown();
 
@@ -45,11 +48,30 @@ mirte_node::~mirte_node() {
   }
 }
 
-void mirte_node::start(std::shared_ptr<rclcpp::Node> s_node) {
+bool mirte_node::start(std::shared_ptr<rclcpp::Node> s_node) {
   Parser p(s_node);
   auto p_s = std::make_shared<Parser>(p);
   std::shared_ptr<Mirte_Board> s_board = Mirte_Board::create(p_s);
-  auto s_tmx = std::make_shared<TMX>("/dev/ttyACM0");
+  auto ports = get_available_ports();
+  decltype(ports) available_ports;
+  for (auto port : ports) {
+    std::cout << "try " << port << std::endl;
+    if (!TMX::check_port(port)) {
+      continue;
+    }
+    std::cout << "found " << port << std::endl;
+    available_ports.push_back(port);
+  }
+  if (available_ports.size() == 0) {
+    std::cout << "No ports available" << std::endl;
+    rclcpp::shutdown();
+    return false;
+  }
+  if (available_ports.size() > 1) {
+    std::cout << "More than one port available, picking the first one"
+              << std::endl;
+  }
+  auto s_tmx = std::make_shared<TMX>(available_ports[0]);
   s_tmx->sendMessage(TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
   s_tmx->setScanDelay(10);
   this->actuators =
@@ -61,4 +83,5 @@ void mirte_node::start(std::shared_ptr<rclcpp::Node> s_node) {
     std::cout << "stop" << std::endl;
     rclcpp::shutdown();
   });
+  return true;
 }

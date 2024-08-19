@@ -14,7 +14,7 @@ private:
 public:
   mirte_node(/* args */);
   ~mirte_node();
-  void start(std::shared_ptr<rclcpp::Node> s_node);
+  bool start(std::shared_ptr<rclcpp::Node> s_node);
   std::shared_ptr<Mirte_Board> s_board;
   std::shared_ptr<TMX> s_tmx;
   std::shared_ptr<Parser> p_s;

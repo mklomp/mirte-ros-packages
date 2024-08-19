@@ -30,3 +30,11 @@ inline bool starts_with(std::string str, std::string prefix) {
 #include <string>
 
 std::string exec(const char *cmd);
+
+#include <filesystem>
+#include <iostream>
+#include <string>
+
+namespace fs = std::filesystem;
+
+std::vector<std::string> get_available_ports();
