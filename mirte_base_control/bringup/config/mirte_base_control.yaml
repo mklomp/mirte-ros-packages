@@ -16,7 +16,7 @@ mirte_base_controller:
     # ticks: 1320
     use_stamped_vel: false
     reference_timeout: 0.25
-
+    command_timeout: 0.25
     command_joint_names: ["left_front_wheel_joint", "left_rear_wheel_joint", "right_rear_wheel_joint", "right_front_wheel_joint"]
     # command_joint_names: ["left_front_wheel_joint", "left_rear_wheel_joint", "right_rear_wheel_joint", "right_front_wheel_joint"]
 
