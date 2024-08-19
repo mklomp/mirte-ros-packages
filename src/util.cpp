@@ -16,8 +16,8 @@ std::string exec(const char *cmd) {
 std::vector<std::string> get_available_ports() {
   std::vector<std::string> port_names;
 
-  fs::path p("/dev/serial/by-id");
   try {
+    fs::path p("/dev/serial/by-id");
     if (!exists(p)) {
       throw std::runtime_error(p.generic_string() + " does not exist");
     } else {
@@ -32,7 +32,6 @@ std::vector<std::string> get_available_ports() {
     }
   } catch (const fs::filesystem_error &ex) {
     std::cout << ex.what() << '\n';
-    throw ex;
   }
   std::sort(port_names.begin(), port_names.end());
   return port_names;
