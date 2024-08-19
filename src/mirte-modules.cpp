@@ -488,7 +488,7 @@ void INA226_sensor::shutdown_robot() {
   // run shutdown command
   exec("sudo bash -c \"wall 'Shutting down.'\""); // TODO: check if this works
                                                   // with sudo on a mirte
-  // exec("sudo shutdown now");
+  exec("sudo shutdown now");
 }
 
 void INA226_sensor::shutdown_robot_cb(
