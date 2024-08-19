@@ -2,7 +2,8 @@
 
 Mirte_Ping::Mirte_Ping(std::shared_ptr<rclcpp::Node> nh,
                        std::shared_ptr<TMX> tmx,
-                       std::function<void()> stop_func): tmx(tmx), nh(nh), stop_func(stop_func) {
+                       std::function<void()> stop_func)
+    : tmx(tmx), nh(nh), stop_func(stop_func) {
   this->ping_thread = std::thread(&Mirte_Ping::ping_task, this);
   this->tmx->add_callback(
       TMX::MESSAGE_IN_TYPE::PONG_REPORT,

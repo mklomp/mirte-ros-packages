@@ -34,12 +34,12 @@ Motor::get_motors(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
     if (motor_data->check()) {
       if (motor_data->type == Motor_data::Motor_type::PP) {
         auto motor = std::make_shared<PPMotor>(nh, tmx, board, motor_data,
-                                                   motor_data->name);
+                                               motor_data->name);
         motor->start();
         motors.push_back(motor);
       } else if (motor_data->type == Motor_data::Motor_type::DP) {
         auto motor = std::make_shared<DPMotor>(nh, tmx, board, motor_data,
-                                                   motor_data->name);
+                                               motor_data->name);
         motor->start();
         motors.push_back(motor);
       } else if (motor_data->type == Motor_data::Motor_type::DDP) {

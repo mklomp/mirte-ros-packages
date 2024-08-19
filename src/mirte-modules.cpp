@@ -72,29 +72,29 @@ PCA_Module::PCA_Module(std::shared_ptr<rclcpp::Node> nh,
   motor_service = nh->create_service<mirte_msgs::srv::SetSpeedMultiple>(
       "/mirte/set_" + this->name + "_multiple_speeds",
       std::bind(&PCA_Module::motor_service_cb, this, _1, _2));
-
 }
 
 bool PCA_Module::motor_service_cb(
     const std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Request> req,
     std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Response> res) {
-      std::shared_ptr<std::vector<PCA9685_module::PWM_val>> pwm_vals = std::make_shared<std::vector<PCA9685_module::PWM_val>>();
-       if(req->speeds.size() == 0){
-        res->success = false;
-        return false;
+  std::shared_ptr<std::vector<PCA9685_module::PWM_val>> pwm_vals =
+      std::make_shared<std::vector<PCA9685_module::PWM_val>>();
+  if (req->speeds.size() == 0) {
+    res->success = false;
+    return false;
+  }
+  for (auto speed : req->speeds) {
+    for (auto motor : this->motors) {
+      if (motor->motor_data->name == speed.name) {
+        motor->set_speed(speed.speed, false, pwm_vals);
+        continue;
       }
-      for(auto speed : req->speeds){ 
-        for(auto motor : this->motors){ 
-          if(motor->motor_data->name == speed.name){
-            motor->set_speed(speed.speed,false, pwm_vals);
-            continue;
-          }
-        }
-      }
-      if(pwm_vals->size() > 0){
-        this->pca9685->set_multiple_pwm(pwm_vals);
-      }
-  
+    }
+  }
+  if (pwm_vals->size() > 0) {
+    this->pca9685->set_multiple_pwm(pwm_vals);
+  }
+
   res->success = true;
   return true;
 }
@@ -117,8 +117,10 @@ PCA_Motor::PCA_Motor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
       "/mirte/motor_" + this->motor_data->name + "_speed", 1000,
       std::bind(&PCA_Motor::motor_callback, this, std::placeholders::_1));
 }
- 
-void PCA_Motor::set_speed(int speed, bool direct , std::shared_ptr<std::vector<PCA9685_module::PWM_val>> pwm_vals  ) {
+
+void PCA_Motor::set_speed(
+    int speed, bool direct,
+    std::shared_ptr<std::vector<PCA9685_module::PWM_val>> pwm_vals) {
   std::cout << "Setting speed: " << speed << std::endl;
   int32_t speed_ = (int32_t)((float)speed * (4095.0) / 100.0);
   // TODO: add invert
@@ -138,7 +140,7 @@ void PCA_Motor::set_speed(int speed, bool direct , std::shared_ptr<std::vector<P
     reverse = true;
   }
 
-  if (reverse && direct ) {
+  if (reverse && direct) {
     this->pca9685_mod->set_pwm(this->motor_data->pinA, 0);
     this->pca9685_mod->set_pwm(this->motor_data->pinB, 0);
     // std::cout << "Setting speed to 0" << std::endl;
@@ -146,7 +148,7 @@ void PCA_Motor::set_speed(int speed, bool direct , std::shared_ptr<std::vector<P
   }
   auto speedA = speed > 0 ? speed_ : 0;
   auto speedB = speed < 0 ? -speed_ : 0;
-  if(direct) {
+  if (direct) {
     this->pca9685_mod->set_pwm(this->motor_data->pinA, speedA);
     this->pca9685_mod->set_pwm(this->motor_data->pinB, speedB);
   } else {

@@ -59,7 +59,7 @@ public:
   virtual void set_speed(int speed) = 0;
   std::shared_ptr<Motor_data> motor_data;
   int max_pwm;
-  void start() {this->set_speed(0);}
+  void start() { this->set_speed(0); }
 };
 
 class PPMotor : public Motor {

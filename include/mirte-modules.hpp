@@ -56,9 +56,9 @@ public:
              std::shared_ptr<PCA_data> pca_data);
   std::shared_ptr<PCA9685_module> pca9685;
   std::vector<std::shared_ptr<PCA_Motor>> motors;
-  
-  
-  std::shared_ptr<rclcpp::Service<mirte_msgs::srv::SetSpeedMultiple>> motor_service;
+
+  std::shared_ptr<rclcpp::Service<mirte_msgs::srv::SetSpeedMultiple>>
+      motor_service;
   bool motor_service_cb(
       const std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Request> req,
       std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Response> res);
@@ -80,7 +80,9 @@ public:
   std::shared_ptr<PCA9685_module> pca9685_mod;
   // Stolen from mirtes-actuators.hpp::motor, but it was too shit to inherit
   // from that one as well.
-  void set_speed(int speed, bool direct = true, std::shared_ptr<std::vector<PCA9685_module::PWM_val>> pwm_vals = {});
+  void set_speed(
+      int speed, bool direct = true,
+      std::shared_ptr<std::vector<PCA9685_module::PWM_val>> pwm_vals = {});
   rclcpp::Service<mirte_msgs::srv::SetMotorSpeed>::SharedPtr motor_service;
   bool service_callback(
       const std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Request> req,
