@@ -16,10 +16,11 @@ std::string exec(const char *cmd) {
 std::vector<std::string> get_available_ports() {
   std::vector<std::string> port_names;
 
+  fs::path p("/dev/serial/by-id");
   try {
-    fs::path p("/dev/serial/by-id");
     if (!exists(p)) {
-      throw std::runtime_error(p.generic_string() + " does not exist");
+      std::cout << p.generic_string() << " does not exist" << std::endl;
+      return port_names;
     } else {
       for (auto de : fs::directory_iterator(p)) {
         if (is_symlink(de.symlink_status())) {
@@ -32,6 +33,7 @@ std::vector<std::string> get_available_ports() {
     }
   } catch (const fs::filesystem_error &ex) {
     std::cout << ex.what() << '\n';
+    throw port_names;
   }
   std::sort(port_names.begin(), port_names.end());
   return port_names;
