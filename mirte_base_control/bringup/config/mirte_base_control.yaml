@@ -6,7 +6,7 @@ controller_manager:
       type: joint_state_broadcaster/JointStateBroadcaster
 
     mirte_base_controller:
-      type: mecanum_drive_controller/MecanumDriveController
+      type: clearpath_mecanum_drive_controller/MecanumDriveController
     # :
     #   type: mirte_base_control/MirteBaseHWInterface
 
