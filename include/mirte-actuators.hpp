@@ -37,6 +37,7 @@ public:
   Mirte_Actuator(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
                  std::shared_ptr<Mirte_Board> board, std::vector<pin_t> pins,
                  std::string name);
+  virtual ~Mirte_Actuator() {}
 };
 
 class Motor : public Mirte_Actuator {

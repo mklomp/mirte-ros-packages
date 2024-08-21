@@ -14,20 +14,15 @@ using connector_map = std::map<std::string, pin_map>;
 #include <string> // for string, basic_string, operator<
 
 class Mirte_Board {
-public:
-  // Mirte_Board(
-  //   // std::shared_ptr<TMX> tmx, std::shared_ptr<rclcpp::Node> nh
-  //   );
-  // std::shared_ptr<TMX> tmx;
-  // std::shared_ptr<rclcpp::Node> nh;
+public: 
   virtual int get_adc_bits() = 0;
   virtual int get_max_pwm() = 0;
-  // std::vector<uint8_t> resolvePins(std::string pin);
   virtual int resolvePin(std::string pin) = 0;
   virtual std::map<std::string, int>
   resolveConnector(std::string connector) = 0;
   virtual uint8_t resolveI2CPort(uint8_t sda) = 0;
   static std::shared_ptr<Mirte_Board> create(std::shared_ptr<Parser> parser);
+  virtual ~Mirte_Board() {}
 };
 
 class Mirte_Board_atmega328p : public Mirte_Board {

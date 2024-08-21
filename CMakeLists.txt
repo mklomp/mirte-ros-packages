@@ -28,24 +28,13 @@ find_package(sensor_msgs REQUIRED)
 include_directories(include/ libs/tmx-cpp/include/
                     libs/tmx-cpp/libs/async_serial/ ${catkin_INCLUDE_DIRS})
 
-# Declare a C++ library add_library(${PROJECT_NAME}
-# src/${PROJECT_NAME}/mobile_controller.cpp )
-
-# Add cmake target dependencies of the library as an example, code may need to
-# be generated before libraries either from message generation or dynamic
-# reconfigure add_dependencies(${PROJECT_NAME}
-# ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-# Declare a C++ executable With catkin_make all packages are built within a
-# single CMake context The recommended prefix ensures that target names across
-# packages don't collide
 include(CheckIPOSupported)
 check_ipo_supported(RESULT supported OUTPUT error)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++ -Wswitch-enum") # -Wall -Wextra
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum -Wall -Werror -Wno-sign-compare") # -Wall -Wextra
                                                                  # -Wpedantic
                                                                  # -Werror")
-# set(NO_CLANG_TIDY TRUE CACHE BOOL "Disable clang-tidy")
+# set(NO_CLANG_TIDY FALSE CACHE BOOL "Disable clang-tidy")
 # if(NOT NO_CLANG_TIDY)
 # set(CMAKE_CXX_CLANG_TIDY
 # clang-tidy-14;
@@ -93,13 +82,17 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 # Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} Boost::system
                       Boost::thread)
-# set_property(TARGET ${PROJECT_NAME}_node PROPERTY CXX_INCLUDE_WHAT_YOU_USE
-# ${iwyu_path})
+set_property(TARGET ${PROJECT_NAME}_node PROPERTY CXX_INCLUDE_WHAT_YOU_USE
+${iwyu_path})
 
-# if(supported) if(CMAKE_BUILD_TYPE STREQUAL "Release") message(STATUS "IPO /
-# LTO enabled") set_property(TARGET ${PROJECT_NAME}_node PROPERTY
-# INTERPROCEDURAL_OPTIMIZATION TRUE) endif() else() message(STATUS "IPO / LTO
-# not supported: <${error}>") endif()
+if(supported)
+ if(CMAKE_BUILD_TYPE STREQUAL "Release") 
+ message(STATUS "IPO LTO enabled") 
+ set_property(TARGET ${PROJECT_NAME}_node PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE) 
+ endif() 
+ else() 
+ message(STATUS "IPO  / LTO not supported: <${error}>") 
+ endif()
 
 install(
   TARGETS ${PROJECT_NAME}_node

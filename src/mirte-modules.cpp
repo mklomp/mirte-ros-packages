@@ -412,7 +412,7 @@ float INA226_sensor::calc_soc(float voltage) {
       {3.82, 0.45}, {3.84, 0.50}, {3.85, 0.55}, {3.87, 0.60}, {3.91, 0.65},
       {3.95, 0.70}, {3.98, 0.75}, {4.02, 0.80}, {4.08, 0.85}, {4.11, 0.90},
       {4.15, 0.95}, {4.20, 1.00}, {10, 1.00}};
-  for (int i = 1; i < soc_levels.size(); i++) {
+  for (size_t i = 1; i < soc_levels.size(); i++) {
     if (voltage < soc_levels[i].first) { // find the first voltage level that is
                                          // higher than the current voltage
       return soc_levels[i - 1]

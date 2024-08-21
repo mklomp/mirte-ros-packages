@@ -13,14 +13,11 @@ Servo_data::parse_servo_data(std::shared_ptr<Parser> parser,
     Servo_data servo_data;
     servo_data.name = name;
     if (servos_config.count("connector")) {
-      std::cout << "connector" << std::endl;
       std::string connector = servos_config["connector"].get<std::string>();
       auto pins = board->resolveConnector(connector);
       servo_data.pin = pins["pin"];
     }
-    pin_t pin = -1;
     if (servo_keys.count("pins")) {
-      std::cout << "pin" << std::endl;
       // pins:
       //   pin: 1
       servo_data.pin =

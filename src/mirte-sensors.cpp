@@ -32,11 +32,8 @@ Mirte_Sensors::Mirte_Sensors(std::shared_ptr<rclcpp::Node> nh,
 bool Mirte_Sensors::pin_callback(
     const std::shared_ptr<mirte_msgs::srv::GetPinValue::Request> req,
     std::shared_ptr<mirte_msgs::srv::GetPinValue::Response> res) {
-  // calculate time for this function
-  auto start2 = std::chrono::system_clock::now();
   bool is_digital = starts_with(req->type, "d") || starts_with(req->type, "D");
   auto pin = this->board->resolvePin(req->pin);
-  auto done = false;
   bool has_digital_cb = false;
   bool has_analog_cb = false;
   if (this->pin_map.count(pin)) {
@@ -46,10 +43,6 @@ bool Mirte_Sensors::pin_callback(
     if ((type == PIN_USE::DIGITAL_IN && is_digital) ||
         (type == PIN_USE::ANALOG_IN && !is_digital)) {
       res->data = value;
-      // cout time it took
-      auto end = std::chrono::system_clock::now();
-      std::chrono::duration<double> elapsed_seconds = end - start2;
-      std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
       return true;
     }
   }
@@ -87,15 +80,9 @@ bool Mirte_Sensors::pin_callback(
   // while time less than 5s, after that its probably not going to change
   auto start = std::chrono::system_clock::now();
   while (std::chrono::system_clock::now() - start < std::chrono::seconds(5)) {
-    // if (this->pin_map.count(pin)) {
     const auto [type, value, has_analog, has_digital] = this->pin_map[pin];
     if (value != -1) {
       res->data = value;
-
-      // cout time it took
-      auto end = std::chrono::system_clock::now();
-      std::chrono::duration<double> elapsed_seconds = end - start2;
-      std::cout << "321elapsed time: " << elapsed_seconds.count() << "s\n";
       return true;
     }
 
