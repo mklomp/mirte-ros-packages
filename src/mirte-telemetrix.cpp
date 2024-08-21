@@ -52,11 +52,12 @@ bool mirte_node::start(std::shared_ptr<rclcpp::Node> s_node) {
   Parser p(s_node);
   auto p_s = std::make_shared<Parser>(p);
   std::shared_ptr<Mirte_Board> s_board = Mirte_Board::create(p_s);
-  auto ports = get_available_ports();
+  auto ports = TMX::get_available_ports();
   decltype(ports) available_ports;
-  for (auto port : ports) {
+  for (auto& port : ports) {
+    // maybe move this to a function in tmx
     std::cout << "try " << port.port_name << std::endl;
-    if(port.vid != 0x0403 || port.pid != 0x6015) {
+    if(!TMX::is_accepted_port(port)) {
       continue;
     }
     if (!TMX::check_port(port.port_name)) {
@@ -74,6 +75,37 @@ bool mirte_node::start(std::shared_ptr<rclcpp::Node> s_node) {
     std::cout << "More than one port available, picking the first one"
               << std::endl;
   }
+
+  if(true) {
+    auto mcu_id = 12; // TODO: add to parsing and config
+    bool found = false;
+    for(auto& port : available_ports) {
+      auto id = TMX::get_id(port);
+      std::cout << "ID: " << std::hex << (int)id << std::endl;
+      if(id == 0xff) { // default flash value is 0xff, so no id set
+        auto check = TMX::set_id(port, mcu_id);
+        if(!check) {
+          std::cout << "Failed to set MCU ID" << std::endl;
+          rclcpp::shutdown();
+          return false;
+        } else {
+          id = mcu_id;
+        }
+      }
+      if(id == mcu_id) {
+        available_ports = {port};
+        found = true;
+        break;
+      }
+    }
+    if(!found) {
+      std::cout << "No port with MCU ID " << mcu_id << " found" << std::endl;
+      rclcpp::shutdown();
+      return false;
+    }
+  }
+
+
   auto s_tmx = std::make_shared<TMX>(available_ports[0].port_name);
   s_tmx->sendMessage(TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
   s_tmx->setScanDelay(10);

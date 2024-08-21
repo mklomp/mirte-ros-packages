@@ -29,16 +29,9 @@ inline bool starts_with(std::string str, std::string prefix) {
 #include <stdexcept>
 #include <string>
 
-std::string exec(const char *cmd);
+std::string exec(const std::string& cmd);
 
 #include <filesystem>
 #include <iostream>
 #include <string>
 
-namespace fs = std::filesystem;
-struct serial_port {
-  std::string port_name;
-  uint pid;
-  uint vid;
-};
-std::vector<serial_port> get_available_ports();
