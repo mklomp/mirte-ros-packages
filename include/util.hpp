@@ -36,5 +36,9 @@ std::string exec(const char *cmd);
 #include <string>
 
 namespace fs = std::filesystem;
-
-std::vector<std::string> get_available_ports();
+struct serial_port {
+  std::string port_name;
+  uint pid;
+  uint vid;
+};
+std::vector<serial_port> get_available_ports();

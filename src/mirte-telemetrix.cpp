@@ -55,11 +55,14 @@ bool mirte_node::start(std::shared_ptr<rclcpp::Node> s_node) {
   auto ports = get_available_ports();
   decltype(ports) available_ports;
   for (auto port : ports) {
-    std::cout << "try " << port << std::endl;
-    if (!TMX::check_port(port)) {
+    std::cout << "try " << port.port_name << std::endl;
+    if(port.vid != 0x0403 || port.pid != 0x6015) {
       continue;
     }
-    std::cout << "found " << port << std::endl;
+    if (!TMX::check_port(port.port_name)) {
+      continue;
+    }
+    std::cout << "found " << port.port_name << std::endl;
     available_ports.push_back(port);
   }
   if (available_ports.size() == 0) {
@@ -71,7 +74,7 @@ bool mirte_node::start(std::shared_ptr<rclcpp::Node> s_node) {
     std::cout << "More than one port available, picking the first one"
               << std::endl;
   }
-  auto s_tmx = std::make_shared<TMX>(available_ports[0]);
+  auto s_tmx = std::make_shared<TMX>(available_ports[0].port_name);
   s_tmx->sendMessage(TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
   s_tmx->setScanDelay(10);
   this->actuators =
