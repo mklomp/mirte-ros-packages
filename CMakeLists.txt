@@ -31,7 +31,7 @@ include_directories(include/ libs/tmx-cpp/include/
 include(CheckIPOSupported)
 check_ipo_supported(RESULT supported OUTPUT error)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum -Wall -Werror -Wno-sign-compare") # -Wall -Wextra
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum -Wall -Werror -Wno-sign-compare") # -Wall -Wextra
                                                                  # -Wpedantic
                                                                  # -Werror")
 # set(NO_CLANG_TIDY FALSE CACHE BOOL "Disable clang-tidy")

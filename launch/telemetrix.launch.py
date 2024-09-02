@@ -41,7 +41,7 @@ def generate_launch_description():
 
     node=Node(
         package = 'mirte_telemetrix_cpp',
-        name = 'mirte',
+        name = 'mirte_telemetrix',
         executable = 'mirte_telemetrix_cpp_node',
         parameters = [config],
         output='screen',
