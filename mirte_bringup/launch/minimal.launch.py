@@ -12,7 +12,7 @@ def generate_launch_description():
             PathJoinSubstitution([
                 FindPackageShare('mirte_telemetrix'),
                 'launch',
-                'telemetrix.launch'
+                'telemetrix.launch.py'
             ])
         ])
     )
