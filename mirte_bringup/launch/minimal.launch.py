@@ -4,28 +4,35 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 
+
 def generate_launch_description():
     ld = LaunchDescription()
 
-    telemetrix=IncludeLaunchDescription(
+    telemetrix = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
-                FindPackageShare('mirte_telemetrix'),
-                'launch',
-                'telemetrix.launch.py'
+                FindPackageShare("mirte_telemetrix"),
+                "launch",
+                "telemetrix.launch.py",
             ])
-        ])
+        ]),
+        launch_arguments={
+            "config_path": PathJoinSubstitution([
+                FindPackageShare("mirte_telemetrix_cpp"),
+                "config",
+                "mirte_pcb08_config.yaml",
+            ])
+        }.items(),
     )
 
-
-    diff_drive_control=IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            PathJoinSubstitution([
-                FindPackageShare('mirte_control'),
-                'launch',
-                'diffbot.launch.py'
-            ])
-        ])
+    diff_drive_control = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [
+                PathJoinSubstitution(
+                    [FindPackageShare("mirte_control"), "launch", "diffbot.launch.py"]
+                )
+            ]
+        )
     )
 
     ld.add_action(telemetrix)
