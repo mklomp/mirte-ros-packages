@@ -15,9 +15,8 @@ const connector_map mirte_pico_pcb_map06 = {
     {"SRF2", {{"trigger", "9"}, {"echo", "8"}}},
     {"I2C1", {{"scl", "5"}, {"sda", "4"}}},
     {"I2C2", {{"scl", "11"}, {"sda", "10"}}},
-    // FIXME: PATCH THESE
-    {"ENC1", {{"pin", "15"}}},
-    {"ENC2", {{"pin", "14"}}},
+    {"ENC1", {{"pinA", "15"}, {"pinB", "-1"}}},
+    {"ENC2", {{"pinA", "14"}, {"pinB", "-1"}}},
     {"Keypad", {{"pin", "28"}}},
     {"Servo1", {{"pin", "2"}}}, // These 2 servos don't work together with the
                                 // motor controllers at the same time
