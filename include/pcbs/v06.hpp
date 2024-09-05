@@ -15,6 +15,7 @@ const connector_map mirte_pico_pcb_map06 = {
     {"SRF2", {{"trigger", "9"}, {"echo", "8"}}},
     {"I2C1", {{"scl", "5"}, {"sda", "4"}}},
     {"I2C2", {{"scl", "11"}, {"sda", "10"}}},
+    // FIXME: PATCH THESE
     {"ENC1", {{"pin", "15"}}},
     {"ENC2", {{"pin", "14"}}},
     {"Keypad", {{"pin", "28"}}},

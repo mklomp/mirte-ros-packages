@@ -25,8 +25,9 @@ find_package(sensor_msgs REQUIRED)
 
 # Specify additional locations of header files Your package locations should be
 # listed before other locations
+add_subdirectory(libs/tmx-cpp)
 include_directories(include/ libs/tmx-cpp/include/
-                    libs/tmx-cpp/libs/async_serial/ ${catkin_INCLUDE_DIRS})
+                    libs/tmx-cpp/libs/async_serial/include/ ${catkin_INCLUDE_DIRS})
 
 include(CheckIPOSupported)
 check_ipo_supported(RESULT supported OUTPUT error)
@@ -60,16 +61,7 @@ add_executable(
   src/parsers/actuators.cpp
   src/parsers/parsers.cpp
   src/parsers/p_modules.cpp
-  src/parsers/p_sensors.cpp
-  libs/tmx-cpp/src/tmx.cpp
-  libs/tmx-cpp/src/buffer_build.cpp
-  libs/tmx-cpp/src/sensors.cpp
-  libs/tmx-cpp/src/modules.cpp
-  libs/tmx-cpp/src/modules/PCA9685.cpp
-  libs/tmx-cpp/src/modules/HiwonderServo.cpp
-  libs/tmx-cpp/src/sensors/INA226.cpp
-  libs/tmx-cpp/libs/async_serial/AsyncSerial.cpp
-  libs/tmx-cpp/libs/async_serial/BufferedAsyncSerial.cpp)
+  src/parsers/p_sensors.cpp)
 ament_target_dependencies(
   ${PROJECT_NAME}_node std_msgs std_srvs mirte_msgs rclcpp sensor_msgs # DEPENDS
                                                               # system_lib
@@ -81,7 +73,7 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 
 # Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} Boost::system
-                      Boost::thread)
+                      Boost::thread tmx_cpp)
 set_property(TARGET ${PROJECT_NAME}_node PROPERTY CXX_INCLUDE_WHAT_YOU_USE
 ${iwyu_path})
 
