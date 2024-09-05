@@ -15,13 +15,8 @@ def generate_launch_description():
             "mirte_user_config.yaml",
         )),
     )
-    ld = LaunchDescription([param_config_arg])
 
-    # config = os.path.join(
-    # get_package_share_directory("mirte_telemetrix_cpp"),
-    # "config",
-    #     "mirte_user_config.yaml",
-    # )
+    ld = LaunchDescription([param_config_arg])
 
     node = Node(
         package="mirte_telemetrix_cpp",
@@ -32,6 +27,9 @@ def generate_launch_description():
         namespace="/mirte",
         # node_namespace='/mirte',
         emulate_tty=True,
+        respawn=True,
+        respawn_delay=5,
+        # respawn_max_retries=10  # TODO: Not avialable yet in humble (avialable starting from jazzy)
     )
 
     ld.add_action(node)

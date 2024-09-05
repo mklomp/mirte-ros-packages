@@ -8,15 +8,15 @@
 |                        | ROS_Telemetrix_aio (ros1) | mirte-telemetrix-cpp | remarks                                                                               |
 | ---------------------- | ------------------------- | -------------------- | ------------------------------------------------------------------------------------- |
 | **Sensors**            |                           |                      |
-| Sonar                  | ✅                         | ✅                    |                                                                                       |
-| intensity              | ✅                         | ❓                    |                                                                                       |
-| encoders               | ✅                         | ✅                    |                                                                                       |
+| Sonar                  | ✅                         | ✅/❗                    | SRF2 does not work                                                                             |
+| intensity              | ✅                         | ✅                    | On pcb only left tested                                                                                      |
+| encoders               | ✅                         | ✅ ?                   |                                                                                       |
 | get pin service        | ✅                         | ❓                    |                                                                                       |
 | **Actuators**          |                           |                      |                                                                                       |
 | oled                   | ✅                         | ❌                    |                                                                                       |
 | servos                 | ✅                         | ❌                    |                                                                                       |
 | keypad                 | ✅                         | ❓                    |                                                                                       |
-| motors                 | ✅                         | ❓                    |                                                                                       |
+| motors                 | ✅                         | ❓                    | L9110S Work                                                                                   |
 | set pin service        | ✅                         | ❓                    |                                                                                       |
 | **Mirte-master parts** |                           |                      |                                                                                       |
 | hiwonder servo         | ✅                         | ✅                    |                                                                                       |
