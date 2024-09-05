@@ -9,6 +9,12 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <!-- TODO: Add this when finalized -->
+  <!-- <exec_depend>mirte_telemetrix_cpp</exec_depend> -->
+  
+  <exec_depend>usb_cam</exec_depend>
+  <exec_depend>web_video_server</exec_depend>
+
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
