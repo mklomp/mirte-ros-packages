@@ -85,7 +85,7 @@ Keypad_data::parse_keypad_data(std::shared_ptr<Parser> parser,
   for (auto name : parser->get_params_keys("keypad")) {
     Keypad_data data;
     data.name = name;
-    auto key = parser->build_param_name("intensity", name);
+    auto key = parser->build_param_name("keypad", name);
     auto config = parser->get_params_name(key);
     auto keys = parser->get_params_keys(key);
     if (config.count("connector")) {

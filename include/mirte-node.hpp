@@ -5,7 +5,7 @@
 #include "mirte-sensors.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include <memory>
-#include <tmx.hpp>
+#include <tmx_cpp/tmx.hpp>
 
 class mirte_node : public rclcpp::Node {
 private:

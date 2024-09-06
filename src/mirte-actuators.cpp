@@ -12,6 +12,8 @@ Mirte_Actuators::Mirte_Actuators(std::shared_ptr<rclcpp::Node> nh,
   // TODO: set_pin!!!
   // auto servos = Servo_data::parse_servo_data(parser, board);
   // auto motors = Motor_data::parse_motor_data(parser, board);
+  auto servos = Servo::get_servos(nh, tmx, board, parser);
+  this->actuators.insert(this->actuators.end(), servos.begin(), servos.end());
 }
 
 Mirte_Actuator::Mirte_Actuator(std::shared_ptr<rclcpp::Node> nh,

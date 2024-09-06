@@ -2,7 +2,7 @@
 #include "mirte-board.hpp"
 #include "parsers/p_sensors.hpp"
 #include "ros.hpp"
-#include <tmx.hpp>
+#include <tmx_cpp/tmx.hpp>
 class Mirte_Sensor;
 class Mirte_Sensors {
 public:

@@ -58,6 +58,7 @@ add_executable(
   src/mirte-modules.cpp
   src/mirte-sensors.cpp
   src/mirte-ping.cpp
+  src/actuators/servo.cpp
   src/parsers/actuators.cpp
   src/parsers/parsers.cpp
   src/parsers/p_modules.cpp

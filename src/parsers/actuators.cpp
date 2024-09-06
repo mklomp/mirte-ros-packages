@@ -33,6 +33,12 @@ Servo_data::parse_servo_data(std::shared_ptr<Parser> parser,
     if (servo_keys.count("max_pulse")) {
       servo_data.max_pulse = servos_config["max_pulse"].get<int>();
     }
+    if (servo_keys.count("min_angle")) {
+      servo_data.min_angle = servos_config["min_angle"].get<float>();
+    }
+    if (servo_keys.count("max_angle")) {
+      servo_data.max_angle = servos_config["max_angle"].get<float>();
+    }
     if (servo_data.check()) {
       servos.push_back(std::make_shared<Servo_data>(servo_data));
     }

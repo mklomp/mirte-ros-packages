@@ -8,14 +8,14 @@
 |                        | ROS_Telemetrix_aio (ros1) | mirte-telemetrix-cpp | remarks                                                                               |
 | ---------------------- | ------------------------- | -------------------- | ------------------------------------------------------------------------------------- |
 | **Sensors**            |                           |                      |
-| Sonar                  | ✅                         | ✅/❗                    | SRF2 does not work                                                                             |
-| intensity              | ✅                         | ✅                    | On pcb only left tested                                                                                      |
+| Sonar                  | ✅                         | ✅                    |                                                                              |
+| intensity              | ✅                         | ✅                    |                                                                                       |
 | encoders               | ✅                         | ✅ ?                   |                                                                                       |
-| get pin service        | ✅                         | ❓                    |                                                                                       |
+| get pin service        | ✅                         | ✅                    | Reading output pins results in undefined behavior (Tested digital read a digital out)                                                                                     |
 | **Actuators**          |                           |                      |                                                                                       |
 | oled                   | ✅                         | ❌                    |                                                                                       |
 | servos                 | ✅                         | ❌                    |                                                                                       |
-| keypad                 | ✅                         | ❓                    |                                                                                       |
+| keypad                 | ✅                         | ✅                    |                                                                                       |
 | motors                 | ✅                         | ❓                    | L9110S Work                                                                                   |
 | set pin service        | ✅                         | ❓                    |                                                                                       |
 | **Mirte-master parts** |                           |                      |                                                                                       |

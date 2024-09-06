@@ -8,11 +8,16 @@ public:
   pin_t pin = (pin_t)-1;
   int min_pulse = 0;
   int max_pulse = 0;
-  Servo_data(std::string name, pin_t pin, int min_pulse, int max_pulse) {
+  // Min/Max angle in degrees
+  float min_angle = 0;
+  float max_angle = 180;
+  Servo_data(std::string name, pin_t pin, int min_pulse, int max_pulse, float min_angle, float max_angle) {
     this->name = name;
     this->pin = pin;
     this->min_pulse = min_pulse;
     this->max_pulse = max_pulse;
+    this->min_angle = min_angle;
+    this->max_angle = max_angle;
   }
   Servo_data() {}
   static std::vector<std::shared_ptr<Servo_data>>

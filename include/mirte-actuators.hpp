@@ -7,8 +7,9 @@
 #include <memory>
 #include <mirte-board.hpp>
 #include <string>
-#include <tmx.hpp>
+#include <tmx_cpp/tmx.hpp>
 #include <vector>
+
 class Mirte_Actuator;
 class Mirte_Actuators {
 public:
@@ -39,6 +40,8 @@ public:
                  std::string name);
   virtual ~Mirte_Actuator() {}
 };
+
+#include <actuators/servo.hpp>
 
 class Motor : public Mirte_Actuator {
 public:

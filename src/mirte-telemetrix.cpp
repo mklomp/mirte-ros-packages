@@ -5,7 +5,7 @@
 #include "mirte-ping.hpp"      // for Mirte_Ping
 #include "mirte-sensors.hpp"   // for Mirte_Sensors
 #include "parsers/parsers.hpp" // for Parser
-#include "tmx.hpp"             // for TMX, TMX::GET_PICO_UNIQUE_ID, TMX...
+#include "tmx_cpp/tmx.hpp"             // for TMX, TMX::GET_PICO_UNIQUE_ID, TMX...
 #include "util.hpp"
 #include <exception>               // for exception
 #include <iostream>                // for operator<<, endl, basic_ostream
@@ -68,6 +68,8 @@ bool mirte_node::start(std::shared_ptr<rclcpp::Node> s_node) {
   }
   if (available_ports.size() == 0) {
     std::cout << "No ports available" << std::endl;
+    // FIXME: REMOVE DEBUG HACK
+    // rclcpp::spin(s_node);
     rclcpp::shutdown();
     return false;
   }

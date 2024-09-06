@@ -43,6 +43,14 @@ Parser::Parser(std::shared_ptr<rclcpp::Node> nh) {
   auto node_parameters_iface = nh->get_node_parameters_interface();
   auto parameter_overrides = node_parameters_iface->get_parameter_overrides();
   this->params = parameter_overrides;
+
+  for (auto const& [key, val] : this->params)
+{
+    std::cout << key        // string (key)
+              << ':'  
+              << rclcpp::to_string(val)       // string's value
+              << std::endl;
+}
 }
 
 /**

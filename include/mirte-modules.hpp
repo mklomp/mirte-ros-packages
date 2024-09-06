@@ -1,19 +1,25 @@
 #pragma once
+#include "rclcpp/rclcpp.hpp"
+
+#include "std_msgs/msg/header.hpp"
+#include "std_msgs/msg/int32.hpp"
+
+#include "std_srvs/srv/set_bool.hpp"
+
 #include "mirte_msgs/msg/servo_position.hpp"
 #include "mirte_msgs/srv/get_servo_range.hpp"
 #include "mirte_msgs/srv/set_motor_speed.hpp"
 #include "mirte_msgs/srv/set_servo_angle.hpp"
 #include "mirte_msgs/srv/set_speed_multiple.hpp"
-#include "parsers/p_modules.hpp"
-#include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/header.hpp"
-#include "std_msgs/msg/int32.hpp"
-#include "std_srvs/srv/set_bool.hpp"
-#include <memory>
+
 #include <mirte-board.hpp>
-#include <modules/PCA9685.hpp>
+#include "parsers/p_modules.hpp"
+
+#include <tmx_cpp/tmx.hpp>
+#include <tmx_cpp/modules/PCA9685.hpp>
+
+#include <memory>
 #include <string>
-#include <tmx.hpp>
 #include <vector>
 
 // #include <mirte-actuators.hpp>
@@ -163,7 +169,7 @@ public:
 };
 
 #include "sensor_msgs/msg/battery_state.hpp"
-#include "sensors/INA226.hpp"
+#include "tmx_cpp/sensors/INA226.hpp"
 class INA226_sensor : public Mirte_module {
 public:
   INA226_sensor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,

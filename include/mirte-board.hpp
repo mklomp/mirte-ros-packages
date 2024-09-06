@@ -42,7 +42,10 @@ public:
   Mirte_Board_pico();
   std::map<std::string, int> resolveConnector(std::string connector);
   int resolvePin(std::string pin);
-  int get_adc_bits() { return 12; }
+  int get_adc_bits() { 
+    /*   # NOTE: the pico itself has 12 bits, but micropython will upgrade to 16
+    # no clue why 14 works*/
+    return 14; }
   int get_max_pwm() { return 20000; } // TODO: check with actual board
   uint8_t resolveI2CPort(uint8_t sda);
 };
