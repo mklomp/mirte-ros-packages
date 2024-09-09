@@ -11,6 +11,7 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
 set(msg_files
+  "msg/Color.msg"
   "msg/Encoder.msg"
   "msg/Intensity.msg"
   "msg/IntensityDigital.msg"
@@ -20,6 +21,7 @@ set(msg_files
 )
 
 set(srv_files
+  "srv/GetColor.srv"
   "srv/GetDistance.srv"
   "srv/GetEncoder.srv"
   "srv/GetIntensity.srv"
@@ -29,7 +31,6 @@ set(srv_files
   "srv/SetLEDValue.srv"
   "srv/SetMotorSpeed.srv"
   "srv/SetOLEDImage.srv"
-  "srv/SetPinMode.srv"
   "srv/SetPinValue.srv"
   "srv/SetServoAngle.srv"
   "srv/GetServoRange.srv"
