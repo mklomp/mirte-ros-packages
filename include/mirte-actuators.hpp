@@ -1,5 +1,7 @@
 #pragma once
-#include "mirte_msgs/srv/set_motor_speed.hpp"
+#include <mirte_msgs/srv/set_motor_speed.hpp>
+#include <mirte_msgs/srv/set_pin_value.hpp>
+
 #include "parsers/actuators.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/header.hpp"
@@ -20,6 +22,12 @@ public:
   std::shared_ptr<rclcpp::Node> nh;
   std::shared_ptr<Mirte_Board> board;
   std::vector<std::shared_ptr<Mirte_Actuator>> actuators;
+
+  rclcpp::Service<mirte_msgs::srv::SetPinValue>::SharedPtr set_pin_value_service;
+
+private:
+  void set_pin_value_service_callback(const mirte_msgs::srv::SetPinValue::Request::ConstSharedPtr req,
+                                      mirte_msgs::srv::SetPinValue::Response::SharedPtr res);
 };
 
 class Mirte_Actuator {
