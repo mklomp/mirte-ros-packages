@@ -41,7 +41,7 @@ void Servo::set_angle_service_callback(mirte_msgs::srv::SetServoAngle::Request::
   if (angle > data->max_angle || angle < data->min_angle)
   {
     RCLCPP_WARN(nh->get_logger(),
-                "The provided angle is out of range. Angle %f.3 degrees was requested, but range is [%f.3, %f.3]",
+                "The provided angle is out of range. Angle %.3f degrees was requested, but range is [%.3f, %.3f]",
                 angle, data->min_angle, data->max_angle);
     res->status = false;
     return;

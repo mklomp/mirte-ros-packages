@@ -6,8 +6,8 @@ class Servo_data {
 public:
   std::string name = "";
   pin_t pin = (pin_t)-1;
-  int min_pulse = 0;
-  int max_pulse = 0;
+  int min_pulse = 544;
+  int max_pulse = 2400;
   // Min/Max angle in degrees
   float min_angle = 0;
   float max_angle = 180;
