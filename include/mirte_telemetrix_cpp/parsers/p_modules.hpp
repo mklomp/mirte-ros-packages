@@ -1,6 +1,6 @@
 #pragma once
-#include "mirte-board.hpp"
-#include "parsers/parsers.hpp"
+#include "mirte_telemetrix_cpp/mirte-board.hpp"
+#include "mirte_telemetrix_cpp/parsers/parsers.hpp"
 
 class PCA_Motor_data;
 class PCA_Servo_data;

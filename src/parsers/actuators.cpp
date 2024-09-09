@@ -1,5 +1,5 @@
 #include <boost/algorithm/string.hpp>
-#include <parsers/actuators.hpp>
+#include <mirte_telemetrix_cpp/parsers/actuators.hpp>
 
 std::vector<std::shared_ptr<Servo_data>>
 Servo_data::parse_servo_data(std::shared_ptr<Parser> parser,

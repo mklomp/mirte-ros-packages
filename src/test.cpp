@@ -1,4 +1,4 @@
-#include <mirte-board.hpp>
+#include <mirte_telemetrix_cpp/mirte-board.hpp>
 int main() {
   // Your code here
   Mirte_Board_pico board; //(/*s_tmx, s_node*/);

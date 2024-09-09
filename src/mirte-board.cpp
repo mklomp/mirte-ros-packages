@@ -1,4 +1,4 @@
-#include <mirte-board.hpp>
+#include <mirte_telemetrix_cpp/mirte-board.hpp>
 
 std::shared_ptr<Mirte_Board>
 Mirte_Board::create(std::shared_ptr<Parser> parser) {

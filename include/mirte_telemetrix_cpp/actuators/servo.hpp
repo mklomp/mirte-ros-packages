@@ -7,8 +7,8 @@
 
 #include <memory>
 #include <string>
-#include "mirte-actuators.hpp"
-#include "parsers/actuators.hpp"
+#include "mirte_telemetrix_cpp/mirte-actuators.hpp"
+#include "mirte_telemetrix_cpp/parsers/actuators.hpp"
 
 class Servo : public Mirte_Actuator
 {

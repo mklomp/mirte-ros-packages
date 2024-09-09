@@ -1,8 +1,8 @@
-#include <parsers/p_modules.hpp>
+#include <mirte_telemetrix_cpp/parsers/p_modules.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <cmath>
-#include <parsers/actuators.hpp>
+#include <mirte_telemetrix_cpp/parsers/actuators.hpp>
 std::vector<std::shared_ptr<PCA_data>>
 PCA_data::parse_pca_data(std::shared_ptr<Parser> parser,
                          std::shared_ptr<Mirte_Board> board) {

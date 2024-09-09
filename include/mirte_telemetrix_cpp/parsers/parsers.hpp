@@ -1,6 +1,6 @@
 #pragma once
 #include "rclcpp/rclcpp.hpp"
-#include "util.hpp"
+#include "mirte_telemetrix_cpp/util.hpp"
 #include <map>
 #include <memory>
 #include <set>

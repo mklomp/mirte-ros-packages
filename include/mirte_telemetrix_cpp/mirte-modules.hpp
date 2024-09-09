@@ -12,8 +12,8 @@
 #include "mirte_msgs/srv/set_servo_angle.hpp"
 #include "mirte_msgs/srv/set_speed_multiple.hpp"
 
-#include <mirte-board.hpp>
-#include "parsers/p_modules.hpp"
+#include <mirte_telemetrix_cpp/mirte-board.hpp>
+#include <mirte_telemetrix_cpp/parsers/p_modules.hpp>
 
 #include <tmx_cpp/tmx.hpp>
 #include <tmx_cpp/modules/PCA9685.hpp>

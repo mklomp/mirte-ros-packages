@@ -2,7 +2,7 @@
 
 #include <mirte_msgs/srv/set_servo_angle.hpp>
 
-#include <actuators/servo.hpp>
+#include <mirte_telemetrix_cpp/actuators/servo.hpp>
 
 #include <tmx_cpp/tmx.hpp>
 
@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <functional>
 
-#include "mirte-actuators.hpp"
+#include "mirte_telemetrix_cpp/mirte-actuators.hpp"
 
 Servo::Servo(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
              std::shared_ptr<Servo_data> servo_data)

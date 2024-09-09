@@ -1,11 +1,14 @@
 #pragma once
-#include "mirte-actuators.hpp"
-#include "mirte-board.hpp"
-#include "mirte-ping.hpp"
-#include "mirte-sensors.hpp"
-#include "rclcpp/rclcpp.hpp"
 #include <memory>
+
+#include <rclcpp/rclcpp.hpp>
+
 #include <tmx_cpp/tmx.hpp>
+
+#include "mirte_telemetrix_cpp/mirte-actuators.hpp"
+#include "mirte_telemetrix_cpp/mirte-board.hpp"
+#include "mirte_telemetrix_cpp/mirte-ping.hpp"
+#include "mirte_telemetrix_cpp/mirte-sensors.hpp"
 
 class mirte_node : public rclcpp::Node {
 private:

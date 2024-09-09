@@ -1,5 +1,5 @@
-#include "mirte-board.hpp" // for Mirte_Board_pico
-#include "util.hpp"        // for try_parse_int, starts_with
+#include "mirte_telemetrix_cpp/mirte-board.hpp" // for Mirte_Board_pico
+#include "mirte_telemetrix_cpp/util.hpp"        // for try_parse_int, starts_with
 #include <iostream>        // for operator<<, endl, basic_ostream, ostream
 #include <map>             // for map
 #include <optional>        // for optional

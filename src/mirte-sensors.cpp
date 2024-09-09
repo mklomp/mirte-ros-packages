@@ -1,5 +1,5 @@
-#include "mirte-sensors.hpp"
-#include "parsers/p_sensors.hpp"
+#include "mirte_telemetrix_cpp/mirte-sensors.hpp"
+#include "mirte_telemetrix_cpp/parsers/p_sensors.hpp"
 
 Mirte_Sensors::Mirte_Sensors(std::shared_ptr<rclcpp::Node> nh,
                              std::shared_ptr<TMX> tmx,

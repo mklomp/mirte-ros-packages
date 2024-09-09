@@ -1,6 +1,6 @@
 #include <functional>
-#include <mirte-modules.hpp>
-#include <util.hpp>
+#include <mirte_telemetrix_cpp/mirte-modules.hpp>
+#include <mirte_telemetrix_cpp/util.hpp>
 using namespace std::placeholders; // for _1, _2, _3...
 
 Mirte_modules::Mirte_modules(std::shared_ptr<rclcpp::Node> nh,

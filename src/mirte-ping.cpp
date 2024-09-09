@@ -1,4 +1,4 @@
-#include "mirte-ping.hpp"
+#include "mirte_telemetrix_cpp/mirte-ping.hpp"
 
 Mirte_Ping::Mirte_Ping(std::shared_ptr<rclcpp::Node> nh,
                        std::shared_ptr<TMX> tmx,

@@ -1,12 +1,12 @@
-#include "mirte-actuators.hpp" // for Mirte_Actuators
-#include "mirte-board.hpp"     // for Mirte_Board
-#include "mirte-modules.hpp"
-#include "mirte-node.hpp"
-#include "mirte-ping.hpp"      // for Mirte_Ping
-#include "mirte-sensors.hpp"   // for Mirte_Sensors
-#include "parsers/parsers.hpp" // for Parser
+#include "mirte_telemetrix_cpp/mirte-actuators.hpp" // for Mirte_Actuators
+#include "mirte_telemetrix_cpp/mirte-board.hpp"     // for Mirte_Board
+#include "mirte_telemetrix_cpp/mirte-modules.hpp"
+#include "mirte_telemetrix_cpp/mirte-node.hpp"
+#include "mirte_telemetrix_cpp/mirte-ping.hpp"      // for Mirte_Ping
+#include "mirte_telemetrix_cpp/mirte-sensors.hpp"   // for Mirte_Sensors
+#include "mirte_telemetrix_cpp/parsers/parsers.hpp" // for Parser
 #include "tmx_cpp/tmx.hpp"             // for TMX, TMX::GET_PICO_UNIQUE_ID, TMX...
-#include "util.hpp"
+#include "mirte_telemetrix_cpp/util.hpp"
 #include <exception>               // for exception
 #include <iostream>                // for operator<<, endl, basic_ostream
 #include <memory>                  // for make_shared, shared_ptr, __shared...
