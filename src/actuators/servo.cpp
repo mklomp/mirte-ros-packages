@@ -17,11 +17,11 @@ Servo::Servo(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::sh
   : Mirte_Actuator(nh, tmx, board, { servo_data->pin }, servo_data->name), data(servo_data)
 {
   this->set_angle_service = nh->create_service<mirte_msgs::srv::SetServoAngle>(
-      "/mirte/set_" + name + "_servo_angle",
+      "set_" + name + "_servo_angle",
       std::bind(&Servo::set_angle_service_callback, this, std::placeholders::_1, std::placeholders::_2));
 
   this->get_range_service = nh->create_service<mirte_msgs::srv::GetServoRange>(
-      "/mirte/get_" + name + "_servo_range",
+      "get_" + name + "_servo_range",
       std::bind(&Servo::get_range_service_callback, this, std::placeholders::_1, std::placeholders::_2));
 
   tmx->attach_servo(data->pin, data->min_pulse, data->max_pulse);

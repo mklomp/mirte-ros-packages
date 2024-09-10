@@ -24,7 +24,7 @@ Mirte_Sensors::Mirte_Sensors(std::shared_ptr<rclcpp::Node> nh,
       std::chrono::milliseconds(1000 / parser->get_frequency()),
       std::bind(&Mirte_Sensors::publish, this));
   this->pin_service = nh->create_service<mirte_msgs::srv::GetPinValue>(
-      "/mirte/get_pin_value",
+      "get_pin_value",
       std::bind(&Mirte_Sensors::pin_callback, this, std::placeholders::_1,
                 std::placeholders::_2));
 }
@@ -140,9 +140,9 @@ KeypadMonitor::KeypadMonitor(std::shared_ptr<rclcpp::Node> nh,
     : Mirte_Sensor(nh, tmx, board, {keypad_data->pin}, keypad_data->name) {
   this->keypad_data = keypad_data;
   keypad_pub = nh->create_publisher<mirte_msgs::msg::Keypad>(
-      "/mirte/keypad/" + keypad_data->name, 1);
+      "keypad/" + keypad_data->name, 1);
   keypad_pressed_pub = nh->create_publisher<mirte_msgs::msg::Keypad>(
-      "/mirte/keypad/" + keypad_data->name + "_pressed", 1);
+      "keypad/" + keypad_data->name + "_pressed", 1);
   keypad_service = nh->create_service<mirte_msgs::srv::GetKeypad>(
       keypad_data->name + "_get",
       std::bind(&KeypadMonitor::keypad_callback, this, std::placeholders::_1,
@@ -232,9 +232,9 @@ SonarMonitor::SonarMonitor(std::shared_ptr<rclcpp::Node> nh,
                    sonar_data->name) {
   this->sonar_data = sonar_data;
   sonar_pub = nh->create_publisher<sensor_msgs::msg::Range>(
-      "/mirte/distance/" + sonar_data->name, 1);
+      "distance/" + sonar_data->name, 1);
   this->sonar_service = nh->create_service<mirte_msgs::srv::GetDistance>(
-      "/mirte/get_distance_" + sonar_data->name,
+      "get_distance_" + sonar_data->name,
       std::bind(&SonarMonitor::service_callback, this, std::placeholders::_1,
                 std::placeholders::_2));
   tmx->attach_sonar(sonar_data->trigger, sonar_data->echo,
@@ -305,11 +305,11 @@ Digital_IntensityMonitor::Digital_IntensityMonitor(
                        intensity_data->name) {
   this->intensity_data = intensity_data;
   intensity_pub = nh->create_publisher<mirte_msgs::msg::IntensityDigital>(
-      "/mirte/intensity/" + intensity_data->name + "_digital", 1);
+      "intensity/" + intensity_data->name + "_digital", 1);
 
   this->intensity_service =
       nh->create_service<mirte_msgs::srv::GetIntensityDigital>(
-          "/mirte/get_intensity_" + intensity_data->name + "_digital",
+          "get_intensity_" + intensity_data->name + "_digital",
           std::bind(&Digital_IntensityMonitor::service_callback, this,
                     std::placeholders::_1, std::placeholders::_2));
   tmx->setPinMode(intensity_data->d_pin, TMX::PIN_MODES::DIGITAL_INPUT, true,
@@ -327,10 +327,10 @@ Analog_IntensityMonitor::Analog_IntensityMonitor(
                        intensity_data->name) {
   this->intensity_data = intensity_data;
   intensity_pub = nh->create_publisher<mirte_msgs::msg::Intensity>(
-      "/mirte/intensity/" + intensity_data->name, 1);
+      "intensity/" + intensity_data->name, 1);
 
   this->intensity_service = nh->create_service<mirte_msgs::srv::GetIntensity>(
-      "/mirte/get_intensity_" + intensity_data->name,
+      "get_intensity_" + intensity_data->name,
       std::bind(&Analog_IntensityMonitor::service_callback, this,
                 std::placeholders::_1, std::placeholders::_2));
   tmx->setPinMode(intensity_data->a_pin, TMX::PIN_MODES::ANALOG_INPUT, true, 0);

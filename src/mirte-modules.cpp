@@ -70,7 +70,7 @@ PCA_Module::PCA_Module(std::shared_ptr<rclcpp::Node> nh,
   // TODO: add servos to this as well
 
   motor_service = nh->create_service<mirte_msgs::srv::SetSpeedMultiple>(
-      "/mirte/set_" + this->name + "_multiple_speeds",
+      "set_" + this->name + "_multiple_speeds",
       std::bind(&PCA_Module::motor_service_cb, this, _1, _2));
 }
 
@@ -109,12 +109,12 @@ PCA_Motor::PCA_Motor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
   // this->nh = nh;
   // this->board = board;
   motor_service = nh->create_service<mirte_msgs::srv::SetMotorSpeed>(
-      "/mirte/set_" + this->motor_data->name + "_speed",
+      "set_" + this->motor_data->name + "_speed",
       std::bind(&PCA_Motor::service_callback, this, std::placeholders::_1,
                 std::placeholders::_2));
 
   ros_client = nh->create_subscription<std_msgs::msg::Int32>(
-      "/mirte/motor_" + this->motor_data->name + "_speed", 1000,
+      "motor_" + this->motor_data->name + "_speed", 1000,
       std::bind(&PCA_Motor::motor_callback, this, std::placeholders::_1));
 }
 
@@ -203,7 +203,7 @@ Hiwonder_bus_module::Hiwonder_bus_module(
 
   // create bus services
   this->enable_service = nh->create_service<std_srvs::srv::SetBool>(
-      "/mirte/set_" + this->name + "_all_servos_enable",
+      "set_" + this->name + "_all_servos_enable",
       std::bind(&Hiwonder_bus_module::enable_cb, this, _1, _2));
 }
 
@@ -273,22 +273,22 @@ Hiwonder_servo::Hiwonder_servo(std::shared_ptr<rclcpp::Node> nh,
 
   // create enable service
   this->enable_service = nh->create_service<std_srvs::srv::SetBool>(
-      "/mirte/set_" + this->servo_data->name + "_servo_enable",
+      "set_" + this->servo_data->name + "_servo_enable",
       std::bind(&Hiwonder_servo::enable_cb, this, _1, _2));
 
   // create angle service
   this->angle_service = nh->create_service<mirte_msgs::srv::SetServoAngle>(
-      "/mirte/set_" + this->servo_data->name + "_servo_angle",
+      "set_" + this->servo_data->name + "_servo_angle",
       std::bind(&Hiwonder_servo::angle_cb, this, _1, _2));
 
   // create range service
   this->range_service = nh->create_service<mirte_msgs::srv::GetServoRange>(
-      "/mirte/get_" + this->servo_data->name + "_servo_range",
+      "get_" + this->servo_data->name + "_servo_range",
       std::bind(&Hiwonder_servo::range_cb, this, _1, _2));
 
   // create publisher
   this->position_pub = nh->create_publisher<mirte_msgs::msg::ServoPosition>(
-      "/servos/" + this->servo_data->name + "/position", 10);
+      "servos/" + this->servo_data->name + "/position", 10);
 }
 
 void Hiwonder_servo::position_cb(HiwonderServo_module::Servo_pos &pos) {

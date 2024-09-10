@@ -48,12 +48,12 @@ Motor::Motor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
              std::vector<pin_t> pins)
     : Mirte_Actuator(nh, tmx, board, pins, name) {
   motor_service = nh->create_service<mirte_msgs::srv::SetMotorSpeed>(
-      "/mirte/set_" + this->name + "_speed",
+      "set_" + this->name + "_speed",
       std::bind(&Motor::service_callback, this, std::placeholders::_1,
                 std::placeholders::_2));
 
   ros_client = nh->create_subscription<std_msgs::msg::Int32>(
-      "/mirte/motor_" + this->name + "_speed", 1000,
+      "motor_" + this->name + "_speed", 1000,
       std::bind(&Motor::motor_callback, this, std::placeholders::_1));
   this->motor_data = motor_data;
   this->max_pwm = board->get_max_pwm();

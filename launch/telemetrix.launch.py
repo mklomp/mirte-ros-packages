@@ -24,8 +24,6 @@ def generate_launch_description():
         executable="mirte_telemetrix_cpp_node",
         parameters=[LaunchConfiguration("config_path")],
         output="screen",
-        namespace="/mirte",
-        # node_namespace='/mirte',
         emulate_tty=True,
         respawn=True,
         respawn_delay=5,

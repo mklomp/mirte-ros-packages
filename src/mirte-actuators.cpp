@@ -10,7 +10,7 @@ Mirte_Actuators::Mirte_Actuators(std::shared_ptr<rclcpp::Node> nh,
   this->board = board;
 
   this->set_pin_value_service = nh->create_service<mirte_msgs::srv::SetPinValue>(
-    "/mirte/set_pin_value",
+    "set_pin_value",
     std::bind(&Mirte_Actuators::set_pin_value_service_callback, this, std::placeholders::_1,
               std::placeholders::_2)
     );
