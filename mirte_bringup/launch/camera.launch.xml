@@ -6,9 +6,9 @@
   </node>
    
   <!-- The video web server is broken untill https://github.com/RobotWebTools/web_video_server/pull/136 is merged,
-    since the port parameter cannot be changed and port is already used -->
-  <!--  <node pkg="web_video_server" name="web_video_server" exec="web_video_server">
+    since the port parameter cannot be changed and port is already used (Now on the forked branch) -->
+   <node pkg="web_video_server" name="web_video_server" exec="web_video_server">
     <param name="default_transport" value="theora"/>
     <param name="port" value="8181"/>
-  </node> -->
+  </node>
 </launch>
