@@ -5,19 +5,17 @@
 
     <ros2_control name="${name}" type="system">
       <hardware>
-        <plugin>mirte_control/DiffBotSystemHardware</plugin>
-        <param name="example_param_hw_start_duration_sec">0</param>
-        <param name="example_param_hw_stop_duration_sec">0.1</param>
+        <plugin>mirte_control/MirtePioneerSrvSystemHardware</plugin>
       </hardware>
       <joint name="${prefix}left_wheel_joint">
-        <command_interface name="velocity"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
+        <command_interface name="velocity" />
+        <state_interface name="position" />
+        <state_interface name="velocity" />
       </joint>
       <joint name="${prefix}right_wheel_joint">
-        <command_interface name="velocity"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
+        <command_interface name="velocity" />
+        <state_interface name="position" />
+        <state_interface name="velocity" />
       </joint>
     </ros2_control>
 

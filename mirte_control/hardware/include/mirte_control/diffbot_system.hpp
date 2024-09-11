@@ -35,10 +35,10 @@
 
 namespace mirte_control
 {
-class DiffBotSystemHardware : public hardware_interface::SystemInterface
+class MirtePioneerSrvSystemHardware : public hardware_interface::SystemInterface
 {
 public:
-  RCLCPP_SHARED_PTR_DEFINITIONS(DiffBotSystemHardware);
+  RCLCPP_SHARED_PTR_DEFINITIONS(MirtePioneerSrvSystemHardware);
 
   MIRTE_CONTROL_PUBLIC
   hardware_interface::CallbackReturn on_init(
@@ -67,17 +67,12 @@ public:
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 private:
-  // Parameters for the DiffBot simulation
-  double hw_start_sec_;
-  double hw_stop_sec_;
 
   // Store the command for the simulated robot
   std::vector<double> hw_commands_;
   std::vector<double> hw_positions_;
   std::vector<double> hw_velocities_;
 
-  // Store the wheeled robot position
-  double base_x_, base_y_, base_theta_;
   int last_cmd_left_;
   int last_cmd_right_;
 
