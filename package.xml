@@ -5,16 +5,23 @@
   <description>Telemetrix cpp implementation</description>
   <maintainer email="tmxcpp@arend-jan.com">Arend-Jan van Hilten</maintainer> 
   <license>AGPL</license>
-  <depend>boost</depend>
+  
   <exec_depend>rclpy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>mirte_msgs</exec_depend>
+  <depend>rclcpp</depend>
+  <depend>boost</depend>
   <depend>sensor_msgs</depend>
+
   <!-- <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
  -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_cmake_clang_format</test_depend>
+  <test_depend>ament_cmake_cppcheck</test_depend>
+  <test_depend>ament_cmake_pycodestyle</test_depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>
