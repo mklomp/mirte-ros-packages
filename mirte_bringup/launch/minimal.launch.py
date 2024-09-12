@@ -17,15 +17,21 @@ def generate_launch_description():
         [
             DeclareLaunchArgument(
                 "machine_namespace",
-                # default_value=TextSubstitution(text=platform.node().replace("-", "_")),
-                default_value="mirte"
-            )
-        ]
+                default_value=TextSubstitution(
+                    text=platform.node().replace("-", "_").lower()
+                ),
+                description="The namespace containing all Robot specific ROS communication",
+            ),
+            DeclareLaunchArgument(
+                "hardware_namespace",
+                default_value="io",
+                description="The namespace for the Telemetrix Node and the hardware peripherals",
+            ),
+        ],
     )
 
-    # ld.add_action(PushRosNamespace(LaunchConfiguration("machine_namespace")))
-
-    telemetrix = GroupAction([PushRosNamespace(LaunchConfiguration("machine_namespace")),IncludeLaunchDescription(
+    # Make configurable
+    telemetrix = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
                 PathJoinSubstitution(
@@ -44,20 +50,22 @@ def generate_launch_description():
                     "config",
                     "mirte_user_config.yaml",
                 ]
-            )
+            ),
+            "hardware_namespace": LaunchConfiguration("hardware_namespace"),
         }.items(),
-    )])
+    )
 
     diff_drive_control = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
                 PathJoinSubstitution(
-                    [FindPackageShare("mirte_control"), "launch", "diffbot.launch.py"]
+                    [FindPackageShare("mirte_control"), "launch", "mirte.launch.py"]
                 )
             ]
         )
     )
 
+    ld.add_action(PushRosNamespace(LaunchConfiguration("machine_namespace")))
     ld.add_action(telemetrix)
     ld.add_action(diff_drive_control)
     return ld

@@ -24,6 +24,8 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
+    # TODO: Add possible namespacing
+    # TODO: Use prefixes? for urdf
     namespace = ""
     # Get URDF via xacro
     robot_description_content = Command(
@@ -85,7 +87,6 @@ def generate_launch_description():
 
     nodes = [
         # TODO: FIX NAMESPACES
-        PushRosNamespace("/mirte"),
         control_node,
         robot_state_pub_node,
         joint_state_broadcaster_spawner,

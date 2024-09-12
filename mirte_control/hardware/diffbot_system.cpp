@@ -42,12 +42,12 @@ hardware_interface::CallbackReturn MirtePioneerSrvSystemHardware::on_init(
   last_cmd_right_ = 0;
 
   // TODO: Make wheel names configurable based, like https://github.com/joshnewans/diffdrive_arduino/blob/humble/description/ros2_control/diffbot.ros2_control.xacro
-  // TODO: Make wheel service names configurable
 
   // TODO: Maybe move this to a later stage if that would make sense
   std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared(get_name());
-  left_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("set_left_speed");
-  right_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("set_right_speed");
+  // TODO: Make wheel service names configurable (Including namespace)
+  left_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("io/set_left_speed");
+  right_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("io/set_right_speed");
 
   while (!left_client_->wait_for_service(std::chrono::seconds(1))) {
     if (!rclcpp::ok()) {
