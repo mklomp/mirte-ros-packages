@@ -226,7 +226,7 @@ void MirteBaseHWInterface::init_service_clients() {
      } else {
       service_clients.clear();
       service_requests.clear();
-     this->set_speed_multiple_client = nh->create_client<mirte_msgs::srv::SetSpeedMultiple>("/mirte/set_motorservocontroller_multiple_speeds");
+     this->set_speed_multiple_client = nh->create_client<mirte_msgs::srv::SetSpeedMultiple>("/io/set_motorservocontroller_multiple_speeds");
     while (!this->set_speed_multiple_client->wait_for_service(1s)) {
     if (!rclcpp::ok()) {
       RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
@@ -484,9 +484,9 @@ this->ros_spin();  });
   }
   assert(joints.size() == NUM_JOINTS);
   this->init_service_clients();
-  assert(service_requests.size() == NUM_JOINTS);
+  // assert(service_requests.size() == NUM_JOINTS);
 
-  assert(service_clients.size() == NUM_JOINTS);
+  // assert(service_clients.size() == NUM_JOINTS);
    if (
     hardware_interface::SystemInterface::on_init(info) !=
     hardware_interface::CallbackReturn::SUCCESS)

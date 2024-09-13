@@ -93,7 +93,7 @@ def generate_launch_description():
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["mirte_base_controller", "-c", "/controller_manager", '--ros-args', '--log-level', 'DEBUG'],
+        arguments=["mirte_base_controller", "-c", "/controller_manager"],
         # prefix=["xterm -e gdb -ex run --args"],
     )
 
