@@ -68,7 +68,7 @@ servo:
       pin: A3
 keypad:
   yellow:
-    name: keypad
+    name: yellow
     device: mirte
     pins:
       pin: A4              # pin needs analog input

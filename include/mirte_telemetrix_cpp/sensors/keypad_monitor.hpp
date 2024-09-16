@@ -3,7 +3,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <mirte_telemetrix_cpp/sensors/base_sensor.hpp>
 
-#include <mirte_telemetrix_cpp/parsers/p_sensors.hpp>
+#include <mirte_telemetrix_cpp/parsers/sensors/keypad_data.hpp>
 
 #include <mirte_msgs/msg/keypad.hpp>
 #include <mirte_msgs/srv/get_keypad.hpp>
@@ -12,9 +12,9 @@ class KeypadMonitor : public Mirte_Sensor {
 public:
   KeypadMonitor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
                 std::shared_ptr<Mirte_Board> board,
-                std::shared_ptr<Keypad_data> keypad_data);
+                KeypadData keypad_data);
   void publish();
-  std::shared_ptr<Keypad_data> keypad_data;
+  KeypadData keypad_data;
   std::shared_ptr<rclcpp::Publisher<mirte_msgs::msg::Keypad>> keypad_pub;
   std::shared_ptr<rclcpp::Publisher<mirte_msgs::msg::Keypad>>
       keypad_pressed_pub;

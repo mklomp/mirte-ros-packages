@@ -1,7 +1,5 @@
 #pragma once
 #include "mirte_telemetrix_cpp/mirte-board.hpp"
-#include "mirte_telemetrix_cpp/parsers/p_sensors.hpp"
-// #include "mirte_telemetrix_cpp/ros.hpp"
 #include <tmx_cpp/tmx.hpp>
 
 #include <mirte_telemetrix_cpp/sensors/base_sensor.hpp>

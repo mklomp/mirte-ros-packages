@@ -63,7 +63,11 @@ add_executable(
   src/parsers/actuators.cpp
   src/parsers/parsers.cpp
   src/parsers/p_modules.cpp
-  src/parsers/p_sensors.cpp
+  src/parsers/sensors/base_sensor_data.cpp
+  src/parsers/sensors/encoder_data.cpp
+  src/parsers/sensors/intensity_data.cpp
+  src/parsers/sensors/sonar_data.cpp
+  src/parsers/sensors/keypad_data.cpp
   src/sensors/base_sensor.cpp
   src/sensors/encoder_monitor.cpp
   src/sensors/intensity_monitor.cpp

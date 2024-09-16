@@ -22,6 +22,11 @@ def generate_launch_description():
             default_value="io",
             description="The namespace for the Telemetrix Node and the hardware peripherals",
         ),
+        DeclareLaunchArgument(
+            "frame_prefix",
+            default_value="",
+            description="The TF2 frame prefix"
+        )
     ]
 
     ld = LaunchDescription(launch_arguments)
@@ -30,7 +35,10 @@ def generate_launch_description():
         package="mirte_telemetrix_cpp",
         name="telemetrix",
         executable="mirte_telemetrix_cpp_node",
-        parameters=[LaunchConfiguration("config_path")],
+        parameters=[
+            LaunchConfiguration("config_path"),
+            {"frame_prefix": LaunchConfiguration("frame_prefix")},
+        ],
         output="screen",
         emulate_tty=True,
         namespace=LaunchConfiguration("hardware_namespace"),

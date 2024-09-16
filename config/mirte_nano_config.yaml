@@ -63,7 +63,7 @@ servo:
       pin: D10               # pin needs PWM
 keypad:
   yellow:
-    name: keypad
+    name: yellow
     device: mirte
     pins:
       pin: A2              # pin needs analog input
