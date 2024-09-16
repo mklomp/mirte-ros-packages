@@ -63,7 +63,12 @@ add_executable(
   src/parsers/actuators.cpp
   src/parsers/parsers.cpp
   src/parsers/p_modules.cpp
-  src/parsers/p_sensors.cpp)
+  src/parsers/p_sensors.cpp
+  src/sensors/base_sensor.cpp
+  src/sensors/encoder_monitor.cpp
+  src/sensors/intensity_monitor.cpp
+  src/sensors/keypad_monitor.cpp
+  src/sensors/sonar_monitor.cpp)
 ament_target_dependencies(
   ${PROJECT_NAME}_node std_msgs std_srvs mirte_msgs rclcpp sensor_msgs # DEPENDS
                                                               # system_lib
