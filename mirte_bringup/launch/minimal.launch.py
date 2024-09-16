@@ -51,6 +51,7 @@ def generate_launch_description():
                 ]
             ),
             "hardware_namespace": hardware_namespace,
+            "frame_prefix": frame_prefix,
         }.items(),
     )
 
@@ -58,13 +59,11 @@ def generate_launch_description():
         PathJoinSubstitution(
             [FindPackageShare("mirte_control"), "launch", "mirte.launch.py"]
         ),
-        launch_arguments={
-            "frame_prefix": frame_prefix
-        }.items()
+        launch_arguments={"frame_prefix": frame_prefix}.items(),
     )
 
-    # Instead of this, we could add a conditional to the launch argument declarations to only launch when the condition is not set.
-    # LaunchConfigurationEquals 
+    # Instead of this, we could add a conditional to the launch argument declarations
+    # to only launch when the condition is not set. By means of LaunchConfigurationEquals
     ld.add_action(
         GroupAction(
             [PushRosNamespace(machine_namespace), telemetrix, diff_drive_control],
