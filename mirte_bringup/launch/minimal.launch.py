@@ -63,6 +63,8 @@ def generate_launch_description():
         }.items()
     )
 
+    # Instead of this, we could add a conditional to the launch argument declarations to only launch when the condition is not set.
+    # LaunchConfigurationEquals 
     ld.add_action(
         GroupAction(
             [PushRosNamespace(machine_namespace), telemetrix, diff_drive_control],

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MIRTE_CONTROL__DIFFBOT_SYSTEM_HPP_
-#define MIRTE_CONTROL__DIFFBOT_SYSTEM_HPP_
+#ifndef MIRTE_CONTROL__MIRTE_PIONEER_SYSTEM_HPP_
+#define MIRTE_CONTROL__MIRTE_PIONEER_SYSTEM_HPP_
 
 #include <memory>
 #include <string>
@@ -82,4 +82,4 @@ private:
 
 }  // namespace mirte_control
 
-#endif  // MIRTE_CONTROL__DIFFBOT_SYSTEM_HPP_
+#endif  // MIRTE_CONTROL__MIRTE_PIONEER_SYSTEM_HPP_

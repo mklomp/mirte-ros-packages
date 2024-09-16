@@ -25,7 +25,7 @@ endforeach()
 add_library(
   mirte_control
   SHARED
-  hardware/diffbot_system.cpp
+  hardware/mirte_pioneer_system.cpp
 )
 target_compile_features(mirte_control PUBLIC cxx_std_17)
 target_include_directories(mirte_control PUBLIC

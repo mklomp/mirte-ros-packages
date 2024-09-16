@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "mirte_control/diffbot_system.hpp"
+#include "mirte_control/mirte_pioneer_system.hpp"
 
 #include <chrono>
 #include <cmath>
