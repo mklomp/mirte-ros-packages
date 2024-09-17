@@ -2,7 +2,7 @@
 #include <tmx_cpp/tmx.hpp>
 
 Mirte_Actuators::Mirte_Actuators(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   std::shared_ptr<Parser> parser)
 : nh(nh), tmx(tmx), board(board)
 {
@@ -28,11 +28,11 @@ void Mirte_Actuators::set_pin_value_service_callback(
   auto pin = this->board->resolvePin(req->pin);
 
   if (is_digital) {
-    this->tmx->setPinMode(pin, TMX::PIN_MODES::DIGITAL_OUTPUT, false, 0);
+    this->tmx->setPinMode(pin, tmx_cpp::TMX::PIN_MODES::DIGITAL_OUTPUT, false, 0);
     // TODO: Maybe a sleep is required here?
     this->tmx->digitalWrite(pin, req->value != 0);
   } else {
-    this->tmx->setPinMode(pin, TMX::PIN_MODES::PWM_OUTPUT, false, 0);
+    this->tmx->setPinMode(pin, tmx_cpp::TMX::PIN_MODES::PWM_OUTPUT, false, 0);
     // TODO: Maybe a sleep is required here?
     this->tmx->pwmWrite(pin, std::clamp(req->value, 0, this->board->get_max_pwm()));
   }
@@ -40,7 +40,7 @@ void Mirte_Actuators::set_pin_value_service_callback(
 }
 
 Mirte_Actuator::Mirte_Actuator(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   std::vector<pin_t> pins, std::string name)
 : nh(nh), tmx(tmx), board(board), pins(pins), name(name)
 {

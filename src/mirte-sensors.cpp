@@ -6,7 +6,7 @@
 #include <mirte_telemetrix_cpp/sensors/sonar_monitor.hpp>
 
 Mirte_Sensors::Mirte_Sensors(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   std::shared_ptr<Parser> parser)
 : nh(nh), tmx(tmx), board(board)
 {
@@ -52,7 +52,7 @@ bool Mirte_Sensors::pin_callback(
   if (is_digital) {
     this->pin_map[pin] = {PIN_USE::DIGITAL_IN, -1, has_analog_cb, true};
 
-    this->tmx->setPinMode(pin, TMX::PIN_MODES::DIGITAL_INPUT, true);
+    this->tmx->setPinMode(pin, tmx_cpp::TMX::PIN_MODES::DIGITAL_INPUT, true);
     if (!has_digital_cb) {
       std::cout << "add digital callback" << std::endl;
       this->tmx->add_digital_callback(pin, [this](auto pin, auto value) {
@@ -65,7 +65,7 @@ bool Mirte_Sensors::pin_callback(
   } else {
     this->pin_map[pin] = {PIN_USE::ANALOG_IN, -1, true, has_digital_cb};
 
-    this->tmx->setPinMode(pin, TMX::PIN_MODES::ANALOG_INPUT, true, 0);
+    this->tmx->setPinMode(pin, tmx_cpp::TMX::PIN_MODES::ANALOG_INPUT, true, 0);
     if (!has_analog_cb) {
       std::cout << "add a callback" << std::endl;
 

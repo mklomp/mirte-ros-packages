@@ -12,7 +12,7 @@
 
 #include "mirte_telemetrix_cpp/mirte-actuators.hpp"
 
-Servo::Servo(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+Servo::Servo(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
              std::shared_ptr<Servo_data> servo_data)
   : Mirte_Actuator(nh, tmx, board, { servo_data->pin }, servo_data->name), data(servo_data)
 {
@@ -67,7 +67,7 @@ Servo::~Servo()
 }
 
 std::vector<std::shared_ptr<Mirte_Actuator>> Servo::get_servos(std::shared_ptr<rclcpp::Node> nh,
-                                                                      std::shared_ptr<TMX> tmx,
+                                                                      std::shared_ptr<tmx_cpp::TMX> tmx,
                                                                       std::shared_ptr<Mirte_Board> board,
                                                                       std::shared_ptr<Parser> parser)
 {

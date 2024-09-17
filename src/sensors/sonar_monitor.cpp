@@ -8,7 +8,7 @@
 #include <sensor_msgs/msg/range.hpp>
 
 std::vector<std::shared_ptr<SonarMonitor>> SonarMonitor::get_sonar_monitors(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   std::shared_ptr<Parser> parser)
 {
   std::vector<std::shared_ptr<SonarMonitor>> sensors;
@@ -21,7 +21,7 @@ std::vector<std::shared_ptr<SonarMonitor>> SonarMonitor::get_sonar_monitors(
 }
 
 SonarMonitor::SonarMonitor(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   SonarData sonar_data)
 : Mirte_Sensor(nh, tmx, board, {sonar_data.trigger, sonar_data.echo}, (SensorData)sonar_data),
   sonar_data(sonar_data)

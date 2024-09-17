@@ -14,7 +14,7 @@ class Servo : public Mirte_Actuator
 {
 public:
   Servo(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
     std::shared_ptr<Servo_data> servo_data);
 
   // TODO: Maybe make private
@@ -22,7 +22,7 @@ public:
   rclcpp::Service<mirte_msgs::srv::GetServoRange>::SharedPtr get_range_service;
 
   static std::vector<std::shared_ptr<Mirte_Actuator>> get_servos(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
     std::shared_ptr<Parser> parser);
 
   ~Servo();

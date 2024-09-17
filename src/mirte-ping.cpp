@@ -1,14 +1,14 @@
 #include "mirte_telemetrix_cpp/mirte-ping.hpp"
 
 Mirte_Ping::Mirte_Ping(std::shared_ptr<rclcpp::Node> nh,
-                       std::shared_ptr<TMX> tmx,
+                       std::shared_ptr<tmx_cpp::TMX> tmx,
                        std::function<void()> stop_func)
     : tmx(tmx), nh(nh), stop_func(stop_func) {
   this->ping_thread = std::thread(&Mirte_Ping::ping_task, this);
   this->tmx->add_callback(
-      TMX::MESSAGE_IN_TYPE::PONG_REPORT,
+      tmx_cpp::TMX::MESSAGE_IN_TYPE::PONG_REPORT,
       std::bind(&Mirte_Ping::ping_callback, this, std::placeholders::_1));
-  this->tmx->add_callback(TMX::MESSAGE_IN_TYPE::ANALOG_REPORT,
+  this->tmx->add_callback(tmx_cpp::TMX::MESSAGE_IN_TYPE::ANALOG_REPORT,
                           [](std::vector<uint8_t> t) { t[1] = 3; });
 }
 

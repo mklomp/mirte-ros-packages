@@ -4,7 +4,7 @@
 #include <mirte_telemetrix_cpp/actuators/motor.hpp>
 
 std::vector<std::shared_ptr<Mirte_Actuator>>
-Motor::get_motors(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+Motor::get_motors(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
                   std::shared_ptr<Mirte_Board> board,
                   std::shared_ptr<Parser> parser) {
   std::vector<std::shared_ptr<Mirte_Actuator>> motors;
@@ -42,7 +42,7 @@ void Motor::motor_callback(const std_msgs::msg::Int32 &msg) {
   this->set_speed(msg.data);
 }
 
-Motor::Motor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+Motor::Motor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
              std::shared_ptr<Mirte_Board> board,
              std::shared_ptr<Motor_data> motor_data, std::string name,
              std::vector<pin_t> pins)
@@ -59,15 +59,15 @@ Motor::Motor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
   this->max_pwm = board->get_max_pwm();
 }
 
-DPMotor::DPMotor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+DPMotor::DPMotor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
                  std::shared_ptr<Mirte_Board> board,
                  std::shared_ptr<Motor_data> motor_data, std::string name)
     : Motor(nh, tmx, board, motor_data, name,
             {motor_data->D1, motor_data->P1}) {
   this->pwm_pin = motor_data->P1;
   this->dir_pin = motor_data->D1;
-  tmx->setPinMode(this->pwm_pin, TMX::PIN_MODES::PWM_OUTPUT);
-  tmx->setPinMode(this->dir_pin, TMX::PIN_MODES::DIGITAL_OUTPUT);
+  tmx->setPinMode(this->pwm_pin, tmx_cpp::TMX::PIN_MODES::PWM_OUTPUT);
+  tmx->setPinMode(this->dir_pin, tmx_cpp::TMX::PIN_MODES::DIGITAL_OUTPUT);
   // motor_service = nh.advertiseService(name, &Motor::service_callback, this);
   // ros_client = nh.subscribe<mirte_msgs::SetMotorSpeed>(name, 1000,
   //                                                      &Motor::motor_callback,
@@ -84,7 +84,7 @@ void DPMotor::set_speed(int speed) {
   // tmx->set_digital_pwm(pins[0], speed);
 }
 
-PPMotor::PPMotor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+PPMotor::PPMotor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
                  std::shared_ptr<Mirte_Board> board,
                  std::shared_ptr<Motor_data> motor_data, std::string name)
     : Motor(nh, tmx, board, motor_data, name,
@@ -93,8 +93,8 @@ PPMotor::PPMotor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
   this->pwmB_pin = motor_data->P2;
   std::cout << "PPMotor" << std::hex << this->pwmA_pin << " " << std::hex
             << this->pwmB_pin << std::endl;
-  tmx->setPinMode(this->pwmA_pin, TMX::PIN_MODES::PWM_OUTPUT);
-  tmx->setPinMode(this->pwmB_pin, TMX::PIN_MODES::PWM_OUTPUT);
+  tmx->setPinMode(this->pwmA_pin, tmx_cpp::TMX::PIN_MODES::PWM_OUTPUT);
+  tmx->setPinMode(this->pwmB_pin, tmx_cpp::TMX::PIN_MODES::PWM_OUTPUT);
 }
 
 void PPMotor::setA(int speed) { tmx->pwmWrite(this->pwmA_pin, speed); }

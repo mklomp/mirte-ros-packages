@@ -4,14 +4,10 @@
 using namespace std::placeholders; // for _1, _2, _3...
 
 Mirte_modules::Mirte_modules(std::shared_ptr<rclcpp::Node> nh,
-                             std::shared_ptr<TMX> tmx,
+                             std::shared_ptr<tmx_cpp::TMX> tmx,
                              std::shared_ptr<Mirte_Board> board,
-                             std::shared_ptr<Parser> parser) {
-  this->nh = nh;
-  this->tmx = tmx;
-  this->board = board;
-  // this->parser = parser;
-  this->module_sys = std::make_shared<Modules>(tmx);
+                             std::shared_ptr<Parser> parser) : nh(nh), tmx(tmx), board(board) {
+  this->module_sys = std::make_shared<tmx_cpp::Modules>(tmx);
   auto pca_mods =
       PCA_Module::get_pca_modules(nh, tmx, board, parser, this->module_sys);
   this->modules.insert(this->modules.end(), pca_mods.begin(), pca_mods.end());
@@ -22,7 +18,7 @@ Mirte_modules::Mirte_modules(std::shared_ptr<rclcpp::Node> nh,
   this->modules.insert(this->modules.end(), hiwonder_mods.begin(),
                        hiwonder_mods.end());
 
-  this->sensor_sys = std::make_shared<Sensors>(tmx);
+  this->sensor_sys = std::make_shared<tmx_cpp::Sensors>(tmx);
   auto ina_mods =
       INA226_sensor::get_ina_modules(nh, tmx, board, parser, this->sensor_sys);
   std::cout << "Adding ina modules" << ina_mods.size() << std::endl;
@@ -30,9 +26,9 @@ Mirte_modules::Mirte_modules(std::shared_ptr<rclcpp::Node> nh,
   this->modules.insert(this->modules.end(), ina_mods.begin(), ina_mods.end());
 }
 std::vector<std::shared_ptr<PCA_Module>> PCA_Module::get_pca_modules(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
     std::shared_ptr<Mirte_Board> board, std::shared_ptr<Parser> parser,
-    std::shared_ptr<Modules> modules) {
+    std::shared_ptr<tmx_cpp::Modules> modules) {
   std::vector<std::shared_ptr<PCA_Module>> pca_modules;
   auto pca_data = PCA_data::parse_pca_data(parser, board);
   for (auto pca : pca_data) {
@@ -42,24 +38,16 @@ std::vector<std::shared_ptr<PCA_Module>> PCA_Module::get_pca_modules(
   }
   return pca_modules;
 }
-Mirte_module::Mirte_module(std::shared_ptr<rclcpp::Node> nh,
-                           std::shared_ptr<TMX> tmx,
-                           std::shared_ptr<Mirte_Board> board,
-                           std::string name) {
-  this->name = name;
-  this->tmx = tmx;
-  this->nh = nh;
-  this->board = board;
-}
+
 
 PCA_Module::PCA_Module(std::shared_ptr<rclcpp::Node> nh,
-                       std::shared_ptr<TMX> tmx,
+                       std::shared_ptr<tmx_cpp::TMX> tmx,
                        std::shared_ptr<Mirte_Board> board, std::string name,
-                       std::shared_ptr<Modules> modules,
+                       std::shared_ptr<tmx_cpp::Modules> modules,
                        std::shared_ptr<PCA_data> pca_data)
     : Mirte_module(nh, tmx, board, name) {
   tmx->setI2CPins(pca_data->scl, pca_data->sda, pca_data->port);
-  this->pca9685 = std::make_shared<PCA9685_module>(
+  this->pca9685 = std::make_shared<tmx_cpp::PCA9685_module>(
       pca_data->port, pca_data->addr, pca_data->frequency);
   modules->add_mod(pca9685);
   for (auto motor : pca_data->motors) {
@@ -77,8 +65,8 @@ PCA_Module::PCA_Module(std::shared_ptr<rclcpp::Node> nh,
 bool PCA_Module::motor_service_cb(
     const std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Request> req,
     std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Response> res) {
-  std::shared_ptr<std::vector<PCA9685_module::PWM_val>> pwm_vals =
-      std::make_shared<std::vector<PCA9685_module::PWM_val>>();
+  std::shared_ptr<std::vector<tmx_cpp::PCA9685_module::PWM_val>> pwm_vals =
+      std::make_shared<std::vector<tmx_cpp::PCA9685_module::PWM_val>>();
   if (req->speeds.size() == 0) {
     res->success = false;
     return false;
@@ -99,10 +87,10 @@ bool PCA_Module::motor_service_cb(
   return true;
 }
 
-PCA_Motor::PCA_Motor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+PCA_Motor::PCA_Motor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
                      std::shared_ptr<Mirte_Board> board,
                      std::shared_ptr<PCA_Motor_data> motor_data,
-                     std::shared_ptr<PCA9685_module> pca9685) {
+                     std::shared_ptr<tmx_cpp::PCA9685_module> pca9685) {
   this->motor_data = motor_data;
   this->pca9685_mod = pca9685;
   // this->tmx = tmx;
@@ -120,7 +108,7 @@ PCA_Motor::PCA_Motor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
 
 void PCA_Motor::set_speed(
     int speed, bool direct,
-    std::shared_ptr<std::vector<PCA9685_module::PWM_val>> pwm_vals) {
+    std::shared_ptr<std::vector<tmx_cpp::PCA9685_module::PWM_val>> pwm_vals) {
   std::cout << "Setting speed: " << speed << std::endl;
   int32_t speed_ = (int32_t)((float)speed * (4095.0) / 100.0);
   // TODO: add invert
@@ -173,13 +161,13 @@ bool PCA_Motor::service_callback(
 
 // hiwonder bus
 Hiwonder_bus_module::Hiwonder_bus_module(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
     std::shared_ptr<Mirte_Board> board, std::string name,
-    std::shared_ptr<Modules> modules,
+    std::shared_ptr<tmx_cpp::Modules> modules,
     std::shared_ptr<Hiwonder_bus_data> bus_data)
     : Mirte_module(nh, tmx, board, name) {
 
-  std::function<void(std::vector<HiwonderServo_module::Servo_pos>)>
+  std::function<void(std::vector<tmx_cpp::HiwonderServo_module::Servo_pos>)>
       position_cb = std::bind(&Hiwonder_bus_module::position_cb, this, _1);
   std::function<void(int, bool)> verify_cb =
       std::bind(&Hiwonder_bus_module::verify_cb, this, _1, _2);
@@ -192,7 +180,7 @@ Hiwonder_bus_module::Hiwonder_bus_module(
   for (auto servo : bus_data->servos) {
     servo_ids.push_back(servo->id);
   }
-  this->bus = std::make_shared<HiwonderServo_module>(
+  this->bus = std::make_shared<tmx_cpp::HiwonderServo_module>(
       this->bus_data->uart_port, this->bus_data->rx_pin, this->bus_data->tx_pin,
       servo_ids, position_cb, verify_cb, range_cb, offset_cb);
   modules->add_mod(this->bus);
@@ -218,10 +206,10 @@ bool Hiwonder_bus_module::enable_cb(
 
 std::vector<std::shared_ptr<Hiwonder_bus_module>>
 Hiwonder_bus_module::get_hiwonder_modules(std::shared_ptr<rclcpp::Node> nh,
-                                          std::shared_ptr<TMX> tmx,
+                                          std::shared_ptr<tmx_cpp::TMX> tmx,
                                           std::shared_ptr<Mirte_Board> board,
                                           std::shared_ptr<Parser> parser,
-                                          std::shared_ptr<Modules> modules) {
+                                          std::shared_ptr<tmx_cpp::Modules> modules) {
   std::vector<std::shared_ptr<Hiwonder_bus_module>> hiwonder_modules;
   auto hiwonder_data =
       Hiwonder_bus_data::parse_hiwonder_bus_data(parser, board);
@@ -234,7 +222,7 @@ Hiwonder_bus_module::get_hiwonder_modules(std::shared_ptr<rclcpp::Node> nh,
 }
 
 void Hiwonder_bus_module::position_cb(
-    std::vector<HiwonderServo_module::Servo_pos> pos) {
+    std::vector<tmx_cpp::HiwonderServo_module::Servo_pos> pos) {
   for (auto p : pos) {
     // std::cout << "Servo: " << (int)p.id << " pos: " << p.angle << std::endl;
     for (auto servo : this->servos) {
@@ -261,10 +249,10 @@ void Hiwonder_bus_module::offset_cb(int id, uint16_t offset) {
 }
 
 Hiwonder_servo::Hiwonder_servo(std::shared_ptr<rclcpp::Node> nh,
-                               std::shared_ptr<TMX> tmx,
+                               std::shared_ptr<tmx_cpp::TMX> tmx,
                                std::shared_ptr<Mirte_Board> board,
                                std::shared_ptr<Hiwonder_servo_data> servo_data,
-                               std::shared_ptr<HiwonderServo_module> bus_mod) {
+                               std::shared_ptr<tmx_cpp::HiwonderServo_module> bus_mod) {
   this->servo_data = servo_data;
   this->bus_mod = bus_mod;
   // this->tmx = tmx;
@@ -291,7 +279,7 @@ Hiwonder_servo::Hiwonder_servo(std::shared_ptr<rclcpp::Node> nh,
       "servos/" + this->servo_data->name + "/position", 10);
 }
 
-void Hiwonder_servo::position_cb(HiwonderServo_module::Servo_pos &pos) {
+void Hiwonder_servo::position_cb(tmx_cpp::HiwonderServo_module::Servo_pos &pos) {
   // TODO: publish current angle
   // don't forget to calculate angle
   auto angle = calc_angle_in(pos.angle);
@@ -360,9 +348,9 @@ float Hiwonder_servo::calc_angle_in(uint16_t angle) {
 }
 
 INA226_sensor::INA226_sensor(std::shared_ptr<rclcpp::Node> nh,
-                             std::shared_ptr<TMX> tmx,
+                             std::shared_ptr<tmx_cpp::TMX> tmx,
                              std::shared_ptr<Mirte_Board> board,
-                             std::string name, std::shared_ptr<Sensors> modules,
+                             std::string name, std::shared_ptr<tmx_cpp::Sensors> modules,
                              std::shared_ptr<INA226_data> ina_data)
     : Mirte_module(nh, tmx, board, name) {
   tmx->setI2CPins(ina_data->scl, ina_data->sda, ina_data->port);
@@ -371,7 +359,7 @@ INA226_sensor::INA226_sensor(std::shared_ptr<rclcpp::Node> nh,
   this->used_time = nh->now();
   this->total_used_mAh = 0;
 
-  this->ina226 = std::make_shared<INA226_module>(
+  this->ina226 = std::make_shared<tmx_cpp::INA226_module>(
       ina_data->port, ina_data->addr,
       std::bind(&INA226_sensor::data_cb, this, _1, _2));
   this->battery_pub = nh->create_publisher<sensor_msgs::msg::BatteryState>(
@@ -502,9 +490,9 @@ void INA226_sensor::shutdown_robot_cb(
 }
 
 std::vector<std::shared_ptr<INA226_sensor>> INA226_sensor::get_ina_modules(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
     std::shared_ptr<Mirte_Board> board, std::shared_ptr<Parser> parser,
-    std::shared_ptr<Sensors> modules) {
+    std::shared_ptr<tmx_cpp::Sensors> modules) {
   std::vector<std::shared_ptr<INA226_sensor>> pca_modules;
   auto pca_data = INA226_data::parse_ina226_data(parser, board);
   for (auto pca : pca_data) {

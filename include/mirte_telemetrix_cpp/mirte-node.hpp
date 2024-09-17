@@ -19,7 +19,7 @@ public:
   ~mirte_node();
   bool start(std::shared_ptr<rclcpp::Node> s_node);
   std::shared_ptr<Mirte_Board> s_board;
-  std::shared_ptr<TMX> s_tmx;
+  std::shared_ptr<tmx_cpp::TMX> s_tmx;
   std::shared_ptr<Parser> p_s;
   std::shared_ptr<Mirte_Sensors> monitor;
   std::shared_ptr<Mirte_Actuators> actuators;

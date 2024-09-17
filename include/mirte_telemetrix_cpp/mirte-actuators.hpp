@@ -18,9 +18,9 @@ class Mirte_Actuators
 {
 public:
   Mirte_Actuators(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
     std::shared_ptr<Parser> parser);
-  std::shared_ptr<TMX> tmx;
+  std::shared_ptr<tmx_cpp::TMX> tmx;
   std::shared_ptr<rclcpp::Node> nh;
   std::shared_ptr<Mirte_Board> board;
   std::vector<std::shared_ptr<Mirte_Actuator>> actuators;
@@ -36,7 +36,7 @@ private:
 class Mirte_Actuator
 {
 public:
-  std::shared_ptr<TMX> tmx;
+  std::shared_ptr<tmx_cpp::TMX> tmx;
   std::shared_ptr<rclcpp::Node> nh;
   std::shared_ptr<Mirte_Board> board;
   std::vector<pin_t> pins;
@@ -49,7 +49,7 @@ public:
     return header;
   }
   Mirte_Actuator(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
     std::vector<pin_t> pins, std::string name);
   virtual ~Mirte_Actuator() {}
 };

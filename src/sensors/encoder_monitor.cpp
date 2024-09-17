@@ -6,7 +6,7 @@
 #include <mirte_msgs/srv/get_encoder.hpp>
 
 EncoderMonitor::EncoderMonitor(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   EncoderData encoder_data)
 : Mirte_Sensor(nh, tmx, board, {encoder_data.pinA, encoder_data.pinB}, (SensorData)encoder_data),
   encoder_data(encoder_data)
@@ -46,7 +46,7 @@ bool EncoderMonitor::service_callback(
 }
 
 std::vector<std::shared_ptr<EncoderMonitor>> EncoderMonitor::get_encoder_monitors(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   std::shared_ptr<Parser> parser)
 {
   std::vector<std::shared_ptr<EncoderMonitor>> sensors;

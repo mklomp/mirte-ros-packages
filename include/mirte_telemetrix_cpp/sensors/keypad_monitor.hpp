@@ -10,7 +10,7 @@
 
 class KeypadMonitor : public Mirte_Sensor {
 public:
-  KeypadMonitor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+  KeypadMonitor(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
                 std::shared_ptr<Mirte_Board> board,
                 KeypadData keypad_data);
   void publish();
@@ -29,6 +29,6 @@ public:
   std::string last_debounced_key;
 
   static std::vector<std::shared_ptr<KeypadMonitor>> get_keypad_monitors(
-      std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx,
+      std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
       std::shared_ptr<Mirte_Board> board, std::shared_ptr<Parser> parser);
 };

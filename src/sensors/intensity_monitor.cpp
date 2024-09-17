@@ -9,14 +9,14 @@
 #include <mirte_msgs/msg/intensity_digital.hpp>
 
 IntensityMonitor::IntensityMonitor(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   std::vector<pin_t> pins, IntensityData intensity_data)
 : Mirte_Sensor(nh, tmx, board, pins, (SensorData)intensity_data), intensity_data(intensity_data)
 {
 }
 
 std::vector<std::shared_ptr<IntensityMonitor>> IntensityMonitor::get_intensity_monitors(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   std::shared_ptr<Parser> parser)
 {
   std::vector<std::shared_ptr<IntensityMonitor>> sensors;
@@ -51,7 +51,7 @@ void DigitalIntensityMonitor::publish()
 }
 
 DigitalIntensityMonitor::DigitalIntensityMonitor(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   IntensityData intensity_data)
 : IntensityMonitor(nh, tmx, board, {intensity_data.d_pin}, intensity_data)
 {
@@ -64,13 +64,13 @@ DigitalIntensityMonitor::DigitalIntensityMonitor(
       &DigitalIntensityMonitor::service_callback, this, std::placeholders::_1,
       std::placeholders::_2));
 
-  tmx->setPinMode(intensity_data.d_pin, TMX::PIN_MODES::DIGITAL_INPUT, true, 0);
+  tmx->setPinMode(intensity_data.d_pin, tmx_cpp::TMX::PIN_MODES::DIGITAL_INPUT, true, 0);
   tmx->add_digital_callback(
     intensity_data.d_pin, [this](auto pin, auto value) { this->callback(value); });
 }
 
 AnalogIntensityMonitor::AnalogIntensityMonitor(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   IntensityData intensity_data)
 : IntensityMonitor(nh, tmx, board, {intensity_data.a_pin}, intensity_data)
 {
@@ -82,7 +82,7 @@ AnalogIntensityMonitor::AnalogIntensityMonitor(
                                               &AnalogIntensityMonitor::service_callback, this,
                                               std::placeholders::_1, std::placeholders::_2));
 
-  tmx->setPinMode(intensity_data.a_pin, TMX::PIN_MODES::ANALOG_INPUT, true, 0);
+  tmx->setPinMode(intensity_data.a_pin, tmx_cpp::TMX::PIN_MODES::ANALOG_INPUT, true, 0);
   tmx->add_analog_callback(
     intensity_data.a_pin, [this](auto pin, auto value) { this->callback(value); });
 }

@@ -8,7 +8,7 @@
 #include <mirte_msgs/srv/get_keypad.hpp>
 
 std::vector<std::shared_ptr<KeypadMonitor>> KeypadMonitor::get_keypad_monitors(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   std::shared_ptr<Parser> parser)
 {
   std::vector<std::shared_ptr<KeypadMonitor>> sensors;
@@ -23,7 +23,7 @@ std::vector<std::shared_ptr<KeypadMonitor>> KeypadMonitor::get_keypad_monitors(
 }
 
 KeypadMonitor::KeypadMonitor(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
   KeypadData keypad_data)
 : Mirte_Sensor(nh, tmx, board, {keypad_data.pin}, (SensorData)keypad_data), keypad_data(keypad_data)
 {
@@ -35,7 +35,7 @@ KeypadMonitor::KeypadMonitor(
     keypad_data.name + "_get",
     std::bind(&KeypadMonitor::keypad_callback, this, std::placeholders::_1, std::placeholders::_2));
 
-  tmx->setPinMode(keypad_data.pin, TMX::PIN_MODES::ANALOG_INPUT, true, 0);
+  tmx->setPinMode(keypad_data.pin, tmx_cpp::TMX::PIN_MODES::ANALOG_INPUT, true, 0);
   tmx->add_analog_callback(
     keypad_data.pin, [this](auto pin, auto value) { this->callback(value); });
 }

@@ -15,7 +15,7 @@
 class Mirte_Sensor
 {
 public:
-  std::shared_ptr<TMX> tmx;
+  std::shared_ptr<tmx_cpp::TMX> tmx;
   std::shared_ptr<rclcpp::Node> nh;
   std::shared_ptr<Mirte_Board> board;
   std::vector<uint8_t> pins;
@@ -33,11 +33,11 @@ public:
     return header;
   }
   Mirte_Sensor(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
     std::vector<uint8_t> pins, SensorData data);
 
   Mirte_Sensor(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
     std::vector<uint8_t> pins, std::string name);
 };
 
