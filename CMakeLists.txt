@@ -75,7 +75,10 @@ add_executable(
   src/sensors/intensity_monitor.cpp
   src/sensors/keypad_monitor.cpp
   src/sensors/sonar_monitor.cpp
-  src/modules/base_module.cpp)
+  src/modules/base_module.cpp
+  src/modules/pca_module.cpp
+  src/modules/ina226_module.cpp
+  src/modules/hiwonder_module.cpp)
 ament_target_dependencies(
   ${PROJECT_NAME}_node std_msgs std_srvs mirte_msgs rclcpp rcpputils sensor_msgs # DEPENDS
                                                               # system_lib
