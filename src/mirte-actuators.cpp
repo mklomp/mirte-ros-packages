@@ -1,19 +1,15 @@
-#include "mirte_telemetrix_cpp/mirte-actuators.hpp"
+#include <mirte_telemetrix_cpp/mirte-actuators.hpp>
 #include <tmx_cpp/tmx.hpp>
 
-Mirte_Actuators::Mirte_Actuators(std::shared_ptr<rclcpp::Node> nh,
-                                 std::shared_ptr<TMX> tmx,
-                                 std::shared_ptr<Mirte_Board> board,
-                                 std::shared_ptr<Parser> parser) {
-  this->tmx = tmx;
-  this->nh = nh;
-  this->board = board;
-
+Mirte_Actuators::Mirte_Actuators(
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::shared_ptr<Parser> parser)
+: nh(nh), tmx(tmx), board(board)
+{
   this->set_pin_value_service = nh->create_service<mirte_msgs::srv::SetPinValue>(
-    "set_pin_value",
-    std::bind(&Mirte_Actuators::set_pin_value_service_callback, this, std::placeholders::_1,
-              std::placeholders::_2)
-    );
+    "set_pin_value", std::bind(
+                       &Mirte_Actuators::set_pin_value_service_callback, this,
+                       std::placeholders::_1, std::placeholders::_2));
 
   this->actuators = Motor::get_motors(nh, tmx, board, parser);
   // WIP:
@@ -25,8 +21,9 @@ Mirte_Actuators::Mirte_Actuators(std::shared_ptr<rclcpp::Node> nh,
 }
 
 void Mirte_Actuators::set_pin_value_service_callback(
-    const mirte_msgs::srv::SetPinValue::Request::ConstSharedPtr req,
-    mirte_msgs::srv::SetPinValue::Response::SharedPtr res) {
+  const mirte_msgs::srv::SetPinValue::Request::ConstSharedPtr req,
+  mirte_msgs::srv::SetPinValue::Response::SharedPtr res)
+{
   bool is_digital = starts_with(req->type, "d") || starts_with(req->type, "D");
   auto pin = this->board->resolvePin(req->pin);
 
@@ -42,13 +39,9 @@ void Mirte_Actuators::set_pin_value_service_callback(
   res->status = true;
 }
 
-Mirte_Actuator::Mirte_Actuator(std::shared_ptr<rclcpp::Node> nh,
-                               std::shared_ptr<TMX> tmx,
-                               std::shared_ptr<Mirte_Board> board,
-                               std::vector<pin_t> pins, std::string name) {
-  this->tmx = tmx;
-  this->nh = nh;
-  this->board = board;
-  this->pins = pins;
-  this->name = name;
+Mirte_Actuator::Mirte_Actuator(
+  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<TMX> tmx, std::shared_ptr<Mirte_Board> board,
+  std::vector<pin_t> pins, std::string name)
+: nh(nh), tmx(tmx), board(board), pins(pins), name(name)
+{
 }

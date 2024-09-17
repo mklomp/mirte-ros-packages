@@ -14,11 +14,13 @@ set(CMAKE_CXX_STANDARD 20)
 # REQUIRED COMPONENTS xyz) is used, also find other catkin packages
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rcpputils REQUIRED)
 find_package(mirte_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
+find_package(Boost REQUIRED COMPONENTS system thread)
 # ##############################################################################
 # Build ##
 # ##############################################################################
@@ -27,7 +29,7 @@ find_package(sensor_msgs REQUIRED)
 # listed before other locations
 add_subdirectory(libs/tmx-cpp)
 include_directories(include/ libs/tmx-cpp/include/
-                    libs/tmx-cpp/libs/async_serial/include/ ${catkin_INCLUDE_DIRS})
+                    libs/tmx-cpp/libs/async_serial/include/ ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 include(CheckIPOSupported)
 check_ipo_supported(RESULT supported OUTPUT error)
@@ -74,10 +76,9 @@ add_executable(
   src/sensors/keypad_monitor.cpp
   src/sensors/sonar_monitor.cpp)
 ament_target_dependencies(
-  ${PROJECT_NAME}_node std_msgs std_srvs mirte_msgs rclcpp sensor_msgs # DEPENDS
+  ${PROJECT_NAME}_node std_msgs std_srvs mirte_msgs rclcpp rcpputils sensor_msgs # DEPENDS
                                                               # system_lib
 )
-find_package(Boost REQUIRED COMPONENTS system thread)
 
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS}
 # ${catkin_EXPORTED_TARGETS} )
@@ -111,6 +112,7 @@ install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
+  set(ament_cmake_clang_format_CONFIG_FILE ${PROJECT_SOURCE_DIR}/.clang-format)
   ament_lint_auto_find_test_dependencies()
 endif()
 

@@ -6,11 +6,14 @@
   <maintainer email="tmxcpp@arend-jan.com">Arend-Jan van Hilten</maintainer> 
   <license>AGPL</license>
   
-  <exec_depend>rclpy</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>mirte_msgs</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+
   <depend>rclcpp</depend>
+  <depend>rcpputils</depend>
   <depend>boost</depend>
+  <depend>std_msgs</depend>
+  <depend>mirte_msgs</depend>
   <depend>sensor_msgs</depend>
 
   <!-- <test_depend>ament_copyright</test_depend>

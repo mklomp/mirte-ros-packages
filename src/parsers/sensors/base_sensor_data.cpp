@@ -1,3 +1,7 @@
+#include <boost/format.hpp>
+
+#include <rcpputils/asserts.hpp>
+
 #include <mirte_telemetrix_cpp/parsers/parsers.hpp>
 #include <mirte_telemetrix_cpp/parsers/sensors/base_sensor_data.hpp>
 
@@ -6,7 +10,12 @@ SensorData::SensorData(
   std::string sensor_type, std::map<std::string, rclcpp::ParameterValue> parameters)
 : name(name)
 {
-  if (parameters.count("name")) assert(this->name.compare(get_string(parameters["name"])) == 0);
+  if (parameters.count("name"))
+    rcpputils::require_true(
+      this->name.compare(get_string(parameters["name"])) == 0,
+      (boost::format("The optional name parameter does not match it's key. [ %1% != %2% ]") % name %
+       get_string(parameters["name"]))
+        .str());
 
   std::string frame_prefix =
     (parser->params.count("frame_prefix") && !get_string(parser->params["frame_prefix"]).empty())
