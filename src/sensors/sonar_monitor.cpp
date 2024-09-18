@@ -36,10 +36,10 @@ SonarMonitor::SonarMonitor(NodeData node_data, SonarData sonar_data)
 void SonarMonitor::callback(uint16_t value)
 {
   this->value = value;
-  this->publish();
+  this->update();
 }
 
-void SonarMonitor::publish()
+void SonarMonitor::update()
 {
   sensor_msgs::msg::Range msg;
   msg.header = this->get_header();

@@ -3,7 +3,7 @@
 KeypadData::KeypadData(
   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
   std::map<std::string, rclcpp::ParameterValue> parameters)
-: SensorData(parser, board, name, KeypadData::get_sensor_class(), parameters)
+: SensorData(parser, board, name, KeypadData::get_device_class(), parameters)
 {
   if (parameters.count("connector")) {
     auto connector = get_string(parameters["connector"]);

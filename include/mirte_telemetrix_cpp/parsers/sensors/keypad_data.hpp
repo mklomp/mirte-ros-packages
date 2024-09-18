@@ -13,5 +13,5 @@ public:
 
   bool check();
 
-  static std::string get_sensor_class() { return "keypad"; };
+  static std::string get_device_class() { return "keypad"; };
 };

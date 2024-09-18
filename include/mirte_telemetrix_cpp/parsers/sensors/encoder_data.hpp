@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mirte_telemetrix_cpp/parsers/sensors/sonar_data.hpp>
+#include <mirte_telemetrix_cpp/parsers/sensors/base_sensor_data.hpp>
 
 class EncoderData : public SensorData
 {
@@ -14,5 +14,5 @@ public:
 
   bool check();
 
-  static std::string get_sensor_class() { return "encoder"; }
+  static std::string get_device_class() { return "encoder"; }
 };

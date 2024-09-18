@@ -6,8 +6,8 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <mirte_telemetrix_cpp/mirte-board.hpp>
+#include <mirte_telemetrix_cpp/device.hpp>
 #include <mirte_telemetrix_cpp/node_data.hpp>
-#include <mirte_telemetrix_cpp/parsers/actuators.hpp>
 #include <tmx_cpp/tmx.hpp>
 
 #include <mirte_msgs/srv/set_pin_value.hpp>
@@ -33,21 +33,9 @@ private:
     mirte_msgs::srv::SetPinValue::Response::SharedPtr res);
 };
 
-class Mirte_Actuator
+class Mirte_Actuator: public TelemetrixDevice
 {
 public:
-  std::shared_ptr<tmx_cpp::TMX> tmx;
-  std::shared_ptr<rclcpp::Node> nh;
-  std::shared_ptr<Mirte_Board> board;
-  std::vector<pin_t> pins;
-  std::string name;
-  auto get_header()
-  {
-    std_msgs::msg::Header header;
-    header.stamp = nh->now();
-
-    return header;
-  }
-  Mirte_Actuator(NodeData node_data, std::vector<pin_t> pins, std::string name);
+  Mirte_Actuator(NodeData node_data, std::vector<pin_t> pins, DeviceData data);
   virtual ~Mirte_Actuator() {}
 };

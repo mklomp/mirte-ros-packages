@@ -15,7 +15,7 @@ class IntensityMonitor : public Mirte_Sensor
 public:
   IntensityMonitor(NodeData node_data, std::vector<pin_t> pins, IntensityData intensity_data);
 
-  virtual void publish() = 0;
+  virtual void update() = 0;
 
   static std::vector<std::shared_ptr<IntensityMonitor>> get_intensity_monitors(
     NodeData node_data, std::shared_ptr<Parser> parser);
@@ -27,7 +27,7 @@ class DigitalIntensityMonitor : public IntensityMonitor
 {
 public:
   DigitalIntensityMonitor(NodeData node_data, IntensityData intensity_data);
-  void publish();
+  void update();
   void callback(uint16_t value);
   bool value;
 
@@ -43,7 +43,7 @@ class AnalogIntensityMonitor : public IntensityMonitor
 {
 public:
   AnalogIntensityMonitor(NodeData node_data, IntensityData intensity_data);
-  void publish();
+  void update();
   void callback(uint16_t value);
   uint16_t value;
 

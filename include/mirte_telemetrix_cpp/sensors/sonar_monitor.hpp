@@ -13,7 +13,7 @@ class SonarMonitor : public Mirte_Sensor
 public:
   SonarMonitor(NodeData node_data, SonarData sonar_data);
 
-  void publish();
+  void update();
 
   SonarData sonar_data;
   std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Range>> sonar_pub;

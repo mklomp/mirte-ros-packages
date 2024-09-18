@@ -4,8 +4,7 @@
 #include <mirte_telemetrix_cpp/actuators/motor.hpp>
 #include <mirte_telemetrix_cpp/actuators/servo.hpp>
 
-Mirte_Actuators::Mirte_Actuators(
-  NodeData node_data, std::shared_ptr<Parser> parser)
+Mirte_Actuators::Mirte_Actuators(NodeData node_data, std::shared_ptr<Parser> parser)
 : nh(node_data.nh), tmx(node_data.tmx), board(node_data.board)
 {
   this->set_pin_value_service = nh->create_service<mirte_msgs::srv::SetPinValue>(
@@ -41,9 +40,7 @@ void Mirte_Actuators::set_pin_value_service_callback(
   res->status = true;
 }
 
-Mirte_Actuator::Mirte_Actuator(
-  NodeData node_data,
-  std::vector<pin_t> pins, std::string name)
-: nh(node_data.nh), tmx(node_data.tmx), board(node_data.board), pins(pins), name(name)
+Mirte_Actuator::Mirte_Actuator(NodeData node_data, std::vector<pin_t> pins, DeviceData data)
+: TelemetrixDevice(node_data, pins, data)
 {
 }

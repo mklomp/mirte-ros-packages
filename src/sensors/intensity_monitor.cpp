@@ -35,10 +35,10 @@ std::vector<std::shared_ptr<IntensityMonitor>> IntensityMonitor::get_intensity_m
 void DigitalIntensityMonitor::callback(uint16_t value)
 {
   this->value = value;
-  this->publish();
+  this->update();
 }
 
-void DigitalIntensityMonitor::publish()
+void DigitalIntensityMonitor::update()
 {
   mirte_msgs::msg::IntensityDigital msg;
 
@@ -84,10 +84,10 @@ AnalogIntensityMonitor::AnalogIntensityMonitor(NodeData node_data, IntensityData
 void AnalogIntensityMonitor::callback(uint16_t value)
 {
   this->value = value;
-  this->publish();
+  this->update();
 }
 
-void AnalogIntensityMonitor::publish()
+void AnalogIntensityMonitor::update()
 {
   mirte_msgs::msg::Intensity msg;
 

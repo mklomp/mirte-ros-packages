@@ -22,7 +22,7 @@ Mirte_Sensors::Mirte_Sensors(NodeData node_data, std::shared_ptr<Parser> parser)
 
   this->timer = nh->create_wall_timer(
     std::chrono::milliseconds(1000 / parser->get_frequency()),
-    std::bind(&Mirte_Sensors::publish, this));
+    std::bind(&Mirte_Sensors::update, this));
 
   this->pin_service = nh->create_service<mirte_msgs::srv::GetPinValue>(
     "get_pin_value",
@@ -93,10 +93,10 @@ bool Mirte_Sensors::pin_callback(
   return false;
 }
 
-void Mirte_Sensors::publish()
+void Mirte_Sensors::update()
 {
   for (auto sensor : this->sensors) {
-    sensor->publish();
+    sensor->update();
   }
 }
 

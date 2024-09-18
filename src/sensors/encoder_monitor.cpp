@@ -22,10 +22,10 @@ EncoderMonitor::EncoderMonitor(NodeData node_data, EncoderData encoder_data)
 void EncoderMonitor::callback(int16_t value)
 {
   value += value;
-  publish();
+  update();
 }
 
-void EncoderMonitor::publish()
+void EncoderMonitor::update()
 {
   mirte_msgs::msg::Encoder msg;
 

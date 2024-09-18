@@ -19,7 +19,7 @@ public:
   std::shared_ptr<tmx_cpp::INA226_module> ina226;
 
   void data_cb(float voltage, float current);
-  void publish();
+  void update();
   float calc_soc(float voltage);
   void integrate_usage(float current);
   void check_soc(float voltage, float current);

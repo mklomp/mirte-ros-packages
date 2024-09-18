@@ -19,7 +19,7 @@ public:
 
   bool check();
 
-  static std::string get_sensor_class() { return "distance"; };
+  static std::string get_device_class() { return "distance"; };
 };
 
 // std::vector<SonarData> parse_sonars(

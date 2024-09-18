@@ -21,8 +21,7 @@ std::vector<std::shared_ptr<KeypadMonitor>> KeypadMonitor::get_keypad_monitors(
   // TODO: schedule periodic publishing
 }
 
-KeypadMonitor::KeypadMonitor(
-  NodeData node_data, KeypadData keypad_data)
+KeypadMonitor::KeypadMonitor(NodeData node_data, KeypadData keypad_data)
 : Mirte_Sensor(node_data, {keypad_data.pin}, (SensorData)keypad_data), keypad_data(keypad_data)
 {
   keypad_pub = nh->create_publisher<mirte_msgs::msg::Keypad>("keypad/" + keypad_data.name, 1);
@@ -41,7 +40,7 @@ KeypadMonitor::KeypadMonitor(
 void KeypadMonitor::callback(uint16_t value)
 {
   this->value = value;
-  this->publish();
+  this->update();
 }
 
 bool KeypadMonitor::keypad_callback(
@@ -52,7 +51,7 @@ bool KeypadMonitor::keypad_callback(
   return true;
 }
 
-void KeypadMonitor::publish()
+void KeypadMonitor::update()
 {
   auto header = get_header();
 
