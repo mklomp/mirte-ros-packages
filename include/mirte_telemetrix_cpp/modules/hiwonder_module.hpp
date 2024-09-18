@@ -17,8 +17,7 @@ class Hiwonder_bus_module : public Mirte_module
 {
 public:
   Hiwonder_bus_module(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
-    std::shared_ptr<Mirte_Board> board, std::string name, std::shared_ptr<tmx_cpp::Modules> modules,
+    NodeData node_data, std::string name, std::shared_ptr<tmx_cpp::Modules> modules,
     std::shared_ptr<Hiwonder_bus_data> bus_data);
   std::shared_ptr<tmx_cpp::HiwonderServo_module> bus;
   std::vector<std::shared_ptr<Hiwonder_servo>> servos;
@@ -28,9 +27,7 @@ public:
   static std::vector<std::shared_ptr<Hiwonder_bus_module>>
 
   get_hiwonder_modules(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
-    std::shared_ptr<Mirte_Board> board, std::shared_ptr<Parser> parser,
-    std::shared_ptr<tmx_cpp::Modules> modules);
+    NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Modules> modules);
 
   void position_cb(std::vector<tmx_cpp::HiwonderServo_module::Servo_pos>);
   void verify_cb(int, bool);

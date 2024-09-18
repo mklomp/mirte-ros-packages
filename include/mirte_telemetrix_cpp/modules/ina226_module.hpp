@@ -13,8 +13,7 @@ class INA226_sensor : public Mirte_module
 {
 public:
   INA226_sensor(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
-    std::shared_ptr<Mirte_Board> board, std::string name, std::shared_ptr<tmx_cpp::Sensors> modules,
+    NodeData node_data, std::string name, std::shared_ptr<tmx_cpp::Sensors> modules,
     std::shared_ptr<INA226_data> ina_data);
   std::shared_ptr<INA226_data> ina_data;
   std::shared_ptr<tmx_cpp::INA226_module> ina226;
@@ -29,9 +28,7 @@ public:
     const std::shared_ptr<std_srvs::srv::SetBool::Request> req,
     std::shared_ptr<std_srvs::srv::SetBool::Response> res);
   static std::vector<std::shared_ptr<INA226_sensor>> get_ina_modules(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
-    std::shared_ptr<Mirte_Board> board, std::shared_ptr<Parser> parser,
-    std::shared_ptr<tmx_cpp::Sensors> sensors);
+    NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Sensors> sensors);
 
 private:
   float total_used_mAh = 0;

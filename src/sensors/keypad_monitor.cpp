@@ -8,14 +8,13 @@
 #include <mirte_msgs/srv/get_keypad.hpp>
 
 std::vector<std::shared_ptr<KeypadMonitor>> KeypadMonitor::get_keypad_monitors(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-  std::shared_ptr<Parser> parser)
+  NodeData node_data, std::shared_ptr<Parser> parser)
 {
   std::vector<std::shared_ptr<KeypadMonitor>> sensors;
-  auto keypads = parse_all<KeypadData>(parser, board);
-  
+  auto keypads = parse_all<KeypadData>(parser, node_data.board);
+
   for (auto keypad : keypads) {
-    sensors.push_back(std::make_shared<KeypadMonitor>(nh, tmx, board, keypad));
+    sensors.push_back(std::make_shared<KeypadMonitor>(node_data, keypad));
     std::cout << "Add Keypad: " << keypad.name << std::endl;
   }
   return sensors;
@@ -23,9 +22,8 @@ std::vector<std::shared_ptr<KeypadMonitor>> KeypadMonitor::get_keypad_monitors(
 }
 
 KeypadMonitor::KeypadMonitor(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-  KeypadData keypad_data)
-: Mirte_Sensor(nh, tmx, board, {keypad_data.pin}, (SensorData)keypad_data), keypad_data(keypad_data)
+  NodeData node_data, KeypadData keypad_data)
+: Mirte_Sensor(node_data, {keypad_data.pin}, (SensorData)keypad_data), keypad_data(keypad_data)
 {
   keypad_pub = nh->create_publisher<mirte_msgs::msg::Keypad>("keypad/" + keypad_data.name, 1);
   keypad_pressed_pub =

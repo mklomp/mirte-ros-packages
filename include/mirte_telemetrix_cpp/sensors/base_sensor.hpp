@@ -5,6 +5,7 @@
 
 #include <tmx_cpp/tmx.hpp>
 
+#include <mirte_telemetrix_cpp/node_data.hpp>
 #include <mirte_telemetrix_cpp/mirte-board.hpp>
 #include <mirte_telemetrix_cpp/parsers/sensors/base_sensor_data.hpp>
 
@@ -32,13 +33,7 @@ public:
 
     return header;
   }
-  Mirte_Sensor(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-    std::vector<uint8_t> pins, SensorData data);
-
-  Mirte_Sensor(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-    std::vector<uint8_t> pins, std::string name);
+  Mirte_Sensor(NodeData node_data, std::vector<uint8_t> pins, SensorData data);
 };
 
 // }  // namespace mirte_telemetrix_cpp

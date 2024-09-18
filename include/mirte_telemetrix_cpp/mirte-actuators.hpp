@@ -6,6 +6,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <mirte_telemetrix_cpp/mirte-board.hpp>
+#include <mirte_telemetrix_cpp/node_data.hpp>
 #include <mirte_telemetrix_cpp/parsers/actuators.hpp>
 #include <tmx_cpp/tmx.hpp>
 
@@ -17,9 +18,8 @@ class Mirte_Actuator;
 class Mirte_Actuators
 {
 public:
-  Mirte_Actuators(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-    std::shared_ptr<Parser> parser);
+  Mirte_Actuators(NodeData data, std::shared_ptr<Parser> parser);
+
   std::shared_ptr<tmx_cpp::TMX> tmx;
   std::shared_ptr<rclcpp::Node> nh;
   std::shared_ptr<Mirte_Board> board;
@@ -48,11 +48,6 @@ public:
 
     return header;
   }
-  Mirte_Actuator(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-    std::vector<pin_t> pins, std::string name);
+  Mirte_Actuator(NodeData node_data, std::vector<pin_t> pins, std::string name);
   virtual ~Mirte_Actuator() {}
 };
-
-#include <mirte_telemetrix_cpp/actuators/motor.hpp>
-#include <mirte_telemetrix_cpp/actuators/servo.hpp>

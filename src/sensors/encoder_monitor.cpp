@@ -5,10 +5,8 @@
 #include <mirte_msgs/msg/encoder.hpp>
 #include <mirte_msgs/srv/get_encoder.hpp>
 
-EncoderMonitor::EncoderMonitor(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-  EncoderData encoder_data)
-: Mirte_Sensor(nh, tmx, board, {encoder_data.pinA, encoder_data.pinB}, (SensorData)encoder_data),
+EncoderMonitor::EncoderMonitor(NodeData node_data, EncoderData encoder_data)
+: Mirte_Sensor(node_data, {encoder_data.pinA, encoder_data.pinB}, (SensorData)encoder_data),
   encoder_data(encoder_data)
 {
   encoder_pub = nh->create_publisher<mirte_msgs::msg::Encoder>("encoder/" + encoder_data.name, 1);
@@ -46,13 +44,12 @@ bool EncoderMonitor::service_callback(
 }
 
 std::vector<std::shared_ptr<EncoderMonitor>> EncoderMonitor::get_encoder_monitors(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-  std::shared_ptr<Parser> parser)
+  NodeData node_data, std::shared_ptr<Parser> parser)
 {
   std::vector<std::shared_ptr<EncoderMonitor>> sensors;
-  auto encoders = parse_all<EncoderData>(parser, board);
+  auto encoders = parse_all<EncoderData>(parser, node_data.board);
   for (auto encoder : encoders) {
-    sensors.push_back(std::make_shared<EncoderMonitor>(nh, tmx, board, encoder));
+    sensors.push_back(std::make_shared<EncoderMonitor>(node_data, encoder));
     std::cout << "Add Encoder: " << encoder.name << std::endl;
   }
   return sensors;

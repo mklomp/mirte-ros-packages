@@ -2,13 +2,12 @@
 
 #include <mirte_telemetrix_cpp/modules/ina226_module.hpp>
 
-using namespace std::placeholders; // for _1, _2, _3...
+using namespace std::placeholders;  // for _1, _2, _3...
 
 INA226_sensor::INA226_sensor(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
-  std::shared_ptr<Mirte_Board> board, std::string name, std::shared_ptr<tmx_cpp::Sensors> modules,
+  NodeData node_data, std::string name, std::shared_ptr<tmx_cpp::Sensors> modules,
   std::shared_ptr<INA226_data> ina_data)
-: Mirte_module(nh, tmx, board, name)
+: Mirte_module(node_data, name)
 {
   tmx->setI2CPins(ina_data->scl, ina_data->sda, ina_data->port);
 
@@ -145,15 +144,13 @@ void INA226_sensor::shutdown_robot_cb(
 }
 
 std::vector<std::shared_ptr<INA226_sensor>> INA226_sensor::get_ina_modules(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
-  std::shared_ptr<Mirte_Board> board, std::shared_ptr<Parser> parser,
-  std::shared_ptr<tmx_cpp::Sensors> modules)
+  NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Sensors> modules)
 {
   std::vector<std::shared_ptr<INA226_sensor>> pca_modules;
-  auto pca_data = INA226_data::parse_ina226_data(parser, board);
+  auto pca_data = INA226_data::parse_ina226_data(parser, node_data.board);
   for (auto pca : pca_data) {
     std::cout << "ina data" << pca->name << std::endl;
-    auto pca_module = std::make_shared<INA226_sensor>(nh, tmx, board, pca->name, modules, pca);
+    auto pca_module = std::make_shared<INA226_sensor>(node_data, pca->name, modules, pca);
     pca_modules.push_back(pca_module);
   }
   return pca_modules;

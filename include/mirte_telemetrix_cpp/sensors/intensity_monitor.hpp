@@ -13,15 +13,12 @@
 class IntensityMonitor : public Mirte_Sensor
 {
 public:
-  IntensityMonitor(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-    std::vector<pin_t> pins, IntensityData intensity_data);
+  IntensityMonitor(NodeData node_data, std::vector<pin_t> pins, IntensityData intensity_data);
 
   virtual void publish() = 0;
 
   static std::vector<std::shared_ptr<IntensityMonitor>> get_intensity_monitors(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-    std::shared_ptr<Parser> parser);
+    NodeData node_data, std::shared_ptr<Parser> parser);
 
   IntensityData intensity_data;
 };
@@ -29,9 +26,7 @@ public:
 class DigitalIntensityMonitor : public IntensityMonitor
 {
 public:
-  DigitalIntensityMonitor(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-    IntensityData intensity_data);
+  DigitalIntensityMonitor(NodeData node_data, IntensityData intensity_data);
   void publish();
   void callback(uint16_t value);
   bool value;
@@ -47,9 +42,7 @@ public:
 class AnalogIntensityMonitor : public IntensityMonitor
 {
 public:
-  AnalogIntensityMonitor(
-    std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-    IntensityData intensity_data);
+  AnalogIntensityMonitor(NodeData node_data, IntensityData intensity_data);
   void publish();
   void callback(uint16_t value);
   uint16_t value;

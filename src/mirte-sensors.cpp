@@ -5,21 +5,19 @@
 #include <mirte_telemetrix_cpp/sensors/keypad_monitor.hpp>
 #include <mirte_telemetrix_cpp/sensors/sonar_monitor.hpp>
 
-Mirte_Sensors::Mirte_Sensors(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-  std::shared_ptr<Parser> parser)
-: nh(nh), tmx(tmx), board(board)
+Mirte_Sensors::Mirte_Sensors(NodeData node_data, std::shared_ptr<Parser> parser)
+: nh(node_data.nh), tmx(node_data.tmx), board(node_data.board)
 {
-  auto keypads = KeypadMonitor::get_keypad_monitors(nh, tmx, board, parser);
+  auto keypads = KeypadMonitor::get_keypad_monitors(node_data, parser);
   this->sensors.insert(this->sensors.end(), keypads.begin(), keypads.end());
 
-  auto sonars = SonarMonitor::get_sonar_monitors(nh, tmx, board, parser);
+  auto sonars = SonarMonitor::get_sonar_monitors(node_data, parser);
   this->sensors.insert(this->sensors.end(), sonars.begin(), sonars.end());
 
-  auto irs = IntensityMonitor::get_intensity_monitors(nh, tmx, board, parser);
+  auto irs = IntensityMonitor::get_intensity_monitors(node_data, parser);
   this->sensors.insert(this->sensors.end(), irs.begin(), irs.end());
 
-  auto encoders = EncoderMonitor::get_encoder_monitors(nh, tmx, board, parser);
+  auto encoders = EncoderMonitor::get_encoder_monitors(node_data, parser);
   this->sensors.insert(this->sensors.end(), encoders.begin(), encoders.end());
 
   this->timer = nh->create_wall_timer(

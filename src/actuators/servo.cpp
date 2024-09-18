@@ -12,9 +12,9 @@
 
 #include "mirte_telemetrix_cpp/mirte-actuators.hpp"
 
-Servo::Servo(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
+Servo::Servo(NodeData node_data,
              std::shared_ptr<Servo_data> servo_data)
-  : Mirte_Actuator(nh, tmx, board, { servo_data->pin }, servo_data->name), data(servo_data)
+  : Mirte_Actuator(node_data, { servo_data->pin }, servo_data->name), data(servo_data)
 {
   this->set_angle_service = nh->create_service<mirte_msgs::srv::SetServoAngle>(
       "set_" + name + "_servo_angle",
@@ -66,18 +66,16 @@ Servo::~Servo()
   tmx->detach_servo(data->pin);
 }
 
-std::vector<std::shared_ptr<Mirte_Actuator>> Servo::get_servos(std::shared_ptr<rclcpp::Node> nh,
-                                                                      std::shared_ptr<tmx_cpp::TMX> tmx,
-                                                                      std::shared_ptr<Mirte_Board> board,
+std::vector<std::shared_ptr<Mirte_Actuator>> Servo::get_servos(NodeData node_data,
                                                                       std::shared_ptr<Parser> parser)
 {
   std::vector<std::shared_ptr<Mirte_Actuator>> servos;
-  auto servo_datas = Servo_data::parse_servo_data(parser, board);
+  auto servo_datas = Servo_data::parse_servo_data(parser, node_data.board);
   for (auto servo_data : servo_datas)
   {
     if (servo_data->check())
     {
-      auto servo = std::make_shared<Servo>(nh, tmx, board, servo_data);
+      auto servo = std::make_shared<Servo>(node_data, servo_data);
       servos.push_back(servo);
     }
   }

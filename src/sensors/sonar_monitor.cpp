@@ -8,22 +8,19 @@
 #include <sensor_msgs/msg/range.hpp>
 
 std::vector<std::shared_ptr<SonarMonitor>> SonarMonitor::get_sonar_monitors(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-  std::shared_ptr<Parser> parser)
+  NodeData node_data, std::shared_ptr<Parser> parser)
 {
   std::vector<std::shared_ptr<SonarMonitor>> sensors;
-  auto sonars = parse_all<SonarData>(parser, board);
+  auto sonars = parse_all<SonarData>(parser, node_data.board);
   for (auto sonar : sonars) {
-    sensors.push_back(std::make_shared<SonarMonitor>(nh, tmx, board, sonar));
+    sensors.push_back(std::make_shared<SonarMonitor>(node_data, sonar));
     std::cout << "Add Sonar: " << sonar.name << std::endl;
   }
   return sensors;
 }
 
-SonarMonitor::SonarMonitor(
-  std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx, std::shared_ptr<Mirte_Board> board,
-  SonarData sonar_data)
-: Mirte_Sensor(nh, tmx, board, {sonar_data.trigger, sonar_data.echo}, (SensorData)sonar_data),
+SonarMonitor::SonarMonitor(NodeData node_data, SonarData sonar_data)
+: Mirte_Sensor(node_data, {sonar_data.trigger, sonar_data.echo}, (SensorData)sonar_data),
   sonar_data(sonar_data)
 {
   sonar_pub = nh->create_publisher<sensor_msgs::msg::Range>("distance/" + sonar_data.name, 1);

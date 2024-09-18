@@ -8,8 +8,7 @@
 
 class Mirte_Sensors {
 public:
-  Mirte_Sensors(std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
-                std::shared_ptr<Mirte_Board> board,
+  Mirte_Sensors(NodeData node_data,
                 std::shared_ptr<Parser> parser);
   std::shared_ptr<tmx_cpp::TMX> tmx;
   std::shared_ptr<rclcpp::Node> nh;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <concepts>
-#include <exception>
 #include <map>
 #include <string>
 
@@ -25,6 +24,8 @@ public:
 
   bool check();
 
+  /// @brief Get the sensor class of this type. So 'distance' for sonars and 'keypad' for keypads, etc.
+  /// @return The sensor class string
   static std::string get_sensor_class() { return "no_type"; }
 };
 
