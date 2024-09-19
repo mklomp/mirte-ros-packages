@@ -3,7 +3,7 @@
 #include <tmx_cpp/sensors/INA226.hpp>
 
 #include <mirte_telemetrix_cpp/modules/base_module.hpp>
-#include <mirte_telemetrix_cpp/parsers/p_modules.hpp>
+#include <mirte_telemetrix_cpp/parsers/modules/ina226_data.hpp>
 
 #include <sensor_msgs/msg/battery_state.hpp>
 #include <std_msgs/msg/int32.hpp>
@@ -12,21 +12,24 @@
 class INA226_sensor : public Mirte_module
 {
 public:
-  INA226_sensor(
-    NodeData node_data, std::string name, std::shared_ptr<tmx_cpp::Sensors> modules,
-    std::shared_ptr<INA226_data> ina_data);
-  std::shared_ptr<INA226_data> ina_data;
+  INA226_sensor(NodeData node_data, INA226Data ina_data, std::shared_ptr<tmx_cpp::Sensors> modules);
+
+  INA226Data ina_data;
   std::shared_ptr<tmx_cpp::INA226_module> ina226;
 
+  // virtual void update() override;
+
   void data_cb(float voltage, float current);
-  void update();
+
   float calc_soc(float voltage);
   void integrate_usage(float current);
   void check_soc(float voltage, float current);
+
   void shutdown_robot();
   void shutdown_robot_cb(
     const std::shared_ptr<std_srvs::srv::SetBool::Request> req,
     std::shared_ptr<std_srvs::srv::SetBool::Response> res);
+
   static std::vector<std::shared_ptr<INA226_sensor>> get_ina_modules(
     NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Sensors> sensors);
 

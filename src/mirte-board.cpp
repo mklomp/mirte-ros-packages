@@ -41,3 +41,11 @@ std::string get_string(rclcpp::ParameterValue param) {
     return rclcpp::to_string(param);
   }
 }
+
+float get_float(rclcpp::ParameterValue param) {
+  if (param.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE) {
+    return param.get<float>();
+  } else {
+    return std::stof(rclcpp::to_string(param));
+  }
+}

@@ -24,3 +24,6 @@ public:
 };
 
 std::string get_string(rclcpp::ParameterValue param);
+
+/// Convience function to read float parameters, will still work if parameter is actually an integer.
+float get_float(rclcpp::ParameterValue param);

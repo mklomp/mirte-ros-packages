@@ -19,9 +19,9 @@ ServoData::ServoData(
 
   if (parameters.count("max_pulse")) this->max_pulse = parameters["max_pulse"].get<int>();
 
-  if (parameters.count("min_angle")) this->min_angle = parameters["min_angle"].get<float>();
+  if (parameters.count("min_angle")) this->min_angle = get_float(parameters["min_angle"]);
 
-  if (parameters.count("max_angle")) this->max_angle = parameters["max_angle"].get<float>();
+  if (parameters.count("max_angle")) this->max_angle = get_float(parameters["max_angle"]);
 }
 
 bool ServoData::check() { return pin != (pin_t)-1 && DeviceData::check(); }

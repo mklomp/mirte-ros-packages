@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <functional>
 
 #include <mirte_telemetrix_cpp/modules/ina226_module.hpp>
@@ -5,23 +7,21 @@
 using namespace std::placeholders;  // for _1, _2, _3...
 
 INA226_sensor::INA226_sensor(
-  NodeData node_data, std::string name, std::shared_ptr<tmx_cpp::Sensors> modules,
-  std::shared_ptr<INA226_data> ina_data)
-: Mirte_module(node_data, name)
+  NodeData node_data, INA226Data ina_data, std::shared_ptr<tmx_cpp::Sensors> modules)
+: Mirte_module(node_data, {ina_data.scl, ina_data.sda}, (ModuleData)ina_data), ina_data(ina_data)
 {
-  tmx->setI2CPins(ina_data->scl, ina_data->sda, ina_data->port);
+  tmx->setI2CPins(ina_data.scl, ina_data.sda, ina_data.port);
 
-  this->ina_data = ina_data;
   this->used_time = nh->now();
   this->total_used_mAh = 0;
 
   this->ina226 = std::make_shared<tmx_cpp::INA226_module>(
-    ina_data->port, ina_data->addr, std::bind(&INA226_sensor::data_cb, this, _1, _2));
+    ina_data.port, ina_data.addr, std::bind(&INA226_sensor::data_cb, this, _1, _2));
   this->battery_pub =
-    nh->create_publisher<sensor_msgs::msg::BatteryState>("power/" + this->ina_data->name, 1);
+    nh->create_publisher<sensor_msgs::msg::BatteryState>("power/" + this->name, 1);
 
   this->used_pub =
-    nh->create_publisher<std_msgs::msg::Int32>("power/" + this->ina_data->name + "/used", 1);
+    nh->create_publisher<std_msgs::msg::Int32>("power/" + this->name + "/used", 1);
 
   this->shutdown_service = nh->create_service<std_srvs::srv::SetBool>(
     "shutdown", std::bind(&INA226_sensor::shutdown_robot_cb, this, _1, _2));
@@ -36,10 +36,10 @@ void INA226_sensor::data_cb(float voltage, float current)
 {
   // std::cout << "INA226 data: " << current << " " << voltage << std::endl;
   auto msg = sensor_msgs::msg::BatteryState();
+  msg.header = get_header();
+
   msg.voltage = voltage;
   msg.current = current;
-  msg.header.frame_id = this->ina_data->name;
-  msg.header.stamp = this->nh->now();
   msg.percentage = calc_soc(voltage);
   this->battery_pub->publish(msg);
   this->integrate_usage(current);
@@ -94,11 +94,11 @@ void INA226_sensor::check_soc(float voltage, float current)
   //  trigger voltage, then shut down
   // this makes sure that a short dip (motor start) does not trigger it
 
-  if (voltage != 0.1 && voltage < this->ina_data->min_voltage) {
+  if (voltage != 0.1 && voltage < this->ina_data.min_voltage) {
     if (!this->in_power_dip) {
       this->turn_off_trigger_time = this->nh->now();
       this->in_power_dip = true;
-      std::cout << "Triggering turn off in " << this->ina_data->power_low_time << "s" << std::endl;
+      std::cout << "Triggering turn off in " << this->ina_data.power_low_time << "s" << std::endl;
     }
   } else {
     this->in_power_dip = false;
@@ -109,9 +109,9 @@ void INA226_sensor::check_soc(float voltage, float current)
     auto current_time = this->nh->now();
     auto duration = current_time - this->turn_off_trigger_time;
     std::cout << "Triggering turn off maybe" << duration.seconds() << std::endl;
-    std::cout << "you have " << (this->ina_data->power_low_time - duration.seconds()) << "s left"
+    std::cout << "you have " << (this->ina_data.power_low_time - duration.seconds()) << "s left"
               << std::endl;
-    if (duration.seconds() > this->ina_data->power_low_time) {
+    if (duration.seconds() > this->ina_data.power_low_time) {
       std::cout << "Turning off" << std::endl;
       // this->tmx->shutdown();
       this->shutdown_robot();
@@ -147,10 +147,10 @@ std::vector<std::shared_ptr<INA226_sensor>> INA226_sensor::get_ina_modules(
   NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Sensors> modules)
 {
   std::vector<std::shared_ptr<INA226_sensor>> pca_modules;
-  auto pca_data = INA226_data::parse_ina226_data(parser, node_data.board);
+  auto pca_data = parse_all_modules<INA226Data>(parser, node_data.board);
   for (auto pca : pca_data) {
-    std::cout << "ina data" << pca->name << std::endl;
-    auto pca_module = std::make_shared<INA226_sensor>(node_data, pca->name, modules, pca);
+    std::cout << "ina data" << pca.name << std::endl;
+    auto pca_module = std::make_shared<INA226_sensor>(node_data, pca, modules);
     pca_modules.push_back(pca_module);
   }
   return pca_modules;

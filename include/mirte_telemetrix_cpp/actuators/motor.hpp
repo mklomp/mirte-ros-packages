@@ -11,7 +11,7 @@ class Motor : public Mirte_Actuator
 {
 public:
   Motor(
-    NodeData node_data, MotorData motor_data, std::vector<pin_t> pins);
+    NodeData node_data, std::vector<pin_t> pins, MotorData motor_data);
   
   rclcpp::Service<mirte_msgs::srv::SetMotorSpeed>::SharedPtr motor_service;
   

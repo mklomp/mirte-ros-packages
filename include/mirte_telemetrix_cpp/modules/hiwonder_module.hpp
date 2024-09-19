@@ -5,6 +5,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <mirte_telemetrix_cpp/modules/base_module.hpp>
+#include <mirte_telemetrix_cpp/parsers/modules/hiwonder_data.hpp>
 #include <mirte_telemetrix_cpp/parsers/p_modules.hpp>
 
 #include <mirte_msgs/msg/servo_position.hpp>
@@ -17,13 +18,13 @@ class Hiwonder_bus_module : public Mirte_module
 {
 public:
   Hiwonder_bus_module(
-    NodeData node_data, std::string name, std::shared_ptr<tmx_cpp::Modules> modules,
-    std::shared_ptr<Hiwonder_bus_data> bus_data);
+    NodeData node_data, HiWonderBusData bus_data,
+    std::shared_ptr<tmx_cpp::Modules> modules);
   std::shared_ptr<tmx_cpp::HiwonderServo_module> bus;
   std::vector<std::shared_ptr<Hiwonder_servo>> servos;
   //   std::vector<std::shared_ptr<PCA_Servo>> servos;
 
-  std::shared_ptr<Hiwonder_bus_data> bus_data;
+  HiWonderBusData bus_data;
   static std::vector<std::shared_ptr<Hiwonder_bus_module>>
 
   get_hiwonder_modules(

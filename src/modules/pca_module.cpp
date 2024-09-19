@@ -8,26 +8,25 @@ std::vector<std::shared_ptr<PCA_Module>> PCA_Module::get_pca_modules(
   NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Modules> modules)
 {
   std::vector<std::shared_ptr<PCA_Module>> pca_modules;
-  auto pca_data = PCA_data::parse_pca_data(parser, node_data.board);
+  auto pca_data = parse_all_modules<PCAData>(parser, node_data.board);
   for (auto pca : pca_data) {
-    auto pca_module = std::make_shared<PCA_Module>(node_data, pca->name, modules, pca);
+    auto pca_module = std::make_shared<PCA_Module>(node_data, pca, modules);
     pca_modules.push_back(pca_module);
   }
   return pca_modules;
 }
 
 PCA_Module::PCA_Module(
-  NodeData node_data, std::string name, std::shared_ptr<tmx_cpp::Modules> modules,
-  std::shared_ptr<PCA_data> pca_data)
-: Mirte_module(node_data, name)
+  NodeData node_data, PCAData pca_data, std::shared_ptr<tmx_cpp::Modules> modules)
+: Mirte_module(node_data, {pca_data.scl, pca_data.sda}, (ModuleData)pca_data)
 {
-  tmx->setI2CPins(pca_data->scl, pca_data->sda, pca_data->port);
+  tmx->setI2CPins(pca_data.scl, pca_data.sda, pca_data.port);
 
   this->pca9685 =
-    std::make_shared<tmx_cpp::PCA9685_module>(pca_data->port, pca_data->addr, pca_data->frequency);
+    std::make_shared<tmx_cpp::PCA9685_module>(pca_data.port, pca_data.addr, pca_data.frequency);
 
   modules->add_mod(pca9685);
-  for (auto motor : pca_data->motors) {
+  for (auto motor : pca_data.motors) {
     std::cout << "Adding PCA motor: " << motor->name << std::endl;
     this->motors.push_back(std::make_shared<PCA_Motor>(node_data, motor, pca9685));
   }

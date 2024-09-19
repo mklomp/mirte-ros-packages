@@ -13,9 +13,7 @@ class PCA_Motor;
 class PCA_Module : public Mirte_module
 {
 public:
-  PCA_Module(
-    NodeData node_data, std::string name, std::shared_ptr<tmx_cpp::Modules> modules,
-    std::shared_ptr<PCA_data> pca_data);
+  PCA_Module(NodeData node_data, PCAData pca_data, std::shared_ptr<tmx_cpp::Modules> modules);
   std::shared_ptr<tmx_cpp::PCA9685_module> pca9685;
   std::vector<std::shared_ptr<PCA_Motor>> motors;
 

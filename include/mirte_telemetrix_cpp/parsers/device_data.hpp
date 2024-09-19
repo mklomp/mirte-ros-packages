@@ -9,15 +9,19 @@
 #include <mirte_telemetrix_cpp/mirte-board.hpp>
 #include <mirte_telemetrix_cpp/parsers/parsers.hpp>
 
+// TODO: Wishlist: Add unused key warnings
+
 class DeviceData
 {
 public:
   std::string name = "";
   std::string frame_id = "";
 
-  DeviceData(
-    std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-    std::map<std::string, rclcpp::ParameterValue> parameters);
+  // TODO: REMOVE
+  // DeviceData(
+  //   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
+  //   std::map<std::string, rclcpp::ParameterValue> parameters);
+  
   DeviceData(
     std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
     std::string device_type, std::map<std::string, rclcpp::ParameterValue> parameters);

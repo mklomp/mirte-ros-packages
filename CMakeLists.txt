@@ -73,6 +73,10 @@ add_executable(
   src/parsers/sensors/intensity_data.cpp
   src/parsers/sensors/sonar_data.cpp
   src/parsers/sensors/keypad_data.cpp
+  src/parsers/modules/module_data.cpp
+  src/parsers/modules/i2c_module_data.cpp
+  src/parsers/modules/ina226_data.cpp
+  src/parsers/modules/hiwonder_data.cpp
   src/parsers/modules/pca_data.cpp
   src/sensors/base_sensor.cpp
   src/sensors/encoder_monitor.cpp

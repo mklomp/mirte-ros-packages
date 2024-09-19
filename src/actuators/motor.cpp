@@ -39,7 +39,7 @@ bool Motor::service_callback(
 
 void Motor::motor_callback(const std_msgs::msg::Int32 & msg) { this->set_speed(msg.data); }
 
-Motor::Motor(NodeData node_data, MotorData motor_data, std::vector<pin_t> pins)
+Motor::Motor(NodeData node_data, std::vector<pin_t> pins, MotorData motor_data)
 : Mirte_Actuator(node_data, pins, (DeviceData)motor_data), data(motor_data)
 {
   motor_service = nh->create_service<mirte_msgs::srv::SetMotorSpeed>(
@@ -53,7 +53,7 @@ Motor::Motor(NodeData node_data, MotorData motor_data, std::vector<pin_t> pins)
 }
 
 DPMotor::DPMotor(NodeData node_data, MotorData motor_data)
-: Motor(node_data, motor_data, {motor_data.D1, motor_data.P1})
+: Motor(node_data, {motor_data.D1, motor_data.P1}, motor_data)
 {
   this->pwm_pin = motor_data.P1;
   this->dir_pin = motor_data.D1;
@@ -77,7 +77,7 @@ void DPMotor::set_speed(int speed)
 }
 
 PPMotor::PPMotor(NodeData node_data, MotorData motor_data)
-: Motor(node_data, motor_data, {motor_data.P1, motor_data.P2})
+: Motor(node_data, {motor_data.P1, motor_data.P2}, motor_data)
 {
   this->pwmA_pin = motor_data.P1;
   this->pwmB_pin = motor_data.P2;

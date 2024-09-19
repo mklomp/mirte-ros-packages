@@ -6,9 +6,9 @@ using namespace std::placeholders;  // for _1, _2, _3...
 
 // hiwonder bus
 Hiwonder_bus_module::Hiwonder_bus_module(
-  NodeData node_data, std::string name, std::shared_ptr<tmx_cpp::Modules> modules,
-  std::shared_ptr<Hiwonder_bus_data> bus_data)
-: Mirte_module(node_data, name), bus_data(bus_data)
+  NodeData node_data, HiWonderBusData bus_data, std::shared_ptr<tmx_cpp::Modules> modules)
+: Mirte_module(node_data, {bus_data.tx_pin, bus_data.rx_pin}, (ModuleData)bus_data),
+  bus_data(bus_data)
 {
   std::function<void(std::vector<tmx_cpp::HiwonderServo_module::Servo_pos>)> position_cb =
     std::bind(&Hiwonder_bus_module::position_cb, this, _1);
@@ -20,14 +20,14 @@ Hiwonder_bus_module::Hiwonder_bus_module(
     std::bind(&Hiwonder_bus_module::offset_cb, this, _1, _2);
 
   std::vector<uint8_t> servo_ids;
-  for (auto servo : bus_data->servos) {
+  for (auto servo : bus_data.servos) {
     servo_ids.push_back(servo->id);
   }
   this->bus = std::make_shared<tmx_cpp::HiwonderServo_module>(
-    this->bus_data->uart_port, this->bus_data->rx_pin, this->bus_data->tx_pin, servo_ids,
-    position_cb, verify_cb, range_cb, offset_cb);
+    this->bus_data.uart_port, this->bus_data.rx_pin, this->bus_data.tx_pin, servo_ids, position_cb,
+    verify_cb, range_cb, offset_cb);
   modules->add_mod(this->bus);
-  for (auto servo : bus_data->servos) {
+  for (auto servo : bus_data.servos) {
     this->servos.push_back(std::make_shared<Hiwonder_servo>(nh, tmx, board, servo, this->bus));
   }
 
@@ -51,10 +51,9 @@ std::vector<std::shared_ptr<Hiwonder_bus_module>> Hiwonder_bus_module::get_hiwon
   NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Modules> modules)
 {
   std::vector<std::shared_ptr<Hiwonder_bus_module>> hiwonder_modules;
-  auto hiwonder_data = Hiwonder_bus_data::parse_hiwonder_bus_data(parser, node_data.board);
+  auto hiwonder_data = parse_all_modules<HiWonderBusData>(parser, node_data.board);
   for (auto hiwonder : hiwonder_data) {
-    auto hiwonder_module =
-      std::make_shared<Hiwonder_bus_module>(node_data, hiwonder->name, modules, hiwonder);
+    auto hiwonder_module = std::make_shared<Hiwonder_bus_module>(node_data, hiwonder, modules);
     hiwonder_modules.push_back(hiwonder_module);
   }
   return hiwonder_modules;
