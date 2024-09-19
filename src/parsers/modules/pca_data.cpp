@@ -21,12 +21,13 @@ PCAData::PCAData(
   auto pca_key = parser->build_param_name(get_device_class(), name);
 
   if (unused_keys.erase("motors")) {
+    RCLCPP_DEBUG(logger, "Attempting to find PCA motors [%s]", pca_key.c_str());
     //TODO: MOTORS REPARSE
-    RCLCPP_INFO(logger, "Attempting to find motors [%s]", pca_key.c_str());
     this->motors = PCA_Motor_data::parse_pca_motor_data(parser, board, pca_key);
   }
 
   if (unused_keys.erase("servos")) {
+    RCLCPP_DEBUG(logger, "Attempting to find PCA servos [%s]", pca_key.c_str());
     //TODO: SERVOS REPARSE
     this->servos = PCA_Servo_data::parse_pca_servo_data(parser, board, pca_key);
   }
