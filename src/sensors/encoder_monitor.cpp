@@ -50,7 +50,7 @@ std::vector<std::shared_ptr<EncoderMonitor>> EncoderMonitor::get_encoder_monitor
   auto encoders = parse_all<EncoderData>(parser, node_data.board);
   for (auto encoder : encoders) {
     sensors.push_back(std::make_shared<EncoderMonitor>(node_data, encoder));
-    std::cout << "Add Encoder: " << encoder.name << std::endl;
+    // std::cout << "Add Encoder: " << encoder.name << std::endl;
   }
   return sensors;
 }

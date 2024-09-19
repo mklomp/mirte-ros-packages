@@ -2,15 +2,17 @@
 
 EncoderData::EncoderData(
   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-  std::map<std::string, rclcpp::ParameterValue> parameters)
-: SensorData(parser, board, name, EncoderData::get_device_class(), parameters)
+  std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
+: SensorData(parser, board, name, EncoderData::get_device_class(), parameters, unused_keys)
 {
-  if (parameters.count("connector")) {
+  auto logger = parser->nh->get_logger();
+
+  if (unused_keys.erase("connector")) {
     auto connector = get_string(parameters["connector"]);
     auto pins = board->resolveConnector(connector);
     this->pinA = pins["pinA"];
     this->pinB = pins["pinB"];
-  } else {
+  } else if (unused_keys.erase("pins")) {
     // FIXME: Maybe restructure to test if pin A and B or only pin is set.
     if (parameters.count("pins.A"))
       this->pinA = board->resolvePin(get_string(parameters["pins.A"]));
@@ -22,7 +24,10 @@ EncoderData::EncoderData(
       this->pinA = board->resolvePin(get_string(parameters["pins.pin"]));
       this->pinB = (pin_t)-1;
     }
-  }
+  } else
+    RCLCPP_ERROR(
+      logger, "Device %s.%s has no a connector or pins specified.", get_device_class().c_str(),
+      name.c_str());
 }
 
 bool EncoderData::check()

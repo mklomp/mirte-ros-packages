@@ -7,31 +7,32 @@
 
 PCAData::PCAData(
   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-  std::map<std::string, rclcpp::ParameterValue> parameters)
-: I2CModuleData(parser, board, name, /*this->get_module_type()*/ parameters)
+  std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
+: I2CModuleData(parser, board, name, /*this->get_module_type()*/ parameters, unused_keys)
 {
+  auto logger = parser->nh->get_logger();
+
   // TODO: Temporary new default for address
   if ((!parameters.count("id")) && this->addr == 0xFF) this->addr = 0x41;
 
-  if (parameters.count("frequency")) this->frequency = parameters["frequency"].get<int>();
+  if (unused_keys.erase("frequency")) this->frequency = parameters["frequency"].get<int>();
 
   // FIXME: Remove
   auto pca_key = parser->build_param_name(get_device_class(), name);
 
-  if (parameters.count("motors")) {
+  if (unused_keys.erase("motors")) {
     //TODO: MOTORS REPARSE
+    RCLCPP_INFO(logger, "Attempting to find motors [%s]", pca_key.c_str());
     this->motors = PCA_Motor_data::parse_pca_motor_data(parser, board, pca_key);
   }
 
-  if (parameters.count("servos")) {
+  if (unused_keys.erase("servos")) {
     //TODO: SERVOS REPARSE
     this->servos = PCA_Servo_data::parse_pca_servo_data(parser, board, pca_key);
   }
 }
 
-bool PCAData::check() {
-  return I2CModuleData::check(get_module_type());
-}
+bool PCAData::check() { return I2CModuleData::check(get_module_type()); }
 
 // std::vector<std::shared_ptr<PCA_data>> PCA_data::parse_pca_data(
 //   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board)

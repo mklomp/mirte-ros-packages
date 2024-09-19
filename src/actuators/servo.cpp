@@ -74,7 +74,7 @@ std::vector<std::shared_ptr<Servo>> Servo::get_servos(
   auto servos = parse_all<ServoData>(parser, node_data.board);
   for (auto servo : servos) {
     actuators.push_back(std::make_shared<Servo>(node_data, servo));
-    std::cout << "Add Servo: " << servo.name << std::endl;
+    // std::cout << "Add Servo: " << servo.name << std::endl;
   }
   return actuators;
 }

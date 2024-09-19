@@ -14,7 +14,7 @@ std::vector<std::shared_ptr<SonarMonitor>> SonarMonitor::get_sonar_monitors(
   auto sonars = parse_all<SonarData>(parser, node_data.board);
   for (auto sonar : sonars) {
     sensors.push_back(std::make_shared<SonarMonitor>(node_data, sonar));
-    std::cout << "Add Sonar: " << sonar.name << std::endl;
+    // std::cout << "Add Sonar: " << sonar.name << std::endl;
   }
   return sensors;
 }

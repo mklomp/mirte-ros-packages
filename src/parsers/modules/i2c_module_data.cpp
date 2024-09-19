@@ -6,10 +6,10 @@
 
 I2CModuleData::I2CModuleData(
   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-  std::map<std::string, rclcpp::ParameterValue> parameters)
-: ModuleData(parser, board, name, parameters)
+  std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string>& unused_keys)
+: ModuleData(parser, board, name, parameters, unused_keys)
 {
-  if (parameters.count("connector")) {
+  if (unused_keys.erase("connector")) {
     auto connector = get_string(parameters["connector"]);
     auto pins = board->resolveConnector(connector);
     this->scl = pins["scl"];
@@ -26,7 +26,7 @@ I2CModuleData::I2CModuleData(
 
   // TODO: Why isn't this field called 'addr' in the config?
   // ina parser used to check for addr field, but config still said id
-  if (parameters.count("id")) this->addr = parameters["id"].get<uint8_t>();
+  if (unused_keys.erase("id")) this->addr = parameters["id"].get<uint8_t>();
 }
 
 bool I2CModuleData::check(std::string module_type)

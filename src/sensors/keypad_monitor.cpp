@@ -15,7 +15,7 @@ std::vector<std::shared_ptr<KeypadMonitor>> KeypadMonitor::get_keypad_monitors(
 
   for (auto keypad : keypads) {
     sensors.push_back(std::make_shared<KeypadMonitor>(node_data, keypad));
-    std::cout << "Add Keypad: " << keypad.name << std::endl;
+    // std::cout << "Add Keypad: " << keypad.name << std::endl;
   }
   return sensors;
   // TODO: schedule periodic publishing

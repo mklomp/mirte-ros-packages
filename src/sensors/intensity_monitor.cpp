@@ -22,11 +22,11 @@ std::vector<std::shared_ptr<IntensityMonitor>> IntensityMonitor::get_intensity_m
   for (auto ir_data : ir_sensors) {
     if (ir_data.a_pin != (pin_t)-1) {
       sensors.push_back(std::make_shared<AnalogIntensityMonitor>(node_data, ir_data));
-      std::cout << "Add Analog Intensity: " << ir_data.name << std::endl;
+      // std::cout << "Add Analog Intensity: " << ir_data.name << std::endl;
     }
     if (ir_data.d_pin != (pin_t)-1) {
       sensors.push_back(std::make_shared<DigitalIntensityMonitor>(node_data, ir_data));
-      std::cout << "Add Digital Intensity: " << ir_data.name << std::endl;
+      // std::cout << "Add Digital Intensity: " << ir_data.name << std::endl;
     }
   }
   return sensors;

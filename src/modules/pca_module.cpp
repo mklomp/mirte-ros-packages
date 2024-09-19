@@ -74,6 +74,9 @@ PCA_Motor::PCA_Motor(
   // this->tmx = tmx;
   // this->nh = nh;
   // this->board = board;
+
+  std::cout << "Adding Motor to PCA " << motor_data->name << std::endl;
+
   motor_service = nh->create_service<mirte_msgs::srv::SetMotorSpeed>(
     "set_" + this->motor_data->name + "_speed",
     std::bind(&PCA_Motor::service_callback, this, std::placeholders::_1, std::placeholders::_2));
