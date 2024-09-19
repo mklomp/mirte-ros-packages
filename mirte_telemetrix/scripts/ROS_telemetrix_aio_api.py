@@ -334,16 +334,37 @@ class ColorSensorMonitor(SensorMonitor):
             "/mirte/get_color_" + sensor["name"], GetColor, self.get_data
         )
         super().__init__(board, sensor, pub)
-        self.port = port
-        self.last_publish_value = Color()
+        self.port = port  # this value is nonsense and unused
+        self.last_publish_value = ColorStamped()
+        self.sensor_obj = sensor
 
     def get_data(self, req):
         return GetColorResponse(self.last_publish_value)
 
     async def start(self):
-        await self.board.set_pin_mode_i2c(self.port, 4, 5)
+        if board_mapping.get_mcu() != "pico":
+            print("Color sensor not supported on an Arduino yet")
+            return
+
+        if "connector" in self.sensor_obj:
+            pins = board_mapping.connector_to_pins(self.sensor_obj["connector"])
+        else:
+            pins = self.sensor_obj["pins"]
+        pin_numbers = {}
+        for item in pins:
+            pin_numbers[item] = board_mapping.pin_name_to_pin_number(pins[item])
+        self.i2c_port = board_mapping.get_I2C_port(pin_numbers["sda"])
+        try:
+            await self.board.set_pin_mode_i2c(
+                i2c_port=self.i2c_port,
+                sda_gpio=pin_numbers["sda"],
+                scl_gpio=pin_numbers["scl"],
+            )
+        except e:
+            print("err")
+            pass  # some other module on i2c probably
         await asyncio.sleep(0.1)
-        await self.board.sensors.add_veml6040(self.port, self.publish_data)
+        await self.board.sensors.add_veml6040(self.i2c_port, self.publish_data)
 
     async def publish_data(self, data):
         color_stamped = ColorStamped()
@@ -647,13 +668,16 @@ class Oled(_SSD1306):
             for item in pins:
                 pin_numbers[item] = board_mapping.pin_name_to_pin_number(pins[item])
             self.i2c_port = board_mapping.get_I2C_port(pin_numbers["sda"])
-            self.init_awaits.append(
-                self.board.set_pin_mode_i2c(
-                    i2c_port=self.i2c_port,
-                    sda_gpio=pin_numbers["sda"],
-                    scl_gpio=pin_numbers["scl"],
+            try:
+                self.init_awaits.append(
+                    self.board.set_pin_mode_i2c(
+                        i2c_port=self.i2c_port,
+                        sda_gpio=pin_numbers["sda"],
+                        scl_gpio=pin_numbers["scl"],
+                    )
                 )
-            )
+            except e:
+                pass  # other module set up i2c already probably
         else:
             self.init_awaits.append(self.board.set_pin_mode_i2c(i2c_port=self.i2c_port))
         time.sleep(1)
@@ -1126,7 +1150,7 @@ if __name__ == "__main__":
         l = lambda loop=loop, board=board: asyncio.ensure_future(shutdown(loop, board))
         loop.add_signal_handler(s, l)
 
-    # Initialize the ROS node as anonymous since there
+    # Initialize the ROS node as not anonymous since there
     # should only be one instnace running.
     rospy.init_node("mirte_telemetrix", anonymous=False)
 
