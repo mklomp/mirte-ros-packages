@@ -2,13 +2,19 @@
 
 #include <functional>
 
+#ifdef WITH_GPIO
+#include <chrono>
+
+using namespace std::chrono_literals;
+#endif
+
 #include <mirte_telemetrix_cpp/modules/ina226_module.hpp>
 
 using namespace std::placeholders;  // for _1, _2, _3...
 
 INA226_sensor::INA226_sensor(
   NodeData node_data, INA226Data ina_data, std::shared_ptr<tmx_cpp::Sensors> modules)
-: Mirte_module(node_data, {ina_data.scl, ina_data.sda}, (ModuleData)ina_data), ina_data(ina_data)
+: Mirte_module(node_data, {ina_data.scl, ina_data.sda}, (ModuleData)ina_data), data(ina_data)
 {
   tmx->setI2CPins(ina_data.scl, ina_data.sda, ina_data.port);
 
@@ -20,8 +26,7 @@ INA226_sensor::INA226_sensor(
   this->battery_pub =
     nh->create_publisher<sensor_msgs::msg::BatteryState>("power/" + this->name, 1);
 
-  this->used_pub =
-    nh->create_publisher<std_msgs::msg::Int32>("power/" + this->name + "/used", 1);
+  this->used_pub = nh->create_publisher<std_msgs::msg::Int32>("power/" + this->name + "/used", 1);
 
   this->shutdown_service = nh->create_service<std_srvs::srv::SetBool>(
     "shutdown", std::bind(&INA226_sensor::shutdown_robot_cb, this, _1, _2));
@@ -30,6 +35,13 @@ INA226_sensor::INA226_sensor(
   // TODO: add used topic
   // TODO: add shutdown service
   // TODO: add auto shutdown
+
+#ifdef WITH_GPIO  // LED Battery indicator
+    if (this->data.use_percentage_led)
+  {
+    battery_led_timer = nh->create_wall_timer(0.5s, std::bind(this->battery_led_timer_callback));
+  }
+#endif
 }
 
 void INA226_sensor::data_cb(float voltage, float current)
@@ -62,7 +74,7 @@ float INA226_sensor::calc_soc(float voltage)
       return soc_levels[i - 1].second;    // return the soc level of the previous voltage level
     }
   }
-  return 100;
+  return 1.00;
 }
 
 void INA226_sensor::integrate_usage(float current)
@@ -94,11 +106,11 @@ void INA226_sensor::check_soc(float voltage, float current)
   //  trigger voltage, then shut down
   // this makes sure that a short dip (motor start) does not trigger it
 
-  if (voltage != 0.1 && voltage < this->ina_data.min_voltage) {
+  if (voltage != 0.1 && voltage < this->data.min_voltage) {
     if (!this->in_power_dip) {
       this->turn_off_trigger_time = this->nh->now();
       this->in_power_dip = true;
-      std::cout << "Triggering turn off in " << this->ina_data.power_low_time << "s" << std::endl;
+      std::cout << "Triggering turn off in " << this->data.power_low_time << "s" << std::endl;
     }
   } else {
     this->in_power_dip = false;
@@ -109,9 +121,9 @@ void INA226_sensor::check_soc(float voltage, float current)
     auto current_time = this->nh->now();
     auto duration = current_time - this->turn_off_trigger_time;
     std::cout << "Triggering turn off maybe" << duration.seconds() << std::endl;
-    std::cout << "you have " << (this->ina_data.power_low_time - duration.seconds()) << "s left"
+    std::cout << "you have " << (this->data.power_low_time - duration.seconds()) << "s left"
               << std::endl;
-    if (duration.seconds() > this->ina_data.power_low_time) {
+    if (duration.seconds() > this->data.power_low_time) {
       std::cout << "Turning off" << std::endl;
       // this->tmx->shutdown();
       this->shutdown_robot();
@@ -155,3 +167,22 @@ std::vector<std::shared_ptr<INA226_sensor>> INA226_sensor::get_ina_modules(
   }
   return pca_modules;
 }
+
+#ifdef WITH_GPIO
+void INA226_sensor::battery_led_timer_callback()
+{
+  // show the SOC by blinking the led. Shorter pulse -> lower SOC
+  // cycle time of 5s
+  auto now = std::chrono::system_clock::now().time_since_epoch() / 1ms;
+  auto time_msec = now % 5000;
+
+  auto percentage = calc_soc(voltage) * 5000;
+  if (time_msec > percentage) {
+    //turn off the led
+    data.percentage_led_pin.write(0)
+  } else {
+    //turn on the led
+    data.percentage_led_pin.write(1)
+  }
+}
+#endif

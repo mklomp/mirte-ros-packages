@@ -11,9 +11,9 @@ PCAData::PCAData(
 : I2CModuleData(parser, board, name, /*this->get_module_type()*/ parameters, unused_keys)
 {
   auto logger = parser->nh->get_logger();
-
-  // TODO: Temporary new default for address
-  if ((!parameters.count("id")) && this->addr == 0xFF) this->addr = 0x41;
+  
+  // Set default for address
+  if ((!parameters.count("addr")) && this->addr == 0xFF) this->addr = 0x41;
 
   if (unused_keys.erase("frequency")) this->frequency = parameters["frequency"].get<int>();
 

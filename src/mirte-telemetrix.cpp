@@ -122,12 +122,12 @@ bool TelemetrixNode::start()
 
   NodeData node_data{nh, tmx, board};
 
+  this->ping = std::make_shared<Mirte_Ping>(nh, tmx, [&]() { rclcpp::shutdown(); });
   std::cout << "Start adding" << std::endl;
 
   this->actuators = std::make_shared<Mirte_Actuators>(node_data, parser);
   this->monitor = std::make_shared<Mirte_Sensors>(node_data, parser);
   this->modules = std::make_shared<Mirte_modules>(node_data, parser);
   std::cout << "Done adding" << std::endl;
-  this->ping = std::make_shared<Mirte_Ping>(nh, tmx, [&]() { rclcpp::shutdown(); });
   return true;
 }

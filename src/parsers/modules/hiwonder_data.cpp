@@ -9,20 +9,26 @@ HiWonderBusData::HiWonderBusData(
   std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
 : ModuleData(parser, board, name, parameters, unused_keys)
 {
+  auto logger = parser->nh->get_logger();
+
   if (unused_keys.erase("connector")) {
     rcpputils::check_true(
-      false, (boost::format("No {rx/tx}_pin tag was supplied to PCA module '%1%' [Connector "
+      false, (boost::format("No pins tag was supplied to PCA module '%1%' [Connector "
                             "configuration not supported yet.]") %
               name)
                .str());
-  } else  {
+  } else if (unused_keys.erase("pins")) {
     // FIXME: Shouldn't this be moved under pins?
-    if (unused_keys.erase("rx_pin"))
-      this->rx_pin = board->resolvePin(get_string(parameters["rx_pin"]));
-    if (unused_keys.erase("tx_pin"))
-      this->tx_pin = board->resolvePin(get_string(parameters["tx_pin"]));
-  }
+    if (parameters.count("pins.rx"))
+      this->rx_pin = board->resolvePin(get_string(parameters["pins.rx"]));
+    if (parameters.count("pins.tx"))
+      this->tx_pin = board->resolvePin(get_string(parameters["pins.tx"]));
+  } else 
+    RCLCPP_ERROR(
+      logger, "Device %s.%s has no a connector or pins specified. (Connector not supported yet)", get_device_class().c_str(),
+      name.c_str());
 
+  // FIXME: REMOVE resolve from pins and remove.
   if (unused_keys.erase("uart")) {
     this->uart_port = parameters["uart"].get<uint8_t>();
 

@@ -24,9 +24,7 @@ I2CModuleData::I2CModuleData(
   }
   this->port = board->resolveI2CPort(this->sda);
 
-  // TODO: Why isn't this field called 'addr' in the config?
-  // ina parser used to check for addr field, but config still said id
-  if (unused_keys.erase("id")) this->addr = parameters["id"].get<uint8_t>();
+  if (unused_keys.erase("addr")) this->addr = parameters["addr"].get<uint8_t>();
 }
 
 bool I2CModuleData::check(std::string module_type)

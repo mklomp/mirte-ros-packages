@@ -14,7 +14,7 @@ class INA226_sensor : public Mirte_module
 public:
   INA226_sensor(NodeData node_data, INA226Data ina_data, std::shared_ptr<tmx_cpp::Sensors> modules);
 
-  INA226Data ina_data;
+  INA226Data data;
   std::shared_ptr<tmx_cpp::INA226_module> ina226;
 
   // virtual void update() override;
@@ -45,4 +45,9 @@ private:
   bool in_power_dip = false;
   rclcpp::Time turn_off_time = rclcpp::Time(0, 0);
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr shutdown_service;
+
+#ifdef WITH_GPIO
+  rclcpp::TimerBase::SharedPtr battery_led_timer;
+  void battery_led_timer_callback();
+#endif
 };

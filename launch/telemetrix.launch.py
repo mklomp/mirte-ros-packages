@@ -1,11 +1,23 @@
+import platform
+
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
+DEBUG = True
 
 def generate_launch_description():
+    telemetrix_ros_arguments = (
+        [
+            "--log-level",
+            f"{platform.node().replace('-','_').lower()}.io.telemetrix:=debug",
+        ]
+        if DEBUG
+        else []
+    )
+
     launch_arguments: list[DeclareLaunchArgument] = [
         DeclareLaunchArgument(
             "config_path",
@@ -23,10 +35,8 @@ def generate_launch_description():
             description="The namespace for the Telemetrix Node and the hardware peripherals",
         ),
         DeclareLaunchArgument(
-            "frame_prefix",
-            default_value="",
-            description="The TF2 frame prefix"
-        )
+            "frame_prefix", default_value="", description="The TF2 frame prefix"
+        ),
     ]
 
     ld = LaunchDescription(launch_arguments)
@@ -44,6 +54,7 @@ def generate_launch_description():
         namespace=LaunchConfiguration("hardware_namespace"),
         respawn=True,
         respawn_delay=5,
+        ros_arguments=telemetrix_ros_arguments,
         # TODO: Not avialable yet in humble (avialable starting from jazzy)
         # respawn_max_retries=10
     )

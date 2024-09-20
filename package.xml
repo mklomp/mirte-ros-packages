@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
 <name>mirte_telemetrix_cpp</name>
   <version>0.0.1</version>
   <description>Telemetrix cpp implementation</description>
@@ -15,6 +16,7 @@
   <depend>std_msgs</depend>
   <depend>mirte_msgs</depend>
   <depend>sensor_msgs</depend>
+  <build_depend condition="$MIRTE_TYPE == 'mirte-master'">libgpiod-dev</build_depend>
 
   <!-- <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
