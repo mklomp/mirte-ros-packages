@@ -29,21 +29,21 @@ void GPIOPin::setup()
   }
 }
 
-void GPIOPin::write(bool value) const
+void GPIOPin::write(bool value)
 {
   if (!configured) setup();
 
   gpio_line.set_value((int)value);
 }
 
-bool GPIOPin::read() const
+bool GPIOPin::read()
 {
   if (!configured) setup();
 
   return (bool)gpio_line.get_value();
 }
 
-~GPIOPin::GPIOPin()
+GPIOPin::~GPIOPin()
 {
   if (configured) {
     gpio_line.set_value(0);

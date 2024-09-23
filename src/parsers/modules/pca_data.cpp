@@ -137,7 +137,7 @@ std::vector<std::shared_ptr<PCA_Servo_data>> PCA_Servo_data::parse_pca_servo_dat
       PCA_Servo_data servo_data;
       servo_data.name = servo_key;
       if (servo_keys.count("pin")) {
-        servo_data.pin = board->resolvePin(servo_config["pin"].get<std::string>());
+        servo_data.pin = servo_config["pin"].get<pin_t>();
       }
       if (servo_keys.count("min_pulse")) {
         servo_data.min_pulse = servo_config["min_pulse"].get<int>();

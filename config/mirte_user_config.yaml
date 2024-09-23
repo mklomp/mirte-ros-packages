@@ -190,7 +190,7 @@
         # switch_off_value: True
         # switch_pull: 1 # -1 for pulldown, 1 for pullup, 0 for none
         # switch_time: 5
-        percentage_led_pin: gpiochip4_B4  # 12 = B4, left-most led on usb switcher pcb
+        percentage_led_pin: GPIO4_B4  # 12 = B4, left-most led on usb switcher pcb
 
     distance:
       left_front:

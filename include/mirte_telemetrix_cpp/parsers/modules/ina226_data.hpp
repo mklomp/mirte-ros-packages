@@ -16,7 +16,7 @@ public:
 
 #ifdef WITH_GPIO
   bool use_percentage_led = false;
-  GPIOPin percentage_led_pin;
+  std::shared_ptr<GPIOPin> percentage_led_pin;
 #endif
 
   INA226Data(

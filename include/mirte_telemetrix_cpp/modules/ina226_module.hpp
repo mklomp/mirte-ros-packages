@@ -46,6 +46,8 @@ private:
   rclcpp::Time turn_off_time = rclcpp::Time(0, 0);
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr shutdown_service;
 
+  float voltage_ = 0;
+
 #ifdef WITH_GPIO
   rclcpp::TimerBase::SharedPtr battery_led_timer;
   void battery_led_timer_callback();

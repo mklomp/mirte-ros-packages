@@ -22,7 +22,7 @@ INA226Data::INA226Data(
   if (unused_keys.erase("percentage_led_pin")) {
 #ifdef WITH_GPIO
     this->use_percentage_led = true;
-    this->percentage_led_pin = GPIOPin(
+    this->percentage_led_pin = std::make_shared<GPIOPin>(
       get_string(parameters["percentage_led_pin"]), "mirte-telemetrix-battery-indicator-led");
 #else
     RCLCPP_ERROR(

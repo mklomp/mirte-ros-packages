@@ -37,15 +37,16 @@ INA226_sensor::INA226_sensor(
   // TODO: add auto shutdown
 
 #ifdef WITH_GPIO  // LED Battery indicator
-    if (this->data.use_percentage_led)
+  if (this->data.use_percentage_led)
   {
-    battery_led_timer = nh->create_wall_timer(0.5s, std::bind(this->battery_led_timer_callback));
+    battery_led_timer = nh->create_wall_timer(0.5s, std::bind(&INA226_sensor::battery_led_timer_callback, this));
   }
 #endif
 }
 
 void INA226_sensor::data_cb(float voltage, float current)
 {
+  voltage_ = voltage;
   // std::cout << "INA226 data: " << current << " " << voltage << std::endl;
   auto msg = sensor_msgs::msg::BatteryState();
   msg.header = get_header();
@@ -176,13 +177,13 @@ void INA226_sensor::battery_led_timer_callback()
   auto now = std::chrono::system_clock::now().time_since_epoch() / 1ms;
   auto time_msec = now % 5000;
 
-  auto percentage = calc_soc(voltage) * 5000;
+  auto percentage = calc_soc(voltage_) * 5000;
   if (time_msec > percentage) {
     //turn off the led
-    data.percentage_led_pin.write(0)
+    data.percentage_led_pin->write(0);
   } else {
     //turn on the led
-    data.percentage_led_pin.write(1)
+    data.percentage_led_pin->write(1);
   }
 }
 #endif
