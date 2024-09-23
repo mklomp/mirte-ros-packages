@@ -57,3 +57,23 @@ uint8_t Mirte_Board_pico::resolveI2CPort(uint8_t sda) {
     break;
   }
 }
+
+uint8_t Mirte_Board_pico::resolveUARTPort(uint8_t pin) {
+  switch (pin)
+  {
+  case 0:
+  case 1:
+  case 12:
+  case 13:
+  case 16:
+  case 17:
+    return 0;
+  case 4:
+  case 5:
+  case 8:
+  case 9:
+    return 1;
+  default:
+    return 0xFF;
+  }
+}

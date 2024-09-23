@@ -43,7 +43,6 @@
       servo_controller:
         device: mirte
         type: Hiwonder_Servo
-        uart: 0 # FIXME: Remove
         pins:
           rx: 0
           tx: 1

@@ -23,22 +23,12 @@ HiWonderBusData::HiWonderBusData(
       this->rx_pin = board->resolvePin(get_string(parameters["pins.rx"]));
     if (parameters.count("pins.tx"))
       this->tx_pin = board->resolvePin(get_string(parameters["pins.tx"]));
-  } else 
+  } else
     RCLCPP_ERROR(
-      logger, "Device %s.%s has no a connector or pins specified. (Connector not supported yet)", get_device_class().c_str(),
-      name.c_str());
+      logger, "Device %s.%s has no a connector or pins specified. (Connector not supported yet)",
+      get_device_class().c_str(), name.c_str());
 
-  // FIXME: REMOVE resolve from pins and remove.
-  if (unused_keys.erase("uart")) {
-    this->uart_port = parameters["uart"].get<uint8_t>();
-
-    // FIXME: Why this port check?
-    rcpputils::check_true(
-      // Either 0 or 1
-      this->uart_port <= 1,
-      (boost::format("Invalid uart port %1% specified for module %2%") % this->uart_port % name)
-        .str());
-  }
+  this->uart_port = board->resolveUARTPort(this->rx_pin);
 
   // FIXME: NESTED PARAMS
   if (unused_keys.erase("servos"))
@@ -48,6 +38,6 @@ HiWonderBusData::HiWonderBusData(
 
 bool HiWonderBusData::check()
 {
-  return uart_port <= 1 && tx_pin != (pin_t)-1 && rx_pin != (pin_t)-1 &&
+  return uart_port != 0xFF && tx_pin != (pin_t)-1 && rx_pin != (pin_t)-1 &&
          ModuleData::check(get_module_type());
 }

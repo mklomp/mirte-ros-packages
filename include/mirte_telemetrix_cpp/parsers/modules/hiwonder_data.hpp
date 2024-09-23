@@ -9,7 +9,7 @@ public:
   uint8_t uart_port;
   pin_t tx_pin = (pin_t)-1;
   pin_t rx_pin = (pin_t)-1;
-  // TODO: UART
+  // TODO: UART Module class
   std::vector<std::shared_ptr<Hiwonder_servo_data>> servos;
 
   HiWonderBusData(

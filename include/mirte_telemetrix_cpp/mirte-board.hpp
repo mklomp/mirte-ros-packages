@@ -21,6 +21,7 @@ public:
   virtual std::map<std::string, int>
   resolveConnector(std::string connector) = 0;
   virtual uint8_t resolveI2CPort(uint8_t sda) = 0;
+  virtual uint8_t resolveUARTPort(uint8_t pin) = 0;
   static std::shared_ptr<Mirte_Board> create(std::shared_ptr<Parser> parser);
   virtual ~Mirte_Board() {}
 };
@@ -32,7 +33,9 @@ public:
   int resolvePin(std::string pin);
   int get_adc_bits();
   int get_max_pwm() { return 255; }
-  uint8_t resolveI2CPort(uint8_t sda) { return 0; }
+  virtual uint8_t resolveI2CPort(uint8_t sda) override { return 0; }
+
+  virtual uint8_t resolveUARTPort(uint8_t pin) override { return 0; };
 };
 class Mirte_Board_pico : public Mirte_Board {
 public:
@@ -47,7 +50,8 @@ public:
     # no clue why 14 works*/
     return 14; }
   int get_max_pwm() { return 20000; } // TODO: check with actual board
-  uint8_t resolveI2CPort(uint8_t sda);
+  virtual uint8_t resolveI2CPort(uint8_t sda) override;
+  virtual uint8_t resolveUARTPort(uint8_t pin) override;
 };
 
 class Mirte_Board_pcb : public Mirte_Board {
@@ -61,7 +65,8 @@ public:
   int resolvePin(std::string pin);
   int get_adc_bits() { return mcu->get_adc_bits(); }
   int get_max_pwm() { return mcu->get_max_pwm(); }
-  uint8_t resolveI2CPort(uint8_t sda) { return mcu->resolveI2CPort(sda); }
+  virtual uint8_t resolveI2CPort(uint8_t sda) override;
+  virtual uint8_t resolveUARTPort(uint8_t pin) override;
   std::string version;
   connector_map connectors = mirte_pico_pcb_map08;
 };
