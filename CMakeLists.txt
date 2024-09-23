@@ -9,18 +9,8 @@ set(CMAKE_CXX_STANDARD 20)
 include(CheckIncludeFileCXX)
 
 set(MIRTE_EXTRA_LIBS "")
-# Use libgpiod for Mirte Master LED power indicator.
-# find_library(LIBgpiodcxx gpiodcxx)
-# if(LIBgpiodcxx)
-# set(MIRTE_EXTRA_LIBS gpiodcxx)
-# add_compile_definitions(WITH_GPIOD)
-# else()
-# set(MIRTE_EXTRA_LIBS)
-# message("libgpiod not found not including SBC GPIO features")
-# endif()
-# # add_compile_options(-lgpiodcxx)
 
-# CHECK_INCLUDE_FILES(gpiod.hpp HAVE_GPIOD_HPP)
+# Use libgpiod for Mirte Master LED power indicator.
 CHECK_INCLUDE_FILE_CXX(gpiod.hpp HAVE_GPIOD_HPP)
 if (HAVE_GPIOD_HPP)
 list(APPEND MIRTE_EXTRA_LIBS gpiodcxx)
