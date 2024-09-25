@@ -117,6 +117,10 @@
     #       p1: GP20
     #       p2: GP21
     modules:
+      oled:
+        device: mirte
+        type: SSD1306
+        connector: I2C1
       motorservocontroller:
         device: mirte
         type: PCA9685

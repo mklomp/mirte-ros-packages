@@ -16,6 +16,8 @@
   <depend>std_msgs</depend>
   <depend>mirte_msgs</depend>
   <depend>sensor_msgs</depend>
+  <depend>libopencv-dev</depend>
+  <depend>ament_index_cpp</depend>
   <build_depend condition="$MIRTE_TYPE == 'mirte-master'">libgpiod-dev</build_depend>
 
   <!-- <test_depend>ament_copyright</test_depend>

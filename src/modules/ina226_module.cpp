@@ -16,7 +16,7 @@ INA226_sensor::INA226_sensor(
   NodeData node_data, INA226Data ina_data, std::shared_ptr<tmx_cpp::Sensors> modules)
 : Mirte_module(node_data, {ina_data.scl, ina_data.sda}, (ModuleData)ina_data), data(ina_data)
 {
-  tmx->setI2CPins(ina_data.scl, ina_data.sda, ina_data.port);
+  tmx->setI2CPins(ina_data.sda, ina_data.scl, ina_data.port);
 
   this->used_time = nh->now();
   this->total_used_mAh = 0;
