@@ -4,6 +4,7 @@
 #include <mirte_telemetrix_cpp/modules/hiwonder_module.hpp>
 #include <mirte_telemetrix_cpp/modules/ina226_module.hpp>
 #include <mirte_telemetrix_cpp/modules/pca_module.hpp>
+#include <mirte_telemetrix_cpp/modules/ssd1306_module.hpp>
 
 Mirte_modules::Mirte_modules(NodeData node_data, std::shared_ptr<Parser> parser)
 : nh(node_data.nh), tmx(node_data.tmx), board(node_data.board)
@@ -19,6 +20,10 @@ Mirte_modules::Mirte_modules(NodeData node_data, std::shared_ptr<Parser> parser)
     Hiwonder_bus_module::get_hiwonder_modules(node_data, parser, this->module_sys);
   std::cout << "Adding hiwonder modules" << hiwonder_mods.size() << std::endl;
   this->modules.insert(this->modules.end(), hiwonder_mods.begin(), hiwonder_mods.end());
+
+  RCLCPP_INFO(nh->get_logger(), "Adding SSD1306 OLED Modules");
+  auto oled_mods = SSD1306_module::get_ssd1306_modules(node_data, parser, this->module_sys);
+  this->modules.insert(this->modules.end(), oled_mods.begin(), oled_mods.end());
 
   this->sensor_sys = std::make_shared<tmx_cpp::Sensors>(tmx);
   RCLCPP_INFO(nh->get_logger(), "Adding INA226 Modules");

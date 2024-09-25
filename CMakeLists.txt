@@ -25,6 +25,7 @@ endif()
 # Find catkin macros and libraries if COMPONENTS list like find_package(catkin
 # REQUIRED COMPONENTS xyz) is used, also find other catkin packages
 find_package(ament_cmake REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcpputils REQUIRED)
 find_package(mirte_msgs REQUIRED)
@@ -32,6 +33,7 @@ find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
+find_package(OpenCV REQUIRED COMPONENTS core imgcodecs)
 find_package(Boost REQUIRED COMPONENTS system thread)
 # ##############################################################################
 # Build ##
@@ -91,6 +93,7 @@ add_executable(
   src/parsers/modules/ina226_data.cpp
   src/parsers/modules/hiwonder_data.cpp
   src/parsers/modules/pca_data.cpp
+  src/parsers/modules/ssd1306_data.cpp
   src/sensors/base_sensor.cpp
   src/sensors/encoder_monitor.cpp
   src/sensors/intensity_monitor.cpp
@@ -99,7 +102,8 @@ add_executable(
   src/modules/base_module.cpp
   src/modules/pca_module.cpp
   src/modules/ina226_module.cpp
-  src/modules/hiwonder_module.cpp)
+  src/modules/hiwonder_module.cpp
+  src/modules/ssd1306_module.cpp)
 ament_target_dependencies(
   ${PROJECT_NAME}_node std_msgs std_srvs mirte_msgs rclcpp rcpputils sensor_msgs # DEPENDS
                                                               # system_lib
@@ -110,7 +114,7 @@ ament_target_dependencies(
 
 # Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} Boost::system
-                      Boost::thread tmx_cpp ${MIRTE_EXTRA_LIBS})
+                      Boost::thread tmx_cpp ${MIRTE_EXTRA_LIBS}  ${OpenCV_LIBS})
 set_property(TARGET ${PROJECT_NAME}_node PROPERTY CXX_INCLUDE_WHAT_YOU_USE
 ${iwyu_path})
 
