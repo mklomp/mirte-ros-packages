@@ -1,5 +1,6 @@
 #pragma once
 #include <filesystem>
+#include <optional>
 
 namespace fs = std::filesystem;
 
@@ -8,10 +9,10 @@ namespace fs = std::filesystem;
 #include <mirte_telemetrix_cpp/modules/base_module.hpp>
 #include <mirte_telemetrix_cpp/parsers/modules/ssd1306_data.hpp>
 
+#include <mirte_msgs/srv/set_oled_file.hpp>
+#include <mirte_msgs/srv/set_oled_image.hpp>
 #include <mirte_msgs/srv/set_oled_image_legacy.hpp>
 #include <mirte_msgs/srv/set_oled_text.hpp>
-#include <mirte_msgs/srv/set_oled_file.hpp>
-
 
 class SSD1306_module : public Mirte_module
 {
@@ -33,14 +34,15 @@ public:
 private:
   bool default_image = true;
   bool enabled = true;
-  std::string last_text = "";
+  std::optional<std::string> last_text;
 
-  // FIXME: TO BE REMOVED
+  rclcpp::CallbackGroup::SharedPtr oled_access_callback_group;
+
   rclcpp::Service<mirte_msgs::srv::SetOLEDImageLegacy>::SharedPtr set_oled_service_legacy;
 
   rclcpp::Service<mirte_msgs::srv::SetOLEDText>::SharedPtr set_oled_text_service;
+  rclcpp::Service<mirte_msgs::srv::SetOLEDImage>::SharedPtr set_oled_image_service;
   rclcpp::Service<mirte_msgs::srv::SetOLEDFile>::SharedPtr set_oled_file_service;
-
 
   bool prewrite();
 
@@ -51,6 +53,10 @@ private:
   void set_oled_text_callback(
     const std::shared_ptr<mirte_msgs::srv::SetOLEDText::Request> req,
     std::shared_ptr<mirte_msgs::srv::SetOLEDText::Response> res);
+
+  void set_oled_image_callback(
+    const std::shared_ptr<mirte_msgs::srv::SetOLEDImage::Request> req,
+    std::shared_ptr<mirte_msgs::srv::SetOLEDImage::Response> res);
 
   void set_oled_file_callback(
     const std::shared_ptr<mirte_msgs::srv::SetOLEDFile::Request> req,

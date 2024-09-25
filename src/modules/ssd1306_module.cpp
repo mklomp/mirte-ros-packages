@@ -9,6 +9,13 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <rcpputils/asserts.hpp>
 
+// Pre & Post IRON compatability.
+#if __has_include(<cv_bridge/cv_bridge.hpp>)
+#include <cv_bridge/cv_bridge.hpp>
+#else
+#include <cv_bridge/cv_bridge.h>
+#endif
+
 #include <mirte_telemetrix_cpp/modules/ssd1306_module.hpp>
 
 using namespace std::placeholders;  // for _1, _2, _3...
@@ -34,17 +41,28 @@ SSD1306_module::SSD1306_module(
   this->ssd1306 =
     std::make_shared<tmx_cpp::SSD1306_module>(data.port, data.addr, data.width, data.height);
 
-  // FIXME: TO BE REMOVED
-  // TODO: Or make configurable
-  this->set_oled_service_legacy = nh->create_service<mirte_msgs::srv::SetOLEDImageLegacy>(
-    "set_" + data.name + "_image_legacy",
-    std::bind(&SSD1306_module::set_oled_callback_legacy, this, _1, _2));
+  // Use a mutally Exclusive callback group to ensure no OLED commands get mixed.
+  this->oled_access_callback_group =
+    nh->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+
+  if (data.legacy)
+    this->set_oled_service_legacy = nh->create_service<mirte_msgs::srv::SetOLEDImageLegacy>(
+      "set_" + data.name + "_image_legacy",
+      std::bind(&SSD1306_module::set_oled_callback_legacy, this, _1, _2),
+      rmw_qos_profile_services_default, oled_access_callback_group);
 
   this->set_oled_text_service = nh->create_service<mirte_msgs::srv::SetOLEDText>(
-    "set_" + data.name + "_text", std::bind(&SSD1306_module::set_oled_text_callback, this, _1, _2));
+    "set_" + data.name + "_text", std::bind(&SSD1306_module::set_oled_text_callback, this, _1, _2),
+    rmw_qos_profile_services_default, oled_access_callback_group);
+
+  this->set_oled_image_service = nh->create_service<mirte_msgs::srv::SetOLEDImage>(
+    "set_" + data.name + "_image",
+    std::bind(&SSD1306_module::set_oled_image_callback, this, _1, _2),
+    rmw_qos_profile_services_default, oled_access_callback_group);
 
   this->set_oled_file_service = nh->create_service<mirte_msgs::srv::SetOLEDFile>(
-    "set_" + data.name + "_file", std::bind(&SSD1306_module::set_oled_file_callback, this, _1, _2));
+    "set_" + data.name + "_file", std::bind(&SSD1306_module::set_oled_file_callback, this, _1, _2),
+    rmw_qos_profile_services_default, oled_access_callback_group);
 
   modules->add_mod(this->ssd1306);
 }
@@ -76,6 +94,8 @@ bool SSD1306_module::set_image(uint8_t width, uint8_t height, uint8_t img_buffer
 {
   if (!prewrite()) return false;
 
+  last_text.reset();
+
   if (width != data.width || height != data.height) {
     RCLCPP_ERROR(
       nh->get_logger(), "Supplied image of wrong size. Expected %ux%u, got %ux%u", data.width,
@@ -106,9 +126,7 @@ bool SSD1306_module::set_image_from_path(std::string path)
     actual_path = fs::path(ament_index_cpp::get_package_share_directory(package)) / remainder;
   } else if (path[0] != '/') {
     // Check the local path from the DEFAULT_PACKAGE or Folder.
-    // TODO: Make DEFAULT_LOCATION configurable
-    std::string default_location = "/usr/local/src/mirte/mirte-oled-images";
-    return set_image_from_path(default_location + "/" + path);
+    return set_image_from_path(data.default_image_path + "/" + path);
   } else {
     actual_path = fs::path(path);
   }
@@ -168,21 +186,19 @@ void SSD1306_module::set_oled_callback_legacy(
 {
   auto logger = nh->get_logger();
 
-  // TODO: Maybe use default location as well?
-
   if (req->type == "text") {
     res->status = set_text(req->value);
   } else if (req->type == "image") {
     // If not an absolute path or a package local path use the old behavior
     auto path = (req->value[0] != '/' && req->value.substr(0, 6) != "pkg://" &&
                  req->value.substr(0, 10) != "package://" && req->value.rfind('.') == -1)
-                  ? "/usr/local/src/mirte/mirte-oled-images/images/" + req->value + ".png"
+                  ? data.default_image_path + "/images/" + req->value + ".png"
                   : req->value;
     res->status = set_image_from_path(path);
   } else if (req->type == "animation") {
     auto path = (req->value[0] != '/' && req->value.substr(0, 6) != "pkg://" &&
                  req->value.substr(0, 10) != "package://" && req->value.back() != '/')
-                  ? "/usr/local/src/mirte/mirte-oled-images/animations/" + req->value + "/"
+                  ? data.default_image_path + "/animations/" + req->value + "/"
                   : req->value;
     res->status = set_image_from_path(path);
   } else {
@@ -198,6 +214,15 @@ void SSD1306_module::set_oled_text_callback(
   std::shared_ptr<mirte_msgs::srv::SetOLEDText::Response> res)
 {
   res->status = set_text(req->text);
+}
+
+void SSD1306_module::set_oled_image_callback(
+  const std::shared_ptr<mirte_msgs::srv::SetOLEDImage::Request> req,
+  std::shared_ptr<mirte_msgs::srv::SetOLEDImage::Response> res)
+{
+  auto bridged_img = cv_bridge::toCvShare(req->image, req, "mono8");
+  res->status =
+    set_image(bridged_img->image.cols, bridged_img->image.rows, bridged_img->image.data);
 }
 
 void SSD1306_module::set_oled_file_callback(

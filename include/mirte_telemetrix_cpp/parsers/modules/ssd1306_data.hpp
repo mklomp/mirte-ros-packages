@@ -8,6 +8,12 @@ public:
   uint8_t width = 128;  // Hardcoded in the Pico
   uint8_t height = 64;  // Hardcoded in the Pico
 
+  // Enable LEGACY set OLED image, which works as the old set_oled_image
+  bool legacy = false;
+  // The default location to look for images, this can be an absolute path or a package uri ('pkg://PKG_NAME/FOLDER_PATH...').
+  // This is also used by the Legacy command as the folder containing an 'images' and 'animations' folder.
+  std::string default_image_path = "/usr/local/src/mirte/mirte-oled-images";
+
   SSD1306Data(
     std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
     std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys);

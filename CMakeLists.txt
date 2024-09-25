@@ -32,6 +32,7 @@ find_package(mirte_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
 
 find_package(OpenCV REQUIRED COMPONENTS core imgcodecs)
 find_package(Boost REQUIRED COMPONENTS system thread)
@@ -105,7 +106,7 @@ add_executable(
   src/modules/hiwonder_module.cpp
   src/modules/ssd1306_module.cpp)
 ament_target_dependencies(
-  ${PROJECT_NAME}_node std_msgs std_srvs mirte_msgs rclcpp rcpputils sensor_msgs # DEPENDS
+  ${PROJECT_NAME}_node std_msgs std_srvs mirte_msgs rclcpp rcpputils sensor_msgs cv_bridge # DEPENDS
                                                               # system_lib
 )
 
@@ -113,7 +114,7 @@ ament_target_dependencies(
 # ${catkin_EXPORTED_TARGETS} )
 
 # Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} Boost::system
+target_link_libraries(${PROJECT_NAME}_node Boost::system
                       Boost::thread tmx_cpp ${MIRTE_EXTRA_LIBS}  ${OpenCV_LIBS})
 set_property(TARGET ${PROJECT_NAME}_node PROPERTY CXX_INCLUDE_WHAT_YOU_USE
 ${iwyu_path})

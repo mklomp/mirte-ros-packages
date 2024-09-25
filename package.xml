@@ -17,6 +17,7 @@
   <depend>mirte_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>libopencv-dev</depend>
+  <depend>cv_bridge</depend>
   <depend>ament_index_cpp</depend>
   <build_depend condition="$MIRTE_TYPE == 'mirte-master'">libgpiod-dev</build_depend>
 
