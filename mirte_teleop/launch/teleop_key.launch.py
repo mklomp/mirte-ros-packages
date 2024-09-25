@@ -10,7 +10,7 @@
 import sys, subprocess
 
 # Currently parameters (turn/speed) are not implemented in ROS2
-sys.exit(subprocess.call(["/opt/ros/humble/lib/teleop_twist_keyboard/teleop_twist_keyboard", "--ros-args", "-r", "cmd_vel:=/diffbot_base_controller/cmd_vel_unstamped"]))
+sys.exit(subprocess.call(["/opt/ros/humble/lib/teleop_twist_keyboard/teleop_twist_keyboard", "--ros-args", "-r", "cmd_vel:=/mirte_base_controller/cmd_vel_unstamped"]))
 
 #from launch import LaunchDescription
 #from launch_ros.actions import Node
