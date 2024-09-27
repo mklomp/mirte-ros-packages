@@ -74,7 +74,6 @@ add_executable(
   src/mirte-actuators.cpp
   src/mirte-modules.cpp
   src/mirte-sensors.cpp
-  src/mirte-ping.cpp
   src/device.cpp
   src/gpio_pin.cpp
   src/actuators/servo.cpp

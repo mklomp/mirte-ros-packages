@@ -9,7 +9,6 @@
 #include "mirte_telemetrix_cpp/mirte-actuators.hpp"  // for Mirte_Actuators
 #include "mirte_telemetrix_cpp/mirte-board.hpp"      // for Mirte_Board
 #include "mirte_telemetrix_cpp/mirte-modules.hpp"
-#include "mirte_telemetrix_cpp/mirte-ping.hpp"       // for Mirte_Ping
 #include "mirte_telemetrix_cpp/mirte-sensors.hpp"    // for Mirte_Sensors
 #include "mirte_telemetrix_cpp/parsers/parsers.hpp"  // for Parser
 #include "mirte_telemetrix_cpp/util.hpp"
@@ -26,11 +25,14 @@ int main(int argc, char ** argv)
   try {
     rclcpp::init(argc, argv);
 
+    rclcpp::executors::MultiThreadedExecutor executor;
+    
     // Spin the ROS node
     auto node = std::make_shared<TelemetrixNode>();
     if (!node->start()) return 0;
 
-    rclcpp::spin(node);
+    executor.add_node(node);
+    executor.spin();
     rclcpp::shutdown();
 
   } catch (std::exception & e) {
@@ -116,13 +118,12 @@ bool TelemetrixNode::start()
     }
   }
 
-  auto tmx = std::make_shared<tmx_cpp::TMX>(available_ports[0].port_name);
+  auto tmx = std::make_shared<tmx_cpp::TMX>( [&]() { rclcpp::shutdown(); }, available_ports[0].port_name);
   tmx->sendMessage(tmx_cpp::TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
   tmx->setScanDelay(10);
 
   NodeData node_data{nh, tmx, board};
 
-  this->ping = std::make_shared<Mirte_Ping>(nh, tmx, [&]() { rclcpp::shutdown(); });
   std::cout << "Start adding" << std::endl;
 
   this->actuators = std::make_shared<Mirte_Actuators>(node_data, parser);
