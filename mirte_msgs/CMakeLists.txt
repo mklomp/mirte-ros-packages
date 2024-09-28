@@ -54,6 +54,8 @@ find_package(catkin REQUIRED COMPONENTS
    Encoder.msg
    Color.msg
    ColorStamped.msg
+   ColorHSL.msg
+   ColorHSLStamped.msg
    Intensity.msg
    IntensityDigital.msg
    Keypad.msg
@@ -63,6 +65,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   GetColor.srv
+  GetColorHSL.srv
   GetDistance.srv
   GetIntensity.srv
   GetIntensityDigital.srv
