@@ -26,4 +26,5 @@ public:
   bool service_callback(
     const std::shared_ptr<mirte_msgs::srv::GetEncoder::Request> req,
     std::shared_ptr<mirte_msgs::srv::GetEncoder::Response> res);
+    ~EncoderMonitor() {};
 };

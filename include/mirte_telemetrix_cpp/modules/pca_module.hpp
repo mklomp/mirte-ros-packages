@@ -24,6 +24,7 @@ public:
   //   std::vector<std::shared_ptr<PCA_Servo>> servos;
   static std::vector<std::shared_ptr<PCA_Module>> get_pca_modules(
     NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Modules> modules);
+   ~PCA_Module() {};
 };
 
 class PCA_Motor

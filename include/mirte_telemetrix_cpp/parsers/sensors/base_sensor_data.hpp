@@ -15,7 +15,7 @@ public:
     std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
     std::string sensor_type, std::map<std::string, rclcpp::ParameterValue> parameters,
     std::set<std::string>& unused_keys);
-
+  ~SensorData() {};
   // bool check();
 
   // / @brief Get the sensor class of this type. So 'distance' for sonars and 'keypad' for keypads, etc.

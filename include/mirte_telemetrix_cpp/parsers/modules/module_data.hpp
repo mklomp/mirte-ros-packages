@@ -14,11 +14,12 @@ public:
     std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
     std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys);
 
-  bool check();
-  bool check(std::string module_type);
+  virtual bool check();
+  virtual bool check(std::string module_type);
 
   static std::string get_device_class() { return "modules"; }
   static std::string get_module_type() { return "no_type"; }
+  ~ModuleData() {};
 };
 
 // TODO: Redo this for modules so we do not have to dump 3 times

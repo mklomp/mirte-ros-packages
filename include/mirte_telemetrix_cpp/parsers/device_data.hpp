@@ -18,11 +18,6 @@ public:
   std::string name = "";
   std::string frame_id = "";
 
-  // TODO: REMOVE
-  // DeviceData(
-  //   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-  //   std::map<std::string, rclcpp::ParameterValue> parameters);
-
   DeviceData(
     std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
     std::string device_type, std::map<std::string, rclcpp::ParameterValue> parameters,
@@ -33,6 +28,7 @@ public:
   /// @brief Get the device class of this type. So 'distance' for sonars and 'keypad' for keypads, etc.
   /// @return The device class string
   static std::string get_device_class() { return "no_type"; }
+  virtual ~DeviceData() {};
 };
 
 template <class T>

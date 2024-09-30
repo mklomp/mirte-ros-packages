@@ -11,6 +11,7 @@ class Mirte_Sensor : public TelemetrixDevice
 public:
   virtual void update() override = 0;
   Mirte_Sensor(NodeData node_data, std::vector<uint8_t> pins, SensorData data);
+  virtual ~Mirte_Sensor() = default;
 };
 
 // }  // namespace mirte_telemetrix_cpp

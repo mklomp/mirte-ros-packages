@@ -7,7 +7,7 @@
 #include <mirte_telemetrix_cpp/modules/ssd1306_module.hpp>
 
 Mirte_modules::Mirte_modules(NodeData node_data, std::shared_ptr<Parser> parser)
-: nh(node_data.nh), tmx(node_data.tmx), board(node_data.board)
+: tmx(node_data.tmx), nh(node_data.nh), board(node_data.board)
 {
   this->module_sys = std::make_shared<tmx_cpp::Modules>(tmx);
 
