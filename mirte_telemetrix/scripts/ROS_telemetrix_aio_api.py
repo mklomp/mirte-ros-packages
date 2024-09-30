@@ -400,10 +400,10 @@ class ColorSensorMonitor(SensorMonitor):
         # uW/cm2 for green: 2^16 / 130 = 504 uW/cm2. And even though red and espcially blue
         # can meadure more, they need to be capped to this value so they will be even.
         # And all can be normalized to [0,1]
-        max_uW_cm2 = 250 # calculated (504), emperical (250) (TODO: make setting)
+        max_uW_cm2 = 250  # calculated (504), emperical (250) (TODO: make setting)
         r_norm = min([r / 125, max_uW_cm2]) / max_uW_cm2
         g_norm = min([g / 130, max_uW_cm2]) / max_uW_cm2
-        b_norm = min([b /  62, max_uW_cm2]) / max_uW_cm2
+        b_norm = min([b / 62, max_uW_cm2]) / max_uW_cm2
         hls = list(colorsys.rgb_to_hls(r_norm, g_norm, b_norm))
         hls[0] = hls[0] * 360
 
