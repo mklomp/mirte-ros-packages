@@ -32,7 +32,6 @@ public:
   bool set_image_from_path(std::string path);
 
 private:
-  bool default_image = true;
   bool enabled = true;
   std::optional<std::string> last_text;
 
@@ -44,7 +43,9 @@ private:
   rclcpp::Service<mirte_msgs::srv::SetOLEDImage>::SharedPtr set_oled_image_service;
   rclcpp::Service<mirte_msgs::srv::SetOLEDFile>::SharedPtr set_oled_file_service;
 
-  bool prewrite();
+  rclcpp::TimerBase::SharedPtr default_screen_timer;
+
+  bool prewrite(bool is_default = false);
 
   void set_oled_callback_legacy(
     const std::shared_ptr<mirte_msgs::srv::SetOLEDImageLegacy::Request> req,
@@ -61,4 +62,6 @@ private:
   void set_oled_file_callback(
     const std::shared_ptr<mirte_msgs::srv::SetOLEDFile::Request> req,
     std::shared_ptr<mirte_msgs::srv::SetOLEDFile::Response> res);
+
+  void default_screen_timer_callback();
 };
