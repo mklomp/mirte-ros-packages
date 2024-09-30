@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <chrono>
 #include <functional>
 
 #include <boost/algorithm/string/replace.hpp>
@@ -17,8 +18,10 @@
 #endif
 
 #include <mirte_telemetrix_cpp/modules/ssd1306_module.hpp>
+#include <mirte_telemetrix_cpp/util.hpp>
 
 using namespace std::placeholders;  // for _1, _2, _3...
+using namespace std::chrono_literals;
 
 std::vector<std::shared_ptr<SSD1306_module>> SSD1306_module::get_ssd1306_modules(
   NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Modules> modules)
@@ -45,6 +48,11 @@ SSD1306_module::SSD1306_module(
   this->oled_access_callback_group =
     nh->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
 
+  // Can not call the Timer yet, since the executor needs to spin in order to get the SOC.
+  this->default_screen_timer = nh->create_wall_timer(
+    10s, std::bind(&SSD1306_module::default_screen_timer_callback, this),
+    oled_access_callback_group);
+
   if (data.legacy)
     this->set_oled_service_legacy = nh->create_service<mirte_msgs::srv::SetOLEDImageLegacy>(
       "set_" + data.name + "_image_legacy",
@@ -67,9 +75,10 @@ SSD1306_module::SSD1306_module(
   modules->add_mod(this->ssd1306);
 }
 
-bool SSD1306_module::prewrite()
+bool SSD1306_module::prewrite(bool is_default)
 {
-  default_image = false;
+  if (!is_default) default_screen_timer->cancel();
+
   if (!enabled) {
     RCLCPP_ERROR(nh->get_logger(), "Writing to OLED Module %s failed", data.name.c_str());
     return false;
@@ -139,7 +148,7 @@ bool SSD1306_module::set_image_from_path(fs::path path)
   auto logger = nh->get_logger();
 
   /* Check if the specified path exists */
-  if (!std::filesystem::exists(path)) {
+  if (!fs::exists(path)) {
     RCLCPP_ERROR(logger, "The specified image path does not exist");
     return false;
   }
@@ -230,4 +239,25 @@ void SSD1306_module::set_oled_file_callback(
   std::shared_ptr<mirte_msgs::srv::SetOLEDFile::Response> res)
 {
   res->status = set_image_from_path(req->path);
+}
+
+void SSD1306_module::default_screen_timer_callback()
+{
+  if (!prewrite(true)) return;
+
+  bool succes;
+  if (
+    (fs::status(data.default_screen_script).permissions() &
+     (fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec)) != fs::perms::none) {
+    auto text = exec(data.default_screen_script);
+
+    auto escaped_text = boost::algorithm::replace_all_copy(text, "\\n", "\n");
+    if (escaped_text == last_text) return;
+    last_text = escaped_text;
+    succes = ssd1306->send_text(escaped_text);
+  } else {
+    succes = set_image_from_path(data.default_screen_script);
+  }
+
+  if (not succes) enabled = false;
 }

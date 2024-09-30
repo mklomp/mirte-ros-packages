@@ -14,6 +14,8 @@ public:
   // This is also used by the Legacy command as the folder containing an 'images' and 'animations' folder.
   std::string default_image_path = "/usr/local/src/mirte/mirte-oled-images";
 
+  std::string default_screen_script = "package://mirte_telemetrix_cpp/scripts/default_screen.sh";
+
   SSD1306Data(
     std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
     std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys);
@@ -21,4 +23,6 @@ public:
   bool check();
 
   static std::string get_module_type() { return "ssd1306"; };
+
+  void set_default_screen_script(std::string path);
 };
