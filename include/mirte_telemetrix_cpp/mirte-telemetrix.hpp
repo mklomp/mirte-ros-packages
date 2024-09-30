@@ -17,7 +17,7 @@ private:
   /* data */
 
 public:
-  TelemetrixNode(const rclcpp::NodeOptions & options);
+  TelemetrixNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
   ~TelemetrixNode();
   bool start();

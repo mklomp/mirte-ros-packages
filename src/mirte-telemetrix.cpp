@@ -39,7 +39,7 @@ int main(int argc, char ** argv)
   return 0;
 }
 
-TelemetrixNode::TelemetrixNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
+TelemetrixNode::TelemetrixNode(const rclcpp::NodeOptions & options)
 : rclcpp::Node(
     "mirte_telemetrix_node", rclcpp::NodeOptions(options)
                                .allow_undeclared_parameters(true)
@@ -87,7 +87,7 @@ bool TelemetrixNode::start()
     std::cout << "More than one port available, picking the first one" << std::endl;
   }
 
-  if (true) {
+  if (false) {
     auto mcu_id = 12;  // TODO: add to parsing and config
     bool found = false;
     for (auto & port : available_ports) {

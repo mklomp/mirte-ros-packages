@@ -17,10 +17,14 @@ list(APPEND MIRTE_EXTRA_LIBS gpiodcxx)
 add_compile_definitions(WITH_GPIO)
 add_compile_options(-lgpiodcxx)
 endif()
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# for iwyu, use iwyu_tool.py -p . -j 8
+if(CMAKE_EXPORT_COMPILE_COMMANDS)
+    set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
+endif()
 
-# find_program(iwyu_path NAMES include-what-you-use iwyu REQUIRED) if(NOT
-# iwyu_path) message(FATAL_ERROR "Could not find the program
-# include-what-you-use") endif()
+# to time compilation time. Will gnerate json files you can open in chrome://tracing
+# SET (CMAKE_CXX_FLAGS_INIT                "-ftime-trace") 
 
 # Find catkin macros and libraries if COMPONENTS list like find_package(catkin
 # REQUIRED COMPONENTS xyz) is used, also find other catkin packages
@@ -46,8 +50,8 @@ add_subdirectory(libs/tmx-cpp)
 include_directories(include/ libs/tmx-cpp/include/
                     libs/tmx-cpp/libs/async_serial/include/ ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-include(CheckIPOSupported)
-check_ipo_supported(RESULT supported OUTPUT error)
+# include(CheckIPOSupported)
+# check_ipo_supported(RESULT supported OUTPUT error)
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum -Wall -Werror -Wno-sign-compare") # -Wall -Wextra
                                                                  # -Wpedantic
@@ -110,23 +114,27 @@ ament_target_dependencies(
                                                               # system_lib
 )
 
+if(0) # extra strict errors
+target_compile_options(  ${PROJECT_NAME}_node PRIVATE  -Wall -Wextra -Wpedantic
+-Wconversion -Wno-sign-conversion -Wdouble-promotion -Wno-unused-parameter -Wno-float-conversion -Wno-conversion -Wno-double-promotion
+-Wno-unused-function -Werror  -Wuninitialized)
+endif()
+
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS}
 # ${catkin_EXPORTED_TARGETS} )
 
 # Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node Boost::system
                       Boost::thread tmx_cpp ${MIRTE_EXTRA_LIBS}  ${OpenCV_LIBS})
-set_property(TARGET ${PROJECT_NAME}_node PROPERTY CXX_INCLUDE_WHAT_YOU_USE
-${iwyu_path})
 
-if(supported)
- if(CMAKE_BUILD_TYPE STREQUAL "Release") 
- message(STATUS "IPO LTO enabled") 
- set_property(TARGET ${PROJECT_NAME}_node PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE) 
- endif() 
- else() 
- message(STATUS "IPO  / LTO not supported: <${error}>") 
- endif()
+# if(supported)
+#  if(CMAKE_BUILD_TYPE STREQUAL "Release") 
+#  message(STATUS "IPO LTO enabled") 
+#  set_property(TARGET ${PROJECT_NAME}_node PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE) 
+#  endif() 
+#  else() 
+#  message(STATUS "IPO  / LTO not supported: <${error}>") 
+#  endif()
 
 install(
   TARGETS ${PROJECT_NAME}_node
