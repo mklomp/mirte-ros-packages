@@ -113,8 +113,9 @@ Hiwonder_servo::Hiwonder_servo(
     std::bind(&Hiwonder_servo::range_cb, this, _1, _2));
 
   // create publisher
+  // Use default QOS for sensor publishers as specified in REP2003
   this->position_pub = nh->create_publisher<mirte_msgs::msg::ServoPosition>(
-    "servos/" + this->servo_data->name + "/position", 10);
+    "servos/" + this->servo_data->name + "/position", rclcpp::SystemDefaultsQoS());
 }
 
 void Hiwonder_servo::position_cb(tmx_cpp::HiwonderServo_module::Servo_pos & pos)

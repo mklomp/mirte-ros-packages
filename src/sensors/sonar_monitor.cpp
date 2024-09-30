@@ -23,7 +23,9 @@ SonarMonitor::SonarMonitor(NodeData node_data, SonarData sonar_data)
 : Mirte_Sensor(node_data, {sonar_data.trigger, sonar_data.echo}, (SensorData)sonar_data),
   sonar_data(sonar_data)
 {
-  sonar_pub = nh->create_publisher<sensor_msgs::msg::Range>("distance/" + sonar_data.name, 1);
+  // Use default QOS for sensor publishers as specified in REP2003
+  sonar_pub = nh->create_publisher<sensor_msgs::msg::Range>(
+    "distance/" + sonar_data.name, rclcpp::SystemDefaultsQoS());
 
   sonar_service = nh->create_service<mirte_msgs::srv::GetDistance>(
     "get_distance_" + sonar_data.name,

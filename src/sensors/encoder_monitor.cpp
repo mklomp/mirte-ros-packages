@@ -9,7 +9,10 @@ EncoderMonitor::EncoderMonitor(NodeData node_data, EncoderData encoder_data)
 : Mirte_Sensor(node_data, {encoder_data.pinA, encoder_data.pinB}, (SensorData)encoder_data),
   encoder_data(encoder_data)
 {
-  encoder_pub = nh->create_publisher<mirte_msgs::msg::Encoder>("encoder/" + encoder_data.name, 1);
+  // Use default QOS for sensor publishers as specified in REP2003
+  encoder_pub = nh->create_publisher<mirte_msgs::msg::Encoder>(
+    "encoder/" + encoder_data.name, rclcpp::SystemDefaultsQoS());
+
   encoder_service = nh->create_service<mirte_msgs::srv::GetEncoder>(
     "get_encoder_" + encoder_data.name,
     std::bind(

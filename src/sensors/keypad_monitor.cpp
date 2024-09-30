@@ -24,9 +24,11 @@ std::vector<std::shared_ptr<KeypadMonitor>> KeypadMonitor::get_keypad_monitors(
 KeypadMonitor::KeypadMonitor(NodeData node_data, KeypadData keypad_data)
 : Mirte_Sensor(node_data, {keypad_data.pin}, (SensorData)keypad_data), keypad_data(keypad_data)
 {
-  keypad_pub = nh->create_publisher<mirte_msgs::msg::Keypad>("keypad/" + keypad_data.name, 1);
-  keypad_pressed_pub =
-    nh->create_publisher<mirte_msgs::msg::Keypad>("keypad/" + keypad_data.name + "_pressed", 1);
+  // Use default QOS for sensor publishers as specified in REP2003
+  keypad_pub = nh->create_publisher<mirte_msgs::msg::Keypad>(
+    "keypad/" + keypad_data.name, rclcpp::SystemDefaultsQoS());
+  keypad_pressed_pub = nh->create_publisher<mirte_msgs::msg::Keypad>(
+    "keypad/" + keypad_data.name + "_pressed", rclcpp::SystemDefaultsQoS());
 
   keypad_service = nh->create_service<mirte_msgs::srv::GetKeypad>(
     keypad_data.name + "_get",

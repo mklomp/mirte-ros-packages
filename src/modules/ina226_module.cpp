@@ -23,10 +23,13 @@ INA226_sensor::INA226_sensor(
 
   this->ina226 = std::make_shared<tmx_cpp::INA226_module>(
     ina_data.port, ina_data.addr, std::bind(&INA226_sensor::data_cb, this, _1, _2));
-  this->battery_pub =
-    nh->create_publisher<sensor_msgs::msg::BatteryState>("power/" + this->name, 1);
 
-  this->used_pub = nh->create_publisher<std_msgs::msg::Int32>("power/" + this->name + "/used", 1);
+  // Use default QOS for sensor publishers as specified in REP2003
+  this->battery_pub = nh->create_publisher<sensor_msgs::msg::BatteryState>(
+    "power/" + this->name, rclcpp::SystemDefaultsQoS());
+
+  this->used_pub = nh->create_publisher<std_msgs::msg::Int32>(
+    "power/" + this->name + "/used", rclcpp::SystemDefaultsQoS());
 
   this->shutdown_service = nh->create_service<std_srvs::srv::SetBool>(
     "shutdown", std::bind(&INA226_sensor::shutdown_robot_cb, this, _1, _2));
@@ -37,9 +40,9 @@ INA226_sensor::INA226_sensor(
   // TODO: add auto shutdown
 
 #ifdef WITH_GPIO  // LED Battery indicator
-  if (this->data.use_percentage_led)
-  {
-    battery_led_timer = nh->create_wall_timer(0.5s, std::bind(&INA226_sensor::battery_led_timer_callback, this));
+  if (this->data.use_percentage_led) {
+    battery_led_timer =
+      nh->create_wall_timer(0.5s, std::bind(&INA226_sensor::battery_led_timer_callback, this));
   }
 #endif
 }

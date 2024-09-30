@@ -30,3 +30,6 @@
 
 # local run:
 ./mirte... --ros-args -r __node:=mirte -r __ns:=/mirte --params-file /root/ros2_ws/install/mirte_telemetrix_cpp/share/mirte_telemetrix_cpp/config/mirte_user_config.yaml 
+
+# REP adhearance
+All sensor publishers use QoS profile `SystemDefaultQoS`, as specified in [REP2003](https://www.ros.org/reps/rep-2003.html)
