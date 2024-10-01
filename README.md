@@ -33,3 +33,5 @@
 
 # REP adhearance
 All sensor publishers use QoS profile `SystemDefaultQoS`, as specified in [REP2003](https://www.ros.org/reps/rep-2003.html)
+
+The Sonar Distance Sensor reports out of range values as specified in [REP0117](https://www.ros.org/reps/rep-0117.html)

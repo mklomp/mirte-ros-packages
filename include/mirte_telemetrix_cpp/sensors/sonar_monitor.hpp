@@ -11,6 +11,11 @@
 class SonarMonitor : public Mirte_Sensor
 {
 public:
+  /// @brief The minimum range in meters. 0.02 Meters for the HC-SR04.
+  const double min_range = 0.02;
+  /// @brief The maximum range in meters. 4.50 Meters for the HC-SR04.
+  const double max_range = 4.5;
+
   SonarMonitor(NodeData node_data, SonarData sonar_data);
 
   void update();
@@ -20,7 +25,10 @@ public:
   static std::vector<std::shared_ptr<SonarMonitor>> get_sonar_monitors(
     NodeData node_data, std::shared_ptr<Parser> parser);
   void callback(uint16_t value);
-  uint16_t value;
+
+  /// @brief The last recorded distance.
+  double distance = NAN;
+
   std::shared_ptr<rclcpp::Service<mirte_msgs::srv::GetDistance>> sonar_service;
   bool service_callback(
     const std::shared_ptr<mirte_msgs::srv::GetDistance::Request> req,

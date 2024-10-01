@@ -37,7 +37,35 @@ SonarMonitor::SonarMonitor(NodeData node_data, SonarData sonar_data)
 
 void SonarMonitor::callback(uint16_t value)
 {
-  this->value = value;
+  // Report Errors as specified in REP0117
+  if (value == 0xFFFF) {
+    // Should not occure
+    this->distance = NAN;
+    RCLCPP_DEBUG(
+      nh->get_logger(), "Some weird error which shouldn't occure or no new data was generated?");
+  } else if (value == 0xFFFE) {
+    // Too long since trigger, resulting in invalid reading
+    this->distance = NAN;
+    RCLCPP_DEBUG(nh->get_logger(), "Too long since trigger");
+  } else if (value == 0xFFFD) {
+    // Timeout, so detection is out of range
+    this->distance = INFINITY;
+    RCLCPP_DEBUG(nh->get_logger(), "Object outside of range");
+  } else if (value == 0xFFFC) {
+    this->distance = NAN;
+    RCLCPP_DEBUG(nh->get_logger(), "No new distance measurement was created in time");
+  } else {
+    // The reading is possibly valid.
+    auto raw_distance = value / 100.0;
+    RCLCPP_DEBUG(nh->get_logger(), "%d", value);
+
+    if (raw_distance < min_range)
+      this->distance = -INFINITY;
+    else if (raw_distance > max_range)
+      this->distance = INFINITY;
+    else
+      this->distance = raw_distance;
+  }
   this->update();
 }
 
@@ -47,9 +75,9 @@ void SonarMonitor::update()
   msg.header = this->get_header();
   msg.radiation_type = sensor_msgs::msg::Range::ULTRASOUND;
   msg.field_of_view = M_PI / 12.0;  // 15 degrees, according to the HC-SR04 datasheet
-  msg.min_range = 0.02;
-  msg.max_range = 4.5;
-  msg.range = this->value / 100.0;
+  msg.min_range = min_range;
+  msg.max_range = max_range;
+  msg.range = this->distance;
   this->sonar_pub->publish(msg);
 }
 
@@ -57,6 +85,6 @@ bool SonarMonitor::service_callback(
   const std::shared_ptr<mirte_msgs::srv::GetDistance::Request> req,
   std::shared_ptr<mirte_msgs::srv::GetDistance::Response> res)
 {
-  res->data = this->value / 1000.0;
+  res->data = this->distance;
   return true;
 }
