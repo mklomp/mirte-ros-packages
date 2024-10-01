@@ -24,7 +24,7 @@ EncoderMonitor::EncoderMonitor(NodeData node_data, EncoderData encoder_data)
 
 void EncoderMonitor::callback(int16_t value)
 {
-  value += value;
+  this->value += value;
   update();
 }
 

@@ -21,7 +21,7 @@ public:
   static std::vector<std::shared_ptr<EncoderMonitor>> get_encoder_monitors(
     NodeData node_data, std::shared_ptr<Parser> parser);
   void callback(int16_t value);
-  int16_t value;
+  int16_t value = 0;
   std::shared_ptr<rclcpp::Service<mirte_msgs::srv::GetEncoder>> encoder_service;
   bool service_callback(
     const std::shared_ptr<mirte_msgs::srv::GetEncoder::Request> req,
