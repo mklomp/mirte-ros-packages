@@ -17,6 +17,7 @@ public:
     std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string>& unused_keys);
 
   bool check();
-
+  using DeviceData::check;
   static std::string get_device_class() { return "servo"; }
+  ~ServoData() {}
 };

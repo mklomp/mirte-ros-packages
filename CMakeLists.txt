@@ -11,20 +11,21 @@ include(CheckIncludeFileCXX)
 set(MIRTE_EXTRA_LIBS "")
 
 # Use libgpiod for Mirte Master LED power indicator.
-CHECK_INCLUDE_FILE_CXX(gpiod.hpp HAVE_GPIOD_HPP)
-if (HAVE_GPIOD_HPP)
-list(APPEND MIRTE_EXTRA_LIBS gpiodcxx)
-add_compile_definitions(WITH_GPIO)
-add_compile_options(-lgpiodcxx)
+check_include_file_cxx(gpiod.hpp HAVE_GPIOD_HPP)
+if(HAVE_GPIOD_HPP)
+  list(APPEND MIRTE_EXTRA_LIBS gpiodcxx)
+  add_compile_definitions(WITH_GPIO)
+  add_compile_options(-lgpiodcxx)
 endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # for iwyu, use iwyu_tool.py -p . -j 8
 if(CMAKE_EXPORT_COMPILE_COMMANDS)
-    set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
+  set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES
+      ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
 endif()
 
-# to time compilation time. Will gnerate json files you can open in chrome://tracing
-# SET (CMAKE_CXX_FLAGS_INIT                "-ftime-trace") 
+# to time compilation time. Will gnerate json files you can open in
+# chrome://tracing SET (CMAKE_CXX_FLAGS_INIT                "-ftime-trace")
 
 # Find catkin macros and libraries if COMPONENTS list like find_package(catkin
 # REQUIRED COMPONENTS xyz) is used, also find other catkin packages
@@ -47,22 +48,18 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 # Specify additional locations of header files Your package locations should be
 # listed before other locations
 add_subdirectory(libs/tmx-cpp)
-include_directories(include/ libs/tmx-cpp/include/
-                    libs/tmx-cpp/libs/async_serial/include/ ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+include_directories(
+  include/ libs/tmx-cpp/include/ libs/tmx-cpp/libs/async_serial/include/
+  ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-# include(CheckIPOSupported)
-# check_ipo_supported(RESULT supported OUTPUT error)
+# include(CheckIPOSupported) check_ipo_supported(RESULT supported OUTPUT error)
 
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum -Wall -Werror -Wno-sign-compare") # -Wall -Wextra
-                                                                 # -Wpedantic
-                                                                 # -Werror")
-# set(NO_CLANG_TIDY FALSE CACHE BOOL "Disable clang-tidy")
-# if(NOT NO_CLANG_TIDY)
-# set(CMAKE_CXX_CLANG_TIDY
-# clang-tidy-14;
-# -format-style='file';
-# -header-filter=${CMAKE_CURRENT_SOURCE_DIR};
-# )
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum -Wall -Werror
+# -Wno-sign-compare") # -Wall -Wextra
+# -Wpedantic -Werror")
+# set(NO_CLANG_TIDY FALSE CACHE BOOL "Disable clang-tidy") if(NOT NO_CLANG_TIDY)
+# set(CMAKE_CXX_CLANG_TIDY clang-tidy-14; -format-style='file';
+# -header-filter=${CMAKE_CURRENT_SOURCE_DIR}; )
 # set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # endif()
@@ -109,31 +106,44 @@ add_executable(
   src/modules/hiwonder_module.cpp
   src/modules/ssd1306_module.cpp)
 ament_target_dependencies(
-  ${PROJECT_NAME}_node std_msgs std_srvs mirte_msgs rclcpp rcpputils sensor_msgs cv_bridge # DEPENDS
-                                                              # system_lib
+  ${PROJECT_NAME}_node
+  std_msgs
+  std_srvs
+  mirte_msgs
+  rclcpp
+  rcpputils
+  sensor_msgs
+  cv_bridge # DEPENDS
+  # system_lib
 )
 
 if(0) # extra strict errors
-target_compile_options(  ${PROJECT_NAME}_node PRIVATE  -Wall -Wextra -Wpedantic
--Wconversion -Wno-sign-conversion -Wdouble-promotion -Wno-unused-parameter -Wno-float-conversion -Wno-conversion -Wno-double-promotion
--Wno-unused-function -Werror  -Wuninitialized)
+  target_compile_options(
+    ${PROJECT_NAME}_node
+    PRIVATE -Wall
+            -Wextra
+            -Wpedantic
+            -Wconversion
+            -Wno-sign-conversion
+            -Wdouble-promotion
+            -Wno-unused-parameter
+            -Wno-float-conversion
+            -Wno-conversion
+            -Wno-double-promotion
+            -Wno-sign-compare
+            -Wno-unused-function
+            -Werror
+            -Wuninitialized)
 endif()
 
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS}
-# ${catkin_EXPORTED_TARGETS} )
-
 # Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_node Boost::system
-                      Boost::thread tmx_cpp ${MIRTE_EXTRA_LIBS}  ${OpenCV_LIBS})
+target_link_libraries(${PROJECT_NAME}_node Boost::system Boost::thread tmx_cpp
+                      ${MIRTE_EXTRA_LIBS} ${OpenCV_LIBS})
 
-# if(supported)
-#  if(CMAKE_BUILD_TYPE STREQUAL "Release") 
-#  message(STATUS "IPO LTO enabled") 
-#  set_property(TARGET ${PROJECT_NAME}_node PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE) 
-#  endif() 
-#  else() 
-#  message(STATUS "IPO  / LTO not supported: <${error}>") 
-#  endif()
+# if(supported) if(CMAKE_BUILD_TYPE STREQUAL "Release") message(STATUS "IPO LTO
+# enabled") set_property(TARGET ${PROJECT_NAME}_node PROPERTY
+# INTERPROCEDURAL_OPTIMIZATION TRUE) endif() else() message(STATUS "IPO  / LTO
+# not supported: <${error}>") endif()
 
 install(
   TARGETS ${PROJECT_NAME}_node
@@ -147,7 +157,6 @@ ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME}/)
 install(DIRECTORY scripts DESTINATION share/${PROJECT_NAME}/)
-
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

@@ -6,7 +6,7 @@
 #include <mirte_telemetrix_cpp/sensors/sonar_monitor.hpp>
 
 Mirte_Sensors::Mirte_Sensors(NodeData node_data, std::shared_ptr<Parser> parser)
-: nh(node_data.nh), tmx(node_data.tmx), board(node_data.board)
+: tmx(node_data.tmx), nh(node_data.nh), board(node_data.board)
 {
   auto keypads = KeypadMonitor::get_keypad_monitors(node_data, parser);
   this->sensors.insert(this->sensors.end(), keypads.begin(), keypads.end());

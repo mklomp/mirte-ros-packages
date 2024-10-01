@@ -5,7 +5,7 @@
 #include <mirte_telemetrix_cpp/actuators/servo.hpp>
 
 Mirte_Actuators::Mirte_Actuators(NodeData node_data, std::shared_ptr<Parser> parser)
-: nh(node_data.nh), tmx(node_data.tmx), board(node_data.board)
+: tmx(node_data.tmx), nh(node_data.nh), board(node_data.board)
 {
   this->set_pin_value_service = nh->create_service<mirte_msgs::srv::SetPinValue>(
     "set_pin_value", std::bind(

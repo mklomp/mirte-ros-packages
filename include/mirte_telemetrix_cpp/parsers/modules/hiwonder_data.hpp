@@ -19,4 +19,5 @@ public:
   bool check();
 
   static std::string get_module_type() {return "hiwonder_servo"; };
+  ~HiWonderBusData() {}
 };

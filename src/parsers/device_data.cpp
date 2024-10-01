@@ -29,12 +29,4 @@ DeviceData::DeviceData(
   }
 }
 
-// TODO: REMOVE
-// DeviceData::DeviceData(
-//   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-//   std::map<std::string, rclcpp::ParameterValue> parameters)
-// : DeviceData(parser, board, name, this->get_device_class(), parameters)
-// {
-// }
-
 bool DeviceData::check() { return name != ""; }
