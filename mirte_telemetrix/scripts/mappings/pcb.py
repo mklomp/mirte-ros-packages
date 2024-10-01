@@ -2,6 +2,36 @@ import mappings.pico
 import mappings.nanoatmega328
 import mappings.blackpill_f103c8
 
+mirte_pico_pcb_map06 = {
+    "IR1": {"digital": "16", "analog": "26", "A": "16", "B": "26"},
+    "IR2": {"digital": "17", "analog": "27", "A": "17", "B": "27"},
+    "SRF1": {"trigger": "7", "echo": "6", "A": "7", "B": "6"},
+    "SRF2": {"trigger": "9", "echo": "8", "A": "9", "B": "8"},
+    "I2C1": {"scl": "5", "sda": "4", "A": "5", "B": "4"},
+    "I2C2": {"scl": "11", "sda": "10", "A": "11", "B": "10"},
+    "ENC1": {"pin": "15"},
+    "ENC2": {"pin": "14"},
+    "Keypad": {"pin": "28"},
+    "Servo1": {
+        "pin": "2"
+    },  # These 2 servos don't work together with the motor controllers at the same time
+    "Servo2": {
+        "pin": "3"
+    },  # These 2 servos don't work together with the motor controllers at the same time
+    "Servo3": {"pin": "12"},
+    "Servo4": {"pin": "13"},
+    "LED": {"pin": "25"},
+    "MC1-A": {"1a": "18", "1b": "19"},
+    "MC1-B": {"1a": "20", "1b": "21"},
+    "MC2-A": {"1a": "17", "1b": "27"},
+    "MC2-B": {"1a": "16", "1b": "26"},
+}
+
+
+version = 0.6
+board_mapping = mappings.pico
+connector_mapping = mirte_pico_pcb_map06
+
 
 def get_mcu():
     return board_mapping.get_mcu()
