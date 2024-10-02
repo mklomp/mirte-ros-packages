@@ -72,7 +72,8 @@ SSD1306_module::SSD1306_module(
     rmw_qos_profile_services_default, oled_access_callback_group);
 
   modules->add_mod(this->ssd1306);
-  this->default_screen_timer->execute_callback();
+  // Write an initial text to the screen, and instantly kill the timer if it has failed.
+  if(!this->set_text("Booting...")) this->default_screen_timer->cancel();
 }
 
 bool SSD1306_module::prewrite(bool is_default)
