@@ -124,6 +124,10 @@
         # default_screen_script can be a path or package URI (pkg://PACKAGE_NAME/FOLEDRS) to a image or an executable script which provides text.
         # By default it points to "pkg://mirte_telemetrix_cpp/scripts/default_screen.sh"
         # default_screen_script: "/home/jap/mirte/mirte-oled-images/images/mirte_logo_inv.png"
+      imu:
+        device: mirte
+        type: MPU9250
+        connector: I2C1
       motorservocontroller:
         device: mirte
         type: PCA9685

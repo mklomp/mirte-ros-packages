@@ -95,6 +95,7 @@ add_executable(
   src/parsers/modules/hiwonder_data.cpp
   src/parsers/modules/pca_data.cpp
   src/parsers/modules/ssd1306_data.cpp
+  src/parsers/modules/mpu9250_data.cpp
   src/sensors/base_sensor.cpp
   src/sensors/encoder_monitor.cpp
   src/sensors/intensity_monitor.cpp
@@ -103,6 +104,7 @@ add_executable(
   src/modules/base_module.cpp
   src/modules/pca_module.cpp
   src/modules/ina226_module.cpp
+  src/modules/mpu9250_module.cpp
   src/modules/hiwonder_module.cpp
   src/modules/ssd1306_module.cpp)
 ament_target_dependencies(

@@ -5,6 +5,7 @@
 #include <mirte_telemetrix_cpp/modules/ina226_module.hpp>
 #include <mirte_telemetrix_cpp/modules/pca_module.hpp>
 #include <mirte_telemetrix_cpp/modules/ssd1306_module.hpp>
+#include <mirte_telemetrix_cpp/modules/mpu9250_module.hpp>
 
 Mirte_modules::Mirte_modules(NodeData node_data, std::shared_ptr<Parser> parser)
 : tmx(node_data.tmx), nh(node_data.nh), board(node_data.board)
@@ -29,6 +30,9 @@ Mirte_modules::Mirte_modules(NodeData node_data, std::shared_ptr<Parser> parser)
   RCLCPP_INFO(nh->get_logger(), "Adding INA226 Modules");
   auto ina_mods = INA226_sensor::get_ina_modules(node_data, parser, this->sensor_sys);
   std::cout << "Adding ina modules" << ina_mods.size() << std::endl;
-
   this->modules.insert(this->modules.end(), ina_mods.begin(), ina_mods.end());
+
+  RCLCPP_INFO(nh->get_logger(), "Adding MPU9250 Modules");
+  auto mpu_mods = MPU9250_sensor::get_mpu_modules(node_data, parser, this->sensor_sys);
+  this->modules.insert(this->modules.end(), mpu_mods.begin(), mpu_mods.end());
 }
