@@ -35,3 +35,5 @@
 All sensor publishers use QoS profile `SystemDefaultQoS`, as specified in [REP2003](https://www.ros.org/reps/rep-2003.html)
 
 The Sonar Distance Sensor reports out of range values as specified in [REP0117](https://www.ros.org/reps/rep-0117.html)
+
+The IMU (`MPU9250`) sensors behaves as specified in [REP0145](https://www.ros.org/reps/rep-0145.html)

@@ -48,7 +48,6 @@ SSD1306_module::SSD1306_module(
   this->oled_access_callback_group =
     nh->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
 
-  // Can not call the Timer yet, since the executor needs to spin in order to get the SOC.
   this->default_screen_timer = nh->create_wall_timer(
     10s, std::bind(&SSD1306_module::default_screen_timer_callback, this),
     oled_access_callback_group);
@@ -73,6 +72,7 @@ SSD1306_module::SSD1306_module(
     rmw_qos_profile_services_default, oled_access_callback_group);
 
   modules->add_mod(this->ssd1306);
+  this->default_screen_timer->execute_callback();
 }
 
 bool SSD1306_module::prewrite(bool is_default)
@@ -259,5 +259,10 @@ void SSD1306_module::default_screen_timer_callback()
     succes = set_image_from_path(data.default_screen_script);
   }
 
-  if (not succes) enabled = false;
+  if (not succes) {
+    enabled = false;
+    default_screen_timer->cancel();
+    RCLCPP_ERROR(
+      nh->get_logger(), "Default screen update failed. Disabling screen and update timer.");
+  }
 }

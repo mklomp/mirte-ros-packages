@@ -3,8 +3,6 @@
 #include <numbers>
 
 #include <mirte_telemetrix_cpp/modules/mpu9250_module.hpp>
-#include "mirte_telemetrix_cpp/parsers/modules/module_data.hpp"
-#include "mirte_telemetrix_cpp/parsers/modules/mpu9250_data.hpp"
 
 using namespace std::placeholders;
 
@@ -15,11 +13,12 @@ MPU9250_sensor::MPU9250_sensor(
   tmx->setI2CPins(imu_data.sda, imu_data.scl, imu_data.port);
 
   this->mpu9250 = std::make_shared<tmx_cpp::MPU9250_module>(
-    imu_data.port, imu_data.addr, std::bind(&MPU9250_sensor::data_cb, this, _1, _2, _3));
+    imu_data.port, imu_data.addr, std::bind(&MPU9250_sensor::data_cb, this, _1, _2, _3, _4));
 
-  imu_pub = nh->create_publisher<sensor_msgs::msg::Imu>(this->name, rclcpp::SystemDefaultsQoS());
+  imu_pub = nh->create_publisher<sensor_msgs::msg::Imu>(this->name + "/imu", rclcpp::SystemDefaultsQoS());
 
   // TODO: Add Service
+  imu_service = nh->create_service<mirte_msgs::srv::GetImu>(this->name + "/get_imu", std::bind(&MPU9250_sensor::get_imu_service_callback, this, _1, _2));
 
   //NOTE: There is some covariance between the axes, but this is often considered negligible.
   // Covariance based on datasheet: https://invensense.tdk.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf
@@ -35,7 +34,7 @@ MPU9250_sensor::MPU9250_sensor(
 }
 
 void MPU9250_sensor::data_cb(
-  std::vector<float> acceleration, std::vector<float> gyro, std::vector<float> magnetic_field)
+  std::vector<float> acceleration, std::vector<float> gyro, std::vector<float> magnetic_field, std::vector<float> quaternion)
 {
   msg.header = get_header();
   //TODO: Estimate partial orientation
@@ -48,7 +47,19 @@ void MPU9250_sensor::data_cb(
   msg.angular_velocity.y = gyro[1] * std::numbers::pi / 180.0;
   msg.angular_velocity.z = gyro[2] * std::numbers::pi / 180.0;
 
+  msg.orientation.x = quaternion[0];
+  msg.orientation.y = quaternion[1];
+  msg.orientation.z = quaternion[2];
+  msg.orientation.w = quaternion[3];
+
   imu_pub->publish(msg);
+}
+
+void MPU9250_sensor::get_imu_service_callback(
+  const std::shared_ptr<mirte_msgs::srv::GetImu::Request> req,
+  std::shared_ptr<mirte_msgs::srv::GetImu::Response> res)
+{
+  res->data = sensor_msgs::msg::Imu(msg);
 }
 
 std::vector<std::shared_ptr<MPU9250_sensor>> MPU9250_sensor::get_mpu_modules(
