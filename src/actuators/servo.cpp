@@ -1,3 +1,5 @@
+#include <rclcpp/callback_group.hpp>
+#include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 #include <mirte_msgs/srv/set_servo_angle.hpp>
@@ -12,18 +14,23 @@
 
 #include "mirte_telemetrix_cpp/mirte-actuators.hpp"
 
+/* The Servo callback group can be reentrant (Parrallel), since the second callback does not influence the hardware. */
 Servo::Servo(NodeData node_data, ServoData servo_data)
-: Mirte_Actuator(node_data, {servo_data.pin}, (DeviceData)servo_data), data(servo_data)
+: Mirte_Actuator(
+    node_data, {servo_data.pin}, (DeviceData)servo_data, rclcpp::CallbackGroupType::Reentrant),
+  data(servo_data)
 {
   this->set_angle_service = nh->create_service<mirte_msgs::srv::SetServoAngle>(
     "set_" + name + "_servo_angle",
     std::bind(
-      &Servo::set_angle_service_callback, this, std::placeholders::_1, std::placeholders::_2));
+      &Servo::set_angle_service_callback, this, std::placeholders::_1, std::placeholders::_2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   this->get_range_service = nh->create_service<mirte_msgs::srv::GetServoRange>(
     "get_" + name + "_servo_range",
     std::bind(
-      &Servo::get_range_service_callback, this, std::placeholders::_1, std::placeholders::_2));
+      &Servo::get_range_service_callback, this, std::placeholders::_1, std::placeholders::_2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   tmx->attach_servo(data.pin, data.min_pulse, data.max_pulse);
 }

@@ -118,7 +118,8 @@ bool TelemetrixNode::start()
     }
   }
 
-  auto tmx = std::make_shared<tmx_cpp::TMX>( [&]() { rclcpp::shutdown(); }, available_ports[0].port_name);
+  auto tmx =
+    std::make_shared<tmx_cpp::TMX>([&]() { rclcpp::shutdown(); }, available_ports[0].port_name);
   tmx->sendMessage(tmx_cpp::TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
   tmx->setScanDelay(10);
 

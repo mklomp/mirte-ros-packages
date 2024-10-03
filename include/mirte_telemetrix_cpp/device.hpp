@@ -1,9 +1,8 @@
 #pragma once
-
-#pragma once
-
 #include <memory>
-#include <rclcpp/rclcpp.hpp>
+
+#include <rclcpp/node.hpp>
+#include <rclcpp/callback_group.hpp>
 
 #include <tmx_cpp/tmx.hpp>
 
@@ -26,6 +25,9 @@ public:
   virtual void update() {};
   std::string name;
   std::string frame_id = "";
+
+  rclcpp::CallbackGroup::SharedPtr callback_group;
+  
   virtual void stop() {}
   auto get_header()
   {
@@ -36,6 +38,7 @@ public:
     return header;
   }
   TelemetrixDevice(NodeData node_data, std::vector<uint8_t> pins, DeviceData data);
+  TelemetrixDevice(NodeData node_data, std::vector<uint8_t> pins, DeviceData data, rclcpp::CallbackGroupType callback_group_type);
 };
 
 // }  // namespace mirte_telemetrix_cpp

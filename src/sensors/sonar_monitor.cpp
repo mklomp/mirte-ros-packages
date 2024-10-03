@@ -29,7 +29,8 @@ SonarMonitor::SonarMonitor(NodeData node_data, SonarData sonar_data)
 
   sonar_service = nh->create_service<mirte_msgs::srv::GetDistance>(
     "get_distance_" + sonar_data.name,
-    std::bind(&SonarMonitor::service_callback, this, std::placeholders::_1, std::placeholders::_2));
+    std::bind(&SonarMonitor::service_callback, this, std::placeholders::_1, std::placeholders::_2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   tmx->attach_sonar(
     sonar_data.trigger, sonar_data.echo, [this](auto pin, auto value) { this->callback(value); });

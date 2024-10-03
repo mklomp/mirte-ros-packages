@@ -4,3 +4,10 @@ Mirte_module::Mirte_module(NodeData node_data, std::vector<pin_t> pins, ModuleDa
 : TelemetrixDevice(node_data, pins, (DeviceData)module_data)
 {
 }
+
+Mirte_module::Mirte_module(
+  NodeData node_data, std::vector<pin_t> pins, ModuleData module_data,
+  rclcpp::CallbackGroupType callback_group_type)
+: TelemetrixDevice(node_data, pins, (DeviceData)module_data, callback_group_type)
+{
+}

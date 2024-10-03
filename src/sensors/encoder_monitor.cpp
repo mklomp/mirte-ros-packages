@@ -1,3 +1,4 @@
+#include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 #include <mirte_telemetrix_cpp/sensors/encoder_monitor.hpp>
@@ -16,7 +17,8 @@ EncoderMonitor::EncoderMonitor(NodeData node_data, EncoderData encoder_data)
   encoder_service = nh->create_service<mirte_msgs::srv::GetEncoder>(
     "get_encoder_" + encoder_data.name,
     std::bind(
-      &EncoderMonitor::service_callback, this, std::placeholders::_1, std::placeholders::_2));
+      &EncoderMonitor::service_callback, this, std::placeholders::_1, std::placeholders::_2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   tmx->attach_encoder(
     encoder_data.pinA, encoder_data.pinB, [this](auto pin, auto value) { this->callback(value); });

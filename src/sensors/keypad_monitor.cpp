@@ -32,7 +32,8 @@ KeypadMonitor::KeypadMonitor(NodeData node_data, KeypadData keypad_data)
 
   keypad_service = nh->create_service<mirte_msgs::srv::GetKeypad>(
     "get_keypad_" + keypad_data.name,
-    std::bind(&KeypadMonitor::keypad_callback, this, std::placeholders::_1, std::placeholders::_2));
+    std::bind(&KeypadMonitor::keypad_callback, this, std::placeholders::_1, std::placeholders::_2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   tmx->setPinMode(keypad_data.pin, tmx_cpp::TMX::PIN_MODES::ANALOG_INPUT, true, 0);
   tmx->add_analog_callback(

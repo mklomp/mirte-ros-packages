@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <rclcpp/callback_group.hpp>
 #include <string>
 #include <vector>
 
@@ -37,5 +38,6 @@ class Mirte_Actuator: public TelemetrixDevice
 {
 public:
   Mirte_Actuator(NodeData node_data, std::vector<pin_t> pins, DeviceData data);
+  Mirte_Actuator(NodeData node_data, std::vector<pin_t> pins, DeviceData data, rclcpp::CallbackGroupType callback_group_type);
   virtual ~Mirte_Actuator() {}
 };

@@ -34,7 +34,8 @@ Hiwonder_bus_module::Hiwonder_bus_module(
   // create bus services
   this->enable_service = nh->create_service<std_srvs::srv::SetBool>(
     "set_" + this->name + "_all_servos_enable",
-    std::bind(&Hiwonder_bus_module::enable_cb, this, _1, _2));
+    std::bind(&Hiwonder_bus_module::enable_cb, this, _1, _2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 }
 
 bool Hiwonder_bus_module::enable_cb(
@@ -89,6 +90,7 @@ void Hiwonder_bus_module::offset_cb(int id, uint16_t offset)
   std::cout << "Servo: " << id << " offset: " << offset << std::endl;
 }
 
+// FIXME: Not in it the busmodule callback group yet!
 Hiwonder_servo::Hiwonder_servo(
   std::shared_ptr<rclcpp::Node> nh, std::shared_ptr<tmx_cpp::TMX> tmx,
   std::shared_ptr<Mirte_Board> board, std::shared_ptr<Hiwonder_servo_data> servo_data,

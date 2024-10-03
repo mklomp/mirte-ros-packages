@@ -35,8 +35,6 @@ private:
   bool enabled = true;
   std::optional<std::string> last_text;
 
-  rclcpp::CallbackGroup::SharedPtr oled_access_callback_group;
-
   rclcpp::Service<mirte_msgs::srv::SetOLEDImageLegacy>::SharedPtr set_oled_service_legacy;
 
   rclcpp::Service<mirte_msgs::srv::SetOLEDText>::SharedPtr set_oled_text_service;

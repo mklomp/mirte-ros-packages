@@ -8,6 +8,7 @@
 #include <opencv2/opencv.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <rclcpp/callback_group.hpp>
 #include <rcpputils/asserts.hpp>
 
 // Pre & Post IRON compatability.
@@ -35,41 +36,41 @@ std::vector<std::shared_ptr<SSD1306_module>> SSD1306_module::get_ssd1306_modules
   return new_modules;
 }
 
+// Use a mutally Exclusive callback group to ensure no OLED commands get mixed.
 SSD1306_module::SSD1306_module(
   NodeData node_data, SSD1306Data oled_data, std::shared_ptr<tmx_cpp::Modules> modules)
-: Mirte_module(node_data, {oled_data.scl, oled_data.sda}, (ModuleData)oled_data), data(oled_data)
+: Mirte_module(
+    node_data, {oled_data.scl, oled_data.sda}, (ModuleData)oled_data,
+    rclcpp::CallbackGroupType::MutuallyExclusive),
+  data(oled_data)
 {
   tmx->setI2CPins(data.sda, data.scl, data.port);
 
   this->ssd1306 =
     std::make_shared<tmx_cpp::SSD1306_module>(data.port, data.addr, data.width, data.height);
 
-  // Use a mutally Exclusive callback group to ensure no OLED commands get mixed.
-  this->oled_access_callback_group =
-    nh->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-
   this->default_screen_timer = nh->create_wall_timer(
     10s, std::bind(&SSD1306_module::default_screen_timer_callback, this),
-    oled_access_callback_group);
+    this->callback_group);
 
   if (data.legacy)
     this->set_oled_service_legacy = nh->create_service<mirte_msgs::srv::SetOLEDImageLegacy>(
       "set_" + data.name + "_image_legacy",
       std::bind(&SSD1306_module::set_oled_callback_legacy, this, _1, _2),
-      rmw_qos_profile_services_default, oled_access_callback_group);
+      rmw_qos_profile_services_default, this->callback_group);
 
   this->set_oled_text_service = nh->create_service<mirte_msgs::srv::SetOLEDText>(
     "set_" + data.name + "_text", std::bind(&SSD1306_module::set_oled_text_callback, this, _1, _2),
-    rmw_qos_profile_services_default, oled_access_callback_group);
+    rmw_qos_profile_services_default, this->callback_group);
 
   this->set_oled_image_service = nh->create_service<mirte_msgs::srv::SetOLEDImage>(
     "set_" + data.name + "_image",
     std::bind(&SSD1306_module::set_oled_image_callback, this, _1, _2),
-    rmw_qos_profile_services_default, oled_access_callback_group);
+    rmw_qos_profile_services_default, this->callback_group);
 
   this->set_oled_file_service = nh->create_service<mirte_msgs::srv::SetOLEDFile>(
     "set_" + data.name + "_file", std::bind(&SSD1306_module::set_oled_file_callback, this, _1, _2),
-    rmw_qos_profile_services_default, oled_access_callback_group);
+    rmw_qos_profile_services_default, this->callback_group);
 
   modules->add_mod(this->ssd1306);
   // Write an initial text to the screen, and instantly kill the timer if it has failed.

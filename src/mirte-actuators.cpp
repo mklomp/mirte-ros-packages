@@ -13,10 +13,7 @@ Mirte_Actuators::Mirte_Actuators(NodeData node_data, std::shared_ptr<Parser> par
                        std::placeholders::_1, std::placeholders::_2));
 
   this->actuators = Motor::get_motors(node_data, parser);
-  // WIP:
-  // TODO: set_pin!!!
-  // auto servos = Servo_data::parse_servo_data(parser, board);
-  // auto motors = Motor_data::parse_motor_data(parser, board);
+
   auto servos = Servo::get_servos(node_data, parser);
   this->actuators.insert(this->actuators.end(), servos.begin(), servos.end());
 }
@@ -42,5 +39,12 @@ void Mirte_Actuators::set_pin_value_service_callback(
 
 Mirte_Actuator::Mirte_Actuator(NodeData node_data, std::vector<pin_t> pins, DeviceData data)
 : TelemetrixDevice(node_data, pins, data)
+{
+}
+
+Mirte_Actuator::Mirte_Actuator(
+  NodeData node_data, std::vector<pin_t> pins, DeviceData data,
+  rclcpp::CallbackGroupType callback_group_type)
+: TelemetrixDevice(node_data, pins, data, callback_group_type)
 {
 }

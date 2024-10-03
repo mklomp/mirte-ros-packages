@@ -15,10 +15,12 @@ MPU9250_sensor::MPU9250_sensor(
   this->mpu9250 = std::make_shared<tmx_cpp::MPU9250_module>(
     imu_data.port, imu_data.addr, std::bind(&MPU9250_sensor::data_cb, this, _1, _2, _3, _4));
 
-  imu_pub = nh->create_publisher<sensor_msgs::msg::Imu>(this->name + "/imu", rclcpp::SystemDefaultsQoS());
+  imu_pub =
+    nh->create_publisher<sensor_msgs::msg::Imu>(this->name + "/imu", rclcpp::SystemDefaultsQoS());
 
-  // TODO: Add Service
-  imu_service = nh->create_service<mirte_msgs::srv::GetImu>(this->name + "/get_imu", std::bind(&MPU9250_sensor::get_imu_service_callback, this, _1, _2));
+  imu_service = nh->create_service<mirte_msgs::srv::GetImu>(
+    this->name + "/get_imu", std::bind(&MPU9250_sensor::get_imu_service_callback, this, _1, _2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   //NOTE: There is some covariance between the axes, but this is often considered negligible.
   // Covariance based on datasheet: https://invensense.tdk.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf
@@ -34,7 +36,8 @@ MPU9250_sensor::MPU9250_sensor(
 }
 
 void MPU9250_sensor::data_cb(
-  std::vector<float> acceleration, std::vector<float> gyro, std::vector<float> magnetic_field, std::vector<float> quaternion)
+  std::vector<float> acceleration, std::vector<float> gyro, std::vector<float> magnetic_field,
+  std::vector<float> quaternion)
 {
   msg.header = get_header();
   //TODO: Estimate partial orientation

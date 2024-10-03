@@ -16,6 +16,7 @@ std::vector<std::shared_ptr<PCA_Module>> PCA_Module::get_pca_modules(
   return pca_modules;
 }
 
+// TODO: This possibly could be a reentrant (parallel) callback group
 PCA_Module::PCA_Module(
   NodeData node_data, PCAData pca_data, std::shared_ptr<tmx_cpp::Modules> modules)
 : Mirte_module(node_data, {pca_data.scl, pca_data.sda}, (ModuleData)pca_data)
@@ -34,7 +35,8 @@ PCA_Module::PCA_Module(
 
   motor_service = nh->create_service<mirte_msgs::srv::SetSpeedMultiple>(
     "set_" + this->name + "_multiple_speeds",
-    std::bind(&PCA_Module::motor_service_cb, this, _1, _2));
+    std::bind(&PCA_Module::motor_service_cb, this, _1, _2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 }
 
 bool PCA_Module::motor_service_cb(
@@ -63,6 +65,7 @@ bool PCA_Module::motor_service_cb(
   return true;
 }
 
+// FIXME: Add to PCA module callback group
 PCA_Motor::PCA_Motor(
   NodeData node_data, std::shared_ptr<PCA_Motor_data> motor_data,
   std::shared_ptr<tmx_cpp::PCA9685_module> pca9685)
