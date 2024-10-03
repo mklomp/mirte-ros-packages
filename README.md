@@ -13,18 +13,18 @@
 | encoders               | ✅                        | ✅ ?                 |                                                                                       |
 | get pin service        | ✅                        | ✅                   | Reading output pins results in undefined behavior (Tested digital read a digital out) |
 | **Actuators**          |                           |                      |                                                                                       |
-| oled                   | ✅                        | ❌                   |                                                                                       |
+| oled                   | ✅                        | 🔷                   | OLED is now a Module. (Maybe the parsing can be improved to be more like old style)   |
 | servos                 | ✅                        | ✅                   |                                                                                       |
 | keypad                 | ✅                        | ✅                   |                                                                                       |
 | motors                 | ✅                        | ❓                   | L9110S Work                                                                           |
 | set pin service        | ✅                        | ✅                   | Digital not tested as much                                                            |
 | **Mirte-master parts** |                           |                      |                                                                                       |
-| hiwonder servo         | ✅                        | ✅                   |                                                                                       |
+| hiwonder servo         | ✅                        | ✅ ?Needs more testing|                                                                                      |
 | pca9685 pwm            | ✅                        | ✅                   |                                                                                       |
-| ina226                 | ✅                        | ✅                   | shutdown relay not implemented as hw is not working. gpio blink also not implemented. |
-| imu                    | ✅                        | ❌                   |                                                                                       |
+| ina226                 | ✅                        | ✅                   | shutdown relay not implemented as hw is not working.                                  |
+| imu                    | ✅                        | ✅                   |                                                                                       |
 | ledstrip               | ✅                        | ❌                   |                                                                                       |
-| oled module            | ✅                        | ❌                   |                                                                                       |
+| oled module            | ✅                        | ✅                   |                                                                                       |
 
 
 
