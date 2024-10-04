@@ -1,24 +1,28 @@
 #pragma once
-#include "rclcpp/rclcpp.hpp"
-#include "mirte_telemetrix_cpp/util.hpp"
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
+
+#include "rclcpp/rclcpp.hpp"
+
+#include "mirte_telemetrix_cpp/util.hpp"
+
 using pin_t = uint8_t;
 
-class Parser {
+class Parser
+{
 public:
   std::shared_ptr<rclcpp::Node> nh;
   std::map<std::string, rclcpp::ParameterValue> params;
   Parser(std::shared_ptr<rclcpp::Node> nh);
-  std::map<std::string, rclcpp::ParameterValue>
-  get_params_name(std::string name);
+  std::map<std::string, rclcpp::ParameterValue> get_params_name(std::string name);
   std::set<std::string> get_params_keys(std::string name);
   std::string build_param_name(std::string name, std::string key);
-  int get_frequency() {
-    return 50; // TODO: make this configurable
+  int get_frequency()
+  {
+    return 50;  // TODO: make this configurable
   }
   std::string get_last(std::string name);
 };
@@ -27,3 +31,11 @@ std::string get_string(rclcpp::ParameterValue param);
 
 /// Convience function to read float parameters, will still work if parameter is actually an integer.
 float get_float(rclcpp::ParameterValue param);
+
+/* Insert parameter keys */
+
+std::map<std::string, rclcpp::ParameterValue> insert_default_param(
+  std::map<std::string, rclcpp::ParameterValue> parameters, std::string key,
+  rclcpp::ParameterValue value);
+
+std::set<std::string> & insert_default_param(std::set<std::string> & unused_keys, std::string key);

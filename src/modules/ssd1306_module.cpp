@@ -28,7 +28,7 @@ std::vector<std::shared_ptr<SSD1306_module>> SSD1306_module::get_ssd1306_modules
   NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Modules> modules)
 {
   std::vector<std::shared_ptr<SSD1306_module>> new_modules;
-  auto datas = parse_all_modules<SSD1306Data>(parser, node_data.board);
+  auto datas = parse_all<SSD1306Data>(parser, node_data.board);
   for (auto data : datas) {
     auto module = std::make_shared<SSD1306_module>(node_data, data, modules);
     new_modules.push_back(module);
@@ -55,21 +55,21 @@ SSD1306_module::SSD1306_module(
 
   if (data.legacy)
     this->set_oled_service_legacy = nh->create_service<mirte_msgs::srv::SetOLEDImageLegacy>(
-      "set_" + data.name + "_image_legacy",
+      "oled/set_" + data.name + "_image_legacy",
       std::bind(&SSD1306_module::set_oled_callback_legacy, this, _1, _2),
       rmw_qos_profile_services_default, this->callback_group);
 
   this->set_oled_text_service = nh->create_service<mirte_msgs::srv::SetOLEDText>(
-    "set_" + data.name + "_text", std::bind(&SSD1306_module::set_oled_text_callback, this, _1, _2),
+    "oled/set_" + data.name + "_text", std::bind(&SSD1306_module::set_oled_text_callback, this, _1, _2),
     rmw_qos_profile_services_default, this->callback_group);
 
   this->set_oled_image_service = nh->create_service<mirte_msgs::srv::SetOLEDImage>(
-    "set_" + data.name + "_image",
+    "oled/set_" + data.name + "_image",
     std::bind(&SSD1306_module::set_oled_image_callback, this, _1, _2),
     rmw_qos_profile_services_default, this->callback_group);
 
   this->set_oled_file_service = nh->create_service<mirte_msgs::srv::SetOLEDFile>(
-    "set_" + data.name + "_file", std::bind(&SSD1306_module::set_oled_file_callback, this, _1, _2),
+    "oled/set_" + data.name + "_file", std::bind(&SSD1306_module::set_oled_file_callback, this, _1, _2),
     rmw_qos_profile_services_default, this->callback_group);
 
   modules->add_mod(this->ssd1306);

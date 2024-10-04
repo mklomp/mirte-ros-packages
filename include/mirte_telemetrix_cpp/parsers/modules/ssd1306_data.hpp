@@ -24,6 +24,7 @@ public:
   using I2CModuleData::check;
 
   static std::string get_module_type() { return "ssd1306"; };
+  static std::string get_device_class() { return "oled"; };
 
   void set_default_screen_script(std::string path);
 };

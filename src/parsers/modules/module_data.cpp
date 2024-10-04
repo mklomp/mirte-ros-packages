@@ -7,12 +7,12 @@
 
 ModuleData::ModuleData(
   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-  std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string>& unused_keys)
+  std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
 : DeviceData(parser, board, name, this->get_device_class(), parameters, unused_keys)
 {
   rcpputils::require_true(
     unused_keys.erase("type"),
-    (boost::format("A module configuration requires a 'type' to be specifie, but no "
+    (boost::format("A module configuration requires a 'type' to be specified, but no "
                    "'type' was for module '%1%'") %
      name)
       .str());

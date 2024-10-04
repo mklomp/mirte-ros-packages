@@ -14,14 +14,12 @@ MPU9250Data::MPU9250Data(
 std::map<std::string, rclcpp::ParameterValue> MPU9250Data::insert_default_frame_id(
   std::map<std::string, rclcpp::ParameterValue> parameters)
 {
-  parameters.emplace("frame_id", rclcpp::ParameterValue("imu_link"));
-  return parameters;
+  return insert_default_param(parameters, "frame_id", rclcpp::ParameterValue("imu_link"));
 }
 
 std::set<std::string> & MPU9250Data::insert_default_frame_id(std::set<std::string> & unused_keys)
 {
-  unused_keys.emplace("frame_id");
-  return unused_keys;
+  return insert_default_param(unused_keys, "frame_id");
 }
 
 bool MPU9250Data::check() { return I2CModuleData::check(get_module_type()); }

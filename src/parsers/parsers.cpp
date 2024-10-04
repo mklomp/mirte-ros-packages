@@ -96,3 +96,16 @@ Parser::get_last(std::string name) { // convert modules.servobus to servobus
   auto last = name.substr(last_dot + 1);
   return last;
 }
+
+std::map<std::string, rclcpp::ParameterValue> insert_default_param(
+  std::map<std::string, rclcpp::ParameterValue> parameters, std::string key,
+  rclcpp::ParameterValue value) {
+  parameters.emplace(key, value);
+  return parameters;
+}
+
+
+std::set<std::string> & insert_default_param(std::set<std::string> & unused_keys, std::string key) {
+  unused_keys.emplace(key);
+  return unused_keys;
+}
