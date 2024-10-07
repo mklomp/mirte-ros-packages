@@ -55,28 +55,27 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_lifecycle</depend>
 
-  <exec_depend>forward_command_controller</exec_depend>
-  <exec_depend>joint_state_broadcaster</exec_depend>
-  <exec_depend>joint_state_publisher_gui</exec_depend>
-  <exec_depend>joint_trajectory_controller</exec_depend>
-  <exec_depend>robot_state_publisher</exec_depend> 
-  <exec_depend>ros2controlcli</exec_depend>
-  <exec_depend>ros2launch</exec_depend>
-  <exec_depend>rviz2</exec_depend>
-  <exec_depend>xacro</exec_depend>
-  <depend>yaml_cpp_vendor</depend>
-  <exec_depend>ros2_controllers</exec_depend>
-  <!-- <depend>roscpp</depend> -->
   <depend>std_msgs</depend>
   <depend>mirte_msgs</depend>
   <depend>controller_manager</depend>
   <depend>trajectory_msgs</depend>
-  <exec_depend>diff_drive_controller</exec_depend>
-  <exec_depend>effort_controllers</exec_depend> 
+
+  <depend>yaml_cpp_vendor</depend>
+
   <depend>control_toolbox</depend>
+
+  <exec_depend>forward_command_controller</exec_depend>
+  <exec_depend>joint_state_broadcaster</exec_depend>
+  <exec_depend>joint_trajectory_controller</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>ros2controlcli</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>ros2_controllers</exec_depend>
+  <exec_depend>diff_drive_controller</exec_depend>
+  <exec_depend>effort_controllers</exec_depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>
-
-
 </package>
