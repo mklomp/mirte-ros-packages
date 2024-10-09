@@ -130,11 +130,11 @@ void VEML6040_sensor::get_hsl_service_callback(
 std::vector<std::shared_ptr<VEML6040_sensor>> VEML6040_sensor::get_veml6040_modules(
   NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Sensors> sensors)
 {
-  std::vector<std::shared_ptr<VEML6040_sensor>> modules;
+  std::vector<std::shared_ptr<VEML6040_sensor>> new_modules;
   auto datas = parse_all<VEML6040Data>(parser, node_data.board);
   for (auto data : datas) {
     auto module = std::make_shared<VEML6040_sensor>(node_data, data, sensors);
-    modules.push_back(module);
+    new_modules.push_back(module);
   }
-  return modules;
+  return new_modules;
 }

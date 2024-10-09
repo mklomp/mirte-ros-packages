@@ -41,10 +41,13 @@
         name: right
         device: mirte
         connector: I2C1
-    # color:
-    #   right: # The name of the color sensor
-    #     device: mirte
-    #     connector: I2C1
+    color:
+      left: # The name of the color sensor
+        device: mirte
+        connector: I2C2
+      right: # The name of the color sensor
+        device: mirte
+        connector: I2C1
     servo:
       left:
         name: left

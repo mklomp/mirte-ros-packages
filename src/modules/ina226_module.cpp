@@ -163,14 +163,13 @@ void INA226_sensor::shutdown_robot_cb(
 std::vector<std::shared_ptr<INA226_sensor>> INA226_sensor::get_ina_modules(
   NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Sensors> modules)
 {
-  std::vector<std::shared_ptr<INA226_sensor>> pca_modules;
-  auto pca_data = parse_all_modules<INA226Data>(parser, node_data.board);
-  for (auto pca : pca_data) {
-    std::cout << "ina data" << pca.name << std::endl;
-    auto pca_module = std::make_shared<INA226_sensor>(node_data, pca, modules);
-    pca_modules.push_back(pca_module);
+  std::vector<std::shared_ptr<INA226_sensor>> new_modules;
+  auto datas = parse_all_modules<INA226Data>(parser, node_data.board);
+  for (auto data : datas) {
+    auto module = std::make_shared<INA226_sensor>(node_data, data, modules);
+    new_modules.push_back(module);
   }
-  return pca_modules;
+  return new_modules;
 }
 
 #ifdef WITH_GPIO

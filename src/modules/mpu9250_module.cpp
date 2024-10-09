@@ -40,7 +40,6 @@ void MPU9250_sensor::data_cb(
   std::vector<float> quaternion)
 {
   msg.header = get_header();
-  //TODO: Estimate partial orientation
 
   msg.linear_acceleration.x = acceleration[0] * 9.81;
   msg.linear_acceleration.y = acceleration[1] * 9.81;
