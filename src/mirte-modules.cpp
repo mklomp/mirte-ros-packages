@@ -3,9 +3,10 @@
 
 #include <mirte_telemetrix_cpp/modules/hiwonder_module.hpp>
 #include <mirte_telemetrix_cpp/modules/ina226_module.hpp>
+#include <mirte_telemetrix_cpp/modules/mpu9250_module.hpp>
 #include <mirte_telemetrix_cpp/modules/pca_module.hpp>
 #include <mirte_telemetrix_cpp/modules/ssd1306_module.hpp>
-#include <mirte_telemetrix_cpp/modules/mpu9250_module.hpp>
+#include <mirte_telemetrix_cpp/modules/veml6040_module.hpp>
 
 Mirte_modules::Mirte_modules(NodeData node_data, std::shared_ptr<Parser> parser)
 : tmx(node_data.tmx), nh(node_data.nh), board(node_data.board)
@@ -35,4 +36,8 @@ Mirte_modules::Mirte_modules(NodeData node_data, std::shared_ptr<Parser> parser)
   RCLCPP_INFO(nh->get_logger(), "Adding MPU9250 Modules");
   auto mpu_mods = MPU9250_sensor::get_mpu_modules(node_data, parser, this->sensor_sys);
   this->modules.insert(this->modules.end(), mpu_mods.begin(), mpu_mods.end());
+
+  RCLCPP_INFO(nh->get_logger(), "Adding VEML6040 Modules");
+  auto veml_mods = VEML6040_sensor::get_veml6040_modules(node_data, parser, this->sensor_sys);
+  this->modules.insert(this->modules.end(), veml_mods.begin(), veml_mods.end());
 }

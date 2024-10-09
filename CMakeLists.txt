@@ -37,6 +37,7 @@ find_package(mirte_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(color_util REQUIRED)
 find_package(cv_bridge REQUIRED)
 
 find_package(OpenCV REQUIRED COMPONENTS core imgcodecs)
@@ -96,17 +97,20 @@ add_executable(
   src/parsers/modules/pca_data.cpp
   src/parsers/modules/ssd1306_data.cpp
   src/parsers/modules/mpu9250_data.cpp
+  src/parsers/modules/veml6040_data.cpp
   src/sensors/base_sensor.cpp
   src/sensors/encoder_monitor.cpp
   src/sensors/intensity_monitor.cpp
   src/sensors/keypad_monitor.cpp
   src/sensors/sonar_monitor.cpp
   src/modules/base_module.cpp
-  src/modules/pca_module.cpp
+  src/modules/hiwonder_module.cpp
   src/modules/ina226_module.cpp
   src/modules/mpu9250_module.cpp
-  src/modules/hiwonder_module.cpp
-  src/modules/ssd1306_module.cpp)
+  src/modules/pca_module.cpp
+  src/modules/ssd1306_module.cpp
+  src/modules/veml6040_module.cpp
+)
 ament_target_dependencies(
   ${PROJECT_NAME}_node
   std_msgs
@@ -115,6 +119,7 @@ ament_target_dependencies(
   rclcpp
   rcpputils
   sensor_msgs
+  color_util
   cv_bridge # DEPENDS
   # system_lib
 )
