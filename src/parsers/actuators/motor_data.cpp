@@ -17,17 +17,15 @@ MotorData::MotorData(
     this->D1 = pins["D1"];
     this->D2 = pins["D2"];
   } else if (unused_keys.erase("pins")) {
-    if (parameters.count("pins.p1"))
-      this->P1 = board->resolvePin(get_string(parameters["pins.p1"]));
+    auto subkeys = parser->get_params_keys(parser->build_param_name(get_device_key(this), "pins"));
 
-    if (parameters.count("pins.p2"))
-      this->P2 = board->resolvePin(get_string(parameters["pins.p2"]));
+    if (subkeys.erase("p1")) this->P1 = board->resolvePin(get_string(parameters["pins.p1"]));
+    if (subkeys.erase("p2")) this->P2 = board->resolvePin(get_string(parameters["pins.p2"]));
 
-    if (parameters.count("pins.d1"))
-      this->D1 = board->resolvePin(get_string(parameters["pins.d1"]));
+    if (subkeys.erase("d1")) this->D1 = board->resolvePin(get_string(parameters["pins.d1"]));
+    if (subkeys.erase("p2")) this->D2 = board->resolvePin(get_string(parameters["pins.d2"]));
 
-    if (parameters.count("pins.p2"))
-      this->D2 = board->resolvePin(get_string(parameters["pins.d2"]));
+    for (auto subkey : subkeys) unused_keys.insert(parser->build_param_name("pins", subkey));
   } else
     RCLCPP_ERROR(
       logger, "Device %s.%s has no a connector or pins specified.", get_device_class().c_str(),

@@ -1,10 +1,15 @@
+#include <functional>
+
 #include <mirte_telemetrix_cpp/parsers/sensors/encoder_data.hpp>
+
+using namespace std::placeholders;
 
 EncoderData::EncoderData(
   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
   std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
 : SensorData(parser, board, name, EncoderData::get_device_class(), parameters, unused_keys)
 {
+  auto key = get_device_key(this);
   auto logger = parser->nh->get_logger();
 
   if (unused_keys.erase("connector")) {
@@ -13,21 +18,20 @@ EncoderData::EncoderData(
     this->pinA = pins["pinA"];
     this->pinB = pins["pinB"];
   } else if (unused_keys.erase("pins")) {
+    auto subkeys = parser->get_params_keys(parser->build_param_name(key, "pins"));
     // FIXME: Maybe restructure to test if pin A and B or only pin is set.
-    if (parameters.count("pins.A"))
-      this->pinA = board->resolvePin(get_string(parameters["pins.A"]));
+    if (subkeys.erase("A")) this->pinA = board->resolvePin(get_string(parameters["pins.A"]));
 
-    if (parameters.count("pins.B"))
-      this->pinB = board->resolvePin(get_string(parameters["pins.B"]));
+    if (subkeys.erase("B")) this->pinB = board->resolvePin(get_string(parameters["pins.B"]));
 
-    if (parameters.count("pins.pin")) {
+    if (subkeys.erase("pin")) {
       this->pinA = board->resolvePin(get_string(parameters["pins.pin"]));
       this->pinB = (pin_t)-1;
     }
+
+    for (auto subkey : subkeys) unused_keys.insert(parser->build_param_name("pins", subkey));
   } else
-    RCLCPP_ERROR(
-      logger, "Device %s.%s has no a connector or pins specified.", get_device_class().c_str(),
-      name.c_str());
+    RCLCPP_ERROR(logger, "Device %s has no a connector or pins specified.", key.c_str());
 }
 
 bool EncoderData::check()

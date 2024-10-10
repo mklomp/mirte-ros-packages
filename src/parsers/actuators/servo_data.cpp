@@ -13,8 +13,11 @@ ServoData::ServoData(
 
     this->pin = pins["pin"];
   } else if (unused_keys.erase("pins")) {
-    if (parameters.count("pins.pin"))
-      this->pin = board->resolvePin(get_string(parameters["pins.pin"]));
+    auto subkeys = parser->get_params_keys(parser->build_param_name(get_device_key(this), "pins"));
+
+    if (subkeys.erase("pin")) this->pin = board->resolvePin(get_string(parameters["pins.pin"]));
+
+    for (auto subkey : subkeys) unused_keys.insert(parser->build_param_name("pins", subkey));
   } else
     RCLCPP_ERROR(
       logger, "Device %s.%s has no a connector or pins specified.", get_device_class().c_str(),

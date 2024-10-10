@@ -5,7 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "rclcpp/rclcpp.hpp"
+#include <rclcpp/node.hpp>
+#include <rclcpp/parameter.hpp>
 
 #include "mirte_telemetrix_cpp/util.hpp"
 
@@ -19,7 +20,7 @@ public:
   Parser(std::shared_ptr<rclcpp::Node> nh);
   std::map<std::string, rclcpp::ParameterValue> get_params_name(std::string name);
   std::set<std::string> get_params_keys(std::string name);
-  std::string build_param_name(std::string name, std::string key);
+  static std::string build_param_name(std::string name, std::string key);
   int get_frequency()
   {
     return 50;  // TODO: make this configurable

@@ -69,3 +69,9 @@ std::vector<typename std::enable_if<std::is_base_of<DeviceData, T>::value, T>::t
 
   return devices;
 }
+
+template <class T>
+std::enable_if<std::is_base_of<DeviceData, T>::value, std::string>::type get_device_key(T * device)
+{
+  return Parser::build_param_name(T::get_device_class(), device->name);
+}

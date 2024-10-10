@@ -5,6 +5,7 @@ SonarData::SonarData(
   std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
 : SensorData(parser, board, name, SonarData::get_device_class(), parameters, unused_keys)
 {
+  auto key = get_device_key(this);
   auto logger = parser->nh->get_logger();
 
   if (unused_keys.erase("connector")) {
@@ -13,15 +14,16 @@ SonarData::SonarData(
     this->trigger = pins["trigger"];
     this->echo = pins["echo"];
   } else if (unused_keys.erase("pins")) {
-    if (parameters.count("pins.trigger"))
+    auto subkeys = parser->get_params_keys(parser->build_param_name(key, "pins"));
+
+    if (subkeys.erase("trigger"))
       this->trigger = board->resolvePin(get_string(parameters["pins.trigger"]));
 
-    if (parameters.count("pins.echo"))
-      this->echo = board->resolvePin(get_string(parameters["pins.echo"]));
+    if (subkeys.erase("echo")) this->echo = board->resolvePin(get_string(parameters["pins.echo"]));
+
+    for (auto subkey : subkeys) unused_keys.insert(parser->build_param_name("pins", subkey));
   } else
-    RCLCPP_ERROR(
-      logger, "Device %s . %s has no a connector or pins specified.", get_device_class().c_str(),
-      name.c_str());
+    RCLCPP_ERROR(logger, "Device %s has no a connector or pins specified.", key.c_str());
 }
 
 bool SonarData::check() { return trigger != (pin_t)-1 && echo != (pin_t)-1 && SensorData::check(); }

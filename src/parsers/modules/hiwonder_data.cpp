@@ -9,6 +9,7 @@ HiWonderBusData::HiWonderBusData(
   std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
 : ModuleData(parser, board, name, parameters, unused_keys)
 {
+  auto key = get_device_key(this);
   auto logger = parser->nh->get_logger();
 
   if (unused_keys.erase("connector")) {
@@ -18,22 +19,23 @@ HiWonderBusData::HiWonderBusData(
               name)
                .str());
   } else if (unused_keys.erase("pins")) {
-    // FIXME: Shouldn't this be moved under pins?
-    if (parameters.count("pins.rx"))
-      this->rx_pin = board->resolvePin(get_string(parameters["pins.rx"]));
-    if (parameters.count("pins.tx"))
-      this->tx_pin = board->resolvePin(get_string(parameters["pins.tx"]));
+    auto subkeys = parser->get_params_keys(parser->build_param_name(get_device_key(this), "pins"));
+
+    if (subkeys.erase("rx")) this->rx_pin = board->resolvePin(get_string(parameters["pins.rx"]));
+    if (subkeys.erase("tx")) this->tx_pin = board->resolvePin(get_string(parameters["pins.tx"]));
+
+    for (auto subkey: subkeys) unused_keys.insert(parser->build_param_name("pins", subkey));
   } else
     RCLCPP_ERROR(
-      logger, "Device %s.%s has no a connector or pins specified. (Connector not supported yet)",
-      get_device_class().c_str(), name.c_str());
+      logger, "Device %s has no a connector or pins specified. (Connector not supported yet)",
+      key.c_str());
 
   this->uart_port = board->resolveUARTPort(this->rx_pin);
 
   // FIXME: NESTED PARAMS
   if (unused_keys.erase("servos"))
     this->servos = Hiwonder_servo_data::parse_hiwonder_servo_data(
-      parser, board, parser->build_param_name(get_device_class(), name));
+      parser, board, key);
 }
 
 bool HiWonderBusData::check()

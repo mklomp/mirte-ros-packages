@@ -95,6 +95,8 @@ add_executable(
   src/parsers/modules/ina226_data.cpp
   src/parsers/modules/hiwonder_data.cpp
   src/parsers/modules/pca_data.cpp
+  src/parsers/modules/pca/pca_motor_data.cpp
+  src/parsers/modules/pca/pca_servo_data.cpp
   src/parsers/modules/ssd1306_data.cpp
   src/parsers/modules/mpu9250_data.cpp
   src/parsers/modules/veml6040_data.cpp
