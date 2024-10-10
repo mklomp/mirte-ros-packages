@@ -48,7 +48,7 @@ void Servo::set_angle_service_callback(
 
   if (angle > data.max_angle || angle < data.min_angle) {
     RCLCPP_WARN(
-      nh->get_logger(),
+      logger,
       "The provided angle is out of range. Angle %.3f degrees was requested, but range is [%.3f, "
       "%.3f]",
       angle, data.min_angle, data.max_angle);

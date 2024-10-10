@@ -10,7 +10,7 @@ HiWonderBusData::HiWonderBusData(
 : ModuleData(parser, board, name, parameters, unused_keys)
 {
   auto key = get_device_key(this);
-  auto logger = parser->nh->get_logger();
+  auto logger = parser->logger;
 
   if (unused_keys.erase("connector")) {
     rcpputils::check_true(

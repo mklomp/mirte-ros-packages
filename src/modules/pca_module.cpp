@@ -28,7 +28,6 @@ PCA_Module::PCA_Module(
 
   modules->add_mod(pca9685);
   for (auto motor : pca_data.motors) {
-    std::cout << "Adding PCA motor: " << motor->name << std::endl;
     this->motors.push_back(std::make_shared<PCA_Motor>(node_data, motor, pca9685));
   }
   // TODO: add servos to this as well
@@ -78,7 +77,7 @@ PCA_Motor::PCA_Motor(
   // this->nh = nh;
   // this->board = board;
 
-  std::cout << "Adding Motor to PCA " << motor_data->name << std::endl;
+  RCLCPP_INFO(nh->get_logger(), "Added PCA Motor %s", motor_data->name.c_str());
 
   motor_service = nh->create_service<mirte_msgs::srv::SetMotorSpeed>(
     "set_" + this->motor_data->name + "_speed",

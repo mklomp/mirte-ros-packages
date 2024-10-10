@@ -5,7 +5,7 @@ INA226Data::INA226Data(
   std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
 : I2CModuleData(parser, board, name, parameters, unused_keys)
 {
-  auto logger = parser->nh->get_logger();
+  auto logger = parser->logger.get_child(get_device_class()).get_child(this->name);
 
   // Set default for address
   if ((!parameters.count("addr")) && this->addr == 0xFF) this->addr = 0x40;

@@ -61,7 +61,7 @@ void KeypadMonitor::update()
   std::string key = "";
   auto maxValue = std::pow(2, board->get_adc_bits());
   auto scale = 4096.0 / maxValue;
-  // RCLCPP_INFO(nh->get_logger(), "%d", this->value);
+  // RCLCPP_INFO(logger, "%d", this->value);
   if (this->value < 70 / scale) {
     key = "left";
   } else if (this->value < 230 / scale) {

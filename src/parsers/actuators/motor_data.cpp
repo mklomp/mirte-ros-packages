@@ -6,7 +6,7 @@ MotorData::MotorData(
   std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
 : DeviceData(parser, board, name, MotorData::get_device_class(), parameters, unused_keys)
 {
-  auto logger = parser->nh->get_logger();
+  auto logger = parser->logger;
 
   if (unused_keys.erase("connector")) {
     auto connector = get_string(parameters["connector"]);

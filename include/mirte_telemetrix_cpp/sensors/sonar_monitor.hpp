@@ -26,6 +26,7 @@ public:
     NodeData node_data, std::shared_ptr<Parser> parser);
   void callback(uint16_t value);
 
+private:
   /// @brief The last recorded distance.
   double distance = NAN;
 

@@ -10,7 +10,7 @@ EncoderData::EncoderData(
 : SensorData(parser, board, name, EncoderData::get_device_class(), parameters, unused_keys)
 {
   auto key = get_device_key(this);
-  auto logger = parser->nh->get_logger();
+  auto logger = parser->logger;
 
   if (unused_keys.erase("connector")) {
     auto connector = get_string(parameters["connector"]);

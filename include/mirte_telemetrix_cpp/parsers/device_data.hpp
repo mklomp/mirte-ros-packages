@@ -35,7 +35,7 @@ template <class T>
 std::vector<typename std::enable_if<std::is_base_of<DeviceData, T>::value, T>::type> parse_all(
   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board)
 {
-  auto logger = parser->nh->get_logger();
+  auto logger = parser->logger;
   const auto device_class = T::get_device_class();
 
   std::vector<T> devices;
@@ -71,7 +71,7 @@ std::vector<typename std::enable_if<std::is_base_of<DeviceData, T>::value, T>::t
 }
 
 template <class T>
-std::enable_if<std::is_base_of<DeviceData, T>::value, std::string>::type get_device_key(T * device)
+typename std::enable_if<std::is_base_of<DeviceData, T>::value, std::string>::type get_device_key(T * device)
 {
   return Parser::build_param_name(T::get_device_class(), device->name);
 }

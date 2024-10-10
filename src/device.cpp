@@ -12,6 +12,7 @@ TelemetrixDevice::TelemetrixDevice(
   nh(node_data.nh),
   board(node_data.board),
   pins(pins),
+  logger(nh->get_logger()),
   name(data.name),
   frame_id(data.frame_id)
 {

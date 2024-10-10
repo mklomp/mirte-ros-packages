@@ -44,14 +44,15 @@ SSD1306_module::SSD1306_module(
     rclcpp::CallbackGroupType::MutuallyExclusive),
   data(oled_data)
 {
+  this->logger = this->logger.get_child(data.get_device_class()).get_child(data.name);
+  
   tmx->setI2CPins(data.sda, data.scl, data.port);
 
   this->ssd1306 =
     std::make_shared<tmx_cpp::SSD1306_module>(data.port, data.addr, data.width, data.height);
 
   this->default_screen_timer = nh->create_wall_timer(
-    10s, std::bind(&SSD1306_module::default_screen_timer_callback, this),
-    this->callback_group);
+    10s, std::bind(&SSD1306_module::default_screen_timer_callback, this), this->callback_group);
 
   if (data.legacy)
     this->set_oled_service_legacy = nh->create_service<mirte_msgs::srv::SetOLEDImageLegacy>(
@@ -60,7 +61,8 @@ SSD1306_module::SSD1306_module(
       rmw_qos_profile_services_default, this->callback_group);
 
   this->set_oled_text_service = nh->create_service<mirte_msgs::srv::SetOLEDText>(
-    "oled/set_" + data.name + "_text", std::bind(&SSD1306_module::set_oled_text_callback, this, _1, _2),
+    "oled/set_" + data.name + "_text",
+    std::bind(&SSD1306_module::set_oled_text_callback, this, _1, _2),
     rmw_qos_profile_services_default, this->callback_group);
 
   this->set_oled_image_service = nh->create_service<mirte_msgs::srv::SetOLEDImage>(
@@ -69,7 +71,8 @@ SSD1306_module::SSD1306_module(
     rmw_qos_profile_services_default, this->callback_group);
 
   this->set_oled_file_service = nh->create_service<mirte_msgs::srv::SetOLEDFile>(
-    "oled/set_" + data.name + "_file", std::bind(&SSD1306_module::set_oled_file_callback, this, _1, _2),
+    "oled/set_" + data.name + "_file",
+    std::bind(&SSD1306_module::set_oled_file_callback, this, _1, _2),
     rmw_qos_profile_services_default, this->callback_group);
 
   modules->add_mod(this->ssd1306);
@@ -77,8 +80,7 @@ SSD1306_module::SSD1306_module(
   /* NOTE: This needs to use the raw send_text, because otherwise the default_screen_timer will be canceled. */
   if (!this->ssd1306->send_text("Booting...")) {
     RCLCPP_ERROR(
-      this->nh->get_logger(),
-      "Writing to OLED module '%s' failed, shutting down default screen timer.",
+      this->logger, "Writing to OLED module '%s' failed, shutting down default screen timer.",
       this->data.name.c_str());
     this->default_screen_timer->cancel();
   }
@@ -89,7 +91,7 @@ bool SSD1306_module::prewrite(bool is_default)
   if (!is_default) default_screen_timer->cancel();
 
   if (!enabled) {
-    RCLCPP_ERROR(nh->get_logger(), "Writing to OLED Module %s failed", data.name.c_str());
+    RCLCPP_ERROR(logger, "Writing to OLED Module %s failed", data.name.c_str());
     return false;
   }
   return true;
@@ -116,8 +118,8 @@ bool SSD1306_module::set_image(uint8_t width, uint8_t height, uint8_t img_buffer
 
   if (width != data.width || height != data.height) {
     RCLCPP_ERROR(
-      nh->get_logger(), "Supplied image of wrong size. Expected %ux%u, got %ux%u", data.width,
-      data.height, width, height);
+      logger, "Supplied image of wrong size. Expected %ux%u, got %ux%u", data.width, data.height,
+      width, height);
     return false;
   }
 
@@ -154,8 +156,6 @@ bool SSD1306_module::set_image_from_path(std::string path)
 
 bool SSD1306_module::set_image_from_path(fs::path path)
 {
-  auto logger = nh->get_logger();
-
   /* Check if the specified path exists */
   if (!fs::exists(path)) {
     RCLCPP_ERROR(logger, "The specified image path does not exist");
@@ -202,8 +202,6 @@ void SSD1306_module::set_oled_callback_legacy(
   const std::shared_ptr<mirte_msgs::srv::SetOLEDImageLegacy::Request> req,
   std::shared_ptr<mirte_msgs::srv::SetOLEDImageLegacy::Response> res)
 {
-  auto logger = nh->get_logger();
-
   if (req->type == "text") {
     res->status = set_text(req->value);
   } else if (req->type == "image") {
@@ -271,7 +269,6 @@ void SSD1306_module::default_screen_timer_callback()
   if (not succes) {
     enabled = false;
     default_screen_timer->cancel();
-    RCLCPP_ERROR(
-      nh->get_logger(), "Default screen update failed. Disabling screen and update timer.");
+    RCLCPP_ERROR(logger, "Default screen update failed. Disabling screen and update timer.");
   }
 }

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include <rclcpp/logger.hpp>
 #include <rclcpp/node.hpp>
 #include <rclcpp/parameter.hpp>
 
@@ -17,6 +18,7 @@ class Parser
 public:
   std::shared_ptr<rclcpp::Node> nh;
   std::map<std::string, rclcpp::ParameterValue> params;
+  rclcpp::Logger logger;
   Parser(std::shared_ptr<rclcpp::Node> nh);
   std::map<std::string, rclcpp::ParameterValue> get_params_name(std::string name);
   std::set<std::string> get_params_keys(std::string name);

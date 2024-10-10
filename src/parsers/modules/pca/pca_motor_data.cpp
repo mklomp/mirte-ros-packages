@@ -27,7 +27,7 @@ std::vector<std::shared_ptr<PCA_Motor_data>> PCA_Motor_data::parse_pca_motor_dat
         motor_data.invert = motor_config["invert"].get<bool>();
       }
       if (motor_data.check()) {
-        RCLCPP_DEBUG(parser->nh->get_logger().get_child(pca_key), "Added PCA Motor %s", motor_data.name.c_str());
+        RCLCPP_DEBUG(parser->logger.get_child(pca_key), "Parsed PCA Motor %s", motor_data.name.c_str());
         motors.push_back(std::make_shared<PCA_Motor_data>(motor_data));
       }
 

@@ -12,7 +12,7 @@ PCAData::PCAData(
 {
   auto key = get_device_key(this);
   // This logger is only used for DEBUG, so it is a child logger.
-  auto logger = parser->nh->get_logger().get_child(key);
+  auto logger = parser->logger.get_child(key);
 
   // Set default for address
   if ((!parameters.count("addr")) && this->addr == 0xFF) this->addr = 0x41;

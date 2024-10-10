@@ -23,6 +23,8 @@ SonarMonitor::SonarMonitor(NodeData node_data, SonarData sonar_data)
 : Mirte_Sensor(node_data, {sonar_data.trigger, sonar_data.echo}, (SensorData)sonar_data),
   sonar_data(sonar_data)
 {
+  this->logger = this->logger.get_child(sonar_data.get_device_class()).get_child(sonar_data.name);
+
   // Use default QOS for sensor publishers as specified in REP2003
   sonar_pub = nh->create_publisher<sensor_msgs::msg::Range>(
     "distance/" + sonar_data.name, rclcpp::SystemDefaultsQoS());
@@ -42,23 +44,22 @@ void SonarMonitor::callback(uint16_t value)
   if (value == 0xFFFF) {
     // Should not occure
     this->distance = NAN;
-    RCLCPP_DEBUG(
-      nh->get_logger(), "Some weird error which shouldn't occure or no new data was generated?");
+    RCLCPP_DEBUG(logger, "Some weird error which shouldn't occure or no new data was generated?");
   } else if (value == 0xFFFE) {
     // Too long since trigger, resulting in invalid reading
     this->distance = NAN;
-    RCLCPP_DEBUG(nh->get_logger(), "Too long since trigger");
+    RCLCPP_DEBUG(logger, "Too long since trigger");
   } else if (value == 0xFFFD) {
     // Timeout, so detection is out of range
     this->distance = INFINITY;
-    RCLCPP_DEBUG(nh->get_logger(), "Object outside of range");
+    RCLCPP_DEBUG(logger, "Object outside of range");
   } else if (value == 0xFFFC) {
     this->distance = NAN;
-    RCLCPP_DEBUG(nh->get_logger(), "No new distance measurement was created in time");
+    RCLCPP_DEBUG(logger, "No new distance measurement was created in time");
   } else {
     // The reading is possibly valid.
     auto raw_distance = value / 100.0;
-    RCLCPP_DEBUG(nh->get_logger(), "%d", value);
+    RCLCPP_DEBUG(logger, "%d", value);
 
     if (raw_distance < min_range)
       this->distance = -INFINITY;

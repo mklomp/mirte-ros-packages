@@ -8,10 +8,9 @@
 Mirte_Board_pico::Mirte_Board_pico() {}
 
 int Mirte_Board_pico::resolvePin(std::string pin_name) {
-  std::cout << "Mirte_Board_pico::resolvePin " << pin_name << std::endl;
-  // int pin = -1;
+  // std::cout << "Mirte_Board_pico::resolvePin " << pin_name << std::endl;
   if (auto pin = try_parse_int(pin_name)) {
-    std::cout << "Mirte_Board_pico::tryparse " << *pin << std::endl;
+    // std::cout << "Mirte_Board_pico::tryparse " << *pin << std::endl;
     return pin.value();
   }
   if (starts_with(pin_name, "GP")) {

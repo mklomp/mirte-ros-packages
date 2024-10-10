@@ -26,7 +26,7 @@ int main(int argc, char ** argv)
     rclcpp::init(argc, argv);
 
     rclcpp::executors::MultiThreadedExecutor executor;
-    
+
     // Spin the ROS node
     auto node = std::make_shared<TelemetrixNode>();
     if (!node->start()) return 0;

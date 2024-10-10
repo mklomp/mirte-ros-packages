@@ -21,6 +21,7 @@ public:
   std::shared_ptr<rclcpp::Node> nh;
   std::shared_ptr<Mirte_Board> board;
   std::vector<uint8_t> pins;
+  rclcpp::Logger logger;
 
   virtual void update() {};
   std::string name;
