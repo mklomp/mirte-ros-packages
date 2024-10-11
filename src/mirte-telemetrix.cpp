@@ -22,31 +22,31 @@
 int main(int argc, char ** argv)
 {
   // Initialize the ROS node
-  try {
-    rclcpp::init(argc, argv);
+  rclcpp::init(argc, argv);
 
-    rclcpp::executors::MultiThreadedExecutor executor;
+  rclcpp::executors::MultiThreadedExecutor executor;
 
-    // Spin the ROS node
-    auto node = std::make_shared<TelemetrixNode>();
-    if (!node->start()) return 0;
+  // Spin the ROS node
+  auto node = std::make_shared<TelemetrixNode>();
 
-    executor.add_node(node);
-    executor.spin();
-    rclcpp::shutdown();
+  executor.add_node(node->get_node_base_interface());
+  executor.spin();
+  rclcpp::shutdown();
 
-  } catch (std::exception & e) {
-    std::cout << "Exception " << e.what() << std::endl;
-  }
   return 0;
 }
 
+rclcpp::node_interfaces::NodeBaseInterface::SharedPtr TelemetrixNode::get_node_base_interface() const {
+  return this->node_->get_node_base_interface();
+}
+
 TelemetrixNode::TelemetrixNode(const rclcpp::NodeOptions & options)
-: rclcpp::Node(
+: node_(std::make_shared<rclcpp::Node>(
     "mirte_telemetrix_node", rclcpp::NodeOptions(options)
                                .allow_undeclared_parameters(true)
-                               .automatically_declare_parameters_from_overrides(true))
+                               .automatically_declare_parameters_from_overrides(true)))
 {
+  if (!this->start()) rclcpp::shutdown();
 }
 
 TelemetrixNode::~TelemetrixNode()
@@ -58,8 +58,7 @@ TelemetrixNode::~TelemetrixNode()
 
 bool TelemetrixNode::start()
 {
-  auto nh = shared_from_this();
-  auto parser = std::make_shared<Parser>(nh);
+  auto parser = std::make_shared<Parser>(node_);
 
   std::shared_ptr<Mirte_Board> board = Mirte_Board::create(parser);
 
@@ -118,12 +117,11 @@ bool TelemetrixNode::start()
     }
   }
 
-  auto tmx =
-    std::make_shared<tmx_cpp::TMX>([&]() { rclcpp::shutdown(); }, available_ports[0].port_name);
+  tmx = std::make_shared<tmx_cpp::TMX>([&]() { rclcpp::shutdown(); }, available_ports[0].port_name);
   tmx->sendMessage(tmx_cpp::TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
   tmx->setScanDelay(10);
 
-  NodeData node_data{nh, tmx, board};
+  NodeData node_data{node_, tmx, board};
 
   std::cout << "Start adding" << std::endl;
 

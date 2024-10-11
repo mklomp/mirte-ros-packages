@@ -1,7 +1,9 @@
 #pragma once
 #include <memory>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/node.hpp>
+#include <rclcpp/node_interfaces/node_base_interface.hpp>
+#include <rclcpp/node_options.hpp>
 
 #include <tmx_cpp/tmx.hpp>
 
@@ -10,13 +12,16 @@
 #include <mirte_telemetrix_cpp/mirte-modules.hpp>
 #include <mirte_telemetrix_cpp/mirte-sensors.hpp>
 
-class TelemetrixNode : public rclcpp::Node
- {
+class TelemetrixNode
+{
 private:
   /* data */
+  std::shared_ptr<rclcpp::Node> node_;
 
 public:
   TelemetrixNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr get_node_base_interface() const;
 
   ~TelemetrixNode();
   bool start();
