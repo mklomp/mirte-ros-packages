@@ -4,7 +4,7 @@
 #include <mirte_telemetrix_cpp/parsers/sensors/sonar_data.hpp>
 #include <mirte_telemetrix_cpp/sensors/sonar_monitor.hpp>
 
-#include <mirte_msgs/srv/get_distance.hpp>
+#include <mirte_msgs/srv/get_range.hpp>
 #include <sensor_msgs/msg/range.hpp>
 
 std::vector<std::shared_ptr<SonarMonitor>> SonarMonitor::get_sonar_monitors(
@@ -29,8 +29,8 @@ SonarMonitor::SonarMonitor(NodeData node_data, SonarData sonar_data)
   sonar_pub = nh->create_publisher<sensor_msgs::msg::Range>(
     "distance/" + sonar_data.name, rclcpp::SystemDefaultsQoS());
 
-  sonar_service = nh->create_service<mirte_msgs::srv::GetDistance>(
-    "get_distance_" + sonar_data.name,
+  sonar_service = nh->create_service<mirte_msgs::srv::GetRange>(
+    "distance/" + sonar_data.name + "/get_range",
     std::bind(&SonarMonitor::service_callback, this, std::placeholders::_1, std::placeholders::_2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
@@ -80,13 +80,14 @@ void SonarMonitor::update()
   msg.min_range = min_range;
   msg.max_range = max_range;
   msg.range = this->distance;
+  this->range = msg;
   this->sonar_pub->publish(msg);
 }
 
 bool SonarMonitor::service_callback(
-  const std::shared_ptr<mirte_msgs::srv::GetDistance::Request> req,
-  std::shared_ptr<mirte_msgs::srv::GetDistance::Response> res)
+  const std::shared_ptr<mirte_msgs::srv::GetRange::Request> req,
+  std::shared_ptr<mirte_msgs::srv::GetRange::Response> res)
 {
-  res->data = this->distance;
+  res->range = this->range;
   return true;
 }

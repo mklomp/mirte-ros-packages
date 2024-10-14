@@ -53,10 +53,10 @@ DigitalIntensityMonitor::DigitalIntensityMonitor(NodeData node_data, IntensityDa
 {
   // Use default QOS for sensor publishers as specified in REP2003
   intensity_pub = nh->create_publisher<mirte_msgs::msg::IntensityDigital>(
-    "intensity/" + intensity_data.name + "_digital", rclcpp::SystemDefaultsQoS());
+    "intensity/" + intensity_data.name + "/digital", rclcpp::SystemDefaultsQoS());
 
   intensity_service = nh->create_service<mirte_msgs::srv::GetIntensityDigital>(
-    "get_intensity_" + intensity_data.name + "_digital",
+    "intensity/" + intensity_data.name + "/get_digital",
     std::bind(
       &DigitalIntensityMonitor::service_callback, this, std::placeholders::_1,
       std::placeholders::_2),
@@ -75,7 +75,7 @@ AnalogIntensityMonitor::AnalogIntensityMonitor(NodeData node_data, IntensityData
     "intensity/" + intensity_data.name, rclcpp::SystemDefaultsQoS());
 
   intensity_service = nh->create_service<mirte_msgs::srv::GetIntensity>(
-    "get_intensity_" + intensity_data.name,
+    "intensity/" + intensity_data.name + "/get_analog",
     std::bind(
       &AnalogIntensityMonitor::service_callback, this, std::placeholders::_1,
       std::placeholders::_2),

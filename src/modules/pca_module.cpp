@@ -33,7 +33,7 @@ PCA_Module::PCA_Module(
   // TODO: add servos to this as well
 
   motor_service = nh->create_service<mirte_msgs::srv::SetSpeedMultiple>(
-    "set_" + this->name + "_multiple_speeds",
+    "motor/" + this->name + "/set_multiple_speeds",
     std::bind(&PCA_Module::motor_service_cb, this, _1, _2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 }
@@ -80,11 +80,11 @@ PCA_Motor::PCA_Motor(
   RCLCPP_INFO(nh->get_logger(), "Added PCA Motor %s", motor_data->name.c_str());
 
   motor_service = nh->create_service<mirte_msgs::srv::SetMotorSpeed>(
-    "set_" + this->motor_data->name + "_speed",
+    "motor/" + this->motor_data->name + "/set_speed",
     std::bind(&PCA_Motor::service_callback, this, std::placeholders::_1, std::placeholders::_2));
 
   ros_client = nh->create_subscription<std_msgs::msg::Int32>(
-    "motor_" + this->motor_data->name + "_speed", 1000,
+    "motor/" + this->motor_data->name + "/speed", 1000,
     std::bind(&PCA_Motor::motor_callback, this, std::placeholders::_1));
 }
 

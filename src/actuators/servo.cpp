@@ -21,13 +21,13 @@ Servo::Servo(NodeData node_data, ServoData servo_data)
   data(servo_data)
 {
   this->set_angle_service = nh->create_service<mirte_msgs::srv::SetServoAngle>(
-    "set_" + name + "_servo_angle",
+    "servo/" + name + "/set_angle",
     std::bind(
       &Servo::set_angle_service_callback, this, std::placeholders::_1, std::placeholders::_2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   this->get_range_service = nh->create_service<mirte_msgs::srv::GetServoRange>(
-    "get_" + name + "_servo_range",
+    "servo/" + name + "/get_range",
     std::bind(
       &Servo::get_range_service_callback, this, std::placeholders::_1, std::placeholders::_2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);

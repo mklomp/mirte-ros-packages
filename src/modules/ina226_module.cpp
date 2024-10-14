@@ -32,7 +32,7 @@ INA226_sensor::INA226_sensor(
     "power/" + this->name + "/used", rclcpp::SystemDefaultsQoS());
 
   this->shutdown_service = nh->create_service<std_srvs::srv::SetBool>(
-    "shutdown", std::bind(&INA226_sensor::shutdown_robot_cb, this, _1, _2),
+    "power/" + this->name + "/shutdown", std::bind(&INA226_sensor::shutdown_robot_cb, this, _1, _2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   modules->add_sens(this->ina226);
@@ -42,8 +42,8 @@ INA226_sensor::INA226_sensor(
 
 #ifdef WITH_GPIO  // LED Battery indicator
   if (this->data.use_percentage_led) {
-    battery_led_timer =
-      nh->create_wall_timer(0.5s, std::bind(&INA226_sensor::battery_led_timer_callback, this), this->callback_group);
+    battery_led_timer = nh->create_wall_timer(
+      0.5s, std::bind(&INA226_sensor::battery_led_timer_callback, this), this->callback_group);
   }
 #endif
 }

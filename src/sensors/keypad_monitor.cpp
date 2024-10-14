@@ -28,10 +28,10 @@ KeypadMonitor::KeypadMonitor(NodeData node_data, KeypadData keypad_data)
   keypad_pub = nh->create_publisher<mirte_msgs::msg::Keypad>(
     "keypad/" + keypad_data.name, rclcpp::SystemDefaultsQoS());
   keypad_pressed_pub = nh->create_publisher<mirte_msgs::msg::Keypad>(
-    "keypad/" + keypad_data.name + "_pressed", rclcpp::SystemDefaultsQoS());
+    "keypad/" + keypad_data.name + "/pressed", rclcpp::SystemDefaultsQoS());
 
   keypad_service = nh->create_service<mirte_msgs::srv::GetKeypad>(
-    "get_keypad_" + keypad_data.name,
+    "keypad/" + keypad_data.name + "/get_key",
     std::bind(&KeypadMonitor::keypad_callback, this, std::placeholders::_1, std::placeholders::_2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 

@@ -15,7 +15,7 @@ EncoderMonitor::EncoderMonitor(NodeData node_data, EncoderData encoder_data)
     "encoder/" + encoder_data.name, rclcpp::SystemDefaultsQoS());
 
   encoder_service = nh->create_service<mirte_msgs::srv::GetEncoder>(
-    "get_encoder_" + encoder_data.name,
+    "encoder/" + encoder_data.name + "/get_encoder",
     std::bind(
       &EncoderMonitor::service_callback, this, std::placeholders::_1, std::placeholders::_2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);

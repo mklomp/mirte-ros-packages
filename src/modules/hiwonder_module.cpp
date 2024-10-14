@@ -31,6 +31,8 @@ Hiwonder_bus_module::Hiwonder_bus_module(
     this->servos.push_back(std::make_shared<Hiwonder_servo>(nh, tmx, board, servo, this->bus));
   }
 
+  // TODO: RENAME TO NEW SCHEMA, BUT NOT MIX WITH STANDARD SERVOS.
+
   // create bus services
   this->enable_service = nh->create_service<std_srvs::srv::SetBool>(
     "set_" + this->name + "_all_servos_enable",

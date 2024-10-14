@@ -16,10 +16,10 @@ MPU9250_sensor::MPU9250_sensor(
     imu_data.port, imu_data.addr, std::bind(&MPU9250_sensor::data_cb, this, _1, _2, _3, _4));
 
   imu_pub =
-    nh->create_publisher<sensor_msgs::msg::Imu>(this->name + "/imu", rclcpp::SystemDefaultsQoS());
+    nh->create_publisher<sensor_msgs::msg::Imu>("imu/" + this->name + "/data", rclcpp::SystemDefaultsQoS());
 
   imu_service = nh->create_service<mirte_msgs::srv::GetImu>(
-    this->name + "/get_imu", std::bind(&MPU9250_sensor::get_imu_service_callback, this, _1, _2),
+    "imu/" + this->name + "/get_data", std::bind(&MPU9250_sensor::get_imu_service_callback, this, _1, _2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   //NOTE: There is some covariance between the axes, but this is often considered negligible.

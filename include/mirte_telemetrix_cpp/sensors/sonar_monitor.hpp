@@ -5,7 +5,7 @@
 #include <mirte_telemetrix_cpp/parsers/sensors/sonar_data.hpp>
 #include <mirte_telemetrix_cpp/sensors/base_sensor.hpp>
 
-#include <mirte_msgs/srv/get_distance.hpp>
+#include <mirte_msgs/srv/get_range.hpp>
 #include <sensor_msgs/msg/range.hpp>
 
 class SonarMonitor : public Mirte_Sensor
@@ -29,9 +29,10 @@ public:
 private:
   /// @brief The last recorded distance.
   double distance = NAN;
+  sensor_msgs::msg::Range range;
 
-  std::shared_ptr<rclcpp::Service<mirte_msgs::srv::GetDistance>> sonar_service;
+  std::shared_ptr<rclcpp::Service<mirte_msgs::srv::GetRange>> sonar_service;
   bool service_callback(
-    const std::shared_ptr<mirte_msgs::srv::GetDistance::Request> req,
-    std::shared_ptr<mirte_msgs::srv::GetDistance::Response> res);
+    const std::shared_ptr<mirte_msgs::srv::GetRange::Request> req,
+    std::shared_ptr<mirte_msgs::srv::GetRange::Response> res);
 };

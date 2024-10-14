@@ -47,14 +47,14 @@ Motor::Motor(NodeData node_data, std::vector<pin_t> pins, MotorData motor_data)
 : Mirte_Actuator(node_data, pins, (DeviceData)motor_data), data(motor_data)
 {
   motor_service = nh->create_service<mirte_msgs::srv::SetMotorSpeed>(
-    "set_" + this->name + "_speed",
+    "motor/"+ this->name + "/set_speed",
     std::bind(&Motor::service_callback, this, std::placeholders::_1, std::placeholders::_2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   rclcpp::SubscriptionOptions options;
   options.callback_group = this->callback_group;
   ros_client = nh->create_subscription<std_msgs::msg::Int32>(
-    "motor_" + this->name + "_speed", rclcpp::SystemDefaultsQoS(),
+    "motor/" + this->name + "/speed", rclcpp::SystemDefaultsQoS(),
     std::bind(&Motor::motor_callback, this, std::placeholders::_1), options);
 
   this->max_pwm = board->get_max_pwm();
