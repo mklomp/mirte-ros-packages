@@ -19,7 +19,7 @@ Mirte_modules::Mirte_modules(NodeData node_data, std::shared_ptr<Parser> parser)
 
   RCLCPP_INFO(nh->get_logger(), "Adding HiWonder Modules");
   auto hiwonder_mods =
-    Hiwonder_bus_module::get_hiwonder_modules(node_data, parser, this->module_sys);
+    HiWonderBus_module::get_hiwonder_modules(node_data, parser, this->module_sys);
   std::cout << "Adding hiwonder modules" << hiwonder_mods.size() << std::endl;
   this->modules.insert(this->modules.end(), hiwonder_mods.begin(), hiwonder_mods.end());
 

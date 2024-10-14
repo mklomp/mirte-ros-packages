@@ -1,3 +1,6 @@
+#include <functional>
+#include <numeric>
+
 #include <boost/format.hpp>
 
 #include <rcpputils/asserts.hpp>
@@ -24,7 +27,7 @@ HiWonderBusData::HiWonderBusData(
     if (subkeys.erase("rx")) this->rx_pin = board->resolvePin(get_string(parameters["pins.rx"]));
     if (subkeys.erase("tx")) this->tx_pin = board->resolvePin(get_string(parameters["pins.tx"]));
 
-    for (auto subkey: subkeys) unused_keys.insert(parser->build_param_name("pins", subkey));
+    for (auto subkey : subkeys) unused_keys.insert(parser->build_param_name("pins", subkey));
   } else
     RCLCPP_ERROR(
       logger, "Device %s has no a connector or pins specified. (Connector not supported yet)",
@@ -32,14 +35,17 @@ HiWonderBusData::HiWonderBusData(
 
   this->uart_port = board->resolveUARTPort(this->rx_pin);
 
-  // FIXME: NESTED PARAMS
+  // TODO: Maybe use group_name in frame_id
+  if (unused_keys.erase("group_name"))
+    this->group_name = get_string(parameters["group_name"]);
+
   if (unused_keys.erase("servos"))
-    this->servos = Hiwonder_servo_data::parse_hiwonder_servo_data(
-      parser, board, key);
+    this->servos = HiWonderServoData::parse_hiwonder_servo_data(parser, board, key, unused_keys, this->frame_id);
 }
 
 bool HiWonderBusData::check()
 {
   return uart_port != 0xFF && tx_pin != (pin_t)-1 && rx_pin != (pin_t)-1 &&
-         ModuleData::check(get_module_type());
+         ModuleData::check(get_module_type()) &&
+         std::transform_reduce(servos.cbegin(), servos.cend(), true, std::logical_and<>(), [](auto servo) { return servo->check(); });
 }

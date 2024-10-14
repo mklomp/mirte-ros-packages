@@ -81,7 +81,6 @@ add_executable(
   src/actuators/servo.cpp
   src/actuators/motor.cpp
   src/parsers/parsers.cpp
-  src/parsers/p_modules.cpp
   src/parsers/device_data.cpp
   src/parsers/actuators/motor_data.cpp
   src/parsers/actuators/servo_data.cpp
@@ -94,6 +93,7 @@ add_executable(
   src/parsers/modules/i2c_module_data.cpp
   src/parsers/modules/ina226_data.cpp
   src/parsers/modules/hiwonder_data.cpp
+  src/parsers/modules/hiwonder/hiwonder_servo_data.cpp
   src/parsers/modules/pca_data.cpp
   src/parsers/modules/pca/pca_motor_data.cpp
   src/parsers/modules/pca/pca_servo_data.cpp
@@ -107,6 +107,7 @@ add_executable(
   src/sensors/sonar_monitor.cpp
   src/modules/base_module.cpp
   src/modules/hiwonder_module.cpp
+  src/modules/hiwonder/hiwonder_servo.cpp
   src/modules/ina226_module.cpp
   src/modules/mpu9250_module.cpp
   src/modules/pca_module.cpp
