@@ -41,7 +41,7 @@
 #include <mutex>
 #include <thread>
 // const unsigned int NUM_JOINTS = 4;
-const auto service_format = "io/set_%s_speed";
+const auto service_format = "io/motor/%s/set_speed";
 const auto encoder_format = "io/encoder/%s";
 const auto max_speed = 100; // Quick fix hopefully for power dip.
 

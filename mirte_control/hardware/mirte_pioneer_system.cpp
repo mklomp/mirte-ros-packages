@@ -46,8 +46,8 @@ hardware_interface::CallbackReturn MirtePioneerSrvSystemHardware::on_init(
   // TODO: Maybe move this to a later stage if that would make sense
   std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared(get_name());
   // TODO: Make wheel service names configurable (Including namespace)
-  left_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("io/set_left_speed");
-  right_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("io/set_right_speed");
+  left_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("io/motor/left/set_speed");
+  right_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("io/motor/right/set_speed");
 
   while (!left_client_->wait_for_service(std::chrono::seconds(1))) {
     if (!rclcpp::ok()) {
