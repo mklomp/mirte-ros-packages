@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <functional>
 
 #include <mirte_telemetrix_cpp/modules/pca_module.hpp>
@@ -34,108 +35,40 @@ PCA_Module::PCA_Module(
 
   motor_service = nh->create_service<mirte_msgs::srv::SetSpeedMultiple>(
     "motor/" + this->name + "/set_multiple_speeds",
-    std::bind(&PCA_Module::motor_service_cb, this, _1, _2),
+    std::bind(&PCA_Module::set_multi_speed_service_callback, this, _1, _2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 }
 
-bool PCA_Module::motor_service_cb(
+bool PCA_Module::set_multi_speed_service_callback(
   const std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Request> req,
   std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Response> res)
 {
+  // TODO: Why is this a shared_ptr? (Probably unneccessary)
   std::shared_ptr<std::vector<tmx_cpp::PCA9685_module::PWM_val>> pwm_vals =
     std::make_shared<std::vector<tmx_cpp::PCA9685_module::PWM_val>>();
   if (req->speeds.size() == 0) {
     res->success = false;
     return false;
   }
+
   for (auto speed : req->speeds) {
-    for (auto motor : this->motors) {
-      if (motor->motor_data->name == speed.name) {
-        motor->set_speed(speed.speed, false, pwm_vals);
-        continue;
-      }
+    auto name = speed.name;
+    auto motor = std::find_if(
+      motors.begin(), motors.end(), [name](auto motor) { return motor->motor_data->name == name; });
+
+    if (motor == motors.end()) {
+      RCLCPP_ERROR(
+        logger, "PCA Motor '%s' could not be found. Ignored for set multi speed command",
+        name.c_str());
+      continue;
     }
+
+    auto motor_pwm_vals = (*motor)->get_multi_speed_pwm(speed.speed);
+    pwm_vals->insert(pwm_vals->end(), motor_pwm_vals.begin(), motor_pwm_vals.end());
   }
-  if (pwm_vals->size() > 0) {
-    this->pca9685->set_multiple_pwm(pwm_vals);
-  }
+
+  if (pwm_vals->size() > 0) pca9685->set_multiple_pwm(pwm_vals);
 
   res->success = true;
-  return true;
-}
-
-// FIXME: Add to PCA module callback group
-PCA_Motor::PCA_Motor(
-  NodeData node_data, std::shared_ptr<PCA_Motor_data> motor_data,
-  std::shared_ptr<tmx_cpp::PCA9685_module> pca9685)
-{
-  auto nh = node_data.nh;
-
-  this->motor_data = motor_data;
-  this->pca9685_mod = pca9685;
-  // this->tmx = tmx;
-  // this->nh = nh;
-  // this->board = board;
-
-  RCLCPP_INFO(nh->get_logger(), "Added PCA Motor %s", motor_data->name.c_str());
-
-  motor_service = nh->create_service<mirte_msgs::srv::SetMotorSpeed>(
-    "motor/" + this->motor_data->name + "/set_speed",
-    std::bind(&PCA_Motor::service_callback, this, std::placeholders::_1, std::placeholders::_2));
-
-  ros_client = nh->create_subscription<std_msgs::msg::Int32>(
-    "motor/" + this->motor_data->name + "/speed", 1000,
-    std::bind(&PCA_Motor::motor_callback, this, std::placeholders::_1));
-}
-
-void PCA_Motor::set_speed(
-  int speed, bool direct, std::shared_ptr<std::vector<tmx_cpp::PCA9685_module::PWM_val>> pwm_vals)
-{
-  std::cout << "Setting speed: " << speed << std::endl;
-  int32_t speed_ = (int32_t)((float)speed * (4095.0) / 100.0);
-  // TODO: add invert
-  if (this->motor_data->invert) {
-    speed_ = -speed;
-  }
-  //  if self.prev_motor_speed != speed:
-  //             change_dir = sign(self.prev_motor_speed) != sign(speed)
-
-  if (this->last_speed == speed) {
-    return;
-  }
-  bool reverse = false;
-  if (this->last_speed < 0 && speed > 0) {
-    reverse = true;
-  } else if (this->last_speed > 0 && speed < 0) {
-    reverse = true;
-  }
-
-  if (reverse && direct) {
-    this->pca9685_mod->set_pwm(this->motor_data->pinA, 0);
-    this->pca9685_mod->set_pwm(this->motor_data->pinB, 0);
-    // std::cout << "Setting speed to 0" << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  }
-  auto speedA = speed > 0 ? speed_ : 0;
-  auto speedB = speed < 0 ? -speed_ : 0;
-  if (direct) {
-    this->pca9685_mod->set_pwm(this->motor_data->pinA, speedA);
-    this->pca9685_mod->set_pwm(this->motor_data->pinB, speedB);
-  } else {
-    pwm_vals->push_back({this->motor_data->pinA, (uint16_t)speedA});
-    pwm_vals->push_back({this->motor_data->pinB, (uint16_t)speedB});
-  }
-  // std::cout << "Setting speed to " << std::dec << speed << std::endl;
-
-  // std::cout << "PCA Setting speed to " << std::dec << speed << std::endl;
-  this->last_speed = speed;
-}
-void PCA_Motor::motor_callback(const std_msgs::msg::Int32 & msg) { this->set_speed(msg.data); }
-bool PCA_Motor::service_callback(
-  const std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Request> req,
-  std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Response> res)
-{
-  this->set_speed(req->speed);
-  res->status = true;
   return true;
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/node.hpp>
 
 #include <tmx_cpp/tmx.hpp>
 

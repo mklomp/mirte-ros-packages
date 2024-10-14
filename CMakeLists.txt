@@ -111,6 +111,7 @@ add_executable(
   src/modules/ina226_module.cpp
   src/modules/mpu9250_module.cpp
   src/modules/pca_module.cpp
+  src/modules/pca/pca_motor.cpp
   src/modules/ssd1306_module.cpp
   src/modules/veml6040_module.cpp
 )
