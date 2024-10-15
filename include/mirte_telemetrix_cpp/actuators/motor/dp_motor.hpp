@@ -6,7 +6,9 @@ class DPMotor : public Motor
 {
 public:
   DPMotor(NodeData node_data, MotorData motor_data);
-  void set_speed(int speed);
+
+  virtual void set_speed(int speed) override;
+
   pin_t dir_pin;
   pin_t pwm_pin;
 };

@@ -17,7 +17,7 @@ std::vector<std::shared_ptr<PCA_Module>> PCA_Module::get_pca_modules(
   return pca_modules;
 }
 
-// TODO: This possibly could be a reentrant (parallel) callback group
+// NOTE: Each motor has its own callback group since they inherit from the actuator::Motor
 PCA_Module::PCA_Module(
   NodeData node_data, PCAData pca_data, std::shared_ptr<tmx_cpp::Modules> modules)
 : Mirte_module(node_data, {pca_data.scl, pca_data.sda}, (ModuleData)pca_data)
@@ -29,7 +29,7 @@ PCA_Module::PCA_Module(
 
   modules->add_mod(pca9685);
   for (auto motor : pca_data.motors) {
-    this->motors.push_back(std::make_shared<PCA_Motor>(node_data, motor, pca9685));
+    this->motors.push_back(std::make_shared<PCAMotor>(node_data, motor, pca9685));
   }
   // TODO: add servos to this as well
 

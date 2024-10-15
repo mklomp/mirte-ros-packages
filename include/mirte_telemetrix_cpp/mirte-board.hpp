@@ -15,8 +15,8 @@ using connector_map = std::map<std::string, pin_map>;
 
 class Mirte_Board {
 public: 
-  virtual int get_adc_bits() = 0;
-  virtual int get_max_pwm() = 0;
+  virtual const int get_adc_bits() const = 0;
+  virtual const int get_max_pwm() const = 0;
   virtual int resolvePin(std::string pin) = 0;
   virtual std::map<std::string, int>
   resolveConnector(std::string connector) = 0;
@@ -31,8 +31,8 @@ public:
   Mirte_Board_atmega328p();
   std::map<std::string, int> resolveConnector(std::string connector) override;
   int resolvePin(std::string pin) override;
-  int get_adc_bits() override;
-  int get_max_pwm() override { return 255; }
+  virtual const int get_adc_bits() const override;
+  virtual const int get_max_pwm() const override { return 255; }
   virtual uint8_t resolveI2CPort(uint8_t sda) override { return 0; }
 
   virtual uint8_t resolveUARTPort(uint8_t pin) override { return 0; };
@@ -45,11 +45,11 @@ public:
   Mirte_Board_pico();
   std::map<std::string, int> resolveConnector(std::string connector) override;
   int resolvePin(std::string pin) override;
-  int get_adc_bits() override { 
+  virtual const int get_adc_bits() const override { 
     /*   # NOTE: the pico itself has 12 bits, but micropython will upgrade to 16
     # no clue why 14 works*/
     return 14; }
-  int get_max_pwm() override { return 20000; } // TODO: check with actual board
+  virtual const int get_max_pwm() const override { return 20000; } // TODO: check with actual board
   virtual uint8_t resolveI2CPort(uint8_t sda) override;
   virtual uint8_t resolveUARTPort(uint8_t pin) override;
 };
@@ -63,8 +63,8 @@ public:
   std::shared_ptr<Mirte_Board> mcu; // to look up pins
   std::map<std::string, int> resolveConnector(std::string connector) override;
   int resolvePin(std::string pin) override;
-  int get_adc_bits() override { return mcu->get_adc_bits(); }
-  int get_max_pwm() override { return mcu->get_max_pwm(); }
+  virtual const int get_adc_bits() const override { return mcu->get_adc_bits(); }
+  virtual const int get_max_pwm() const override { return mcu->get_max_pwm(); }
   virtual uint8_t resolveI2CPort(uint8_t sda) override;
   virtual uint8_t resolveUARTPort(uint8_t pin) override;
   std::string version;

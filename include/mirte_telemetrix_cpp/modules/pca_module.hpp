@@ -20,7 +20,7 @@ public:
   PCA_Module(NodeData node_data, PCAData pca_data, std::shared_ptr<tmx_cpp::Modules> modules);
   std::shared_ptr<tmx_cpp::PCA9685_module> pca9685;
 
-  std::vector<std::shared_ptr<PCA_Motor>> motors;
+  std::vector<std::shared_ptr<PCAMotor>> motors;
 
   //   std::vector<std::shared_ptr<PCA_Servo>> servos;
 

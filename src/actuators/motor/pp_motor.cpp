@@ -11,19 +11,35 @@ PPMotor::PPMotor(NodeData node_data, MotorData motor_data)
   tmx->setPinMode(this->pwmB_pin, tmx_cpp::TMX::PIN_MODES::PWM_OUTPUT);
 }
 
-void PPMotor::setA(int speed) { tmx->pwmWrite(this->pwmA_pin, speed); }
-void PPMotor::setB(int speed) { tmx->pwmWrite(this->pwmB_pin, speed); }
+PPMotor::PPMotor(
+  NodeData node_data, pin_t pinA, pin_t pinB, DeviceData data, bool inverted, int max_pwm)
+: Motor(node_data, {}, data, inverted, max_pwm), pwmA_pin(pinA), pwmB_pin(pinB)
+{
+}
+
+// NOTE/TODO: the speed is given as percentages.
+std::tuple<uint32_t, uint32_t> PPMotor::calc_pwm_speed(int speed)
+{
+  int32_t speed_ = (int32_t)((float)speed * (max_pwm) / 100.0);
+
+  if (inverted) speed_ = -speed_;
+
+  auto speedA = speed > 0 ? speed_ : 0;
+  auto speedB = speed < 0 ? -speed_ : 0;
+
+  return std::make_tuple(speedA, speedB);
+}
 
 void PPMotor::set_speed(int speed)
 {
-  int32_t speed_ = (int32_t)((float)speed * (this->max_pwm) / 100.0);
+  auto [speedA, speedB] = calc_pwm_speed(speed);
 
-  this->setA(speed > 0 ? speed_ : 0);
-  this->setB(speed < 0 ? -speed_ : 0);
-  std::cout << "1:" << std::dec << (speed < 0 ? -speed_ : 0) << std::endl;
-  std::cout << "2:" << std::dec << (speed > 0 ? speed_ : 0) << std::endl;
+  tmx->pwmWrite(this->pwmA_pin, speedA);
+  tmx->pwmWrite(this->pwmB_pin, speedB);
+
+  std::cout << "1:" << std::dec << speedA << std::endl;
+  std::cout << "2:" << std::dec << speedB << std::endl;
   std::cout << "Setting speed to " << std::dec << speed << std::endl;
 
   std::cout << "PP Setting speed to " << std::dec << speed << std::endl;
-  // tmx->set_pwm(pins[0], speed);
 }

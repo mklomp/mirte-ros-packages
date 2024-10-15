@@ -38,29 +38,37 @@ std::vector<std::shared_ptr<Mirte_Actuator>> Motor::get_motors(
   }
   return motors;
 }
-bool Motor::service_callback(
+
+Motor::Motor(NodeData node_data, std::vector<pin_t> pins, MotorData motor_data)
+: Motor(node_data, pins, (DeviceData)motor_data, motor_data.inverted, board->get_max_pwm())
+{
+}
+
+Motor::Motor(
+  NodeData node_data, std::vector<pin_t> pins, DeviceData data, bool inverted, int max_pwm)
+: Mirte_Actuator(node_data, pins, data, rclcpp::CallbackGroupType::MutuallyExclusive), inverted(inverted), max_pwm(max_pwm)
+{
+  set_speed_service = nh->create_service<mirte_msgs::srv::SetMotorSpeed>(
+    "motor/" + this->name + "/set_speed",
+    std::bind(&Motor::set_speed_service_callback, this, _1, _2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
+
+  rclcpp::SubscriptionOptions options;
+  options.callback_group = this->callback_group;
+  speed_subscription = nh->create_subscription<std_msgs::msg::Int32>(
+    "motor/" + this->name + "/speed", rclcpp::SystemDefaultsQoS(),
+    std::bind(&Motor::speed_subscription_callback, this, _1), options);
+}
+
+void Motor::set_speed_service_callback(
   const mirte_msgs::srv::SetMotorSpeed::Request::ConstSharedPtr req,
   mirte_msgs::srv::SetMotorSpeed::Response::SharedPtr res)
 {
   this->set_speed(req->speed);
   res->status = true;
-  return true;
 }
 
-void Motor::motor_callback(const std_msgs::msg::Int32 & msg) { this->set_speed(msg.data); }
-
-Motor::Motor(NodeData node_data, std::vector<pin_t> pins, MotorData motor_data)
-: Mirte_Actuator(node_data, pins, (DeviceData)motor_data), data(motor_data)
+void Motor::speed_subscription_callback(const std_msgs::msg::Int32 & msg)
 {
-  motor_service = nh->create_service<mirte_msgs::srv::SetMotorSpeed>(
-    "motor/" + this->name + "/set_speed", std::bind(&Motor::service_callback, this, _1, _2),
-    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
-
-  rclcpp::SubscriptionOptions options;
-  options.callback_group = this->callback_group;
-  ros_client = nh->create_subscription<std_msgs::msg::Int32>(
-    "motor/" + this->name + "/speed", rclcpp::SystemDefaultsQoS(),
-    std::bind(&Motor::motor_callback, this, _1), options);
-
-  this->max_pwm = board->get_max_pwm();
+  this->set_speed(msg.data);
 }

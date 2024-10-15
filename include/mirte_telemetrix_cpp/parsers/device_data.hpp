@@ -23,12 +23,14 @@ public:
     std::string device_type, std::map<std::string, rclcpp::ParameterValue> parameters,
     std::set<std::string> & unused_keys);
 
+  DeviceData(std::string name, std::string frame_id = "");
+
   virtual bool check();
 
   /// @brief Get the device class of this type. So 'distance' for sonars and 'keypad' for keypads, etc.
   /// @return The device class string
   static std::string get_device_class() { return "no_type"; }
-  virtual ~DeviceData() {};
+  virtual ~DeviceData(){};
 };
 
 template <class T>
@@ -71,7 +73,8 @@ std::vector<typename std::enable_if<std::is_base_of<DeviceData, T>::value, T>::t
 }
 
 template <class T>
-typename std::enable_if<std::is_base_of<DeviceData, T>::value, std::string>::type get_device_key(T * device)
+typename std::enable_if<std::is_base_of<DeviceData, T>::value, std::string>::type get_device_key(
+  T * device)
 {
   return Parser::build_param_name(T::get_device_class(), device->name);
 }

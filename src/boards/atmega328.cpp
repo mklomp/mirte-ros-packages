@@ -44,4 +44,4 @@ Mirte_Board_atmega328p::resolveConnector(std::string connector) {
   return {};
 }
 
-int Mirte_Board_atmega328p::get_adc_bits() { return 12; }
+const int Mirte_Board_atmega328p::get_adc_bits() const { return 12; }

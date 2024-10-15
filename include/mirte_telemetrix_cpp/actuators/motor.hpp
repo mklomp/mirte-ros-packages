@@ -16,27 +16,27 @@ class Motor : public Mirte_Actuator
 {
 public:
   Motor(NodeData node_data, std::vector<pin_t> pins, MotorData motor_data);
-
-  rclcpp::Service<mirte_msgs::srv::SetMotorSpeed>::SharedPtr motor_service;
-
-  bool service_callback(
-    const mirte_msgs::srv::SetMotorSpeed::Request::ConstSharedPtr req,
-    mirte_msgs::srv::SetMotorSpeed::Response::SharedPtr res);
-
-  void motor_callback(const std_msgs::msg::Int32 & msg);
+  Motor(NodeData node_data, std::vector<pin_t> pins, DeviceData data, bool inverted, int max_pwm);
 
   int last_speed = 0;
-
-  rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr ros_client;
+  bool inverted;
+  int max_pwm;
 
   static std::vector<std::shared_ptr<Mirte_Actuator>> get_motors(
     NodeData node_data, std::shared_ptr<Parser> parser);
 
   virtual void set_speed(int speed) = 0;
 
-  MotorData data;
-  int max_pwm;
-
   // TODO: Maybe add start to TelemetrixDevice
   void start() { this->set_speed(0); }
+
+private:
+  rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr speed_subscription;
+  rclcpp::Service<mirte_msgs::srv::SetMotorSpeed>::SharedPtr set_speed_service;
+
+  void speed_subscription_callback(const std_msgs::msg::Int32 & msg);
+
+  void set_speed_service_callback(
+    const mirte_msgs::srv::SetMotorSpeed::Request::ConstSharedPtr req,
+    mirte_msgs::srv::SetMotorSpeed::Response::SharedPtr res);
 };
