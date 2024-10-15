@@ -43,7 +43,7 @@ private:
 
   rclcpp::Service<mirte_msgs::srv::SetMotorSpeed>::SharedPtr motor_service;
 
-  bool service_callback(
+  void set_speed_service_callback(
     const std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Request> req,
     std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Response> res);
 };

@@ -80,6 +80,9 @@ add_executable(
   src/gpio_pin.cpp
   src/actuators/servo.cpp
   src/actuators/motor.cpp
+  src/actuators/motor/ddp_motor.cpp
+  src/actuators/motor/dp_motor.cpp
+  src/actuators/motor/pp_motor.cpp
   src/parsers/parsers.cpp
   src/parsers/device_data.cpp
   src/parsers/actuators/motor_data.cpp

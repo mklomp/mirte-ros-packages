@@ -39,7 +39,7 @@ PCA_Module::PCA_Module(
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 }
 
-bool PCA_Module::set_multi_speed_service_callback(
+void PCA_Module::set_multi_speed_service_callback(
   const std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Request> req,
   std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Response> res)
 {
@@ -48,7 +48,7 @@ bool PCA_Module::set_multi_speed_service_callback(
     std::make_shared<std::vector<tmx_cpp::PCA9685_module::PWM_val>>();
   if (req->speeds.size() == 0) {
     res->success = false;
-    return false;
+    return;
   }
 
   for (auto speed : req->speeds) {
@@ -70,5 +70,4 @@ bool PCA_Module::set_multi_speed_service_callback(
   if (pwm_vals->size() > 0) pca9685->set_multiple_pwm(pwm_vals);
 
   res->success = true;
-  return true;
 }

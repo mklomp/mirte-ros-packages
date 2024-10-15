@@ -16,7 +16,7 @@
 | oled                   | ✅                        | 🔷                   | OLED is now a Module. (Maybe the parsing can be improved to be more like old style)   |
 | servos                 | ✅                        | ✅                   |                                                                                       |
 | keypad                 | ✅                        | ✅                   |                                                                                       |
-| motors                 | ✅                        | ❓                   | L9110S Work                                                                           |
+| motors                 | ✅                        | ❓                   | L9110S (PP) & L298N (DDP) work                                                        |
 | set pin service        | ✅                        | ✅                   | Digital not tested as much                                                            |
 | **Mirte-master parts** |                           |                      |                                                                                       |
 | hiwonder servo         | ✅                        | ✅ ?Needs more testing|                                                                                      |

@@ -23,7 +23,7 @@ MotorData::MotorData(
     if (subkeys.erase("p2")) this->P2 = board->resolvePin(get_string(parameters["pins.p2"]));
 
     if (subkeys.erase("d1")) this->D1 = board->resolvePin(get_string(parameters["pins.d1"]));
-    if (subkeys.erase("p2")) this->D2 = board->resolvePin(get_string(parameters["pins.d2"]));
+    if (subkeys.erase("d2")) this->D2 = board->resolvePin(get_string(parameters["pins.d2"]));
 
     for (auto subkey : subkeys) unused_keys.insert(parser->build_param_name("pins", subkey));
   } else

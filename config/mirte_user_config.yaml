@@ -19,7 +19,15 @@
         type: pcb
         version: 0.8
         board: pico
-
+    # motor:
+    #   right:
+    #     name: right
+    #     device: mirte
+    #     type: ddp
+    #     pins:
+    #       p1: 3
+    #       d1: 17
+    #       d2: 27
     encoder:
       left_front:
         name: left_front
@@ -151,6 +159,10 @@
           right_front:
             pin_A: 1
             pin_B: 0
+        # Mightbe incomplete
+        # servos:
+        #   tester:
+        #     pin: 1
       servo_controller:
         device: mirte
         type: Hiwonder_Servo
