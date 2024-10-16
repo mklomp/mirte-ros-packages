@@ -2,7 +2,7 @@
 #include <tmx_cpp/tmx.hpp>
 
 #include <mirte_telemetrix_cpp/actuators/motor.hpp>
-#include <mirte_telemetrix_cpp/actuators/servo.hpp>
+#include <mirte_telemetrix_cpp/actuators/servo/servo.hpp>
 
 Mirte_Actuators::Mirte_Actuators(NodeData node_data, std::shared_ptr<Parser> parser)
 : tmx(node_data.tmx), nh(node_data.nh), board(node_data.board)

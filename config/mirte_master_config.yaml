@@ -11,7 +11,7 @@
         type: PCA9685
         addr: 0x41
         connector: I2C1
-        frequency: 1500
+        frequency: 100
         motors: # TODO: No Idea which motor configuration is correct.
           left_rear:
             pin_A: 6 #0

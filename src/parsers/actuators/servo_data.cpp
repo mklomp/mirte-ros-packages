@@ -31,4 +31,16 @@ ServoData::ServoData(
   if (unused_keys.erase("max_angle")) this->max_angle = get_float(parameters["max_angle"]);
 }
 
+ServoData::ServoData(
+  pin_t pin, int min_pulse, int max_pulse, float min_angle, float max_angle, std::string name,
+  std::string frame_id)
+: DeviceData(name, frame_id),
+  pin(pin),
+  min_pulse(min_pulse),
+  max_pulse(max_pulse),
+  min_angle(min_angle),
+  max_angle(max_angle)
+{
+}
+
 bool ServoData::check() { return pin != (pin_t)-1 && DeviceData::check(); }

@@ -78,7 +78,8 @@ add_executable(
   src/mirte-sensors.cpp
   src/device.cpp
   src/gpio_pin.cpp
-  src/actuators/servo.cpp
+  src/actuators/servo_base.cpp
+  src/actuators/servo/servo.cpp
   src/actuators/motor.cpp
   src/actuators/motor/ddp_motor.cpp
   src/actuators/motor/dp_motor.cpp
@@ -115,6 +116,7 @@ add_executable(
   src/modules/mpu9250_module.cpp
   src/modules/pca_module.cpp
   src/modules/pca/pca_motor.cpp
+  src/modules/pca/pca_servo.cpp
   src/modules/ssd1306_module.cpp
   src/modules/veml6040_module.cpp
 )

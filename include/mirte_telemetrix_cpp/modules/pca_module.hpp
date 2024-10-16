@@ -8,9 +8,11 @@
 #include <tmx_cpp/modules/PCA9685.hpp>
 
 #include <mirte_telemetrix_cpp/modules/base_module.hpp>
-#include <mirte_telemetrix_cpp/modules/pca/pca_motor.hpp>
 #include <mirte_telemetrix_cpp/node_data.hpp>
 #include <mirte_telemetrix_cpp/parsers/modules/pca_data.hpp>
+
+#include <mirte_telemetrix_cpp/modules/pca/pca_motor.hpp>
+#include <mirte_telemetrix_cpp/modules/pca/pca_servo.hpp>
 
 #include <mirte_msgs/srv/set_speed_multiple.hpp>
 
@@ -21,8 +23,7 @@ public:
   std::shared_ptr<tmx_cpp::PCA9685_module> pca9685;
 
   std::vector<std::shared_ptr<PCAMotor>> motors;
-
-  //   std::vector<std::shared_ptr<PCA_Servo>> servos;
+  std::vector<std::shared_ptr<PCAServo>> servos;
 
   static std::vector<std::shared_ptr<PCA_Module>> get_pca_modules(
     NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Modules> modules);

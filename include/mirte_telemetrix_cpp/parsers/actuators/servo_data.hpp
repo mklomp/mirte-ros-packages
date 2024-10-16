@@ -14,7 +14,11 @@ public:
 
   ServoData(
     std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-    std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string>& unused_keys);
+    std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys);
+
+  ServoData(
+    pin_t pin, int min_pulse, int max_pulse, float min_angle, float max_angle, std::string name,
+    std::string frame_id = "");
 
   bool check();
   using DeviceData::check;

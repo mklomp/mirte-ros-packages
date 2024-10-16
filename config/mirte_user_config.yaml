@@ -145,7 +145,10 @@
         type: PCA9685
         addr: 0x41 # bridged A0
         connector: I2C1
-        frequency: 1500
+        frequency: 100
+        servos:
+          middle:
+            pin: 8
         motors:
           left_rear:
             pin_A: 6 #0
@@ -159,10 +162,6 @@
           right_front:
             pin_A: 1
             pin_B: 0
-        # Mightbe incomplete
-        # servos:
-        #   tester:
-        #     pin: 1
       servo_controller:
         device: mirte
         type: Hiwonder_Servo
