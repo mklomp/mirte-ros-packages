@@ -1,5 +1,9 @@
 #include <functional>
 
+#include <thread>
+#include <chrono>
+using namespace std::chrono_literals;
+
 #include <rclcpp/callback_group.hpp>
 
 #include <mirte_telemetrix_cpp/modules/hiwonder_module.hpp>
@@ -22,19 +26,22 @@ HiWonderBus_module::HiWonderBus_module(
 
   this->bus = std::make_shared<tmx_cpp::HiwonderServo_module>(
     this->data.uart_port, this->data.rx_pin, this->data.tx_pin, servo_ids,
-    std::bind(&HiWonderBus_module::position_cb, this, _1),
-    std::bind(&HiWonderBus_module::verify_cb, this, _1, _2),
-    std::bind(&HiWonderBus_module::range_cb, this, _1, _2, _3),
-    std::bind(&HiWonderBus_module::offset_cb, this, _1, _2));
+    std::bind(&HiWonderBus_module::position_cb, this, _1));
 
   modules->add_mod(this->bus);
 
   auto servo_group = this->data.group_name;
   if (!servo_group.ends_with('/')) servo_group.push_back('/');
 
+  std::this_thread::sleep_for(1.20s);
   for (auto servo_data : this->data.servos) {
-    this->servos.push_back(std::make_shared<Hiwonder_servo>(
-      node_data, servo_data, this->bus, servo_group, this->callback_group));
+    if (this->bus->verify_id(servo_data->id))
+      this->servos.push_back(std::make_shared<Hiwonder_servo>(
+        node_data, servo_data, this->bus, servo_group, this->callback_group));
+    else
+    RCLCPP_ERROR(
+        this->logger, "HiWonder Servo '%s' is ignored as its ID [%d] was not found.",
+        servo_data->name.c_str(), servo_data->id);
   }
 
   // Create Bus ROS services
@@ -50,6 +57,14 @@ bool HiWonderBus_module::enable_cb(
   std::shared_ptr<std_srvs::srv::SetBool::Response> res)
 {
   this->bus->set_enabled_all(req->data);
+  
+  // // TODO: TEMP TEST
+  // std::cout << (int)bus->get_offset(4).value_or(99) <<std::endl;
+  // auto [min, max] = bus->get_range(4).value_or(std::make_tuple(0,0));
+  // std::cout << min << " | " << max <<std::endl;
+  // std::cout << bus->verify_id(4) << std::endl;
+  // // TODO: TEMP TEST
+
   res->success = true;
   res->message = req->data ? "Enabled" : "Disabled";
   return true;
@@ -78,24 +93,4 @@ void HiWonderBus_module::position_cb(std::vector<tmx_cpp::HiwonderServo_module::
       }
     }
   }
-}
-
-// Following 3 callbacks are probably never used, maybe use verify to check that
-// they exist
-void HiWonderBus_module::verify_cb(int id, bool status)
-{
-  RCLCPP_INFO(logger, "Servo: %d | status: %s", id, status ? "true" : "false");
-  // std::cout << "Servo: " << id << " status: " << status << std::endl;
-}
-
-void HiWonderBus_module::range_cb(int id, uint16_t min, uint16_t max)
-{
-  RCLCPP_INFO(logger, "Servo: %d | range: %u %u", id, min, max);
-  // std::cout << "Servo: " << id << " range: " << min << " " << max << std::endl;
-}
-
-void HiWonderBus_module::offset_cb(int id, uint16_t offset)
-{
-  RCLCPP_INFO(logger, "Servo: %d | offset: %u", id, offset);
-  // std::cout << "Servo: " << id << " offset: " << offset << std::endl;
 }

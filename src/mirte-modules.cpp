@@ -1,3 +1,5 @@
+#include <future>
+
 #include <mirte_telemetrix_cpp/mirte-modules.hpp>
 #include <mirte_telemetrix_cpp/util.hpp>
 
@@ -13,15 +15,12 @@ Mirte_modules::Mirte_modules(NodeData node_data, std::shared_ptr<Parser> parser)
 {
   this->module_sys = std::make_shared<tmx_cpp::Modules>(tmx);
 
+  RCLCPP_INFO(nh->get_logger(), "Proccessing HiWonder Modules [ASYNC]");
+  auto hiwonder_mods_future = std::async(std::launch::async, HiWonderBus_module::get_hiwonder_modules, node_data, parser, this->module_sys);
+
   RCLCPP_INFO(nh->get_logger(), "Adding PCA Modules");
   auto pca_mods = PCA_Module::get_pca_modules(node_data, parser, this->module_sys);
   this->modules.insert(this->modules.end(), pca_mods.begin(), pca_mods.end());
-
-  RCLCPP_INFO(nh->get_logger(), "Adding HiWonder Modules");
-  auto hiwonder_mods =
-    HiWonderBus_module::get_hiwonder_modules(node_data, parser, this->module_sys);
-  std::cout << "Adding hiwonder modules" << hiwonder_mods.size() << std::endl;
-  this->modules.insert(this->modules.end(), hiwonder_mods.begin(), hiwonder_mods.end());
 
   RCLCPP_INFO(nh->get_logger(), "Adding SSD1306 OLED Modules");
   auto oled_mods = SSD1306_module::get_ssd1306_modules(node_data, parser, this->module_sys);
@@ -40,4 +39,9 @@ Mirte_modules::Mirte_modules(NodeData node_data, std::shared_ptr<Parser> parser)
   RCLCPP_INFO(nh->get_logger(), "Adding VEML6040 Modules");
   auto veml_mods = VEML6040_sensor::get_veml6040_modules(node_data, parser, this->sensor_sys);
   this->modules.insert(this->modules.end(), veml_mods.begin(), veml_mods.end());
+
+  RCLCPP_INFO(nh->get_logger(), "Adding HiWonder Modules");
+  auto hiwonder_mods = hiwonder_mods_future.get();
+  std::cout << "Adding hiwonder modules" << hiwonder_mods.size() << std::endl;
+  this->modules.insert(this->modules.end(), hiwonder_mods.begin(), hiwonder_mods.end());
 }

@@ -4,7 +4,7 @@
 
 using namespace std::placeholders;
 
-// FIXME: Not in it the busmodule callback group yet!
+// TODO: Maybe make it inherit from Servo
 Hiwonder_servo::Hiwonder_servo(
   NodeData node_data, std::shared_ptr<HiWonderServoData> servo_data,
   std::shared_ptr<tmx_cpp::HiwonderServo_module> bus_mod, std::string servo_group,
@@ -12,6 +12,11 @@ Hiwonder_servo::Hiwonder_servo(
 {
   this->servo_data = servo_data;
   this->bus_mod = bus_mod;
+
+  // TODO: Add checks on startup on servo programming...
+
+  // auto [lower, upper] = this->bus_mod->get_range(servo_data->id);
+  // servo_data->max_angle_in
 
   // create enable service
   this->enable_service = node_data.nh->create_service<std_srvs::srv::SetBool>(
@@ -60,6 +65,7 @@ bool Hiwonder_servo::enable_cb(
   return true;
 }
 
+// FIXME: This does not rescpect degrees or radians
 bool Hiwonder_servo::angle_cb(
   const std::shared_ptr<mirte_msgs::srv::SetServoAngle::Request> req,
   std::shared_ptr<mirte_msgs::srv::SetServoAngle::Response> res)

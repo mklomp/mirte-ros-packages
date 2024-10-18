@@ -33,6 +33,7 @@ private:
 
   // ROS Enable Service
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr enable_all_servos_service;
+
   bool enable_cb(
     const std::shared_ptr<std_srvs::srv::SetBool::Request> req,
     std::shared_ptr<std_srvs::srv::SetBool::Response> res);
