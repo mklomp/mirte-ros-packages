@@ -1,7 +1,7 @@
 #include <functional>
 
-#include <thread>
 #include <chrono>
+#include <thread>
 using namespace std::chrono_literals;
 
 #include <rclcpp/callback_group.hpp>
@@ -11,6 +11,7 @@ using namespace std::chrono_literals;
 using namespace std::placeholders;  // for _1, _2, _3...
 
 // hiwonder bus
+// TODO: Maybe add a lock future, to prevent outputting warnings during other modules...?
 HiWonderBus_module::HiWonderBus_module(
   NodeData node_data, HiWonderBusData bus_data, std::shared_ptr<tmx_cpp::Modules> modules)
 : Mirte_module(
@@ -39,7 +40,7 @@ HiWonderBus_module::HiWonderBus_module(
       this->servos.push_back(std::make_shared<Hiwonder_servo>(
         node_data, servo_data, this->bus, servo_group, this->callback_group));
     else
-    RCLCPP_ERROR(
+      RCLCPP_ERROR(
         this->logger, "HiWonder Servo '%s' is ignored as its ID [%d] was not found.",
         servo_data->name.c_str(), servo_data->id);
   }
@@ -57,13 +58,6 @@ bool HiWonderBus_module::enable_cb(
   std::shared_ptr<std_srvs::srv::SetBool::Response> res)
 {
   this->bus->set_enabled_all(req->data);
-  
-  // // TODO: TEMP TEST
-  // std::cout << (int)bus->get_offset(4).value_or(99) <<std::endl;
-  // auto [min, max] = bus->get_range(4).value_or(std::make_tuple(0,0));
-  // std::cout << min << " | " << max <<std::endl;
-  // std::cout << bus->verify_id(4) << std::endl;
-  // // TODO: TEMP TEST
 
   res->success = true;
   res->message = req->data ? "Enabled" : "Disabled";

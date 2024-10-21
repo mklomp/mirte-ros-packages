@@ -10,13 +10,38 @@ Hiwonder_servo::Hiwonder_servo(
   std::shared_ptr<tmx_cpp::HiwonderServo_module> bus_mod, std::string servo_group,
   rclcpp::CallbackGroup::SharedPtr callback_group)
 {
+  auto logger = node_data.nh->get_logger();
+
   this->servo_data = servo_data;
   this->bus_mod = bus_mod;
 
-  // TODO: Add checks on startup on servo programming...
+  if (!this->bus_mod->verify_id(this->servo_data->id))
+    RCLCPP_ERROR(
+      logger, "HiWonder Servo '%s' ID not present. [Expected ID %d, but was not found]",
+      this->servo_data->name, this->servo_data->id);
 
-  // auto [lower, upper] = this->bus_mod->get_range(servo_data->id);
-  // servo_data->max_angle_in
+  auto range = this->bus_mod->get_range(servo_data->id);
+  assert(range.has_value());
+  auto [lower, upper] = range.value();
+  if (lower != this->servo_data->min_angle_out)
+    RCLCPP_WARN(
+      logger,
+      "HiWonder Servo '%s' lower range does not match the config. [Expected %d , Actual %d]",
+      this->servo_data->name.c_str(), this->servo_data->min_angle_out, lower);
+
+  if (upper != this->servo_data->max_angle_out)
+    RCLCPP_WARN(
+      logger,
+      "HiWonder Servo '%s' upper range does not match the config. [Expected %d , Actual %d]",
+      this->servo_data->name.c_str(), this->servo_data->max_angle_out, upper);
+
+  auto home = this->bus_mod->get_offset(servo_data->id);
+  assert(home.has_value());
+  auto home_val = home.value();
+  if (home_val != this->servo_data->home_out)
+    RCLCPP_WARN(
+      logger, "HiWonder Servo '%s' home does not match the config. [Expected %d , Actual %d]",
+      this->servo_data->name.c_str(), this->servo_data->home_out, home_val);
 
   // create enable service
   this->enable_service = node_data.nh->create_service<std_srvs::srv::SetBool>(
