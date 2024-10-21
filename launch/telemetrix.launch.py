@@ -7,6 +7,7 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 DEBUG = True
+DEBUGGER = False
 
 def generate_launch_description():
     telemetrix_ros_arguments = (
@@ -17,6 +18,7 @@ def generate_launch_description():
         if DEBUG
         else []
     )
+    prefix = ['gdbserver localhost:3000'] if DEBUGGER else []
 
     launch_arguments: list[DeclareLaunchArgument] = [
         DeclareLaunchArgument(
@@ -49,6 +51,7 @@ def generate_launch_description():
             LaunchConfiguration("config_path"),
             {"frame_prefix": LaunchConfiguration("frame_prefix")},
         ],
+        prefix=prefix,
         output="screen",
         emulate_tty=True,
         namespace=LaunchConfiguration("hardware_namespace"),

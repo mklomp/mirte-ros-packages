@@ -40,13 +40,16 @@ std::vector<std::shared_ptr<Mirte_Actuator>> Motor::get_motors(
 }
 
 Motor::Motor(NodeData node_data, std::vector<pin_t> pins, MotorData motor_data)
-: Motor(node_data, pins, (DeviceData)motor_data, motor_data.inverted, board->get_max_pwm())
+: Motor(
+    node_data, pins, (DeviceData)motor_data, motor_data.inverted, node_data.board->get_max_pwm())
 {
 }
 
 Motor::Motor(
   NodeData node_data, std::vector<pin_t> pins, DeviceData data, bool inverted, int max_pwm)
-: Mirte_Actuator(node_data, pins, data, rclcpp::CallbackGroupType::MutuallyExclusive), inverted(inverted), max_pwm(max_pwm)
+: Mirte_Actuator(node_data, pins, data, rclcpp::CallbackGroupType::MutuallyExclusive),
+  inverted(inverted),
+  max_pwm(max_pwm)
 {
   set_speed_service = nh->create_service<mirte_msgs::srv::SetMotorSpeed>(
     "motor/" + this->name + "/set_speed",

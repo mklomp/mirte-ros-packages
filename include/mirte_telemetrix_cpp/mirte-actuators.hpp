@@ -1,13 +1,14 @@
 #pragma once
 #include <memory>
-#include <rclcpp/callback_group.hpp>
 #include <string>
 #include <vector>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/callback_group.hpp>
+#include <rclcpp/node.hpp>
+#include <rclcpp/service.hpp>
 
-#include <mirte_telemetrix_cpp/mirte-board.hpp>
 #include <mirte_telemetrix_cpp/device.hpp>
+#include <mirte_telemetrix_cpp/mirte-board.hpp>
 #include <mirte_telemetrix_cpp/node_data.hpp>
 #include <tmx_cpp/tmx.hpp>
 
@@ -34,10 +35,12 @@ private:
     mirte_msgs::srv::SetPinValue::Response::SharedPtr res);
 };
 
-class Mirte_Actuator: public TelemetrixDevice
+class Mirte_Actuator : public TelemetrixDevice
 {
 public:
   Mirte_Actuator(NodeData node_data, std::vector<pin_t> pins, DeviceData data);
-  Mirte_Actuator(NodeData node_data, std::vector<pin_t> pins, DeviceData data, rclcpp::CallbackGroupType callback_group_type);
+  Mirte_Actuator(
+    NodeData node_data, std::vector<pin_t> pins, DeviceData data,
+    rclcpp::CallbackGroupType callback_group_type);
   virtual ~Mirte_Actuator() {}
 };

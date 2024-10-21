@@ -1,10 +1,10 @@
 #include <mirte_telemetrix_cpp/actuators/motor/pp_motor.hpp>
 
 PPMotor::PPMotor(NodeData node_data, MotorData motor_data)
-: Motor(node_data, {motor_data.P1, motor_data.P2}, motor_data)
+: Motor(node_data, {motor_data.P1, motor_data.P2}, motor_data),
+  pwmA_pin(motor_data.P1),
+  pwmB_pin(motor_data.P2)
 {
-  this->pwmA_pin = motor_data.P1;
-  this->pwmB_pin = motor_data.P2;
   std::cout << "PPMotor" << std::hex << this->pwmA_pin << " " << std::hex << this->pwmB_pin
             << std::endl;
   tmx->setPinMode(this->pwmA_pin, tmx_cpp::TMX::PIN_MODES::PWM_OUTPUT);
