@@ -66,6 +66,7 @@ def generate_launch_description():
         parameters=[robot_description, robot_controllers],
   
         output="both",
+        remappings=[("~/robot_description", "robot_description")],
     )
     robot_state_pub_node = Node(
         package="robot_state_publisher",
@@ -87,19 +88,19 @@ def generate_launch_description():
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+        arguments=["joint_state_broadcaster"],
     )
 
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["mirte_base_controller", "-c", "/controller_manager"],
+        arguments=["mirte_base_controller"],
         # prefix=["xterm -e gdb -ex run --args"],
     )
     pid_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["pid_wheels_controller", "-c", "/controller_manager"],
+        arguments=["pid_wheels_controller"],
         # prefix=["xterm -e gdb -ex run --args"],
     )
 
@@ -110,28 +111,28 @@ def generate_launch_description():
     #         on_exit=[rviz_node],
     #     )
     # )
-    delay_joint_state_broadcaster_after_robot_controller_spawner2 = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=joint_state_broadcaster_spawner,
-            on_exit=[pid_controller_spawner],
-        )
-    )
-    # Delay start of joint_state_broadcaster after `robot_controller`
-    # TODO(anyone): This is a workaround for flaky tests. Remove when fixed.
-    delay_joint_state_broadcaster_after_robot_controller_spawner = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=pid_controller_spawner,
-            on_exit=[ robot_controller_spawner],
-        )
-    )
+    # delay_joint_state_broadcaster_after_robot_controller_spawner2 = RegisterEventHandler(
+    #     event_handler=OnProcessExit(
+    #         target_action=joint_state_broadcaster_spawner,
+    #         on_exit=[pid_controller_spawner],
+    #     )
+    # )
+    # # Delay start of joint_state_broadcaster after `robot_controller`
+    # # TODO(anyone): This is a workaround for flaky tests. Remove when fixed.
+    # delay_joint_state_broadcaster_after_robot_controller_spawner = RegisterEventHandler(
+    #     event_handler=OnProcessExit(
+    #         target_action=pid_controller_spawner,
+    #         on_exit=[ robot_controller_spawner],
+    #     )
+    # )
     
 
 
     nodes = [
         control_node,
         robot_state_pub_node,
-        delay_joint_state_broadcaster_after_robot_controller_spawner2,
-        delay_joint_state_broadcaster_after_robot_controller_spawner,
+        pid_controller_spawner,
+        robot_controller_spawner,
         joint_state_broadcaster_spawner
     ]
 
