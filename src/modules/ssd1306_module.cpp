@@ -78,7 +78,7 @@ SSD1306_module::SSD1306_module(
   modules->add_mod(this->ssd1306);
   // Write an initial text to the screen, and instantly kill the timer if it has failed.
   /* NOTE: This needs to use the raw send_text, because otherwise the default_screen_timer will be canceled. */
-  if (!this->ssd1306->send_text("Booting...")) {
+  if (!this->ssd1306->send_text("Booting...", 500ms)) {
     RCLCPP_ERROR(
       this->logger, "Writing to OLED module '%s' failed, shutting down default screen timer.",
       this->data.name.c_str());

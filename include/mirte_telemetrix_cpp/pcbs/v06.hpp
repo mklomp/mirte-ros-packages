@@ -3,11 +3,13 @@
 #include <string>
 #include <vector>
 
+// TODO: MAYBE ADD UNDEFINE
 #define generate_motor_mapping(pin1, pin2)                                     \
   {                                                                            \
     {"P1", pin1}, {"P2", pin2}, {"D1", pin2}, { "D2", pin1 }                   \
   }
 
+// TODO: ADD OD1 and OD2
 const connector_map mirte_pico_pcb_map06 = {
     {"IR1", {{"digital", "16"}, {"analog", "26"}}},
     {"IR2", {{"digital", "17"}, {"analog", "27"}}},
@@ -24,11 +26,12 @@ const connector_map mirte_pico_pcb_map06 = {
                                 // motor controllers at the same time
     {"Servo3", {{"pin", "12"}}},
     {"Servo4", {{"pin", "13"}}},
+    // FIXME: ONBOARD LED OR BOARD LED?
     {"LED", {{"pin", "25"}}},
     {"MC1-A", generate_motor_mapping("19", "18")},
     {"MC1-B", generate_motor_mapping("21", "20")},
-    {"MC2-A", generate_motor_mapping("16", "26")},
-    {"MC2-B", generate_motor_mapping("17", "27")}};
+    {"MC2-A", generate_motor_mapping("17", "27")},
+    {"MC2-B", generate_motor_mapping("16", "26")}};
 
 // const connector_map mirte_pico_pcb_map06 = {
 //   // TODO

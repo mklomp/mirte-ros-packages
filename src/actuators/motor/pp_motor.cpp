@@ -20,6 +20,8 @@ PPMotor::PPMotor(
 // NOTE/TODO: the speed is given as percentages.
 std::tuple<uint32_t, uint32_t> PPMotor::calc_pwm_speed(int speed)
 {
+  if (speed == 0) return {0, 0};
+
   int32_t speed_ = (int32_t)((float)speed * (max_pwm) / 100.0);
 
   if (inverted) speed_ = -speed_;
