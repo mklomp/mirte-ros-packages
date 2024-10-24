@@ -136,6 +136,10 @@
       color:
         connector: I2C2
     modules:
+      alt_imu:
+        device: mirte
+        type: ADXL345
+        connector: I2C1
       imu:
         device: mirte
         type: MPU9250
