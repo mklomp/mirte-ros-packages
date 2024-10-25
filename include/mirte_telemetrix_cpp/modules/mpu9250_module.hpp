@@ -1,5 +1,5 @@
 #pragma once
-
+#include <array>
 #include <memory>
 
 #include <tmx_cpp/sensors/MPU9250.hpp>
@@ -20,8 +20,8 @@ public:
   std::shared_ptr<tmx_cpp::MPU9250_module> mpu9250;
 
   void data_cb(
-    std::vector<float> acceleration, std::vector<float> gyro, std::vector<float> magnetic_field,
-    std::vector<float> quaternion);
+    std::array<float, 3> acceleration, std::array<float, 3> gyro,
+    std::array<float, 3> magnetic_field, std::array<float, 4> quaternion);
 
   static std::vector<std::shared_ptr<MPU9250_sensor>> get_mpu_modules(
     NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Sensors> sensors);
