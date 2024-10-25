@@ -1,6 +1,5 @@
-#include <functional>
-
 #include <chrono>
+#include <functional>
 #include <thread>
 
 using namespace std::chrono_literals;

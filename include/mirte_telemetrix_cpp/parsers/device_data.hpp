@@ -8,29 +8,29 @@
 #include <rclcpp/parameter.hpp>
 
 #include <mirte_telemetrix_cpp/mirte-board.hpp>
+
 #include <mirte_telemetrix_cpp/parsers/parsers.hpp>
 
 // TODO: Wishlist: Add unused key warnings
 
-class DeviceData
-{
-public:
-  std::string name = "";
-  std::string frame_id = "";
+class DeviceData {
+  public:
+    std::string name = "";
+    std::string frame_id = "";
 
-  DeviceData(
-    std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-    std::string device_type, std::map<std::string, rclcpp::ParameterValue> parameters,
-    std::set<std::string> & unused_keys);
+    DeviceData(
+      std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
+      std::string device_type, std::map<std::string, rclcpp::ParameterValue> parameters,
+      std::set<std::string> & unused_keys);
 
-  DeviceData(std::string name, std::string frame_id = "");
+    DeviceData(std::string name, std::string frame_id = "");
 
-  virtual bool check();
+    virtual bool check();
 
-  /// @brief Get the device class of this type. So 'distance' for sonars and 'keypad' for keypads, etc.
-  /// @return The device class string
-  static std::string get_device_class() { return "no_type"; }
-  virtual ~DeviceData(){};
+    /// @brief Get the device class of this type. So 'distance' for sonars and 'keypad' for keypads, etc.
+    /// @return The device class string
+    static std::string get_device_class() { return "no_type"; }
+    virtual ~DeviceData(){};
 };
 
 template <class T>

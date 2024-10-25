@@ -32,8 +32,7 @@ ADXL345_sensor::ADXL345_sensor(
   // Covariance based on: https://github.com/analogdevicesinc/no-OS/blob/c26d25fe7004edc5a5eef40ca36381b08a187a12/drivers/accel/adxl345/adxl345.h#L183
   msg.linear_acceleration_covariance[0] = std::pow(0.75 * 0.0039 * 9.81, 2);  // Var_x
   msg.linear_acceleration_covariance[4] = std::pow(0.75 * 0.0039 * 9.81, 2);  // Var_y
-  msg.linear_acceleration_covariance[8] = std::pow(1.1  * 0.0039 * 9.81, 2);   // Var_z
-
+  msg.linear_acceleration_covariance[8] = std::pow(1.1 * 0.0039 * 9.81, 2);   // Var_z
 
   sensors->add_sens(this->adxl345);
 }

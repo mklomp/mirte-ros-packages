@@ -36,16 +36,18 @@ HiWonderBusData::HiWonderBusData(
   this->uart_port = board->resolveUARTPort(this->rx_pin);
 
   // TODO: Maybe use group_name in frame_id
-  if (unused_keys.erase("group_name"))
-    this->group_name = get_string(parameters["group_name"]);
+  if (unused_keys.erase("group_name")) this->group_name = get_string(parameters["group_name"]);
 
   if (unused_keys.erase("servos"))
-    this->servos = HiWonderServoData::parse_hiwonder_servo_data(parser, board, key, unused_keys, this->frame_id);
+    this->servos =
+      HiWonderServoData::parse_hiwonder_servo_data(parser, board, key, unused_keys, this->frame_id);
 }
 
 bool HiWonderBusData::check()
 {
   return uart_port != 0xFF && tx_pin != (pin_t)-1 && rx_pin != (pin_t)-1 &&
          ModuleData::check(get_module_type()) &&
-         std::transform_reduce(servos.cbegin(), servos.cend(), true, std::logical_and<>(), [](auto servo) { return servo->check(); });
+         std::transform_reduce(
+           servos.cbegin(), servos.cend(), true, std::logical_and<>(),
+           [](auto servo) { return servo->check(); });
 }

@@ -10,7 +10,7 @@ PCAMotor::PCAMotor(
   std::shared_ptr<tmx_cpp::PCA9685_module> pca9685)
 : PPMotor(
     node_data, motor_data->pinA, motor_data->pinB, DeviceData(motor_data->name), motor_data->invert,
-    (1 << 12)-1),
+    (1 << 12) - 1),
   motor_data(motor_data),
   pca9685_mod(pca9685)
 {

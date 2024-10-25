@@ -17,7 +17,7 @@ KeypadData::KeypadData(
 
     if (subkeys.erase("pin")) this->pin = board->resolvePin(get_string(parameters["pins.pin"]));
 
-    for (auto subkey: subkeys) unused_keys.insert(parser->build_param_name("pins", subkey));
+    for (auto subkey : subkeys) unused_keys.insert(parser->build_param_name("pins", subkey));
   } else
     RCLCPP_ERROR(logger, "Device %s has no a connector or pins specified.", key.c_str());
 }

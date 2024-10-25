@@ -6,7 +6,7 @@
 
 I2CModuleData::I2CModuleData(
   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-  std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string>& unused_keys)
+  std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
 : ModuleData(parser, board, name, parameters, unused_keys)
 {
   if (unused_keys.erase("connector")) {

@@ -2,5 +2,5 @@ repositories:
         mirte-ros-packages:
                 type: git
                 url: https://github.com/superjappie08/mirte-ros-packages.git
-                version: ros2
+                version: mirte-ros2
                 

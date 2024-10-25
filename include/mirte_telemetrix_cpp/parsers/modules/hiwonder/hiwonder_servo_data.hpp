@@ -35,34 +35,33 @@
 //   bool check() { return name != ""; }
 // };
 
-class HiWonderServoData : public DeviceData
-{
-public:
-  uint8_t id = -1;
+class HiWonderServoData : public DeviceData {
+  public:
+    uint8_t id = -1;
 
-  // TODO: Maybe change this
-  // angle in centi-degrees
-  int min_angle_out = 0;
-  // angle in centi-degrees
-  int max_angle_out = 24000;
+    // TODO: Maybe change this
+    // angle in centi-degrees
+    int min_angle_out = 0;
+    // angle in centi-degrees
+    int max_angle_out = 24000;
 
-  int home_out = 1000;
+    int home_out = 1000;
 
-  float min_angle_in = -1;
-  float max_angle_in = -1;
+    float min_angle_in = -1;
+    float max_angle_in = -1;
 
-  bool invert = false;
+    bool invert = false;
 
-  HiWonderServoData(
-    std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-    std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys,
-    std::string base_frame_id);
+    HiWonderServoData(
+      std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
+      std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys,
+      std::string base_frame_id);
 
-  // FIXME: CHANGE
-  static std::vector<std::shared_ptr<HiWonderServoData>> parse_hiwonder_servo_data(
-    std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string bus_name,
-    std::set<std::string> & unused_keys, std::string base_frame_id);
+    // FIXME: CHANGE
+    static std::vector<std::shared_ptr<HiWonderServoData>> parse_hiwonder_servo_data(
+      std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string bus_name,
+      std::set<std::string> & unused_keys, std::string base_frame_id);
 
-  // static std::string get_module_type() {return "hiwonder_servo.servo"; };
-  virtual bool check() override;
+    // static std::string get_module_type() {return "hiwonder_servo.servo"; };
+    virtual bool check() override;
 };

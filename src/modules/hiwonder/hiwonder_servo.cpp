@@ -18,7 +18,7 @@ Hiwonder_servo::Hiwonder_servo(
   if (!this->bus_mod->verify_id(this->servo_data->id))
     RCLCPP_ERROR(
       logger, "HiWonder Servo '%s' ID not present. [Expected ID %d, but was not found]",
-      this->servo_data->name, this->servo_data->id);
+      this->servo_data->name.c_str(), this->servo_data->id);
 
   auto range = this->bus_mod->get_range(servo_data->id);
   assert(range.has_value());

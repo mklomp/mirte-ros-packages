@@ -1,4 +1,5 @@
 #include <boost/algorithm/string.hpp>
+
 #include <mirte_telemetrix_cpp/parsers/actuators/motor_data.hpp>
 
 MotorData::MotorData(

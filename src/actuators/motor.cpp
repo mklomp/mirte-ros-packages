@@ -6,18 +6,17 @@
 #include <rclcpp/subscription_options.hpp>
 
 #include <mirte_telemetrix_cpp/actuators/motor.hpp>
-#include <mirte_telemetrix_cpp/mirte-actuators.hpp>
-
 #include <mirte_telemetrix_cpp/actuators/motor/ddp_motor.hpp>
 #include <mirte_telemetrix_cpp/actuators/motor/dp_motor.hpp>
 #include <mirte_telemetrix_cpp/actuators/motor/pp_motor.hpp>
+#include <mirte_telemetrix_cpp/device.hpp>
 
 using namespace std::placeholders;
 
-std::vector<std::shared_ptr<Mirte_Actuator>> Motor::get_motors(
+std::vector<std::shared_ptr<TelemetrixDevice>> Motor::get_motors(
   NodeData node_data, std::shared_ptr<Parser> parser)
 {
-  std::vector<std::shared_ptr<Mirte_Actuator>> motors;
+  std::vector<std::shared_ptr<TelemetrixDevice>> motors;
   auto motor_datas = parse_all<MotorData>(parser, node_data.board);
   for (auto motor_data : motor_datas) {
     if (motor_data.check()) {
@@ -47,7 +46,7 @@ Motor::Motor(NodeData node_data, std::vector<pin_t> pins, MotorData motor_data)
 
 Motor::Motor(
   NodeData node_data, std::vector<pin_t> pins, DeviceData data, bool inverted, int max_pwm)
-: Mirte_Actuator(node_data, pins, data, rclcpp::CallbackGroupType::MutuallyExclusive),
+: TelemetrixDevice(node_data, pins, data, rclcpp::CallbackGroupType::MutuallyExclusive),
   inverted(inverted),
   max_pwm(max_pwm)
 {

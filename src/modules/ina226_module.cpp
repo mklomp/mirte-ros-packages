@@ -1,6 +1,5 @@
-#include <stdint.h>
-
 #include <functional>
+#include <stdint.h>
 
 #ifdef WITH_GPIO
 #include <chrono>

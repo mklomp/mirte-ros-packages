@@ -2,9 +2,10 @@
 
 #include <rclcpp/rclcpp.hpp>
 
+#include <mirte_msgs/msg/keypad.hpp>
+
 #include <mirte_telemetrix_cpp/sensors/keypad_monitor.hpp>
 
-#include <mirte_msgs/msg/keypad.hpp>
 #include <mirte_msgs/srv/get_keypad.hpp>
 
 std::vector<std::shared_ptr<KeypadMonitor>> KeypadMonitor::get_keypad_monitors(

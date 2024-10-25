@@ -1,9 +1,10 @@
 #pragma once
 
-#include <boost/lexical_cast.hpp>
 #include <optional>
 #include <string>
 #include <vector>
+
+#include <boost/lexical_cast.hpp>
 inline std::optional<int> try_parse_int(std::string str)
 {
   try {

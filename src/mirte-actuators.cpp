@@ -1,8 +1,8 @@
-#include <mirte_telemetrix_cpp/mirte-actuators.hpp>
 #include <tmx_cpp/tmx.hpp>
 
 #include <mirte_telemetrix_cpp/actuators/motor.hpp>
 #include <mirte_telemetrix_cpp/actuators/servo/servo.hpp>
+#include <mirte_telemetrix_cpp/mirte-actuators.hpp>
 
 Mirte_Actuators::Mirte_Actuators(NodeData node_data, std::shared_ptr<Parser> parser)
 : tmx(node_data.tmx), nh(node_data.nh), board(node_data.board)
@@ -35,16 +35,4 @@ void Mirte_Actuators::set_pin_value_service_callback(
     tmx->pwmWrite(pin, std::clamp(req->value, 0, board->get_max_pwm()));
   }
   res->status = true;
-}
-
-Mirte_Actuator::Mirte_Actuator(NodeData node_data, std::vector<pin_t> pins, DeviceData data)
-: TelemetrixDevice(node_data, pins, data)
-{
-}
-
-Mirte_Actuator::Mirte_Actuator(
-  NodeData node_data, std::vector<pin_t> pins, DeviceData data,
-  rclcpp::CallbackGroupType callback_group_type)
-: TelemetrixDevice(node_data, pins, data, callback_group_type)
-{
 }

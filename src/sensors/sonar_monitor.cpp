@@ -2,10 +2,11 @@
 #include <vector>
 
 #include <mirte_telemetrix_cpp/parsers/sensors/sonar_data.hpp>
+
 #include <mirte_telemetrix_cpp/sensors/sonar_monitor.hpp>
 
-#include <mirte_msgs/srv/get_range.hpp>
 #include <sensor_msgs/msg/range.hpp>
+#include <mirte_msgs/srv/get_range.hpp>
 
 std::vector<std::shared_ptr<SonarMonitor>> SonarMonitor::get_sonar_monitors(
   NodeData node_data, std::shared_ptr<Parser> parser)

@@ -12,23 +12,22 @@
 #include <mirte_telemetrix_cpp/mirte-modules.hpp>
 #include <mirte_telemetrix_cpp/mirte-sensors.hpp>
 
-class TelemetrixNode
-{
-private:
-  /* data */
-  std::shared_ptr<rclcpp::Node> node_;
+class TelemetrixNode {
+  private:
+    /* data */
+    std::shared_ptr<rclcpp::Node> node_;
 
-public:
-  TelemetrixNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+  public:
+    TelemetrixNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
-  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr get_node_base_interface() const;
+    rclcpp::node_interfaces::NodeBaseInterface::SharedPtr get_node_base_interface() const;
 
-  ~TelemetrixNode();
-  bool start();
-  std::shared_ptr<Mirte_Board> board;
-  std::shared_ptr<tmx_cpp::TMX> tmx;
+    ~TelemetrixNode();
+    bool start();
+    std::shared_ptr<Mirte_Board> board;
+    std::shared_ptr<tmx_cpp::TMX> tmx;
 
-  std::shared_ptr<Mirte_Sensors> monitor;
-  std::shared_ptr<Mirte_Actuators> actuators;
-  std::shared_ptr<Mirte_modules> modules;
+    std::shared_ptr<Mirte_Sensors> monitor;
+    std::shared_ptr<Mirte_Actuators> actuators;
+    std::shared_ptr<Mirte_modules> modules;
 };

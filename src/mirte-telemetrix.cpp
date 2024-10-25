@@ -1,10 +1,14 @@
-#include <stdint.h>  // for uint8_t
-
 #include <exception>  // for exception
 #include <iostream>   // for operator<<, endl, basic_ostream
 #include <memory>     // for make_shared, shared_ptr, __shared...
+#include <stdint.h>   // for uint8_t
 
-#include <mirte_telemetrix_cpp/mirte-telemetrix.hpp>
+#include <rclcpp/executors.hpp>     // for spin
+#include <rclcpp/node.hpp>          // for Node
+#include <rclcpp/node_options.hpp>  // for NodeOptions
+#include <rclcpp/utilities.hpp>     // for shutdown, init
+
+#include "tmx_cpp/tmx.hpp"  // for TMX, TMX::GET_PICO_UNIQUE_ID, TMX...
 
 #include "mirte_telemetrix_cpp/mirte-actuators.hpp"  // for Mirte_Actuators
 #include "mirte_telemetrix_cpp/mirte-board.hpp"      // for Mirte_Board
@@ -12,12 +16,7 @@
 #include "mirte_telemetrix_cpp/mirte-sensors.hpp"    // for Mirte_Sensors
 #include "mirte_telemetrix_cpp/parsers/parsers.hpp"  // for Parser
 #include "mirte_telemetrix_cpp/util.hpp"
-#include "tmx_cpp/tmx.hpp"  // for TMX, TMX::GET_PICO_UNIQUE_ID, TMX...
-
-#include <rclcpp/executors.hpp>     // for spin
-#include <rclcpp/node.hpp>          // for Node
-#include <rclcpp/node_options.hpp>  // for NodeOptions
-#include <rclcpp/utilities.hpp>     // for shutdown, init
+#include <mirte_telemetrix_cpp/mirte-telemetrix.hpp>
 
 int main(int argc, char ** argv)
 {
@@ -36,7 +35,9 @@ int main(int argc, char ** argv)
   return 0;
 }
 
-rclcpp::node_interfaces::NodeBaseInterface::SharedPtr TelemetrixNode::get_node_base_interface() const {
+rclcpp::node_interfaces::NodeBaseInterface::SharedPtr TelemetrixNode::get_node_base_interface()
+  const
+{
   return this->node_->get_node_base_interface();
 }
 
@@ -119,7 +120,7 @@ bool TelemetrixNode::start()
 
   tmx = std::make_shared<tmx_cpp::TMX>([&]() { rclcpp::shutdown(); }, available_ports[0].port_name);
   tmx->sendMessage(tmx_cpp::TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
-  tmx->setScanDelay(1000/parser->get_frequency());
+  tmx->setScanDelay(1000 / parser->get_frequency());
 
   NodeData node_data{node_, tmx, board};
 

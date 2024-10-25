@@ -7,7 +7,10 @@
 SSD1306Data::SSD1306Data(
   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
   std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
-: I2CModuleData(parser, board, name, insert_default_param(parameters, "type", rclcpp::ParameterValue("ssd1306")), insert_default_param(unused_keys, "type"))
+: I2CModuleData(
+    parser, board, name,
+    insert_default_param(parameters, "type", rclcpp::ParameterValue("ssd1306")),
+    insert_default_param(unused_keys, "type"))
 {
   // Set default for address
   if ((!parameters.count("addr")) && this->addr == 0xFF) this->addr = 0x3C;

@@ -29,7 +29,7 @@ jobs:
           # ...
       - name: install requirements
         run: |
-         sudo apt install -y libboost-all-dev ament-cmake
+         sudo apt install -y libboost-dev libboost-system-dev libboost-thread-dev ament-cmake
       - name: Build mirte-msgs
         run: |
           git clone https://github.com/arendjan/mirte-ros-packages.git -b ros2

@@ -4,9 +4,9 @@
 
 #include <rclcpp/qos.hpp>
 
-#include <mirte_telemetrix_cpp/modules/veml6040_module.hpp>
-
 #include <color_util/convert.hpp>
+
+#include <mirte_telemetrix_cpp/modules/veml6040_module.hpp>
 
 using namespace std::placeholders;
 
