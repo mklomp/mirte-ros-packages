@@ -1,13 +1,14 @@
 import platform
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, Shutdown
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 DEBUG = True
 DEBUGGER = False
+
 
 def generate_launch_description():
     telemetrix_ros_arguments = (
@@ -18,7 +19,7 @@ def generate_launch_description():
         if DEBUG
         else []
     )
-    prefix = ['gdbserver localhost:3000'] if DEBUGGER else []
+    prefix = ["gdbserver localhost:3000"] if DEBUGGER else []
 
     launch_arguments: list[DeclareLaunchArgument] = [
         DeclareLaunchArgument(
@@ -60,6 +61,9 @@ def generate_launch_description():
         ros_arguments=telemetrix_ros_arguments,
         # TODO: Not avialable yet in humble (avialable starting from jazzy)
         # respawn_max_retries=10
+        on_exit=Shutdown(
+            reason="The telemetrix node died repeatedly, try some trouble-shooting steps"
+        ),
     )
 
     ld.add_action(node)
