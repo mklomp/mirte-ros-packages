@@ -16,6 +16,7 @@
 #define MIRTE_CONTROL__MIRTE_PIONEER_SYSTEM_HPP_
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -67,6 +68,7 @@ public:
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 private:
+  std::optional<rclcpp::Logger> logger_;
 
   // Store the command for the simulated robot
   std::vector<double> hw_commands_;

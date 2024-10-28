@@ -61,25 +61,27 @@ hardware_interface::CallbackReturn MirtePioneerSrvSystemHardware::on_init(
 
   // TODO: Maybe move this to a later stage if that would make sense
   std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared(convert_to_snake_case(get_name()));
+  logger_ = node->get_logger();
+
   // TODO: Make wheel service names configurable (Including namespace)
   left_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("io/motor/left/set_speed");
   right_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("io/motor/right/set_speed");
 
   while (!left_client_->wait_for_service(std::chrono::seconds(1))) {
     if (!rclcpp::ok()) {
-      RCLCPP_ERROR(rclcpp::get_logger(get_name()), "Interrupted while waiting for the service. Exiting.");
+      RCLCPP_ERROR(logger_.value(), "Interrupted while waiting for the service. Exiting.");
       return hardware_interface::CallbackReturn::ERROR;
     }
-    RCLCPP_INFO(rclcpp::get_logger(get_name()), "service not available, waiting again...");
+    RCLCPP_INFO(logger_.value(), "service not available, waiting again...");
   }
 
   // TODO: conbine with above
   while (!right_client_->wait_for_service(std::chrono::seconds(1))) {
     if (!rclcpp::ok()) {
-      RCLCPP_ERROR(rclcpp::get_logger(get_name()), "Interrupted while waiting for the service. Exiting.");
+      RCLCPP_ERROR(logger_.value(), "Interrupted while waiting for the service. Exiting.");
       return hardware_interface::CallbackReturn::ERROR;
     }
-    RCLCPP_INFO(rclcpp::get_logger(get_name()), "service not available, waiting again...");
+    RCLCPP_INFO(logger_.value(), "service not available, waiting again...");
   }
 
   hw_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
@@ -92,26 +94,24 @@ hardware_interface::CallbackReturn MirtePioneerSrvSystemHardware::on_init(
     if (joint.command_interfaces.size() != 1)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger(get_name()),
-        "Joint '%s' has %zu command interfaces found. 1 expected.", joint.name.c_str(),
-        joint.command_interfaces.size());
+        logger_.value(), "Joint '%s' has %zu command interfaces found. 1 expected.",
+        joint.name.c_str(), joint.command_interfaces.size());
       return hardware_interface::CallbackReturn::ERROR;
     }
 
     if (joint.command_interfaces[0].name != hardware_interface::HW_IF_VELOCITY)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger(get_name()),
-        "Joint '%s' have %s command interfaces found. '%s' expected.", joint.name.c_str(),
-        joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_VELOCITY);
+        logger_.value(), "Joint '%s' have %s command interfaces found. '%s' expected.",
+        joint.name.c_str(), joint.command_interfaces[0].name.c_str(),
+        hardware_interface::HW_IF_VELOCITY);
       return hardware_interface::CallbackReturn::ERROR;
     }
 
     if (joint.state_interfaces.size() != 2)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger(get_name()),
-        "Joint '%s' has %zu state interface. 2 expected.", joint.name.c_str(),
+        logger_.value(), "Joint '%s' has %zu state interface. 2 expected.", joint.name.c_str(),
         joint.state_interfaces.size());
       return hardware_interface::CallbackReturn::ERROR;
     }
@@ -119,18 +119,18 @@ hardware_interface::CallbackReturn MirtePioneerSrvSystemHardware::on_init(
     if (joint.state_interfaces[0].name != hardware_interface::HW_IF_POSITION)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger(get_name()),
-        "Joint '%s' have '%s' as first state interface. '%s' expected.", joint.name.c_str(),
-        joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION);
+        logger_.value(), "Joint '%s' have '%s' as first state interface. '%s' expected.",
+        joint.name.c_str(), joint.state_interfaces[0].name.c_str(),
+        hardware_interface::HW_IF_POSITION);
       return hardware_interface::CallbackReturn::ERROR;
     }
 
     if (joint.state_interfaces[1].name != hardware_interface::HW_IF_VELOCITY)
     {
       RCLCPP_FATAL(
-        rclcpp::get_logger(get_name()),
-        "Joint '%s' have '%s' as second state interface. '%s' expected.", joint.name.c_str(),
-        joint.state_interfaces[1].name.c_str(), hardware_interface::HW_IF_VELOCITY);
+        logger_.value(), "Joint '%s' have '%s' as second state interface. '%s' expected.",
+        joint.name.c_str(), joint.state_interfaces[1].name.c_str(),
+        hardware_interface::HW_IF_VELOCITY);
       return hardware_interface::CallbackReturn::ERROR;
     }
   }
@@ -178,7 +178,7 @@ hardware_interface::CallbackReturn MirtePioneerSrvSystemHardware::on_activate(
     }
   }
 
-  RCLCPP_INFO(rclcpp::get_logger(get_name()), "Successfully activated!");
+  RCLCPP_INFO(logger_.value(), "Successfully activated!");
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -186,8 +186,7 @@ hardware_interface::CallbackReturn MirtePioneerSrvSystemHardware::on_activate(
 hardware_interface::CallbackReturn MirtePioneerSrvSystemHardware::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
-
-  RCLCPP_INFO(rclcpp::get_logger(get_name()), "Successfully deactivated!");
+  RCLCPP_INFO(logger_.value(), "Successfully deactivated!");
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -210,30 +209,30 @@ hardware_interface::return_type MirtePioneerSrvSystemHardware::read(
 hardware_interface::return_type mirte_control ::MirtePioneerSrvSystemHardware::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
+  // This function converts cmd[0] to pwm and calls that service
 
-      // This function converts cmd[0] to pwm and calls that service
+  // NOTE: this *highly* depends on the voltage of the motors!!!!
+  // For 5V power bank: 255 pwm = 90 ticks/sec -> ca 2 rot/s (4*pi)
+  // For 6V power supply: 255 pwm = 120 ticks/sec -> ca 3 rot/s
+  // (6*pi)
 
-      // NOTE: this *highly* depends on the voltage of the motors!!!!
-      // For 5V power bank: 255 pwm = 90 ticks/sec -> ca 2 rot/s (4*pi)
-      // For 6V power supply: 255 pwm = 120 ticks/sec -> ca 3 rot/s
-      // (6*pi)
+  auto left_request = std::make_shared<mirte_msgs::srv::SetMotorSpeed::Request>();
+  int left_speed = std::max(std::min(int(hw_commands_[0] / (6 * M_PI) * 100), 100), -100);
+  if (left_speed != last_cmd_left_)
+  {
+    left_request->speed = left_speed;
+    auto result = left_client_->async_send_request(left_request);
+    last_cmd_left_ = left_speed;
+  }
 
-      auto left_request = std::make_shared<mirte_msgs::srv::SetMotorSpeed::Request>();
-      int left_speed  = std::max(std::min(int(hw_commands_[0] / ( 6 * M_PI) * 100), 100), -100);
-      if (left_speed != last_cmd_left_){
-        left_request->speed = left_speed;
-        auto result = left_client_->async_send_request(left_request);
-        last_cmd_left_ = left_speed;
-      }
-
-
-      auto right_request = std::make_shared<mirte_msgs::srv::SetMotorSpeed::Request>();
-      int right_speed = std::max(std::min(int(hw_commands_[1] / ( 6 * M_PI) * 100), 100), -100);
-      if (right_speed != last_cmd_right_){
-        right_request->speed = right_speed;
-        auto result = right_client_->async_send_request(right_request);
-        last_cmd_right_ = right_speed;
-      }
+  auto right_request = std::make_shared<mirte_msgs::srv::SetMotorSpeed::Request>();
+  int right_speed = std::max(std::min(int(hw_commands_[1] / (6 * M_PI) * 100), 100), -100);
+  if (right_speed != last_cmd_right_)
+  {
+    right_request->speed = right_speed;
+    auto result = right_client_->async_send_request(right_request);
+    last_cmd_right_ = right_speed;
+  }
 
   return hardware_interface::return_type::OK;
 }
