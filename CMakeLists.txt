@@ -39,6 +39,7 @@ find_package(std_srvs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(color_util REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(backward_ros REQUIRED)
 
 find_package(OpenCV REQUIRED COMPONENTS core imgcodecs)
 find_package(Boost REQUIRED COMPONENTS system thread)
@@ -132,6 +133,7 @@ ament_target_dependencies(
   sensor_msgs
   color_util
   cv_bridge # DEPENDS
+  backward_ros
   # system_lib
 )
 

@@ -6,6 +6,8 @@
 
 #include <color_util/convert.hpp>
 
+#include <tmx_cpp/tmx.hpp>
+
 #include <mirte_telemetrix_cpp/modules/veml6040_module.hpp>
 
 using namespace std::placeholders;
@@ -39,8 +41,21 @@ VEML6040_sensor::VEML6040_sensor(
   modules->add_sens(this->veml6040);
 }
 
+void VEML6040_sensor::update()
+{
+  auto header = get_header();
+  last_rgba.header = header;
+  last_rgbw.header = header;
+  last_hsl.header = header;
+
+  rgbw_pub->publish(last_rgbw);
+  rgba_pub->publish(last_rgba);
+  hsl_pub->publish(last_hsl);
+}
+
 void VEML6040_sensor::data_cb(uint16_t red, uint16_t green, uint16_t blue, uint16_t white)
 {
+  this->device_timer->reset();
   // To get to HSI/HSV/HSL we need to set a max to the intensity (setting). This could be
   // 2^16, but to get more resolution, you could also cap this to a lower value.
 

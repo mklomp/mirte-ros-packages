@@ -36,6 +36,7 @@ void DigitalIntensityMonitor::callback(uint16_t value)
 {
   this->value = value;
   this->update();
+  this->device_timer->reset();
 }
 
 void DigitalIntensityMonitor::update()
@@ -90,6 +91,7 @@ void AnalogIntensityMonitor::callback(uint16_t value)
 {
   this->value = value;
   this->update();
+  this->device_timer->reset();
 }
 
 void AnalogIntensityMonitor::update()

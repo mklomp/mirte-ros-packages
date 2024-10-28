@@ -2,8 +2,6 @@
 #include <filesystem>
 #include <optional>
 
-namespace fs = std::filesystem;
-
 #include <tmx_cpp/modules/SSD1306_oled.hpp>
 
 #include <mirte_telemetrix_cpp/modules/base_module.hpp>
@@ -14,6 +12,8 @@ namespace fs = std::filesystem;
 #include <mirte_msgs/srv/set_oled_image.hpp>
 #include <mirte_msgs/srv/set_oled_image_legacy.hpp>
 #include <mirte_msgs/srv/set_oled_text.hpp>
+
+namespace fs = std::filesystem;
 
 class SSD1306_module : public Mirte_module {
   public:
@@ -32,6 +32,8 @@ class SSD1306_module : public Mirte_module {
     bool set_image_from_path(fs::path path);
     bool set_image_from_path(std::string path);
 
+    virtual void device_timer_callback() override;
+
   private:
     bool enabled = true;
     std::optional<std::string> last_text;
@@ -41,8 +43,6 @@ class SSD1306_module : public Mirte_module {
     rclcpp::Service<mirte_msgs::srv::SetOLEDText>::SharedPtr set_oled_text_service;
     rclcpp::Service<mirte_msgs::srv::SetOLEDImage>::SharedPtr set_oled_image_service;
     rclcpp::Service<mirte_msgs::srv::SetOLEDFile>::SharedPtr set_oled_file_service;
-
-    rclcpp::TimerBase::SharedPtr default_screen_timer;
 
     bool prewrite(bool is_default = false);
 
@@ -61,6 +61,4 @@ class SSD1306_module : public Mirte_module {
     void set_oled_file_callback(
       const std::shared_ptr<mirte_msgs::srv::SetOLEDFile::Request> req,
       std::shared_ptr<mirte_msgs::srv::SetOLEDFile::Response> res);
-
-    void default_screen_timer_callback();
 };

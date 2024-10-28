@@ -21,6 +21,3 @@ class SonarData : public SensorData {
 
     static std::string get_device_class() { return "distance"; };
 };
-
-// std::vector<SonarData> parse_sonars(
-//   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board);

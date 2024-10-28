@@ -14,7 +14,7 @@ class EncoderMonitor : public Mirte_Sensor {
   public:
     EncoderMonitor(NodeData node_data, EncoderData encoder_data);
 
-    void update();
+    virtual void update() override;
 
     EncoderData encoder_data;
     std::shared_ptr<rclcpp::Publisher<mirte_msgs::msg::Encoder>> encoder_pub;

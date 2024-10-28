@@ -29,6 +29,7 @@ void EncoderMonitor::callback(int16_t value)
 {
   this->value += value;
   update();
+  this->device_timer->reset();
 }
 
 void EncoderMonitor::update()

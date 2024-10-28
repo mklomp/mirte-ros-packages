@@ -22,10 +22,7 @@ class Parser {
     std::map<std::string, rclcpp::ParameterValue> get_params_name(std::string name);
     std::set<std::string> get_params_keys(std::string name);
     static std::string build_param_name(std::string name, std::string key);
-    int get_frequency()
-    {
-      return 50;  // TODO: make this configurable
-    }
+    int get_frequency();
     std::string get_last(std::string name);
 };
 

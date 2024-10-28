@@ -1,8 +1,11 @@
+#include <chrono>
 #include <filesystem>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
 #include <mirte_telemetrix_cpp/parsers/modules/ssd1306_data.hpp>
+
+using namespace std::chrono_literals;
 
 SSD1306Data::SSD1306Data(
   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
@@ -10,7 +13,7 @@ SSD1306Data::SSD1306Data(
 : I2CModuleData(
     parser, board, name,
     insert_default_param(parameters, "type", rclcpp::ParameterValue("ssd1306")),
-    insert_default_param(unused_keys, "type"))
+    insert_default_param(unused_keys, "type"), std::chrono::duration_cast<DeviceDuration>(10s))
 {
   // Set default for address
   if ((!parameters.count("addr")) && this->addr == 0xFF) this->addr = 0x3C;

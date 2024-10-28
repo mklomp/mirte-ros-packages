@@ -28,9 +28,6 @@ class HiWonderBus_module : public Mirte_module {
 
   private:
     void position_cb(std::vector<tmx_cpp::HiwonderServo_module::Servo_pos>);
-    void verify_cb(int, bool);
-    void range_cb(int, uint16_t, uint16_t);
-    void offset_cb(int, uint16_t);
 
     // ROS Enable Service
     rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr enable_all_servos_service;

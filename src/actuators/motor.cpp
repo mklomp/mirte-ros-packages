@@ -60,6 +60,8 @@ Motor::Motor(
   speed_subscription = nh->create_subscription<std_msgs::msg::Int32>(
     "motor/" + this->name + "/speed", rclcpp::SystemDefaultsQoS(),
     std::bind(&Motor::speed_subscription_callback, this, _1), options);
+
+  this->device_timer->cancel();
 }
 
 void Motor::set_speed_service_callback(

@@ -13,7 +13,8 @@
 class KeypadMonitor : public Mirte_Sensor {
   public:
     KeypadMonitor(NodeData node_data, KeypadData keypad_data);
-    void update();
+    virtual void update() override;
+
     KeypadData keypad_data;
     std::shared_ptr<rclcpp::Publisher<mirte_msgs::msg::Keypad>> keypad_pub;
     std::shared_ptr<rclcpp::Publisher<mirte_msgs::msg::Keypad>> keypad_pressed_pub;

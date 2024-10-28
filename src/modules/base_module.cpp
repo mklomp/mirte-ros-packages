@@ -11,3 +11,5 @@ Mirte_module::Mirte_module(
 : TelemetrixDevice(node_data, pins, (DeviceData)module_data, callback_group_type)
 {
 }
+
+void Mirte_module::device_timer_callback() { update(); }

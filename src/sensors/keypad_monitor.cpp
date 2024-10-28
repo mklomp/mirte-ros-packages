@@ -45,6 +45,7 @@ void KeypadMonitor::callback(uint16_t value)
 {
   this->value = value;
   this->update();
+  this->device_timer->reset();
 }
 
 bool KeypadMonitor::keypad_callback(

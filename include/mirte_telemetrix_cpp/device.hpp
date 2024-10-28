@@ -1,8 +1,10 @@
 #pragma once
 #include <memory>
+#include <vector>
 
 #include <rclcpp/callback_group.hpp>
 #include <rclcpp/node.hpp>
+#include <rclcpp/timer.hpp>
 
 #include <tmx_cpp/tmx.hpp>
 
@@ -42,6 +44,11 @@ class TelemetrixDevice {
     TelemetrixDevice(
       NodeData node_data, std::vector<uint8_t> pins, DeviceData data,
       rclcpp::CallbackGroupType callback_group_type);
+
+    virtual void device_timer_callback(){};
+
+  protected:
+    rclcpp::TimerBase::SharedPtr device_timer;
 };
 
 // }  // namespace mirte_telemetrix_cpp

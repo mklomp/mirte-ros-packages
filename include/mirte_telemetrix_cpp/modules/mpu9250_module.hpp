@@ -19,6 +19,7 @@ class MPU9250_sensor : public Mirte_module {
     MPU9250Data data;
     std::shared_ptr<tmx_cpp::MPU9250_module> mpu9250;
 
+    virtual void update() override;
     void data_cb(
       std::array<float, 3> acceleration, std::array<float, 3> gyro,
       std::array<float, 3> magnetic_field, std::array<float, 4> quaternion);

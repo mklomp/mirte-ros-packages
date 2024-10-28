@@ -11,5 +11,8 @@ class Mirte_module : public TelemetrixDevice {
     Mirte_module(
       NodeData node_data, std::vector<pin_t> pins, ModuleData module_data,
       rclcpp::CallbackGroupType callback_group_type);
+
     virtual ~Mirte_module() = default;
+    virtual void update() override{};
+    virtual void device_timer_callback() override;
 };

@@ -35,7 +35,6 @@ INA226_sensor::INA226_sensor(
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   modules->add_sens(this->ina226);
-  // TODO: add used topic
   // TODO: add shutdown service
   // TODO: add auto shutdown
 
@@ -47,19 +46,27 @@ INA226_sensor::INA226_sensor(
 #endif
 }
 
-void INA226_sensor::data_cb(float voltage, float current)
+void INA226_sensor::update()
 {
-  voltage_ = voltage;
-  // std::cout << "INA226 data: " << current << " " << voltage << std::endl;
   auto msg = sensor_msgs::msg::BatteryState();
   msg.header = get_header();
 
-  msg.voltage = voltage;
-  msg.current = current;
-  msg.percentage = calc_soc(voltage);
+  msg.voltage = voltage_;
+  msg.current = current_;
+
+  msg.percentage = calc_soc(voltage_);
   this->battery_pub->publish(msg);
-  this->integrate_usage(current);
-  this->check_soc(voltage, current);
+  this->integrate_usage(current_);
+  this->check_soc(voltage_, current_);
+}
+
+void INA226_sensor::data_cb(float voltage, float current)
+{
+  voltage_ = voltage;
+  current_ = current;
+  // std::cout << "INA226 data: " << current << " " << voltage << std::endl;
+  this->update();
+  this->device_timer->reset();
 }
 
 float INA226_sensor::calc_soc(float voltage)

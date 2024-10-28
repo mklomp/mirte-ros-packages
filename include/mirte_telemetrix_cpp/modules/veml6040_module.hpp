@@ -1,7 +1,9 @@
 #pragma once
-
 #include <cstdint>
 #include <memory>
+
+#include <rclcpp/publisher.hpp>
+#include <rclcpp/service.hpp>
 
 #include <tmx_cpp/sensors/VEML6040.hpp>
 
@@ -25,6 +27,7 @@ class VEML6040_sensor : public Mirte_module {
     VEML6040Data data;
     std::shared_ptr<tmx_cpp::VEML6040_module> veml6040;
 
+    virtual void update() override;
     void data_cb(uint16_t red, uint16_t green, uint16_t blue, uint16_t white);
 
     static std::vector<std::shared_ptr<VEML6040_sensor>> get_veml6040_modules(

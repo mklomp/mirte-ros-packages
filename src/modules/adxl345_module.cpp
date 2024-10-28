@@ -37,6 +37,12 @@ ADXL345_sensor::ADXL345_sensor(
   sensors->add_sens(this->adxl345);
 }
 
+void ADXL345_sensor::update()
+{
+  msg.header = get_header();
+  imu_pub->publish(msg);
+}
+
 void ADXL345_sensor::data_cb(std::array<float, 3> acceleration)
 {
   msg.header = get_header();
@@ -46,6 +52,7 @@ void ADXL345_sensor::data_cb(std::array<float, 3> acceleration)
   msg.linear_acceleration.z = acceleration[2] * 9.81;
 
   imu_pub->publish(msg);
+  this->device_timer->reset();
 }
 
 void ADXL345_sensor::get_imu_service_callback(

@@ -3,7 +3,9 @@
 SonarData::SonarData(
   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
   std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
-: SensorData(parser, board, name, SonarData::get_device_class(), parameters, unused_keys)
+: SensorData(
+    parser, board, name, SonarData::get_device_class(), parameters, unused_keys,
+    DeviceDuration(1000.0 / 10.0))
 {
   auto key = get_device_key(this);
   auto logger = parser->logger;

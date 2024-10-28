@@ -13,7 +13,7 @@ class SensorData : public DeviceData {
     SensorData(
       std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
       std::string sensor_type, std::map<std::string, rclcpp::ParameterValue> parameters,
-      std::set<std::string> & unused_keys);
+      std::set<std::string> & unused_keys, std::optional<DeviceDuration> duration = {});
     ~SensorData(){};
     // bool check();
 

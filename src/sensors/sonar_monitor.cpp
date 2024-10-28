@@ -70,6 +70,7 @@ void SonarMonitor::callback(uint16_t value)
       this->distance = raw_distance;
   }
   this->update();
+  this->device_timer->reset();
 }
 
 void SonarMonitor::update()

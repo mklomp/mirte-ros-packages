@@ -36,10 +36,17 @@ MPU9250_sensor::MPU9250_sensor(
   sensors->add_sens(this->mpu9250);
 }
 
+void MPU9250_sensor::update()
+{
+  msg.header = get_header();
+  imu_pub->publish(msg);
+}
+
 void MPU9250_sensor::data_cb(
   std::array<float, 3> acceleration, std::array<float, 3> gyro, std::array<float, 3> magnetic_field,
   std::array<float, 4> quaternion)
 {
+  device_timer->reset();
   msg.header = get_header();
 
   msg.linear_acceleration.x = acceleration[0] * 9.81;

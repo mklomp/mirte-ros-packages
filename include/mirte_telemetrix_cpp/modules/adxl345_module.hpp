@@ -20,6 +20,7 @@ class ADXL345_sensor : public Mirte_module {
     ADXL345Data data;
     std::shared_ptr<tmx_cpp::ADXL345_module> adxl345;
 
+    virtual void update() override;
     void data_cb(std::array<float, 3> acceleration);
 
     static std::vector<std::shared_ptr<ADXL345_sensor>> get_adxl_modules(

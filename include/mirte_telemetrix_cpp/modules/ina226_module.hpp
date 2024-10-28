@@ -18,7 +18,7 @@ class INA226_sensor : public Mirte_module {
     INA226Data data;
     std::shared_ptr<tmx_cpp::INA226_module> ina226;
 
-    // virtual void update() override;
+    virtual void update() override;
 
     void data_cb(float voltage, float current);
 
@@ -49,6 +49,7 @@ class INA226_sensor : public Mirte_module {
     rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr shutdown_service;
 
     float voltage_ = 0;
+    float current_ = 0;
 
 #ifdef WITH_GPIO
     rclcpp::TimerBase::SharedPtr battery_led_timer;

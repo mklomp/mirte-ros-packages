@@ -52,9 +52,6 @@ SSD1306_module::SSD1306_module(
   this->ssd1306 =
     std::make_shared<tmx_cpp::SSD1306_module>(data.port, data.addr, data.width, data.height);
 
-  this->default_screen_timer = nh->create_wall_timer(
-    10s, std::bind(&SSD1306_module::default_screen_timer_callback, this), this->callback_group);
-
   if (data.legacy)
     this->set_oled_service_legacy = nh->create_service<mirte_msgs::srv::SetOLEDImageLegacy>(
       "oled/" + data.name + "/set_image_legacy",
@@ -76,6 +73,8 @@ SSD1306_module::SSD1306_module(
     std::bind(&SSD1306_module::set_oled_file_callback, this, _1, _2),
     rmw_qos_profile_services_default, this->callback_group);
 
+  this->device_timer->reset();
+
   modules->add_mod(this->ssd1306);
   // Write an initial text to the screen, and instantly kill the timer if it has failed.
   /* NOTE: This needs to use the raw send_text, because otherwise the default_screen_timer will be canceled. */
@@ -83,13 +82,13 @@ SSD1306_module::SSD1306_module(
     RCLCPP_ERROR(
       this->logger, "Writing to OLED module '%s' failed, shutting down default screen timer.",
       this->data.name.c_str());
-    this->default_screen_timer->cancel();
+    this->device_timer->cancel();
   }
 }
 
 bool SSD1306_module::prewrite(bool is_default)
 {
-  if (!is_default) default_screen_timer->cancel();
+  if (!is_default) device_timer->cancel();
 
   if (!enabled) {
     RCLCPP_ERROR(logger, "Writing to OLED Module %s failed", data.name.c_str());
@@ -249,7 +248,7 @@ void SSD1306_module::set_oled_file_callback(
   res->status = set_image_from_path(req->path);
 }
 
-void SSD1306_module::default_screen_timer_callback()
+void SSD1306_module::device_timer_callback()
 {
   if (!prewrite(true)) return;
 
@@ -269,7 +268,7 @@ void SSD1306_module::default_screen_timer_callback()
 
   if (not succes) {
     enabled = false;
-    default_screen_timer->cancel();
+    device_timer->cancel();
     RCLCPP_ERROR(logger, "Default screen update failed. Disabling screen and update timer.");
   }
 }

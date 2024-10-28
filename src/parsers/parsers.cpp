@@ -88,6 +88,17 @@ std::set<std::string> Parser::get_params_keys(std::string name)
 
 std::string Parser::build_param_name(std::string name, std::string key) { return name + "." + key; }
 
+int Parser::get_frequency()
+{
+  auto keys = get_params_keys("device.mirte");
+  auto values = get_params_name("device.mirte");
+
+  if (keys.erase("max_frequency"))
+    return values["max_frequency"].get<int>();
+  else
+    return 50;
+}
+
 std::string Parser::get_last(std::string name)
 {  // convert modules.servobus to servobus
   auto last_dot = name.find_last_of(".");

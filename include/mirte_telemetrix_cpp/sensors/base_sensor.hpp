@@ -15,6 +15,8 @@ class Mirte_Sensor : public TelemetrixDevice {
       NodeData node_data, std::vector<uint8_t> pins, SensorData data,
       rclcpp::CallbackGroupType callback_group_type);
     virtual ~Mirte_Sensor() = default;
+
+    virtual void device_timer_callback() override;
 };
 
 // }  // namespace mirte_telemetrix_cpp

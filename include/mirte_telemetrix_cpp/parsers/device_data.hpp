@@ -1,7 +1,10 @@
 #pragma once
 
+#include <chrono>
 #include <concepts>
 #include <map>
+#include <optional>
+#include <ratio>
 #include <set>
 #include <string>
 
@@ -18,12 +21,17 @@ class DeviceData {
     std::string name = "";
     std::string frame_id = "";
 
+    using DeviceDuration = std::chrono::duration<double, std::milli>;
+    DeviceDuration duration;
+
     DeviceData(
       std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
       std::string device_type, std::map<std::string, rclcpp::ParameterValue> parameters,
-      std::set<std::string> & unused_keys);
+      std::set<std::string> & unused_keys, std::optional<DeviceDuration> duration = {});
 
-    DeviceData(std::string name, std::string frame_id = "");
+    DeviceData(
+      std::string name, std::string frame_id = "",
+      DeviceDuration duration = DeviceDuration(10'000.0));
 
     virtual bool check();
 
