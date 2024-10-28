@@ -14,18 +14,34 @@
 
 #include "mirte_control/mirte_pioneer_system.hpp"
 
+#include <cctype>
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
 #include <limits>
 #include <memory>
+#include <string>
 #include <vector>
-#include <cstdlib>
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 namespace mirte_control
 {
+
+std::string convert_to_snake_case(const std::string & input)
+{
+  std::string result = "";
+
+  for (auto it = input.cbegin(); it != input.cend(); ++it) {
+    if (std::isupper(*it) && !result.empty()) {
+      result.push_back('_');
+    }
+    result.push_back(std::tolower(*it));
+  }
+
+  return result;
+}
 
 // TODO: Maybe make this all configurable so N wheels resulting in a combinable Mirte Master Hardware Interface
 hardware_interface::CallbackReturn MirtePioneerSrvSystemHardware::on_init(
@@ -44,7 +60,7 @@ hardware_interface::CallbackReturn MirtePioneerSrvSystemHardware::on_init(
   // TODO: Make wheel names configurable based, like https://github.com/joshnewans/diffdrive_arduino/blob/humble/description/ros2_control/diffbot.ros2_control.xacro
 
   // TODO: Maybe move this to a later stage if that would make sense
-  std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared(get_name());
+  std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared(convert_to_snake_case(get_name()));
   // TODO: Make wheel service names configurable (Including namespace)
   left_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("io/motor/left/set_speed");
   right_client_ = node->create_client<mirte_msgs::srv::SetMotorSpeed>("io/motor/right/set_speed");
