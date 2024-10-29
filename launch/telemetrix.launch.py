@@ -60,10 +60,11 @@ def generate_launch_description():
         respawn_delay=5,
         ros_arguments=telemetrix_ros_arguments,
         # TODO: Not avialable yet in humble (avialable starting from jazzy)
-        # respawn_max_retries=10
-        on_exit=Shutdown(
-            reason="The telemetrix node died repeatedly, try some trouble-shooting steps"
-        ),
+        # respawn_max_retries=10,
+        # Makes Node required
+        # on_exit=Shutdown(
+        #     reason="The telemetrix node died repeatedly, try some trouble-shooting steps"
+        # ),
     )
 
     ld.add_action(node)
