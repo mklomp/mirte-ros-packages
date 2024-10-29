@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-22.04
           # you can specify the version after `-` like `llvm-13.0.0`.
     container:
-        image: ubuntu:noble
+        image: ubuntu:jammy
     steps:
       - uses: actions/checkout@v4
       - name: Extract branch name
