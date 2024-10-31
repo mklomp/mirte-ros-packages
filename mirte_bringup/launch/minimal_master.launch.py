@@ -75,7 +75,8 @@ def generate_launch_description():
                     ]
                 )
             ]
-        )
+        ),
+        launch_arguments={"frame_prefix": frame_prefix}.items(),
     )
 
     web_video_server = Node(

@@ -22,6 +22,7 @@ from launch.substitutions import (
     FindExecutable,
     LaunchConfiguration,
     PathJoinSubstitution,
+    TextSubstitution,
 )
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
@@ -31,7 +32,7 @@ def generate_launch_description():
     frame_prefix_launch_arg = DeclareLaunchArgument(
         "frame_prefix",
         default_value="",
-        description="An arbitrary prefix to add to the published tf2 frames. Defaults to the empty string."
+        description="An arbitrary prefix to add to the published tf2 frames. Defaults to the empty string.",
     )
 
     # TODO: Add possible namespacing
@@ -47,7 +48,10 @@ def generate_launch_description():
             ),
         ]
     )
-    robot_description = {"robot_description": robot_description_content, "frame_prefix": LaunchConfiguration("frame_prefix")}
+    robot_description = {
+        "robot_description": robot_description_content,
+        "frame_prefix": LaunchConfiguration("frame_prefix"),
+    }
 
     robot_controllers = PathJoinSubstitution(
         [
@@ -74,9 +78,7 @@ def generate_launch_description():
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=[
-            "joint_state_broadcaster",
-        ],
+        arguments=["joint_state_broadcaster"],
     )
 
     robot_controller_spawner = Node(
@@ -85,14 +87,32 @@ def generate_launch_description():
         arguments=["diff_drive_controller"],
     )
 
-    # Delay start of robot_controller after `joint_state_broadcaster`
-    delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = (
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=joint_state_broadcaster_spawner,
-                on_exit=[robot_controller_spawner],
-            )
-        )
+    # # Delay start of robot_controller after `joint_state_broadcaster`
+    # delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = (
+    #     RegisterEventHandler(
+    #         event_handler=OnProcessExit(
+    #             target_action=joint_state_broadcaster_spawner,
+    #             on_exit=[robot_controller_spawner],
+    #         )
+    #     )
+    # )
+
+    twist_stamper = Node(
+        package="twist_stamper",
+        executable="twist_stamper",
+        namespace="diff_drive_controller",
+        remappings=[
+            ("cmd_vel_out", "cmd_vel"),
+            ("cmd_vel_in", "cmd_vel_unstamped"),
+        ],
+        parameters=[
+            {
+                "frame_id": (
+                    LaunchConfiguration("frame_prefix"),
+                    TextSubstitution(text="base_link"),
+                )
+            }
+        ],
     )
 
     nodes = [
@@ -102,6 +122,7 @@ def generate_launch_description():
         joint_state_broadcaster_spawner,
         robot_controller_spawner,
         # delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
+        twist_stamper,
     ]
 
     return LaunchDescription(nodes)

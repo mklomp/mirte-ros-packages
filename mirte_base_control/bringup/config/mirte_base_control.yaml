@@ -14,7 +14,7 @@
   ros__parameters:
     # hardware_parameters:
     # ticks: 1320
-    use_stamped_vel: false
+    use_stamped_vel: true # This will become the default in the future
     reference_timeout: 0.25
     command_timeout: 0.25
     command_joint_names: ["pid_wheels_controller/left_front_wheel_joint", "pid_wheels_controller/left_rear_wheel_joint", "pid_wheels_controller/right_rear_wheel_joint", "pid_wheels_controller/right_front_wheel_joint"]
@@ -36,9 +36,9 @@
           # wheel_separation_y: 0.27
 
 
-    base_frame_id: "base_link"
-
-    odom_frame_id: "odom"
+    # These need to be evaluated since this controller does not support frame_prefixes
+    base_frame_id: "$(var frame_prefix '')base_link"
+    odom_frame_id: "$(var frame_prefix '')odom"
 
     enable_odom_tf: true
 
