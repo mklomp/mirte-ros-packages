@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <tuple>
 #include <vector>
 
 #include <rclcpp/node.hpp>
@@ -27,7 +28,7 @@ class HiWonderBus_module : public Mirte_module {
       std::shared_ptr<tmx_cpp::Modules> modules);
 
   private:
-    void position_cb(std::vector<tmx_cpp::HiwonderServo_module::Servo_pos>);
+    void position_cb(std::vector<std::tuple<uint8_t, tmx_cpp::HiwonderServo_module::Servo_pos>>);
 
     // ROS Enable Service
     rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr enable_all_servos_service;

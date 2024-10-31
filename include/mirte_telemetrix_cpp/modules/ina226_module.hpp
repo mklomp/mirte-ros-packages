@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 
 #include <tmx_cpp/sensors/INA226.hpp>
 
@@ -36,7 +37,7 @@ class INA226_sensor : public Mirte_module {
       std::shared_ptr<tmx_cpp::Sensors> sensors);
 
   private:
-    float total_used_mAh = 0;
+    std::atomic<float> total_used_mAh = 0;
     rclcpp::Time used_time = rclcpp::Time(0, 0);
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr used_pub;
     rclcpp::Publisher<sensor_msgs::msg::BatteryState>::SharedPtr battery_pub;
@@ -44,12 +45,12 @@ class INA226_sensor : public Mirte_module {
     bool enable_turn_off = false;
     bool shutdown_triggered = false;
     rclcpp::Time turn_off_trigger_time = rclcpp::Time(0, 0);
-    bool in_power_dip = false;
+    std::atomic<bool> in_power_dip = false;
     rclcpp::Time turn_off_time = rclcpp::Time(0, 0);
     rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr shutdown_service;
 
-    float voltage_ = 0;
-    float current_ = 0;
+    std::atomic<float> voltage_ = 0;
+    std::atomic<float> current_ = 0;
 
 #ifdef WITH_GPIO
     rclcpp::TimerBase::SharedPtr battery_led_timer;

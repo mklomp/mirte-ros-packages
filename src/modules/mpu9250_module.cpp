@@ -38,15 +38,18 @@ MPU9250_sensor::MPU9250_sensor(
 
 void MPU9250_sensor::update()
 {
-  msg.header = get_header();
-  imu_pub->publish(msg);
+  if (msg_mutex.try_lock()) {
+    const std::lock_guard lock{msg_mutex, std::adopt_lock};
+    msg.header = get_header();
+    imu_pub->publish(msg);
+  }
 }
 
 void MPU9250_sensor::data_cb(
   std::array<float, 3> acceleration, std::array<float, 3> gyro, std::array<float, 3> magnetic_field,
   std::array<float, 4> quaternion)
 {
-  device_timer->reset();
+  const std::lock_guard<std::mutex> lock(msg_mutex);
   msg.header = get_header();
 
   msg.linear_acceleration.x = acceleration[0] * 9.81;
@@ -63,12 +66,14 @@ void MPU9250_sensor::data_cb(
   msg.orientation.w = quaternion[3];
 
   imu_pub->publish(msg);
+  device_timer->reset();
 }
 
 void MPU9250_sensor::get_imu_service_callback(
   const std::shared_ptr<mirte_msgs::srv::GetImu::Request> req,
   std::shared_ptr<mirte_msgs::srv::GetImu::Response> res)
 {
+  const std::lock_guard<std::mutex> lock(msg_mutex);
   res->data = sensor_msgs::msg::Imu(msg);
 }
 

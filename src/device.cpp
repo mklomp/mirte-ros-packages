@@ -21,6 +21,12 @@ TelemetrixDevice::TelemetrixDevice(
   this->callback_group = nh->create_callback_group(callback_group_type);
 
   // TODO: Starting from Jazzy Set auto_start false, so they can be started at the end of the initialization.
+
+  // TODO: Could do something like this https://github.com/ros2/demos/blob/rolling/demo_nodes_cpp/src/timers/reuse_timer.cpp
+  // To give more room for recieving the callback while the rate can be fixed at the max_frequency
+
+  // TODO: Compensation could be depended on the amount of cores available.
+  // To compensate for communication latencies, scale the period up by 20% (on my machine with 16 cores)
   this->device_timer = nh->create_wall_timer(
-    data.duration, [this]() { this->device_timer_callback(); }, this->callback_group);
+    data.duration * 1.2, [this]() { this->device_timer_callback(); }, this->callback_group);
 }

@@ -3,10 +3,10 @@
 
 #include <rclcpp/rclcpp.hpp>
 
+#include <mirte_telemetrix_cpp/sensors/intensity_monitor.hpp>
+
 #include <mirte_msgs/msg/intensity.hpp>
 #include <mirte_msgs/msg/intensity_digital.hpp>
-
-#include <mirte_telemetrix_cpp/sensors/intensity_monitor.hpp>
 
 IntensityMonitor::IntensityMonitor(
   NodeData node_data, std::vector<pin_t> pins, IntensityData intensity_data)

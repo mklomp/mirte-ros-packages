@@ -1,14 +1,14 @@
 #pragma once
+#include <atomic>
 
 #include <rclcpp/rclcpp.hpp>
-
-#include <mirte_msgs/msg/intensity.hpp>
-#include <mirte_msgs/msg/intensity_digital.hpp>
 
 #include <mirte_telemetrix_cpp/parsers/sensors/intensity_data.hpp>
 
 #include <mirte_telemetrix_cpp/sensors/base_sensor.hpp>
 
+#include <mirte_msgs/msg/intensity.hpp>
+#include <mirte_msgs/msg/intensity_digital.hpp>
 #include <mirte_msgs/srv/get_intensity.hpp>
 #include <mirte_msgs/srv/get_intensity_digital.hpp>
 
@@ -30,7 +30,7 @@ class DigitalIntensityMonitor : public IntensityMonitor {
     virtual void update() override;
 
     void callback(uint16_t value);
-    bool value;
+    std::atomic<bool> value;
 
     rclcpp::Publisher<mirte_msgs::msg::IntensityDigital>::SharedPtr intensity_pub;
     rclcpp::Service<mirte_msgs::srv::GetIntensityDigital>::SharedPtr intensity_service;
@@ -46,7 +46,7 @@ class AnalogIntensityMonitor : public IntensityMonitor {
     virtual void update() override;
 
     void callback(uint16_t value);
-    uint16_t value;
+    std::atomic<uint16_t> value;
 
     rclcpp::Publisher<mirte_msgs::msg::Intensity>::SharedPtr intensity_pub;
     rclcpp::Service<mirte_msgs::srv::GetIntensity>::SharedPtr intensity_service;

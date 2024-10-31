@@ -1,10 +1,9 @@
 #include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-#include <mirte_msgs/msg/encoder.hpp>
-
 #include <mirte_telemetrix_cpp/sensors/encoder_monitor.hpp>
 
+#include <mirte_msgs/msg/encoder.hpp>
 #include <mirte_msgs/srv/get_encoder.hpp>
 
 EncoderMonitor::EncoderMonitor(NodeData node_data, EncoderData encoder_data)

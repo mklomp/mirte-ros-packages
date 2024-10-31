@@ -39,8 +39,10 @@ SonarMonitor::SonarMonitor(NodeData node_data, SonarData sonar_data)
     sonar_data.trigger, sonar_data.echo, [this](auto pin, auto value) { this->callback(value); });
 }
 
+//TODO: FINISH MUTEX STUFF
 void SonarMonitor::callback(uint16_t value)
 {
+  this->device_timer->call();
   // Report Errors as specified in REP0117
   if (value == 0xFFFF) {
     // Should not occure
@@ -82,14 +84,16 @@ void SonarMonitor::update()
   msg.min_range = min_range;
   msg.max_range = max_range;
   msg.range = this->distance;
-  this->range = msg;
   this->sonar_pub->publish(msg);
+  const std::lock_guard<std::mutex> lock(msg_mutex);
+  this->range = msg;
 }
 
 bool SonarMonitor::service_callback(
   const std::shared_ptr<mirte_msgs::srv::GetRange::Request> req,
   std::shared_ptr<mirte_msgs::srv::GetRange::Response> res)
 {
+  const std::lock_guard<std::mutex> lock(msg_mutex);
   res->range = this->range;
   return true;
 }

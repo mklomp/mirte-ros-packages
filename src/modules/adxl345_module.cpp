@@ -39,12 +39,16 @@ ADXL345_sensor::ADXL345_sensor(
 
 void ADXL345_sensor::update()
 {
-  msg.header = get_header();
-  imu_pub->publish(msg);
+  if (msg_mutex.try_lock()) {
+    const std::lock_guard lock{msg_mutex, std::adopt_lock};
+    msg.header = get_header();
+    imu_pub->publish(msg);
+  }
 }
 
 void ADXL345_sensor::data_cb(std::array<float, 3> acceleration)
 {
+  const std::lock_guard<std::mutex> lock(msg_mutex);
   msg.header = get_header();
 
   msg.linear_acceleration.x = acceleration[0] * 9.81;
@@ -59,6 +63,7 @@ void ADXL345_sensor::get_imu_service_callback(
   const std::shared_ptr<mirte_msgs::srv::GetImu::Request> req,
   std::shared_ptr<mirte_msgs::srv::GetImu::Response> res)
 {
+  const std::lock_guard<std::mutex> lock(msg_mutex);
   res->data = sensor_msgs::msg::Imu(msg);
 }
 

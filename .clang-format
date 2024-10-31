@@ -24,15 +24,15 @@ IncludeCategories:
   #   Priority:  3
   - Regex: ^<.*/msg/.*\.hpp>
     Priority: 6
-    SortPriority: 5
+    SortPriority: 6
     CaseSensitive: false
   - Regex: ^<.*/srv/.*\.hpp>
     Priority: 6
-    SortPriority: 6
+    SortPriority: 7
     CaseSensitive: false
   - Regex: ^<.*/action/.*\.hpp>
     Priority: 6
-    SortPriority: 7
+    SortPriority: 8
     CaseSensitive: false
   - Regex: ^<rclcpp/.*\.hpp>
     Priority: 3

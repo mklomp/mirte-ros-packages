@@ -6,7 +6,7 @@
   <arg name="frame_prefix" default="" description="The TF2 frame prefix" />
 
   <arg name="log_level" default="info"
-    description="Setss the minimal logging level of the Telemetrix Node">
+    description="Sets the minimal logging level of the Telemetrix Node">
     <choice value="debug" />
     <choice value="info" />
     <choice value="warn" />
@@ -22,16 +22,17 @@
       value="$(var root-namespace)$(eval 'len(\'$(var root-namespace)\') > 0 and \'.\' or \'\'')$(var hardware_namespace)" />
     <!-- $(if ...) else only supported in Iron and up-->
 
-    <let name="launch-prefix" value="gdbserver localhost:3000" if="$(var use_debugger)" />
+    <!-- <let name="launch-prefix" value="gdbserver localhost:3000" if="$(var use_debugger)" /> -->
+    <let name="launch-prefix" value="xterm -e gdb -ex run --args" if="$(var use_debugger)" />
 
     <node pkg="mirte_telemetrix_cpp" exec="mirte_telemetrix_cpp_node" name="telemetrix"
       namespace="$(var hardware_namespace)" respawn="true" respawn_delay="5" output="both"
       ros_args="--log-level $(var full-namespace).telemetrix:=$(var log_level)">
       <!-- Iron and up: add emulate_tty="true" for color output -->
-      <!-- Iron and up: add on_exit="shutdown", to make node required -->
+      <!-- Iron and up: add on_exit="shutdown", to make node required, this could cause errors -->
       <!-- Jazzy and up: add respawn_max_retries="10" to make telemetrix stop making attempts -->
       <param from="$(var config_path)" />
-      <param name="frame_prefix" value="$(var frame_prefix)"></param>
+      <param name="frame_prefix" value="$(var frame_prefix)" />
     </node>
   </group>
 </launch>

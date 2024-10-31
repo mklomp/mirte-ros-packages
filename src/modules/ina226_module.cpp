@@ -46,6 +46,7 @@ INA226_sensor::INA226_sensor(
 #endif
 }
 
+// TODO: Maybe add mutex lock-out although not fully necessary
 void INA226_sensor::update()
 {
   auto msg = sensor_msgs::msg::BatteryState();
@@ -88,6 +89,7 @@ float INA226_sensor::calc_soc(float voltage)
   return 1.00;
 }
 
+// TODO: Maybe remove,
 void INA226_sensor::integrate_usage(float current)
 {
   auto current_time = this->nh->now();

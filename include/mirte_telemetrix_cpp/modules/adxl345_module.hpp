@@ -2,6 +2,7 @@
 
 #include <array>
 #include <memory>
+#include <mutex>
 
 #include <tmx_cpp/sensors/ADXL345.hpp>
 
@@ -28,6 +29,7 @@ class ADXL345_sensor : public Mirte_module {
       std::shared_ptr<tmx_cpp::Sensors> sensors);
 
   private:
+    std::mutex msg_mutex;
     sensor_msgs::msg::Imu msg;
     rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pub;
 

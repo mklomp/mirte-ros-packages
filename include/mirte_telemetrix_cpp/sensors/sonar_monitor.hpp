@@ -1,4 +1,6 @@
 #pragma once
+#include <atomic>
+#include <mutex>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -21,17 +23,19 @@ class SonarMonitor : public Mirte_Sensor {
     virtual void update() override;
 
     SonarData sonar_data;
-    std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Range>> sonar_pub;
     static std::vector<std::shared_ptr<SonarMonitor>> get_sonar_monitors(
       NodeData node_data, std::shared_ptr<Parser> parser);
     void callback(uint16_t value);
 
   private:
     /// @brief The last recorded distance.
-    double distance = NAN;
+    std::atomic<double> distance = NAN;
+    std::mutex msg_mutex;
     sensor_msgs::msg::Range range;
 
-    std::shared_ptr<rclcpp::Service<mirte_msgs::srv::GetRange>> sonar_service;
+    rclcpp::Publisher<sensor_msgs::msg::Range>::SharedPtr sonar_pub;
+
+    rclcpp::Service<mirte_msgs::srv::GetRange>::SharedPtr sonar_service;
     bool service_callback(
       const std::shared_ptr<mirte_msgs::srv::GetRange::Request> req,
       std::shared_ptr<mirte_msgs::srv::GetRange::Response> res);

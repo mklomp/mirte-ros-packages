@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <functional>
 
+#include <rclcpp/callback_group.hpp>
 #include <rclcpp/qos.hpp>
 
 #include <color_util/convert.hpp>
@@ -10,12 +11,15 @@
 
 #include <mirte_telemetrix_cpp/modules/veml6040_module.hpp>
 
-using namespace std::placeholders;
-
 VEML6040_sensor::VEML6040_sensor(
   NodeData node_data, VEML6040Data veml_data, std::shared_ptr<tmx_cpp::Sensors> modules)
-: Mirte_module(node_data, {veml_data.scl, veml_data.sda}, (ModuleData)veml_data), data(veml_data)
+: Mirte_module(
+    node_data, {veml_data.scl, veml_data.sda}, (ModuleData)veml_data,
+    rclcpp::CallbackGroupType::Reentrant),
+  data(veml_data)
 {
+  using namespace std::placeholders;
+
   tmx->setI2CPins(veml_data.sda, veml_data.scl, veml_data.port);
 
   this->veml6040 = std::make_shared<tmx_cpp::VEML6040_module>(
@@ -30,31 +34,43 @@ VEML6040_sensor::VEML6040_sensor(
 
   this->rgbw_service = nh->create_service<mirte_msgs::srv::GetColorRGBW>(
     "color/" + this->name + "/get_rgbw",
-    std::bind(&VEML6040_sensor::get_rgbw_service_callback, this, _1, _2));
+    std::bind(&VEML6040_sensor::get_rgbw_service_callback, this, _1, _2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
   this->rgba_service = nh->create_service<mirte_msgs::srv::GetColorRGBA>(
     "color/" + this->name + "/get_rgba",
-    std::bind(&VEML6040_sensor::get_rgba_service_callback, this, _1, _2));
+    std::bind(&VEML6040_sensor::get_rgba_service_callback, this, _1, _2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
   this->hsl_service = nh->create_service<mirte_msgs::srv::GetColorHSL>(
     "color/" + this->name + "/get_hsl",
-    std::bind(&VEML6040_sensor::get_hsl_service_callback, this, _1, _2));
+    std::bind(&VEML6040_sensor::get_hsl_service_callback, this, _1, _2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   modules->add_sens(this->veml6040);
 }
 
 void VEML6040_sensor::update()
 {
-  auto header = get_header();
-  last_rgba.header = header;
-  last_rgbw.header = header;
-  last_hsl.header = header;
+  using mirte_msgs::msg::ColorHSLStamped;
+  using mirte_msgs::msg::ColorRGBAStamped;
+  using mirte_msgs::msg::ColorRGBWStamped;
 
-  rgbw_pub->publish(last_rgbw);
-  rgba_pub->publish(last_rgba);
-  hsl_pub->publish(last_hsl);
+  if (msg_mutex.try_lock_shared()) {
+    const std::shared_lock lock{msg_mutex, std::adopt_lock};
+    auto header = get_header();
+
+    rgbw_pub->publish(mirte_msgs::build<ColorRGBWStamped>().header(header).color(last_rgbw));
+    rgba_pub->publish(mirte_msgs::build<ColorRGBAStamped>().header(header).color(last_rgba));
+    hsl_pub->publish(mirte_msgs::build<ColorHSLStamped>().header(header).color(last_hsl));
+  }
 }
 
 void VEML6040_sensor::data_cb(uint16_t red, uint16_t green, uint16_t blue, uint16_t white)
 {
+  using mirte_msgs::msg::ColorHSLStamped;
+  using mirte_msgs::msg::ColorRGBAStamped;
+  using mirte_msgs::msg::ColorRGBWStamped;
+
+  const std::unique_lock<std::shared_mutex> lock(msg_mutex);
   this->device_timer->reset();
   // To get to HSI/HSV/HSL we need to set a max to the intensity (setting). This could be
   // 2^16, but to get more resolution, you could also cap this to a lower value.
@@ -85,61 +101,60 @@ void VEML6040_sensor::data_cb(uint16_t red, uint16_t green, uint16_t blue, uint1
   float w = (float)white / 65535.0;
 
   auto header = get_header();
-  last_rgbw = mirte_msgs::msg::ColorRGBWStamped();
+  last_rgbw = mirte_msgs::msg::ColorRGBW();
 
-  last_rgbw.header = header;
-  last_rgbw.color.r = r;
-  last_rgbw.color.g = g;
-  last_rgbw.color.b = b;
-  last_rgbw.color.w = w;
+  last_rgbw.r = r;
+  last_rgbw.g = g;
+  last_rgbw.b = b;
+  last_rgbw.w = w;
 
-  rgbw_pub->publish(last_rgbw);
+  rgbw_pub->publish(mirte_msgs::build<ColorRGBWStamped>().header(header).color(last_rgbw));
 
-  last_rgba = mirte_msgs::msg::ColorRGBAStamped();
-  last_rgba.header = header;
-  last_rgba.color.r = r;
-  last_rgba.color.g = g;
-  last_rgba.color.b = b;
-  last_rgba.color.a = 1;
+  last_rgba.r = r;
+  last_rgba.g = g;
+  last_rgba.b = b;
+  last_rgba.a = 1;
 
-  rgba_pub->publish(last_rgba);
+  rgba_pub->publish(mirte_msgs::build<ColorRGBAStamped>().header(header).color(last_rgba));
+  ;
 
-  last_hsl = mirte_msgs::msg::ColorHSLStamped();
-  last_hsl.header = header;
-  auto color_hsva = color_util::changeColorspace(color_util::ColorRGBA(
-    last_rgba.color.r, last_rgba.color.g, last_rgba.color.b, last_rgba.color.a));
+  auto color_hsva = color_util::changeColorspace(
+    color_util::ColorRGBA(last_rgba.r, last_rgba.g, last_rgba.b, last_rgba.a));
   // Convert from hsv to hsl
   // Source: https://en.wikipedia.org/w/index.php?title=HSL_and_HSV&oldid=1236077814#HSV_to_HSL
-  last_hsl.color.h = color_hsva.h * 360;
+  last_hsl.h = color_hsva.h * 360;
 
   auto v = color_hsva.v;
   auto l = v * (1.0 - (color_hsva.s / 2.0));
 
-  last_hsl.color.l = l;
-  last_hsl.color.s = (l >= 1.0 or l <= 0.0) ? 0.0 : ((v - l) / std::min(l, 1 - l));
+  last_hsl.l = l;
+  last_hsl.s = (l >= 1.0 or l <= 0.0) ? 0.0 : ((v - l) / std::min(l, 1 - l));
 
-  hsl_pub->publish(last_hsl);
+  hsl_pub->publish(mirte_msgs::build<ColorHSLStamped>().header(header).color(last_hsl));
 }
 
 void VEML6040_sensor::get_rgbw_service_callback(
   const std::shared_ptr<mirte_msgs::srv::GetColorRGBW::Request> req,
   std::shared_ptr<mirte_msgs::srv::GetColorRGBW::Response> res)
 {
-  res->color = last_rgbw.color;
+  const std::shared_lock<std::shared_mutex> lock(msg_mutex);
+  res->color = last_rgbw;
 }
 
 void VEML6040_sensor::get_rgba_service_callback(
   const std::shared_ptr<mirte_msgs::srv::GetColorRGBA::Request> req,
   std::shared_ptr<mirte_msgs::srv::GetColorRGBA::Response> res)
 {
-  res->color = last_rgba.color;
+  const std::shared_lock<std::shared_mutex> lock(msg_mutex);
+  res->color = last_rgba;
 }
 
 void VEML6040_sensor::get_hsl_service_callback(
   const std::shared_ptr<mirte_msgs::srv::GetColorHSL::Request> req,
   std::shared_ptr<mirte_msgs::srv::GetColorHSL::Response> res)
 {
-  res->color = last_hsl.color;
+  const std::shared_lock<std::shared_mutex> lock(msg_mutex);
+  res->color = last_hsl;
 }
 
 std::vector<std::shared_ptr<VEML6040_sensor>> VEML6040_sensor::get_veml6040_modules(

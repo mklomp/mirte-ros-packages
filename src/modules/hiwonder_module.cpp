@@ -21,6 +21,7 @@ HiWonderBus_module::HiWonderBus_module(
     rclcpp::CallbackGroupType::MutuallyExclusive),
   data(bus_data)
 {
+  this->device_timer->cancel();
   this->logger = this->logger.get_child(data.get_device_class()).get_child(data.name);
 
   // Create a list of ID's
@@ -40,7 +41,7 @@ HiWonderBus_module::HiWonderBus_module(
   for (auto servo_data : this->data.servos) {
     if (this->bus->verify_id(servo_data->id))
       this->servos.push_back(std::make_shared<Hiwonder_servo>(
-        node_data, servo_data, this->bus, servo_group, this->callback_group));
+        node_data, servo_data, this->bus, servo_group, bus_data.duration, this->callback_group));
     else
       RCLCPP_ERROR(
         this->logger, "HiWonder Servo '%s' is ignored as its ID [%d] was not found.",
@@ -85,15 +86,13 @@ std::vector<std::shared_ptr<HiWonderBus_module>> HiWonderBus_module::get_hiwonde
   return hiwonder_modules;
 }
 
-void HiWonderBus_module::position_cb(std::vector<tmx_cpp::HiwonderServo_module::Servo_pos> pos)
+void HiWonderBus_module::position_cb(
+  std::vector<std::tuple<uint8_t, tmx_cpp::HiwonderServo_module::Servo_pos>> pos)
 {
-  for (auto p : pos) {
-    // std::cout << "Servo: " << (int)p.id << " pos: " << p.angle << std::endl;
-    for (auto servo : this->servos) {
-      if (servo->servo_data->id == p.id) {
-        servo->position_cb(p);
-        // servo->servo_data->angle = p.pos;
-      }
-    }
+  for (auto & [idx, p] : pos) {
+    if (idx >= this->servos.size()) continue;
+    auto servo = this->servos[idx];
+    assert(servo->servo_data->id == p.id);
+    servo->position_cb(p);
   }
 }
