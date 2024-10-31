@@ -11,6 +11,8 @@ import sys, subprocess
 import platform
 hostname=platform.node().replace("-", "_").lower()
 
+# FIXME: This differs between the Pioneer and the Master...
+# OPT-TODO: Set it to publish stamped directly
 # Currently parameters (turn/speed) are not implemented in ROS2
 sys.exit(subprocess.call(["/opt/ros/humble/lib/teleop_twist_keyboard/teleop_twist_keyboard", "--ros-args", "-r", f"cmd_vel:=/{hostname}/mirte_base_controller/cmd_vel_unstamped"]))
 
