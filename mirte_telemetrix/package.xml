@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>TODO: Package description</description>
   <maintainer email="m.klomp@tudelft.nl">martin</maintainer>
-  <license>AGPL</license>
+  <license>AGPL-3.0</license>
 
   <exec_depend>rclpy</exec_depend>
   <exec_depend>std_msgs</exec_depend>

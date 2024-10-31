@@ -19,7 +19,7 @@ setup(
     maintainer='Martin Klomp',
     maintainer_email='m.klomp@tudelft.nl',
     description='TODO: Package description',
-    license='AGPL',
+    license='AGPL-3.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
