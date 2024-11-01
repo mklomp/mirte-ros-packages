@@ -44,6 +44,7 @@ set(srv_files
   "srv/SetOLEDText.srv"
   "srv/SetPinValue.srv"
   "srv/SetServoAngle.srv"
+  "srv/SetServoAngleWithSpeed.srv"
   "srv/SetSpeedMultiple.srv"
 )
 
