@@ -21,7 +21,7 @@ INA226_sensor::INA226_sensor(
   this->total_used_mAh = 0;
 
   this->ina226 = std::make_shared<tmx_cpp::INA226_module>(
-    ina_data.port, ina_data.addr, std::bind(&INA226_sensor::data_cb, this, _1, _2));
+    ina_data.port, ina_data.addr, std::bind(&INA226_sensor::data_callback, this, _1, _2));
 
   // Use default QOS for sensor publishers as specified in REP2003
   this->battery_pub = nh->create_publisher<sensor_msgs::msg::BatteryState>(
@@ -31,7 +31,8 @@ INA226_sensor::INA226_sensor(
     "power/" + this->name + "/used", rclcpp::SystemDefaultsQoS());
 
   this->shutdown_service = nh->create_service<std_srvs::srv::SetBool>(
-    "power/" + this->name + "/shutdown", std::bind(&INA226_sensor::shutdown_robot_cb, this, _1, _2),
+    "power/" + this->name + "/shutdown",
+    std::bind(&INA226_sensor::shutdown_robot_service_callback, this, _1, _2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   modules->add_sens(this->ina226);
@@ -61,7 +62,7 @@ void INA226_sensor::update()
   this->check_soc(voltage_, current_);
 }
 
-void INA226_sensor::data_cb(float voltage, float current)
+void INA226_sensor::data_callback(float voltage, float current)
 {
   voltage_ = voltage;
   current_ = current;
@@ -157,9 +158,9 @@ void INA226_sensor::shutdown_robot()
   exec("sudo shutdown now");
 }
 
-void INA226_sensor::shutdown_robot_cb(
-  const std::shared_ptr<std_srvs::srv::SetBool::Request> req,
-  std::shared_ptr<std_srvs::srv::SetBool::Response> res)
+void INA226_sensor::shutdown_robot_service_callback(
+  const std_srvs::srv::SetBool::Request::ConstSharedPtr req,
+  std_srvs::srv::SetBool::Response::SharedPtr res)
 {
   if (req->data) {
     this->shutdown_robot();

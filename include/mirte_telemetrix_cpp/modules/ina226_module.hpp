@@ -21,16 +21,13 @@ class INA226_sensor : public Mirte_module {
 
     virtual void update() override;
 
-    void data_cb(float voltage, float current);
+    void data_callback(float voltage, float current);
 
     float calc_soc(float voltage);
     void integrate_usage(float current);
     void check_soc(float voltage, float current);
 
     void shutdown_robot();
-    void shutdown_robot_cb(
-      const std::shared_ptr<std_srvs::srv::SetBool::Request> req,
-      std::shared_ptr<std_srvs::srv::SetBool::Response> res);
 
     static std::vector<std::shared_ptr<INA226_sensor>> get_ina_modules(
       NodeData node_data, std::shared_ptr<Parser> parser,
@@ -39,18 +36,26 @@ class INA226_sensor : public Mirte_module {
   private:
     std::atomic<float> total_used_mAh = 0;
     rclcpp::Time used_time = rclcpp::Time(0, 0);
-    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr used_pub;
-    rclcpp::Publisher<sensor_msgs::msg::BatteryState>::SharedPtr battery_pub;
 
     bool enable_turn_off = false;
     bool shutdown_triggered = false;
     rclcpp::Time turn_off_trigger_time = rclcpp::Time(0, 0);
     std::atomic<bool> in_power_dip = false;
     rclcpp::Time turn_off_time = rclcpp::Time(0, 0);
-    rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr shutdown_service;
 
     std::atomic<float> voltage_ = 0;
     std::atomic<float> current_ = 0;
+
+    // Publisher: power/NAME/used
+    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr used_pub;
+    // Publisher: power/NAME
+    rclcpp::Publisher<sensor_msgs::msg::BatteryState>::SharedPtr battery_pub;
+    // Service: power/NAME/shutdown
+    rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr shutdown_service;
+
+    void shutdown_robot_service_callback(
+      const std_srvs::srv::SetBool::Request::ConstSharedPtr req,
+      std_srvs::srv::SetBool::Response::SharedPtr res);
 
 #ifdef WITH_GPIO
     rclcpp::TimerBase::SharedPtr battery_led_timer;

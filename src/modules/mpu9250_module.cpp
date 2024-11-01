@@ -13,7 +13,7 @@ MPU9250_sensor::MPU9250_sensor(
   tmx->setI2CPins(imu_data.sda, imu_data.scl, imu_data.port);
 
   this->mpu9250 = std::make_shared<tmx_cpp::MPU9250_module>(
-    imu_data.port, imu_data.addr, std::bind(&MPU9250_sensor::data_cb, this, _1, _2, _3, _4));
+    imu_data.port, imu_data.addr, std::bind(&MPU9250_sensor::data_callback, this, _1, _2, _3, _4));
 
   imu_pub = nh->create_publisher<sensor_msgs::msg::Imu>(
     "imu/" + this->name + "/data", rclcpp::SystemDefaultsQoS());
@@ -45,7 +45,7 @@ void MPU9250_sensor::update()
   }
 }
 
-void MPU9250_sensor::data_cb(
+void MPU9250_sensor::data_callback(
   std::array<float, 3> acceleration, std::array<float, 3> gyro, std::array<float, 3> magnetic_field,
   std::array<float, 4> quaternion)
 {
@@ -70,8 +70,8 @@ void MPU9250_sensor::data_cb(
 }
 
 void MPU9250_sensor::get_imu_service_callback(
-  const std::shared_ptr<mirte_msgs::srv::GetImu::Request> req,
-  std::shared_ptr<mirte_msgs::srv::GetImu::Response> res)
+  const mirte_msgs::srv::GetImu::Request::ConstSharedPtr req,
+  mirte_msgs::srv::GetImu::Response::SharedPtr res)
 {
   const std::lock_guard<std::mutex> lock(msg_mutex);
   res->data = sensor_msgs::msg::Imu(msg);

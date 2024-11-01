@@ -30,10 +30,11 @@ class HiWonderBus_module : public Mirte_module {
   private:
     void position_cb(std::vector<std::tuple<uint8_t, tmx_cpp::HiwonderServo_module::Servo_pos>>);
 
+    // Service: servo/GROUP/enable_all_servos
     // ROS Enable Service
     rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr enable_all_servos_service;
 
-    bool enable_cb(
-      const std::shared_ptr<std_srvs::srv::SetBool::Request> req,
-      std::shared_ptr<std_srvs::srv::SetBool::Response> res);
+    void enable_service_callback(
+      const std_srvs::srv::SetBool::Request::ConstSharedPtr req,
+      std_srvs::srv::SetBool::Response::SharedPtr res);
 };

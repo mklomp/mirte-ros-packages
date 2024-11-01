@@ -30,8 +30,10 @@ class PCA_Module : public Mirte_module {
     ~PCA_Module(){};
 
   private:
+    // Service: motor/NAME/set_multiple_speeds
     rclcpp::Service<mirte_msgs::srv::SetSpeedMultiple>::SharedPtr motor_service;
+
     void set_multi_speed_service_callback(
-      const std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Request> req,
-      std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Response> res);
+      const mirte_msgs::srv::SetSpeedMultiple::Request::ConstSharedPtr req,
+      mirte_msgs::srv::SetSpeedMultiple::Response::SharedPtr res);
 };

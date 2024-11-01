@@ -17,14 +17,22 @@ class EncoderMonitor : public Mirte_Sensor {
     virtual void update() override;
 
     EncoderData encoder_data;
-    std::shared_ptr<rclcpp::Publisher<mirte_msgs::msg::Encoder>> encoder_pub;
+
     static std::vector<std::shared_ptr<EncoderMonitor>> get_encoder_monitors(
       NodeData node_data, std::shared_ptr<Parser> parser);
-    void callback(int16_t value);
-    std::atomic<int16_t> value = 0;
-    std::shared_ptr<rclcpp::Service<mirte_msgs::srv::GetEncoder>> encoder_service;
-    bool service_callback(
-      const std::shared_ptr<mirte_msgs::srv::GetEncoder::Request> req,
-      std::shared_ptr<mirte_msgs::srv::GetEncoder::Response> res);
     ~EncoderMonitor(){};
+
+    void data_callback(int16_t value);
+
+  private:
+    std::atomic<int16_t> value = 0;
+
+    // Publisher: encoder/NAME
+    rclcpp::Publisher<mirte_msgs::msg::Encoder>::SharedPtr encoder_pub;
+    // Service: encoder/NAME/get_encoder
+    rclcpp::Service<mirte_msgs::srv::GetEncoder>::SharedPtr encoder_service;
+
+    void service_callback(
+      const mirte_msgs::srv::GetEncoder::Request::ConstSharedPtr req,
+      mirte_msgs::srv::GetEncoder::Response::SharedPtr res);
 };

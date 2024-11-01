@@ -32,8 +32,12 @@ class KeypadMonitor : public Mirte_Sensor {
     std::atomic<double> last_debounce_time = nh->now().seconds();
     std::atomic<Key> last_debounced_key;
 
+    // Publisher: keypad/NAME
     rclcpp::Publisher<mirte_msgs::msg::Keypad>::SharedPtr keypad_pub;
+    // Publisher: keypad/NAME/pressed
+    // Only publishes when a key is pressed initially
     rclcpp::Publisher<mirte_msgs::msg::Keypad>::SharedPtr keypad_pressed_pub;
+    // Service: keypad/NAME/get_key
     rclcpp::Service<mirte_msgs::srv::GetKeypad>::SharedPtr keypad_service;
 
     void keypad_service_callback(

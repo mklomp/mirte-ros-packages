@@ -199,8 +199,8 @@ bool SSD1306_module::set_image_from_path(fs::path path)
 }
 
 void SSD1306_module::set_oled_callback_legacy(
-  const std::shared_ptr<mirte_msgs::srv::SetOLEDImageLegacy::Request> req,
-  std::shared_ptr<mirte_msgs::srv::SetOLEDImageLegacy::Response> res)
+  const mirte_msgs::srv::SetOLEDImageLegacy::Request::ConstSharedPtr req,
+  mirte_msgs::srv::SetOLEDImageLegacy::Response::SharedPtr res)
 {
   if (req->type == "text") {
     res->status = set_text(req->value);
@@ -226,15 +226,15 @@ void SSD1306_module::set_oled_callback_legacy(
 }
 
 void SSD1306_module::set_oled_text_callback(
-  const std::shared_ptr<mirte_msgs::srv::SetOLEDText::Request> req,
-  std::shared_ptr<mirte_msgs::srv::SetOLEDText::Response> res)
+  const mirte_msgs::srv::SetOLEDText::Request::ConstSharedPtr req,
+  mirte_msgs::srv::SetOLEDText::Response::SharedPtr res)
 {
   res->status = set_text(req->text);
 }
 
 void SSD1306_module::set_oled_image_callback(
-  const std::shared_ptr<mirte_msgs::srv::SetOLEDImage::Request> req,
-  std::shared_ptr<mirte_msgs::srv::SetOLEDImage::Response> res)
+  const mirte_msgs::srv::SetOLEDImage::Request::ConstSharedPtr req,
+  mirte_msgs::srv::SetOLEDImage::Response::SharedPtr res)
 {
   auto bridged_img = cv_bridge::toCvShare(req->image, req, "mono8");
   res->status =
@@ -242,8 +242,8 @@ void SSD1306_module::set_oled_image_callback(
 }
 
 void SSD1306_module::set_oled_file_callback(
-  const std::shared_ptr<mirte_msgs::srv::SetOLEDFile::Request> req,
-  std::shared_ptr<mirte_msgs::srv::SetOLEDFile::Response> res)
+  const mirte_msgs::srv::SetOLEDFile::Request::ConstSharedPtr req,
+  mirte_msgs::srv::SetOLEDFile::Response::SharedPtr res)
 {
   res->status = set_image_from_path(req->path);
 }

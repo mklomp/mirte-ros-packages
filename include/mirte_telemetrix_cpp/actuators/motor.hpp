@@ -31,7 +31,9 @@ class Motor : public TelemetrixDevice {
     void start() { this->set_speed(0); }
 
   private:
+    // Subscriber: motor/NAME/speed
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr speed_subscription;
+    // Service: motor/NAME/set_speed
     rclcpp::Service<mirte_msgs::srv::SetMotorSpeed>::SharedPtr set_speed_service;
 
     void speed_subscription_callback(const std_msgs::msg::Int32 & msg);

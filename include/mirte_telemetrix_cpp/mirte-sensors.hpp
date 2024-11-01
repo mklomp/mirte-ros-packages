@@ -16,11 +16,15 @@ class Mirte_Sensors {
 
     void stop();
 
-    std::shared_ptr<rclcpp::Service<mirte_msgs::srv::GetPinValue>> pin_service;
     enum class PIN_USE { DIGITAL_IN, DIGITAL_OUT, ANALOG_IN, ANALOG_OUT, UNUSED };
     std::map<pin_t, std::tuple<PIN_USE, int, bool, bool>>
       pin_map;  // pin -> (is_digital, value,analog_cb, digital_cb )
-    bool pin_callback(
-      const std::shared_ptr<mirte_msgs::srv::GetPinValue::Request> req,
-      std::shared_ptr<mirte_msgs::srv::GetPinValue::Response> res);
+
+  private:
+    // Service: get_pin_value
+    rclcpp::Service<mirte_msgs::srv::GetPinValue>::SharedPtr pin_service;
+
+    void pin_callback(
+      const mirte_msgs::srv::GetPinValue::Request::ConstSharedPtr req,
+      mirte_msgs::srv::GetPinValue::Response::SharedPtr res);
 };

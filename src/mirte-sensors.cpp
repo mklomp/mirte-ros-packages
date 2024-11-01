@@ -8,6 +8,8 @@
 Mirte_Sensors::Mirte_Sensors(NodeData node_data, std::shared_ptr<Parser> parser)
 : tmx(node_data.tmx), nh(node_data.nh), board(node_data.board)
 {
+  using namespace std::placeholders;
+
   auto keypads = KeypadMonitor::get_keypad_monitors(node_data, parser);
   this->sensors.insert(this->sensors.end(), keypads.begin(), keypads.end());
 
@@ -21,13 +23,12 @@ Mirte_Sensors::Mirte_Sensors(NodeData node_data, std::shared_ptr<Parser> parser)
   this->sensors.insert(this->sensors.end(), encoders.begin(), encoders.end());
 
   this->pin_service = nh->create_service<mirte_msgs::srv::GetPinValue>(
-    "get_pin_value",
-    std::bind(&Mirte_Sensors::pin_callback, this, std::placeholders::_1, std::placeholders::_2));
+    "get_pin_value", std::bind(&Mirte_Sensors::pin_callback, this, _1, _2));
 }
 
-bool Mirte_Sensors::pin_callback(
-  const std::shared_ptr<mirte_msgs::srv::GetPinValue::Request> req,
-  std::shared_ptr<mirte_msgs::srv::GetPinValue::Response> res)
+void Mirte_Sensors::pin_callback(
+  const mirte_msgs::srv::GetPinValue::Request::ConstSharedPtr req,
+  mirte_msgs::srv::GetPinValue::Response::SharedPtr res)
 {
   bool is_digital = starts_with(req->type, "d") || starts_with(req->type, "D");
   auto pin = this->board->resolvePin(req->pin);
@@ -40,7 +41,7 @@ bool Mirte_Sensors::pin_callback(
     if (
       (type == PIN_USE::DIGITAL_IN && is_digital) || (type == PIN_USE::ANALOG_IN && !is_digital)) {
       res->data = value;
-      return true;
+      return;
     }
   }
   if (is_digital) {
@@ -78,15 +79,13 @@ bool Mirte_Sensors::pin_callback(
     const auto [type, value, has_analog, has_digital] = this->pin_map[pin];
     if (value != -1) {
       res->data = value;
-      return true;
+      return;
     }
 
     // sleep for 1ms
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
   res->data = -1;
-
-  return false;
 }
 
 void Mirte_Sensors::stop()

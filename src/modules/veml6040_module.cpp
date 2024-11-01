@@ -23,7 +23,8 @@ VEML6040_sensor::VEML6040_sensor(
   tmx->setI2CPins(veml_data.sda, veml_data.scl, veml_data.port);
 
   this->veml6040 = std::make_shared<tmx_cpp::VEML6040_module>(
-    veml_data.port, veml_data.addr, std::bind(&VEML6040_sensor::data_cb, this, _1, _2, _3, _4));
+    veml_data.port, veml_data.addr,
+    std::bind(&VEML6040_sensor::data_callback, this, _1, _2, _3, _4));
 
   this->rgbw_pub = nh->create_publisher<mirte_msgs::msg::ColorRGBWStamped>(
     "color/" + this->name + "/rgbw", rclcpp::SystemDefaultsQoS());
@@ -64,7 +65,7 @@ void VEML6040_sensor::update()
   }
 }
 
-void VEML6040_sensor::data_cb(uint16_t red, uint16_t green, uint16_t blue, uint16_t white)
+void VEML6040_sensor::data_callback(uint16_t red, uint16_t green, uint16_t blue, uint16_t white)
 {
   using mirte_msgs::msg::ColorHSLStamped;
   using mirte_msgs::msg::ColorRGBAStamped;
@@ -134,24 +135,24 @@ void VEML6040_sensor::data_cb(uint16_t red, uint16_t green, uint16_t blue, uint1
 }
 
 void VEML6040_sensor::get_rgbw_service_callback(
-  const std::shared_ptr<mirte_msgs::srv::GetColorRGBW::Request> req,
-  std::shared_ptr<mirte_msgs::srv::GetColorRGBW::Response> res)
+  const mirte_msgs::srv::GetColorRGBW::Request::ConstSharedPtr req,
+  mirte_msgs::srv::GetColorRGBW::Response::SharedPtr res)
 {
   const std::shared_lock<std::shared_mutex> lock(msg_mutex);
   res->color = last_rgbw;
 }
 
 void VEML6040_sensor::get_rgba_service_callback(
-  const std::shared_ptr<mirte_msgs::srv::GetColorRGBA::Request> req,
-  std::shared_ptr<mirte_msgs::srv::GetColorRGBA::Response> res)
+  const mirte_msgs::srv::GetColorRGBA::Request::ConstSharedPtr req,
+  mirte_msgs::srv::GetColorRGBA::Response::SharedPtr res)
 {
   const std::shared_lock<std::shared_mutex> lock(msg_mutex);
   res->color = last_rgba;
 }
 
 void VEML6040_sensor::get_hsl_service_callback(
-  const std::shared_ptr<mirte_msgs::srv::GetColorHSL::Request> req,
-  std::shared_ptr<mirte_msgs::srv::GetColorHSL::Response> res)
+  const mirte_msgs::srv::GetColorHSL::Request::ConstSharedPtr req,
+  mirte_msgs::srv::GetColorHSL::Response::SharedPtr res)
 {
   const std::shared_lock<std::shared_mutex> lock(msg_mutex);
   res->color = last_hsl;

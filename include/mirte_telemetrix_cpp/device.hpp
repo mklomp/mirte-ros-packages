@@ -31,14 +31,14 @@ class TelemetrixDevice {
 
     rclcpp::CallbackGroup::SharedPtr callback_group;
 
+    // Currently unused
     virtual void stop() {}
-    auto get_header()
-    {
-      std_msgs::msg::Header header;
-      header.stamp = nh->now();
-      header.frame_id = frame_id;
 
-      return header;
+    std_msgs::msg::Header get_header()
+    {
+      return std_msgs::build<std_msgs::msg::Header>()
+        .stamp(this->nh->now())
+        .frame_id(this->frame_id);
     }
     TelemetrixDevice(NodeData node_data, std::vector<uint8_t> pins, DeviceData data);
     TelemetrixDevice(

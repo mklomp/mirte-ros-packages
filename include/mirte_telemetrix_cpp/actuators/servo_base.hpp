@@ -23,7 +23,9 @@ class ServoBase : public TelemetrixDevice {
     ServoData data;
 
   private:
+    // Service: servo/NAME/set_angle
     rclcpp::Service<mirte_msgs::srv::SetServoAngle>::SharedPtr set_angle_service;
+    // Service: servo/NAME/get_range
     rclcpp::Service<mirte_msgs::srv::GetServoRange>::SharedPtr get_range_service;
 
     void set_angle_service_callback(

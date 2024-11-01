@@ -21,7 +21,7 @@ class MPU9250_sensor : public Mirte_module {
     std::shared_ptr<tmx_cpp::MPU9250_module> mpu9250;
 
     virtual void update() override;
-    void data_cb(
+    void data_callback(
       std::array<float, 3> acceleration, std::array<float, 3> gyro,
       std::array<float, 3> magnetic_field, std::array<float, 4> quaternion);
 
@@ -32,11 +32,13 @@ class MPU9250_sensor : public Mirte_module {
   private:
     std::mutex msg_mutex;
     sensor_msgs::msg::Imu msg;
-    rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pub;
 
+    // Publisher: imu/NAME/data
+    rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pub;
+    // Service: imu/NAME/get_data
     rclcpp::Service<mirte_msgs::srv::GetImu>::SharedPtr imu_service;
 
     void get_imu_service_callback(
-      const std::shared_ptr<mirte_msgs::srv::GetImu::Request> req,
-      std::shared_ptr<mirte_msgs::srv::GetImu::Response> res);
+      const mirte_msgs::srv::GetImu::Request::ConstSharedPtr req,
+      mirte_msgs::srv::GetImu::Response::SharedPtr res);
 };

@@ -26,9 +26,10 @@ class Mirte_Actuators {
     std::shared_ptr<Mirte_Board> board;
     std::vector<std::shared_ptr<TelemetrixDevice>> actuators;
 
+  private:
+    // Service: set_pin_value
     rclcpp::Service<mirte_msgs::srv::SetPinValue>::SharedPtr set_pin_value_service;
 
-  private:
     void set_pin_value_service_callback(
       const mirte_msgs::srv::SetPinValue::Request::ConstSharedPtr req,
       mirte_msgs::srv::SetPinValue::Response::SharedPtr res);

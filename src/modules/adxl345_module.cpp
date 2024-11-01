@@ -13,7 +13,7 @@ ADXL345_sensor::ADXL345_sensor(
   tmx->setI2CPins(imu_data.sda, imu_data.scl, imu_data.port);
 
   this->adxl345 = std::make_shared<tmx_cpp::ADXL345_module>(
-    imu_data.port, imu_data.addr, std::bind(&ADXL345_sensor::data_cb, this, _1));
+    imu_data.port, imu_data.addr, std::bind(&ADXL345_sensor::data_callback, this, _1));
 
   imu_pub = nh->create_publisher<sensor_msgs::msg::Imu>(
     "imu/" + this->name + "/data_raw", rclcpp::SystemDefaultsQoS());
@@ -46,7 +46,7 @@ void ADXL345_sensor::update()
   }
 }
 
-void ADXL345_sensor::data_cb(std::array<float, 3> acceleration)
+void ADXL345_sensor::data_callback(std::array<float, 3> acceleration)
 {
   const std::lock_guard<std::mutex> lock(msg_mutex);
   msg.header = get_header();
@@ -60,8 +60,8 @@ void ADXL345_sensor::data_cb(std::array<float, 3> acceleration)
 }
 
 void ADXL345_sensor::get_imu_service_callback(
-  const std::shared_ptr<mirte_msgs::srv::GetImu::Request> req,
-  std::shared_ptr<mirte_msgs::srv::GetImu::Response> res)
+  const mirte_msgs::srv::GetImu::Request::ConstSharedPtr req,
+  mirte_msgs::srv::GetImu::Response::SharedPtr res)
 {
   const std::lock_guard<std::mutex> lock(msg_mutex);
   res->data = sensor_msgs::msg::Imu(msg);

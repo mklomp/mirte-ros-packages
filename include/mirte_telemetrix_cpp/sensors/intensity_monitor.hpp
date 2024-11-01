@@ -29,15 +29,19 @@ class DigitalIntensityMonitor : public IntensityMonitor {
     DigitalIntensityMonitor(NodeData node_data, IntensityData intensity_data);
     virtual void update() override;
 
-    void callback(uint16_t value);
+    void data_callback(uint16_t value);
+
+  private:
     std::atomic<bool> value;
 
+    // Publisher: intensity/NAME/digital
     rclcpp::Publisher<mirte_msgs::msg::IntensityDigital>::SharedPtr intensity_pub;
+    // Service: intensity/NAME/get_digital
     rclcpp::Service<mirte_msgs::srv::GetIntensityDigital>::SharedPtr intensity_service;
 
-    bool service_callback(
-      const std::shared_ptr<mirte_msgs::srv::GetIntensityDigital::Request> req,
-      std::shared_ptr<mirte_msgs::srv::GetIntensityDigital::Response> res);
+    void service_callback(
+      const mirte_msgs::srv::GetIntensityDigital::Request::ConstSharedPtr req,
+      mirte_msgs::srv::GetIntensityDigital::Response::SharedPtr res);
 };
 
 class AnalogIntensityMonitor : public IntensityMonitor {
@@ -45,13 +49,17 @@ class AnalogIntensityMonitor : public IntensityMonitor {
     AnalogIntensityMonitor(NodeData node_data, IntensityData intensity_data);
     virtual void update() override;
 
-    void callback(uint16_t value);
+    void data_callback(uint16_t value);
+
+  private:
     std::atomic<uint16_t> value;
 
+    // Publisher: intensity/NAME
     rclcpp::Publisher<mirte_msgs::msg::Intensity>::SharedPtr intensity_pub;
+    // Service: intensity/NAME/get_analog
     rclcpp::Service<mirte_msgs::srv::GetIntensity>::SharedPtr intensity_service;
 
-    bool service_callback(
-      const std::shared_ptr<mirte_msgs::srv::GetIntensity::Request> req,
-      std::shared_ptr<mirte_msgs::srv::GetIntensity::Response> res);
+    void service_callback(
+      const mirte_msgs::srv::GetIntensity::Request::ConstSharedPtr req,
+      mirte_msgs::srv::GetIntensity::Response::SharedPtr res);
 };

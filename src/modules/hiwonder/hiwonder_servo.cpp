@@ -2,8 +2,6 @@
 
 #include <mirte_telemetrix_cpp/modules/hiwonder/hiwonder_servo.hpp>
 
-using namespace std::placeholders;
-
 // NOTE: Uses a timer per servo instead of the device timer of the bus
 
 // TODO: Maybe make it inherit from Servo
@@ -13,6 +11,7 @@ Hiwonder_servo::Hiwonder_servo(
   DeviceData::DeviceDuration duration, rclcpp::CallbackGroup::SharedPtr callback_group)
 : servo_data(servo_data), bus_mod(bus_mod), nh(node_data.nh)
 {
+  using namespace std::placeholders;
   auto logger = nh->get_logger();
 
   if (!this->bus_mod->verify_id(this->servo_data->id))
@@ -66,54 +65,42 @@ Hiwonder_servo::Hiwonder_servo(
   this->position_pub = nh->create_publisher<mirte_msgs::msg::ServoPosition>(
     "servo/" + servo_group + this->servo_data->name + "/position", rclcpp::SystemDefaultsQoS());
 
-  // last_msg = std::make_shared<mirte_msgs::msg::ServoPosition>();
-  // last_msg->header.frame_id = this->servo_data->frame_id;
-
   // TODO: Maybe add to a separate callbackgroup?
   // Currently overpublishing slightly
-  this->servo_timer = nh->create_wall_timer(
-    duration,
-    [this]() {
-      // this->last_msg->header.stamp = this->nh->now();
-      // auto msg = std::make_unique<mirte_msgs::msg::ServoPosition>(*this->last_msg);
-      mirte_msgs::msg::ServoPosition msg;
-      msg.header = this->get_header();
-      msg.angle = this->last_angle;
-      msg.raw = this->last_raw;
-      this->position_pub->publish(msg);
-    },
-    callback_group);
+  this->servo_timer =
+    nh->create_wall_timer(duration, std::bind(&Hiwonder_servo::update, this), callback_group);
 }
 
 // TODO: Add update en fix time
 void Hiwonder_servo::position_cb(tmx_cpp::HiwonderServo_module::Servo_pos & pos)
 {
+  servo_timer->call();
   last_angle = calc_angle_in(pos.angle);
   last_raw = pos.angle;
-  // last_msg->angle = last_angle;
-  // last_msg->raw = pos.angle;
-  // last_msg->header.stamp = nh->now();
-  mirte_msgs::msg::ServoPosition msg;
-  msg.header = get_header();
-  msg.angle = last_angle;
-  msg.raw = last_raw;
-  // RCLCPP_INFO_STREAM(nh->get_logger(), "M: "  << mirte_msgs::msg::to_yaml(msg, true));
-  this->position_pub->publish(msg);
+  this->update();
   servo_timer->reset();
 }
 
-bool Hiwonder_servo::enable_service_callback(
-  const std::shared_ptr<std_srvs::srv::SetBool::Request> req,
-  std::shared_ptr<std_srvs::srv::SetBool::Response> res)
+void Hiwonder_servo::update()
+{
+  auto msg = mirte_msgs::build<mirte_msgs::msg::ServoPosition>()
+               .header(this->get_header())
+               .angle(this->last_angle)
+               .raw(this->last_raw);
+  this->position_pub->publish(msg);
+}
+
+void Hiwonder_servo::enable_service_callback(
+  const std_srvs::srv::SetBool::Request::ConstSharedPtr req,
+  std_srvs::srv::SetBool::Response::SharedPtr res)
 {
   res->success = this->bus_mod->set_enable_servo(this->servo_data->id, req->data);
   res->message = req->data ? "Enabled" : "Disabled";
-  return true;
 }
 
 void Hiwonder_servo::set_angle_service_callback(
-  const std::shared_ptr<mirte_msgs::srv::SetServoAngle::Request> req,
-  std::shared_ptr<mirte_msgs::srv::SetServoAngle::Response> res)
+  const mirte_msgs::srv::SetServoAngle::Request::ConstSharedPtr req,
+  mirte_msgs::srv::SetServoAngle::Response::SharedPtr res)
 {
   float angle = req->angle;
   bool is_degrees = req->degrees;
@@ -136,13 +123,12 @@ void Hiwonder_servo::set_angle_service_callback(
   res->status = this->bus_mod->set_single_servo(this->servo_data->id, angle_out, 100);
 }
 
-bool Hiwonder_servo::get_range_service_callback(
-  const std::shared_ptr<mirte_msgs::srv::GetServoRange::Request> req,
-  std::shared_ptr<mirte_msgs::srv::GetServoRange::Response> res)
+void Hiwonder_servo::get_range_service_callback(
+  const mirte_msgs::srv::GetServoRange::Request::ConstSharedPtr req,
+  mirte_msgs::srv::GetServoRange::Response::SharedPtr res)
 {
   res->min = this->servo_data->min_angle_in;
   res->max = this->servo_data->max_angle_in;
-  return true;
 }
 
 template <typename T>
@@ -180,9 +166,7 @@ float Hiwonder_servo::calc_angle_in(uint16_t angle)
 
 std_msgs::msg::Header Hiwonder_servo::get_header()
 {
-  std_msgs::msg::Header header;
-  header.stamp = nh->now();
-  header.frame_id = this->servo_data->frame_id;
-
-  return header;
+  return std_msgs::build<std_msgs::msg::Header>()
+    .stamp(this->nh->now())
+    .frame_id(this->servo_data->frame_id);
 }

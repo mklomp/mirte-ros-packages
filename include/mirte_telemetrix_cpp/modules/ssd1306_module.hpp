@@ -38,27 +38,32 @@ class SSD1306_module : public Mirte_module {
     bool enabled = true;
     std::optional<std::string> last_text;
 
+    // Only enabled if legacy is enabled in the config
+    // Service: oled/NAME/set_image_legacy
     rclcpp::Service<mirte_msgs::srv::SetOLEDImageLegacy>::SharedPtr set_oled_service_legacy;
 
+    // Service: oled/NAME/set_text
     rclcpp::Service<mirte_msgs::srv::SetOLEDText>::SharedPtr set_oled_text_service;
+    // Service: oled/NAME/set_image
     rclcpp::Service<mirte_msgs::srv::SetOLEDImage>::SharedPtr set_oled_image_service;
+    // Service: oled/NAME/set_file
     rclcpp::Service<mirte_msgs::srv::SetOLEDFile>::SharedPtr set_oled_file_service;
 
     bool prewrite(bool is_default = false);
 
     void set_oled_callback_legacy(
-      const std::shared_ptr<mirte_msgs::srv::SetOLEDImageLegacy::Request> req,
-      std::shared_ptr<mirte_msgs::srv::SetOLEDImageLegacy::Response> res);
+      const mirte_msgs::srv::SetOLEDImageLegacy::Request::ConstSharedPtr req,
+      mirte_msgs::srv::SetOLEDImageLegacy::Response::SharedPtr res);
 
     void set_oled_text_callback(
-      const std::shared_ptr<mirte_msgs::srv::SetOLEDText::Request> req,
-      std::shared_ptr<mirte_msgs::srv::SetOLEDText::Response> res);
+      const mirte_msgs::srv::SetOLEDText::Request::ConstSharedPtr req,
+      mirte_msgs::srv::SetOLEDText::Response::SharedPtr res);
 
     void set_oled_image_callback(
-      const std::shared_ptr<mirte_msgs::srv::SetOLEDImage::Request> req,
-      std::shared_ptr<mirte_msgs::srv::SetOLEDImage::Response> res);
+      const mirte_msgs::srv::SetOLEDImage::Request::ConstSharedPtr req,
+      mirte_msgs::srv::SetOLEDImage::Response::SharedPtr res);
 
     void set_oled_file_callback(
-      const std::shared_ptr<mirte_msgs::srv::SetOLEDFile::Request> req,
-      std::shared_ptr<mirte_msgs::srv::SetOLEDFile::Response> res);
+      const mirte_msgs::srv::SetOLEDFile::Request::ConstSharedPtr req,
+      mirte_msgs::srv::SetOLEDFile::Response::SharedPtr res);
 };

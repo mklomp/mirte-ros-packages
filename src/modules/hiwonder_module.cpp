@@ -51,17 +51,15 @@ HiWonderBus_module::HiWonderBus_module(
   // Create Bus ROS services
   this->enable_all_servos_service = nh->create_service<std_srvs::srv::SetBool>(
     "servo/" + servo_group + "enable_all_servos",
-    std::bind(&HiWonderBus_module::enable_cb, this, _1, _2),
+    std::bind(&HiWonderBus_module::enable_service_callback, this, _1, _2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 }
 
 // TODO: Make result actually Reflect reality
-bool HiWonderBus_module::enable_cb(
-  const std::shared_ptr<std_srvs::srv::SetBool::Request> req,
-  std::shared_ptr<std_srvs::srv::SetBool::Response> res)
+void HiWonderBus_module::enable_service_callback(
+  const std_srvs::srv::SetBool::Request::ConstSharedPtr req,
+  std_srvs::srv::SetBool::Response::SharedPtr res)
 {
-  this->bus->set_enabled_all(req->data);
-
   // // TODO: TEMP TEST
   // std::cout << (int)bus->get_offset(4).value_or(99) <<std::endl;
   // auto [min, max] = bus->get_range(4).value_or(std::make_tuple(0,0));
@@ -69,9 +67,8 @@ bool HiWonderBus_module::enable_cb(
   // std::cout << bus->verify_id(4) << std::endl;
   // // TODO: TEMP TEST
 
-  res->success = true;
+  res->success = this->bus->set_enabled_all(req->data);
   res->message = req->data ? "Enabled" : "Disabled";
-  return true;
 }
 
 std::vector<std::shared_ptr<HiWonderBus_module>> HiWonderBus_module::get_hiwonder_modules(

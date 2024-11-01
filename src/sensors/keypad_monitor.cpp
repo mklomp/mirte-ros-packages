@@ -103,8 +103,7 @@ std::string KeypadMonitor::key_string(Key key)
 
 void KeypadMonitor::update()
 {
-  auto header = get_header();
-  auto msg_builder = mirte_msgs::build<mirte_msgs::msg::Keypad>().header(header);
+  auto msg_builder = mirte_msgs::build<mirte_msgs::msg::Keypad>().header(get_header());
 
   Key debounced_key = NONE;
   if (nh->now().seconds() - this->last_debounce_time > 0.1) {

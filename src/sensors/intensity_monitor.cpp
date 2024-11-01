@@ -32,7 +32,7 @@ std::vector<std::shared_ptr<IntensityMonitor>> IntensityMonitor::get_intensity_m
   return sensors;
 }
 
-void DigitalIntensityMonitor::callback(uint16_t value)
+void DigitalIntensityMonitor::data_callback(uint16_t value)
 {
   this->value = value;
   this->update();
@@ -41,10 +41,9 @@ void DigitalIntensityMonitor::callback(uint16_t value)
 
 void DigitalIntensityMonitor::update()
 {
-  mirte_msgs::msg::IntensityDigital msg;
-
-  msg.header = get_header();
-  msg.value = value;
+  auto msg = mirte_msgs::build<mirte_msgs::msg::IntensityDigital>()
+               .header(get_header())  // Build the message
+               .value(value);
 
   intensity_pub->publish(msg);
 }
@@ -52,42 +51,42 @@ void DigitalIntensityMonitor::update()
 DigitalIntensityMonitor::DigitalIntensityMonitor(NodeData node_data, IntensityData intensity_data)
 : IntensityMonitor(node_data, {intensity_data.d_pin}, intensity_data)
 {
+  using namespace std::placeholders;
+
   // Use default QOS for sensor publishers as specified in REP2003
   intensity_pub = nh->create_publisher<mirte_msgs::msg::IntensityDigital>(
     "intensity/" + intensity_data.name + "/digital", rclcpp::SystemDefaultsQoS());
 
   intensity_service = nh->create_service<mirte_msgs::srv::GetIntensityDigital>(
     "intensity/" + intensity_data.name + "/get_digital",
-    std::bind(
-      &DigitalIntensityMonitor::service_callback, this, std::placeholders::_1,
-      std::placeholders::_2),
+    std::bind(&DigitalIntensityMonitor::service_callback, this, _1, _2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   tmx->setPinMode(intensity_data.d_pin, tmx_cpp::TMX::PIN_MODES::DIGITAL_INPUT, true, 0);
   tmx->add_digital_callback(
-    intensity_data.d_pin, [this](auto pin, auto value) { this->callback(value); });
+    intensity_data.d_pin, [this](auto pin, auto value) { this->data_callback(value); });
 }
 
 AnalogIntensityMonitor::AnalogIntensityMonitor(NodeData node_data, IntensityData intensity_data)
 : IntensityMonitor(node_data, {intensity_data.a_pin}, intensity_data)
 {
+  using namespace std::placeholders;
+
   // Use default QOS for sensor publishers as specified in REP2003
   intensity_pub = nh->create_publisher<mirte_msgs::msg::Intensity>(
     "intensity/" + intensity_data.name, rclcpp::SystemDefaultsQoS());
 
   intensity_service = nh->create_service<mirte_msgs::srv::GetIntensity>(
     "intensity/" + intensity_data.name + "/get_analog",
-    std::bind(
-      &AnalogIntensityMonitor::service_callback, this, std::placeholders::_1,
-      std::placeholders::_2),
+    std::bind(&AnalogIntensityMonitor::service_callback, this, _1, _2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   tmx->setPinMode(intensity_data.a_pin, tmx_cpp::TMX::PIN_MODES::ANALOG_INPUT, true, 0);
   tmx->add_analog_callback(
-    intensity_data.a_pin, [this](auto pin, auto value) { this->callback(value); });
+    intensity_data.a_pin, [this](auto pin, auto value) { this->data_callback(value); });
 }
 
-void AnalogIntensityMonitor::callback(uint16_t value)
+void AnalogIntensityMonitor::data_callback(uint16_t value)
 {
   this->value = value;
   this->update();
@@ -96,26 +95,23 @@ void AnalogIntensityMonitor::callback(uint16_t value)
 
 void AnalogIntensityMonitor::update()
 {
-  mirte_msgs::msg::Intensity msg;
-
-  msg.header = get_header();
-  msg.value = value;
+  auto msg = mirte_msgs::build<mirte_msgs::msg::Intensity>()
+               .header(get_header())  // Build the message
+               .value(value);
 
   intensity_pub->publish(msg);
 }
 
-bool DigitalIntensityMonitor::service_callback(
-  const std::shared_ptr<mirte_msgs::srv::GetIntensityDigital::Request> req,
-  std::shared_ptr<mirte_msgs::srv::GetIntensityDigital::Response> res)
+void DigitalIntensityMonitor::service_callback(
+  const mirte_msgs::srv::GetIntensityDigital::Request::ConstSharedPtr req,
+  mirte_msgs::srv::GetIntensityDigital::Response::SharedPtr res)
 {
   res->data = value;
-  return true;
 }
 
-bool AnalogIntensityMonitor::service_callback(
-  const std::shared_ptr<mirte_msgs::srv::GetIntensity::Request> req,
-  std::shared_ptr<mirte_msgs::srv::GetIntensity::Response> res)
+void AnalogIntensityMonitor::service_callback(
+  const mirte_msgs::srv::GetIntensity::Request::ConstSharedPtr req,
+  mirte_msgs::srv::GetIntensity::Response::SharedPtr res)
 {
   res->data = value;
-  return true;
 }

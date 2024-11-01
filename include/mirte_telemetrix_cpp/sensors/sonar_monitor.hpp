@@ -25,7 +25,7 @@ class SonarMonitor : public Mirte_Sensor {
     SonarData sonar_data;
     static std::vector<std::shared_ptr<SonarMonitor>> get_sonar_monitors(
       NodeData node_data, std::shared_ptr<Parser> parser);
-    void callback(uint16_t value);
+    void data_callback(uint16_t value);
 
   private:
     /// @brief The last recorded distance.
@@ -33,10 +33,12 @@ class SonarMonitor : public Mirte_Sensor {
     std::mutex msg_mutex;
     sensor_msgs::msg::Range range;
 
+    // Publisher: distance/NAME
     rclcpp::Publisher<sensor_msgs::msg::Range>::SharedPtr sonar_pub;
-
+    // Service: distance/NAME/get_range
     rclcpp::Service<mirte_msgs::srv::GetRange>::SharedPtr sonar_service;
-    bool service_callback(
-      const std::shared_ptr<mirte_msgs::srv::GetRange::Request> req,
-      std::shared_ptr<mirte_msgs::srv::GetRange::Response> res);
+
+    void service_callback(
+      const mirte_msgs::srv::GetRange::Request::ConstSharedPtr req,
+      mirte_msgs::srv::GetRange::Response::SharedPtr res);
 };

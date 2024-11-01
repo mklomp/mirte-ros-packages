@@ -10,43 +10,43 @@ EncoderMonitor::EncoderMonitor(NodeData node_data, EncoderData encoder_data)
 : Mirte_Sensor(node_data, {encoder_data.pinA, encoder_data.pinB}, (SensorData)encoder_data),
   encoder_data(encoder_data)
 {
+  using namespace std::placeholders;
+
   // Use default QOS for sensor publishers as specified in REP2003
   encoder_pub = nh->create_publisher<mirte_msgs::msg::Encoder>(
     "encoder/" + encoder_data.name, rclcpp::SystemDefaultsQoS());
 
   encoder_service = nh->create_service<mirte_msgs::srv::GetEncoder>(
     "encoder/" + encoder_data.name + "/get_encoder",
-    std::bind(
-      &EncoderMonitor::service_callback, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&EncoderMonitor::service_callback, this, _1, _2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
-  tmx->attach_encoder(
-    encoder_data.pinA, encoder_data.pinB, [this](auto pin, auto value) { this->callback(value); });
+  tmx->attach_encoder(encoder_data.pinA, encoder_data.pinB, [this](auto pin, auto value) {
+    this->data_callback(value);
+  });
 }
 
-void EncoderMonitor::callback(int16_t value)
+void EncoderMonitor::data_callback(int16_t value)
 {
   this->value += value;
-  update();
+  this->update();
   this->device_timer->reset();
 }
 
 void EncoderMonitor::update()
 {
-  mirte_msgs::msg::Encoder msg;
-
-  msg.header = get_header();
-  msg.value = value;
+  auto msg = mirte_msgs::build<mirte_msgs::msg::Encoder>()
+               .header(get_header())  // Build the message
+               .value(value);
 
   encoder_pub->publish(msg);
 }
 
-bool EncoderMonitor::service_callback(
-  const std::shared_ptr<mirte_msgs::srv::GetEncoder::Request> req,
-  std::shared_ptr<mirte_msgs::srv::GetEncoder::Response> res)
+void EncoderMonitor::service_callback(
+  const mirte_msgs::srv::GetEncoder::Request::ConstSharedPtr req,
+  mirte_msgs::srv::GetEncoder::Response::SharedPtr res)
 {
   res->data = value;
-  return true;
 }
 
 std::vector<std::shared_ptr<EncoderMonitor>> EncoderMonitor::get_encoder_monitors(
