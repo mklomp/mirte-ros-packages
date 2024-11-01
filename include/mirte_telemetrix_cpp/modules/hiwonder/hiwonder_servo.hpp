@@ -18,6 +18,7 @@
 #include <std_msgs/msg/header.hpp>
 #include <mirte_msgs/srv/get_servo_range.hpp>
 #include <mirte_msgs/srv/set_servo_angle.hpp>
+#include <mirte_msgs/srv/set_servo_angle_with_speed.hpp>
 #include <std_srvs/srv/set_bool.hpp>
 
 class Hiwonder_servo {
@@ -56,6 +57,8 @@ class Hiwonder_servo {
     rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr enable_service;
     // Service: servo/GROUP/NAME/set_angle
     rclcpp::Service<mirte_msgs::srv::SetServoAngle>::SharedPtr angle_service;
+    // Service: servo/GROUP/NAME/set_angle_with_speed
+    rclcpp::Service<mirte_msgs::srv::SetServoAngleWithSpeed>::SharedPtr angle_speed_service;
     // Service: servo/GROUP/NAME/get_range
     rclcpp::Service<mirte_msgs::srv::GetServoRange>::SharedPtr range_service;
 
@@ -66,6 +69,10 @@ class Hiwonder_servo {
     void set_angle_service_callback(
       const mirte_msgs::srv::SetServoAngle::Request::ConstSharedPtr req,
       mirte_msgs::srv::SetServoAngle::Response::SharedPtr res);
+
+    void set_angle_with_speed_service_callback(
+      const mirte_msgs::srv::SetServoAngleWithSpeed::Request::ConstSharedPtr req,
+      mirte_msgs::srv::SetServoAngleWithSpeed::Response::SharedPtr res);
 
     void get_range_service_callback(
       const mirte_msgs::srv::GetServoRange::Request::ConstSharedPtr req,

@@ -1,4 +1,5 @@
 #include <functional>
+#include <numbers>
 
 #include <mirte_telemetrix_cpp/modules/hiwonder/hiwonder_servo.hpp>
 
@@ -52,6 +53,12 @@ Hiwonder_servo::Hiwonder_servo(
   this->angle_service = nh->create_service<mirte_msgs::srv::SetServoAngle>(
     "servo/" + servo_group + this->servo_data->name + "/set_angle",
     std::bind(&Hiwonder_servo::set_angle_service_callback, this, _1, _2),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(), callback_group);
+
+  // create angle speed service
+  this->angle_speed_service = nh->create_service<mirte_msgs::srv::SetServoAngleWithSpeed>(
+    "servo/" + servo_group + this->servo_data->name + "/set_angle_with_speed",
+    std::bind(&Hiwonder_servo::set_angle_with_speed_service_callback, this, _1, _2),
     rclcpp::ServicesQoS().get_rmw_qos_profile(), callback_group);
 
   // create range service
@@ -110,7 +117,7 @@ void Hiwonder_servo::set_angle_service_callback(
   }
 
   if (angle > servo_data->max_angle_in || angle < servo_data->min_angle_in) {
-    RCLCPP_WARN(
+    RCLCPP_ERROR(
       nh->get_logger(),
       "The provided angle is out of range. Angle %.3f radians was requested, but range is [%.3f, "
       "%.3f]",
@@ -121,6 +128,67 @@ void Hiwonder_servo::set_angle_service_callback(
 
   auto angle_out = calc_angle_out(angle);
   res->status = this->bus_mod->set_single_servo(this->servo_data->id, angle_out, 100);
+}
+
+void Hiwonder_servo::set_angle_with_speed_service_callback(
+  const mirte_msgs::srv::SetServoAngleWithSpeed::Request::ConstSharedPtr req,
+  mirte_msgs::srv::SetServoAngleWithSpeed::Response::SharedPtr res)
+{
+  using std::numbers::pi;
+
+  float angle = req->angle;
+  float speed = req->rate;
+  bool is_degrees = req->degrees;
+
+  // Require speed to be positive, since sending 0.0 rad/s results in moving at the max speed
+  if (!speed > 0.0) {
+    RCLCPP_ERROR(
+      nh->get_logger(), "Speed must be positive. Provided speed was non-positive (%.3f <= 0.0)",
+      speed);
+    res->status = false;
+    return;
+  }
+
+  if (is_degrees == mirte_msgs::srv::SetServoAngleWithSpeed::Request::DEGREES) {
+    angle = angle * (pi / 180.0);
+    speed = speed * (pi / 180.0);
+  }
+
+  if (angle > servo_data->max_angle_in || angle < servo_data->min_angle_in) {
+    RCLCPP_ERROR(
+      nh->get_logger(),
+      "The provided angle is out of range. Angle %.3f radians was requested, but range is [%.3f, "
+      "%.3f]",
+      angle, servo_data->min_angle_in, servo_data->max_angle_in);
+    res->status = false;
+    return;
+  }
+
+  auto distance = pi - std::abs(std::fmod(std::abs(angle - last_angle), 2.0 * pi) - pi);
+  auto time = distance / speed;
+  RCLCPP_DEBUG(nh->get_logger(), "TIME: %.3f", time);
+  uint16_t time_ms = time * 1000.0;
+
+  if (time > 30.0) {
+    std::string unit = is_degrees ? "°" : "rad";
+    RCLCPP_ERROR(
+      nh->get_logger(),
+      "The speed angle combo (%.1f%s, %.2f%s/s) results in a move time longer than 30s from the "
+      "current position. (%.2f > 30s)",
+      req->angle, unit.c_str(), req->rate, unit.c_str(), time);
+    res->status = false;
+    return;
+  }
+
+  // NOTE: When time_ms is 0 than the servo attemps to move as fast as possible.
+
+  auto angle_out = calc_angle_out(angle);
+
+  RCLCPP_DEBUG(
+    nh->get_logger(), "Moving Servo from %d to %d in %dms", (int)last_raw, (int)angle_out,
+    (int)time_ms);
+
+  res->status = this->bus_mod->set_single_servo(this->servo_data->id, angle_out, time_ms);
 }
 
 void Hiwonder_servo::get_range_service_callback(
