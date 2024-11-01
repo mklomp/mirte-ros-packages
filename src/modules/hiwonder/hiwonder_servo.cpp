@@ -164,6 +164,7 @@ void Hiwonder_servo::set_angle_with_speed_service_callback(
     return;
   }
 
+  // Distance calculation based on: https://stackoverflow.com/a/52432897
   auto distance = pi - std::abs(std::fmod(std::abs(angle - last_angle), 2.0 * pi) - pi);
   auto time = distance / speed;
   RCLCPP_DEBUG(nh->get_logger(), "TIME: %.3f", time);
