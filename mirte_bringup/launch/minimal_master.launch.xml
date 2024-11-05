@@ -5,13 +5,25 @@
     description="The namespace containing all Robot specific ROS communication" />
   <arg name="hardware_namespace" default="io"
     description="The namespace for the Telemetrix Node and the hardware peripherals" />
+  
+  <!-- Device Toggles -->
+  <!-- FIXME: Depth Camera is disabled for Development -->
+  <arg name="use_depth_camera" default="False"
+    description="Enables or Disables the Astra Pro Plus depth camera" />
+  <arg name="use_lidar" default="True" description="Enables or Disables the RPLiDAR C1 node" />
 
   <!-- Temporary group until scoped including is a thing in ROS 2 (Or that only the top-level launch
   arguments are shown) -->
+  <!-- TODO: Maybe the grouping in XML is fine as it is. -->
   <group scoped="true" forwarding="false">
     <keep name="machine_namespace" value="$(var machine_namespace)" />
     <keep name="hardware_namespace" value="$(var hardware_namespace)" />
+    <keep name="use_depth_camera" value="$(var use_depth_camera)" />
+    <keep name="use_lidar" value="$(var use_lidar)" />
+
+    <!-- Hidden Debug options -->
     <keep name="use_debugger" value="$(var use_debugger False)" />
+
     <let name="frame_prefix" value="$(var machine_namespace)/" />
 
     <push-ros-namespace namespace="$(var machine_namespace)" />
@@ -27,9 +39,10 @@
     </include>
 
     <!-- Depth Camera Astra Pro Plus -->
-    <include file="$(find-pkg-share astra_camera)/launch/astro_pro_plus.launch.xml" />
+    <include file="$(find-pkg-share astra_camera)/launch/astro_pro_plus.launch.xml"
+      if="$(var use_depth_camera)" />
 
     <!-- LiDAR -->
-    <include file="$(find-pkg-share rplidar_ros)/launch/rplidar_c1_launch.py" />
+    <include file="$(find-pkg-share rplidar_ros)/launch/rplidar_c1_launch.py" if="$(var use_lidar)" />
   </group>
 </launch>
