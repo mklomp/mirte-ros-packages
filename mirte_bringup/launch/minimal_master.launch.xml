@@ -22,6 +22,7 @@
     <keep name="use_lidar" value="$(var use_lidar)" />
 
     <!-- Hidden Debug options -->
+    <keep name="emulate_tty" value="$(var emulate_tty True)" />
     <keep name="use_debugger" value="$(var use_debugger False)" />
 
     <let name="frame_prefix" value="$(var machine_namespace)/" />

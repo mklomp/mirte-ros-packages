@@ -1,2 +1,3 @@
 std_msgs/Header header
-int32 value
+# Fraction from [0, 1]
+float32 value
