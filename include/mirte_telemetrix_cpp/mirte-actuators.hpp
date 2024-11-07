@@ -13,9 +13,8 @@
 #include <mirte_telemetrix_cpp/mirte-board.hpp>
 #include <mirte_telemetrix_cpp/node_data.hpp>
 
-#include <std_msgs/msg/header.hpp>
-#include <std_msgs/msg/int32.hpp>
-#include <mirte_msgs/srv/set_pin_value.hpp>
+#include <mirte_msgs/srv/set_digital_pin_value.hpp>
+#include <mirte_msgs/srv/set_pwm_pin_value.hpp>
 
 class Mirte_Actuators {
   public:
@@ -27,10 +26,16 @@ class Mirte_Actuators {
     std::vector<std::shared_ptr<TelemetrixDevice>> actuators;
 
   private:
-    // Service: set_pin_value
-    rclcpp::Service<mirte_msgs::srv::SetPinValue>::SharedPtr set_pin_value_service;
+    // Service: set_digital_pin_value
+    rclcpp::Service<mirte_msgs::srv::SetDigitalPinValue>::SharedPtr digital_pin_service;
+    // Service: set_pwm_pin_value
+    rclcpp::Service<mirte_msgs::srv::SetPWMPinValue>::SharedPtr pwm_pin_service;
 
-    void set_pin_value_service_callback(
-      const mirte_msgs::srv::SetPinValue::Request::ConstSharedPtr req,
-      mirte_msgs::srv::SetPinValue::Response::SharedPtr res);
+    void digital_pin_service_callback(
+      const mirte_msgs::srv::SetDigitalPinValue::Request::ConstSharedPtr req,
+      mirte_msgs::srv::SetDigitalPinValue::Response::SharedPtr res);
+
+    void pwm_pin_service_callback(
+      const mirte_msgs::srv::SetPWMPinValue::Request::ConstSharedPtr req,
+      mirte_msgs::srv::SetPWMPinValue::Response::SharedPtr res);
 };

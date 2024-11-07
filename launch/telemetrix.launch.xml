@@ -17,6 +17,8 @@
   <arg name="use_debugger" default="False" description="Attach a debugger to the telemetrix process" />
 
   <group>
+    <keep name="emulate_tty" value="$(var emulate_tty True)" />
+
     <let name="root-namespace" value="$(var ros_namespace '')" />
     <let name="full-namespace"
       value="$(var root-namespace)$(eval 'len(\'$(var root-namespace)\') > 0 and \'.\' or \'\'')$(var hardware_namespace)" />

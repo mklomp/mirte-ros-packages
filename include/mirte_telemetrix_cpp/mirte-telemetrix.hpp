@@ -4,6 +4,7 @@
 #include <rclcpp/node.hpp>
 #include <rclcpp/node_interfaces/node_base_interface.hpp>
 #include <rclcpp/node_options.hpp>
+#include <rclcpp/service.hpp>
 
 #include <tmx_cpp/tmx.hpp>
 
@@ -11,6 +12,8 @@
 #include <mirte_telemetrix_cpp/mirte-board.hpp>
 #include <mirte_telemetrix_cpp/mirte-modules.hpp>
 #include <mirte_telemetrix_cpp/mirte-sensors.hpp>
+
+#include <mirte_msgs/srv/get_board_characteristics.hpp>
 
 class TelemetrixNode {
   private:
@@ -30,4 +33,7 @@ class TelemetrixNode {
     std::shared_ptr<Mirte_Sensors> monitor;
     std::shared_ptr<Mirte_Actuators> actuators;
     std::shared_ptr<Mirte_modules> modules;
+
+    // Service: get_board_characteristics
+    rclcpp::Service<mirte_msgs::srv::GetBoardCharacteristics>::SharedPtr characteristics_service;
 };

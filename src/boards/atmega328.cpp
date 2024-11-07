@@ -45,4 +45,36 @@ std::map<std::string, int> Mirte_Board_atmega328p::resolveConnector(std::string 
   return {};
 }
 
-const int Mirte_Board_atmega328p::get_adc_bits() const { return 12; }
+const int Mirte_Board_atmega328p::get_adc_bits() const { return 10; }
+
+const bool Mirte_Board_atmega328p::is_analog_pin(uint8_t pin) const
+{
+  switch (pin) {
+    case 14 + 0:
+    case 14 + 1:
+    case 14 + 2:
+    case 14 + 3:
+    case 14 + 4:
+    case 14 + 5:
+    case 14 + 6:
+    case 14 + 7:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const bool Mirte_Board_atmega328p::is_pwm_pin(uint8_t pin) const
+{
+  switch (pin) {
+    case 3:
+    case 5:
+    case 6:
+    case 9:
+    case 10:
+    case 11:
+      return true;
+    default:
+      return false;
+  }
+}

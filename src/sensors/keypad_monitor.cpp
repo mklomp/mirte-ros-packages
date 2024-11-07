@@ -49,8 +49,8 @@ void KeypadMonitor::callback(uint16_t value)
   this->device_timer->call();
 
   Key key = Key::NONE;
-  auto maxValue = std::pow(2, board->get_adc_bits());
-  auto scale = 4096.0 / maxValue;
+  auto maxValue = std::pow(2, this->board->get_adc_bits()) - 1;
+  auto scale = 1024.0 / maxValue;
   // RCLCPP_INFO(logger, "%d", this->value);
   if (value < 70 / scale) {
     key = LEFT;

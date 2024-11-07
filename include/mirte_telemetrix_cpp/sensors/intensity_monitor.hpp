@@ -52,7 +52,7 @@ class AnalogIntensityMonitor : public IntensityMonitor {
     void data_callback(uint16_t value);
 
   private:
-    std::atomic<uint16_t> value;
+    std::atomic<float> value;
 
     // Publisher: intensity/NAME
     rclcpp::Publisher<mirte_msgs::msg::Intensity>::SharedPtr intensity_pub;

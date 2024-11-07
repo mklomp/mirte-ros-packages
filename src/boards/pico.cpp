@@ -78,3 +78,18 @@ uint8_t Mirte_Board_pico::resolveUARTPort(uint8_t pin)
       return 0xFF;
   }
 }
+
+const bool Mirte_Board_pico::is_analog_pin(uint8_t pin) const
+{
+  switch (pin) {
+    case 26:
+    case 27:
+    case 28:
+    case 29:  // The internal temperature sensor
+      return true;
+    default:
+      return false;
+  }
+}
+
+const bool Mirte_Board_pico::is_pwm_pin(uint8_t pin) const { return true; }

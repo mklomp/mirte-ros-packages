@@ -32,6 +32,15 @@ std::shared_ptr<Mirte_Board> Mirte_Board::create(std::shared_ptr<Parser> parser)
   return nullptr;
 }
 
+void Mirte_Board::get_board_characteristics_service_callback(
+  const mirte_msgs::srv::GetBoardCharacteristics::Request::ConstSharedPtr req,
+  mirte_msgs::srv::GetBoardCharacteristics::Response::SharedPtr res) const
+{
+  res->max_adc = (1 << this->get_adc_bits()) - 1;
+  res->max_pwm = this->get_max_pwm();
+  res->max_voltage = this->get_voltage_level();
+}
+
 std::string get_string(rclcpp::ParameterValue param)
 {
   if (param.get_type() == rclcpp::ParameterType::PARAMETER_STRING) {

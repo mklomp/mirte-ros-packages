@@ -1,7 +1,8 @@
 #include <exception>  // for exception
-#include <iostream>   // for operator<<, endl, basic_ostream
-#include <memory>     // for make_shared, shared_ptr, __shared...
-#include <stdint.h>   // for uint8_t
+#include <functional>
+#include <iostream>  // for operator<<, endl, basic_ostream
+#include <memory>    // for make_shared, shared_ptr, __shared...
+#include <stdint.h>  // for uint8_t
 
 #include <rclcpp/executors.hpp>     // for spin
 #include <rclcpp/node.hpp>          // for Node
@@ -59,9 +60,15 @@ TelemetrixNode::~TelemetrixNode()
 
 bool TelemetrixNode::start()
 {
+  using namespace std::placeholders;
+
   auto parser = std::make_shared<Parser>(node_);
 
-  std::shared_ptr<Mirte_Board> board = Mirte_Board::create(parser);
+  this->board = Mirte_Board::create(parser);
+
+  this->characteristics_service = node_->create_service<mirte_msgs::srv::GetBoardCharacteristics>(
+    "get_board_characteristics",
+    std::bind(&Mirte_Board::get_board_characteristics_service_callback, this->board, _1, _2));
 
   auto ports = tmx_cpp::TMX::get_available_ports();
   decltype(ports) available_ports;

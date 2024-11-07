@@ -4,7 +4,8 @@
 #include "mirte_telemetrix_cpp/mirte-board.hpp"
 #include <mirte_telemetrix_cpp/sensors/base_sensor.hpp>
 
-#include <mirte_msgs/srv/get_pin_value.hpp>
+#include <mirte_msgs/srv/get_analog_pin_value.hpp>
+#include <mirte_msgs/srv/get_digital_pin_value.hpp>
 
 class Mirte_Sensors {
   public:
@@ -21,10 +22,15 @@ class Mirte_Sensors {
       pin_map;  // pin -> (is_digital, value,analog_cb, digital_cb )
 
   private:
-    // Service: get_pin_value
-    rclcpp::Service<mirte_msgs::srv::GetPinValue>::SharedPtr pin_service;
+    // Service: get_digital_pin_value
+    rclcpp::Service<mirte_msgs::srv::GetDigitalPinValue>::SharedPtr digital_pin_service;
+    // Service: get_analog_pin_value
+    rclcpp::Service<mirte_msgs::srv::GetAnalogPinValue>::SharedPtr analog_pin_service;
 
-    void pin_callback(
-      const mirte_msgs::srv::GetPinValue::Request::ConstSharedPtr req,
-      mirte_msgs::srv::GetPinValue::Response::SharedPtr res);
+    void digital_pin_service_callback(
+      const mirte_msgs::srv::GetDigitalPinValue::Request::ConstSharedPtr req,
+      mirte_msgs::srv::GetDigitalPinValue::Response::SharedPtr res);
+    void analog_pin_service_callback(
+      const mirte_msgs::srv::GetAnalogPinValue::Request::ConstSharedPtr req,
+      mirte_msgs::srv::GetAnalogPinValue::Response::SharedPtr res);
 };

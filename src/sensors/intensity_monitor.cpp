@@ -88,7 +88,7 @@ AnalogIntensityMonitor::AnalogIntensityMonitor(NodeData node_data, IntensityData
 
 void AnalogIntensityMonitor::data_callback(uint16_t value)
 {
-  this->value = value;
+  this->value = value / (float)((1 << board->get_adc_bits()) - 1);
   this->update();
   this->device_timer->reset();
 }

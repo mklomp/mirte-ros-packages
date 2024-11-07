@@ -35,14 +35,6 @@ Hiwonder_servo::Hiwonder_servo(
       "HiWonder Servo '%s' upper range does not match the config. [Expected %d , Actual %d]",
       this->servo_data->name.c_str(), this->servo_data->max_angle_out, upper);
 
-  auto home = this->bus_mod->get_offset(servo_data->id);
-  assert(home.has_value());
-  auto home_val = home.value();
-  if (home_val != this->servo_data->home_out)
-    RCLCPP_WARN(
-      logger, "HiWonder Servo '%s' home does not match the config. [Expected %d , Actual %d]",
-      this->servo_data->name.c_str(), this->servo_data->home_out, home_val);
-
   // create enable service
   this->enable_service = nh->create_service<std_srvs::srv::SetBool>(
     "servo/" + servo_group + this->servo_data->name + "/set_enable",
