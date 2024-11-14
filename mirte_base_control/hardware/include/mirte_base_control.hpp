@@ -15,9 +15,9 @@
 // ROS
 #include <mirte_msgs/msg/encoder.hpp>
 #include <mirte_msgs/srv/set_motor_speed.hpp>
+#include <mirte_msgs/srv/set_speed_multiple.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_srvs/srv/empty.hpp>
-#include <mirte_msgs/srv/set_speed_multiple.hpp>
 // ros_control
 #include "hardware_interface/actuator_interface.hpp"
 #include "hardware_interface/handle.hpp"
@@ -66,16 +66,17 @@ public:
   // export_command_interfaces
   // read
   // write
-  std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
+  std::vector<hardware_interface::StateInterface>
+  export_state_interfaces() override;
 
-    hardware_interface::CallbackReturn on_activate(
-    const rclcpp_lifecycle::State & previous_state) override;
+  hardware_interface::CallbackReturn
+  on_activate(const rclcpp_lifecycle::State &previous_state) override;
 
-  hardware_interface::CallbackReturn on_deactivate(
-    const rclcpp_lifecycle::State & previous_state) override;
+  hardware_interface::CallbackReturn
+  on_deactivate(const rclcpp_lifecycle::State &previous_state) override;
 
-  std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
-
+  std::vector<hardware_interface::CommandInterface>
+  export_command_interfaces() override;
 
   double calc_speed_pid(int joint, double target,
                         const rclcpp::Duration &period);
@@ -83,15 +84,17 @@ public:
   double calc_speed_map(int joint, double target,
                         const rclcpp::Duration &period);
 
-  bool write_single(int joint, double speed, const rclcpp::Duration &period, bool& updated);
+  bool write_single(int joint, double speed, const rclcpp::Duration &period,
+                    bool &updated);
 
-int calculate_single_speed(int joint, double speed,const rclcpp::Duration &period);
-
+  int calculate_single_speed(int joint, double speed,
+                             const rclcpp::Duration &period);
 
   /*
    *
    */
-hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::Duration & period);
+  hardware_interface::return_type write(const rclcpp::Time &time,
+                                        const rclcpp::Duration &period);
   double rad_per_enc_tick() { return 2.0 * M_PI / this->ticks; }
   /**
    * Reading encoder values and setting position and velocity of encoders
@@ -100,7 +103,8 @@ hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::D
   /**
    * Reading encoder values and setting position and velocity of encoders
    */
-hardware_interface::return_type read(const rclcpp::Time & time, const rclcpp::Duration & period);
+  hardware_interface::return_type read(const rclcpp::Time &time,
+                                       const rclcpp::Duration &period);
   std::shared_ptr<rclcpp::Node> nh;
   // rclcpp::Node private_nh;
 
@@ -126,15 +130,20 @@ private:
 
   rclcpp::Time curr_update_time, prev_update_time;
 
-  std::vector<std::shared_ptr<rclcpp::Subscription<mirte_msgs::msg::Encoder>>> wheel_encoder_subs_;
- std::shared_ptr< rclcpp::Service<std_srvs::srv::Empty>> start_srv_;
- std::shared_ptr<  rclcpp::Service<std_srvs::srv::Empty>> stop_srv_;
+  std::vector<std::shared_ptr<rclcpp::Subscription<mirte_msgs::msg::Encoder>>>
+      wheel_encoder_subs_;
+  std::shared_ptr<rclcpp::Service<std_srvs::srv::Empty>> start_srv_;
+  std::shared_ptr<rclcpp::Service<std_srvs::srv::Empty>> stop_srv_;
 
   bool use_single_client = true;
-  std::vector<std::shared_ptr<rclcpp::Client<mirte_msgs::srv::SetMotorSpeed>>> service_clients;
-  std::vector<std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Request>> service_requests;
-  std::shared_ptr< rclcpp::Client< mirte_msgs::srv::SetSpeedMultiple> > set_speed_multiple_client;
-  std::shared_ptr< mirte_msgs::srv::SetSpeedMultiple::Request> set_speed_multiple_request;
+  std::vector<std::shared_ptr<rclcpp::Client<mirte_msgs::srv::SetMotorSpeed>>>
+      service_clients;
+  std::vector<std::shared_ptr<mirte_msgs::srv::SetMotorSpeed::Request>>
+      service_requests;
+  std::shared_ptr<rclcpp::Client<mirte_msgs::srv::SetSpeedMultiple>>
+      set_speed_multiple_client;
+  std::shared_ptr<mirte_msgs::srv::SetSpeedMultiple::Request>
+      set_speed_multiple_request;
   std::vector<std::string> joints;
   bool enablePID = false;
   std::vector<std::shared_ptr<control_toolbox::Pid>> pids;
@@ -142,12 +151,12 @@ private:
       reconfig_pid; // one dummy pid to use for the dynamic reconfigure
 
   void start_callback(std::shared_ptr<std_srvs::srv::Empty::Request> req,
-                      std::shared_ptr<std_srvs::srv::Empty::Response>res) {
+                      std::shared_ptr<std_srvs::srv::Empty::Response> res) {
     running_ = true;
     // return true;
   }
 
-  void stop_callback(std::shared_ptr<std_srvs::srv::Empty::Request>req,
+  void stop_callback(std::shared_ptr<std_srvs::srv::Empty::Request> req,
                      std::shared_ptr<std_srvs::srv::Empty::Response> res) {
     running_ = false;
     // return true;

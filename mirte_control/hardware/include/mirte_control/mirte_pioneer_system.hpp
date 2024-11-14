@@ -24,48 +24,49 @@
 #include "hardware_interface/hardware_info.hpp"
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
+#include "mirte_control/visibility_control.h"
+#include "mirte_msgs/srv/set_motor_speed.hpp"
 #include "rclcpp/clock.hpp"
 #include "rclcpp/duration.hpp"
 #include "rclcpp/macros.hpp"
-#include "rclcpp/time.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp/time.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
-#include "mirte_control/visibility_control.h"
-#include "mirte_msgs/srv/set_motor_speed.hpp"
 
-namespace mirte_control
-{
-class MirtePioneerSrvSystemHardware : public hardware_interface::SystemInterface
-{
+namespace mirte_control {
+class MirtePioneerSrvSystemHardware
+    : public hardware_interface::SystemInterface {
 public:
   RCLCPP_SHARED_PTR_DEFINITIONS(MirtePioneerSrvSystemHardware);
 
   MIRTE_CONTROL_PUBLIC
-  hardware_interface::CallbackReturn on_init(
-    const hardware_interface::HardwareInfo & info) override;
+  hardware_interface::CallbackReturn
+  on_init(const hardware_interface::HardwareInfo &info) override;
 
   MIRTE_CONTROL_PUBLIC
-  std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
+  std::vector<hardware_interface::StateInterface>
+  export_state_interfaces() override;
 
   MIRTE_CONTROL_PUBLIC
-  std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
+  std::vector<hardware_interface::CommandInterface>
+  export_command_interfaces() override;
 
   MIRTE_CONTROL_PUBLIC
-  hardware_interface::CallbackReturn on_activate(
-    const rclcpp_lifecycle::State & previous_state) override;
+  hardware_interface::CallbackReturn
+  on_activate(const rclcpp_lifecycle::State &previous_state) override;
 
   MIRTE_CONTROL_PUBLIC
-  hardware_interface::CallbackReturn on_deactivate(
-    const rclcpp_lifecycle::State & previous_state) override;
+  hardware_interface::CallbackReturn
+  on_deactivate(const rclcpp_lifecycle::State &previous_state) override;
 
   MIRTE_CONTROL_PUBLIC
-  hardware_interface::return_type read(
-    const rclcpp::Time & time, const rclcpp::Duration & period) override;
+  hardware_interface::return_type read(const rclcpp::Time &time,
+                                       const rclcpp::Duration &period) override;
 
   MIRTE_CONTROL_PUBLIC
-  hardware_interface::return_type write(
-    const rclcpp::Time & time, const rclcpp::Duration & period) override;
+  hardware_interface::return_type
+  write(const rclcpp::Time &time, const rclcpp::Duration &period) override;
 
 private:
   std::optional<rclcpp::Logger> logger_;
@@ -82,6 +83,6 @@ private:
   rclcpp::Client<mirte_msgs::srv::SetMotorSpeed>::SharedPtr right_client_;
 };
 
-}  // namespace mirte_control
+} // namespace mirte_control
 
-#endif  // MIRTE_CONTROL__MIRTE_PIONEER_SYSTEM_HPP_
+#endif // MIRTE_CONTROL__MIRTE_PIONEER_SYSTEM_HPP_
