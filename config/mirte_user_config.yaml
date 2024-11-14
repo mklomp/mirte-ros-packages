@@ -1,6 +1,6 @@
 /**:
   ros__parameters:
-  #    max_frequency: 50
+    #    max_frequency: 50
     # distance:
     #   left:
     #     name: left
@@ -19,7 +19,15 @@
         type: pcb
         version: 0.8
         board: pico
-
+    # motor:
+    #   right:
+    #     name: right
+    #     device: mirte
+    #     type: ddp
+    #     pins:
+    #       p1: 3
+    #       d1: 17
+    #       d2: 27
     encoder:
       left_front:
         name: left_front
@@ -116,13 +124,35 @@
     #     pins:
     #       p1: GP20
     #       p2: GP21
+    oled:
+      oled:
+        device: mirte
+        connector: I2C1
+        # type: SSD1306 # Optional must be 'SSD1306'
+        # default_screen_script can be a path or package URI (pkg://PACKAGE_NAME/FOLEDRS) to a image or an executable script which provides text.
+        # By default it points to "pkg://mirte_telemetrix_cpp/scripts/default_screen.sh"
+        # default_screen_script: "/home/jap/mirte/mirte-oled-images/images/mirte_logo_inv.png"
+    color:
+      color:
+        connector: I2C2
     modules:
+      alt_imu:
+        device: mirte
+        type: ADXL345
+        connector: I2C1
+      imu:
+        device: mirte
+        type: MPU9250
+        connector: I2C1
       motorservocontroller:
         device: mirte
         type: PCA9685
-        id: 0x41 # bridged A0
+        addr: 0x41 # bridged A0
         connector: I2C1
-        frequency: 1500
+        frequency: 100
+        servos:
+          middle:
+            pin: 8
         motors:
           left_rear:
             pin_A: 6 #0
@@ -139,9 +169,9 @@
       servo_controller:
         device: mirte
         type: Hiwonder_Servo
-        uart: 0
-        rx_pin: 0
-        tx_pin: 1
+        pins:
+          rx: 0
+          tx: 1
         servos:
           servoRot:
             id: 2
@@ -177,7 +207,7 @@
         device: mirte
         type: INA226
         connector: I2C1
-        id: 64 # default 0x40
+        addr: 64 # default 0x40
         min_voltage: 11.1 # around 10-15% battery
         max_current: 5.0
         max_voltage: 15.0
@@ -189,9 +219,7 @@
         # switch_off_value: True
         # switch_pull: 1 # -1 for pulldown, 1 for pullup, 0 for none
         # switch_time: 5
-        percentage_led_chip: gpiochip4
-        percentage_led_line: 12 # B4, left-most led on usb switcher pcb
-
+        percentage_led_pin: GPIO4_B4 # 12 = B4, left-most led on usb switcher pcb
     distance:
       left_front:
         name: left_front

@@ -48,7 +48,7 @@ servo:
     connector: Servo1
 keypad:
   yellow:
-    name: keypad
+    name: yellow
     device: mirte
     connector: Keypad
 motor:
