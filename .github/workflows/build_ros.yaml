@@ -18,8 +18,9 @@ jobs:
 
       - name: self-checkout
         run: |
-              mkdir srcO # move all packages to srcO(riginal), as the ros-deb-builder-action wants to create a fresh src folder
-              mv ./mirte_* ./srcO
+              mkdir -p ../srcO/mirte-telemetrix-cpp # move all packages to srcO(riginal), as the ros-deb-builder-action wants to create a fresh src folder
+              mv ./ ../srcO/mirte-telemetrix-cpp
+              mv ../srcO ./
       - uses: arendjan/ros-deb-builder-action@main
         with:
           ROS_DISTRO: ${{ matrix.ros_distro }}
