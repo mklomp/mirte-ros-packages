@@ -17,35 +17,43 @@ import threading
 
 rclpy.init(args=sys.argv)
 
+
 class MyNode(Node):
 
     def __init__(self):
-       super().__init__('mirte_telemetrix', automatically_declare_parameters_from_overrides=True)
+        super().__init__(
+            "mirte_telemetrix", automatically_declare_parameters_from_overrides=True
+        )
 
     def on_shutdown(self):
-       print("doing this")
+        print("doing this")
+
 
 node = MyNode()
 
+
 def helper_fnc(test_str, sep, value):
-   if sep not in test_str:
-     return {test_str: value}
-   key, val = test_str.split(sep, 1)
-   return {key: helper_fnc(val, sep, value)}
+    if sep not in test_str:
+        return {test_str: value}
+    key, val = test_str.split(sep, 1)
+    return {key: helper_fnc(val, sep, value)}
+
 
 from mergedeep import merge
+
+
 def parseNestedParameters(params):
-   nested_params = {}
-   print(params)
-   for param_name, param_value in params.items():
-      test = helper_fnc(param_name, ".", param_value)
-      nested_params = merge(nested_params, test)
-      print(test)
-   return nested_params
+    nested_params = {}
+    print(params)
+    for param_name, param_value in params.items():
+        test = helper_fnc(param_name, ".", param_value)
+        nested_params = merge(nested_params, test)
+        print(test)
+    return nested_params
 
-orig_params = node.get_parameters_by_prefix('')
+
+orig_params = node.get_parameters_by_prefix("")
 params = parseNestedParameters(orig_params)
-
 
 
 # Until we update our own fork of TelemtrixAIO to the renamed pwm calls
@@ -62,6 +70,7 @@ async def analog_write(board, pin, value):
         await board.pwm_write(pin, value)
     else:
         await board.analog_write(pin, value)
+
 
 # Import ROS message types
 from std_msgs.msg import Header, Int32
@@ -100,18 +109,27 @@ if devices["mirte"]["type"].get_parameter_value().string_value == "pcb":
         if "board" in devices["mirte"]:
             board_mapping.set_version(
                 devices["mirte"]["version"].get_parameter_value().string_value,
-                devices["mirte"]["board"].get_parameter_value().string_value
+                devices["mirte"]["board"].get_parameter_value().string_value,
             )
         else:
-            board_mapping.set_version(devices["mirte"]["version"].get_parameter_value().string_value)
+            board_mapping.set_version(
+                devices["mirte"]["version"].get_parameter_value().string_value
+            )
 
 if devices["mirte"]["type"].get_parameter_value().string_value == "breadboard":
     if "board" in devices["mirte"]:
-        if devices["mirte"]["board"].get_parameter_value().string_value == "blackpill_f103c8": 
+        if (
+            devices["mirte"]["board"].get_parameter_value().string_value
+            == "blackpill_f103c8"
+        ):
             board_mapping = mirte_telemetrix.mappings.blackpill_f103c8
-        elif (devices["mirte"]["board"].get_parameter_value().string_value == "nanoatmega328" or
-              devices["mirte"]["board"].get_parameter_value().string_value == "nanoatmega328new" or
-              devices["mirte"]["board"].get_parameter_value().string_value == "uno"):  # uno has the same pinout
+        elif (
+            devices["mirte"]["board"].get_parameter_value().string_value
+            == "nanoatmega328"
+            or devices["mirte"]["board"].get_parameter_value().string_value
+            == "nanoatmega328new"
+            or devices["mirte"]["board"].get_parameter_value().string_value == "uno"
+        ):  # uno has the same pinout
             board_mapping = mirte_telemetrix.mappings.nanoatmega328
         elif devices["mirte"]["board"].get_parameter_value().string_value == "pico":
             board_mapping = mirte_telemetrix.mappings.pico
@@ -132,7 +150,7 @@ def get_pin_numbers(component):
     for item in pins:
         pin_value = pins[item].get_parameter_value().integer_value
         if not pin_value:
-           pin_value = pins[item].get_parameter_value().string_value
+            pin_value = pins[item].get_parameter_value().string_value
         pin_numbers[item] = board_mapping.pin_name_to_pin_number(pin_value)
 
     return pin_numbers
@@ -153,10 +171,14 @@ class SensorMonitor:
         self.loop = asyncio.get_event_loop()
         self.last_publish_time = -1
         self.last_publish_value = {}
-        node.get_logger().info(f'Sensor initialized on topic %s (max_freq: %d, differential: %d)', once=True)
-#            self.publisher.name,
-#            self.max_freq,
-#            self.differential,
+        node.get_logger().info(
+            f"Sensor initialized on topic %s (max_freq: %d, differential: %d)",
+            once=True,
+        )
+
+    #            self.publisher.name,
+    #            self.max_freq,
+    #            self.differential,
 
     def get_header(self):
         header = Header()
@@ -191,16 +213,26 @@ class SensorMonitor:
 
 class KeypadMonitor(SensorMonitor):
     def __init__(self, board, sensor):
-        pub = node.create_publisher(Keypad, "/mirte/keypad/" + sensor["name"].get_parameter_value().string_value, 10)
+        pub = node.create_publisher(
+            Keypad,
+            "/mirte/keypad/" + sensor["name"].get_parameter_value().string_value,
+            10,
+        )
         srv = node.create_service(
-            GetKeypad, "/mirte/get_keypad_" + sensor["name"].get_parameter_value().string_value, self.get_data
+            GetKeypad,
+            "/mirte/get_keypad_" + sensor["name"].get_parameter_value().string_value,
+            self.get_data,
         )
         super().__init__(board, sensor, pub)
         self.last_debounce_time = 0
         self.last_key = ""
         self.last_debounced_key = ""
         self.pressed_publisher = node.create_publisher(
-            Keypad, "/mirte/keypad/" + sensor["name"].get_parameter_value().string_value + "_pressed", 10
+            Keypad,
+            "/mirte/keypad/"
+            + sensor["name"].get_parameter_value().string_value
+            + "_pressed",
+            10,
         )
         self.last_publish_value = Keypad()
 
@@ -261,12 +293,18 @@ class KeypadMonitor(SensorMonitor):
 
 class DistanceSensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
-        latching_qos = QoSProfile(depth=1, durability=QoSDurabilityPolicy.TRANSIENT_LOCAL)
+        latching_qos = QoSProfile(
+            depth=1, durability=QoSDurabilityPolicy.TRANSIENT_LOCAL
+        )
         pub = node.create_publisher(
-            Range, "/mirte/distance/" + sensor["name"].get_parameter_value().string_value, latching_qos
+            Range,
+            "/mirte/distance/" + sensor["name"].get_parameter_value().string_value,
+            latching_qos,
         )
         srv = node.create_service(
-            GetDistance, "/mirte/get_distance_" + sensor["name"].get_parameter_value().string_value, self.get_data
+            GetDistance,
+            "/mirte/get_distance_" + sensor["name"].get_parameter_value().string_value,
+            self.get_data,
         )
         super().__init__(board, sensor, pub)
         self.last_publish_value = Range()
@@ -298,15 +336,21 @@ class DistanceSensorMonitor(SensorMonitor):
 
 class DigitalIntensitySensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
-        latching_qos = QoSProfile(depth=1, durability=QoSDurabilityPolicy.TRANSIENT_LOCAL)
+        latching_qos = QoSProfile(
+            depth=1, durability=QoSDurabilityPolicy.TRANSIENT_LOCAL
+        )
         pub = node.create_publisher(
             IntensityDigital,
-            "/mirte/intensity/" + sensor["name"].get_parameter_value().string_value + "_digital",
-            latching_qos
+            "/mirte/intensity/"
+            + sensor["name"].get_parameter_value().string_value
+            + "_digital",
+            latching_qos,
         )
         srv = node.create_service(
             GetIntensityDigital,
-            "/mirte/get_intensity_" + sensor["name"].get_parameter_value().string_value + "_digital",
+            "/mirte/get_intensity_"
+            + sensor["name"].get_parameter_value().string_value
+            + "_digital",
             self.get_data,
         )
         super().__init__(board, sensor, pub)
@@ -331,10 +375,14 @@ class DigitalIntensitySensorMonitor(SensorMonitor):
 class AnalogIntensitySensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
         pub = node.create_publisher(
-            Intensity, "/mirte/intensity/" + sensor["name"].get_parameter_value().string_value, 10
+            Intensity,
+            "/mirte/intensity/" + sensor["name"].get_parameter_value().string_value,
+            10,
         )
         srv = node.create_service(
-            GetIntensity, "/mirte/get_intensity_" + sensor["name"].get_parameter_value().string_value, self.get_data
+            GetIntensity,
+            "/mirte/get_intensity_" + sensor["name"].get_parameter_value().string_value,
+            self.get_data,
         )
         super().__init__(board, sensor, pub)
         self.last_publish_value = Intensity()
@@ -359,20 +407,30 @@ class AnalogIntensitySensorMonitor(SensorMonitor):
 
 class EncoderSensorMonitor(SensorMonitor):
     def __init__(self, board, sensor):
-        latching_qos = QoSProfile(depth=1, durability=QoSDurabilityPolicy.TRANSIENT_LOCAL)
+        latching_qos = QoSProfile(
+            depth=1, durability=QoSDurabilityPolicy.TRANSIENT_LOCAL
+        )
         pub = node.create_publisher(
-            Encoder, "/mirte/encoder/" + sensor["name"].get_parameter_value().string_value, latching_qos
+            Encoder,
+            "/mirte/encoder/" + sensor["name"].get_parameter_value().string_value,
+            latching_qos,
         )
         srv = node.create_service(
-            GetEncoder, "/mirte/get_encoder_" + sensor["name"].get_parameter_value().string_value, self.get_data
+            GetEncoder,
+            "/mirte/get_encoder_" + sensor["name"].get_parameter_value().string_value,
+            self.get_data,
         )
         self.speed_pub = node.create_publisher(
-            Encoder, "/mirte/encoder_speed/" + sensor["name"].get_parameter_value().string_value, latching_qos
+            Encoder,
+            "/mirte/encoder_speed/" + sensor["name"].get_parameter_value().string_value,
+            latching_qos,
         )
         super().__init__(board, sensor, pub)
         self.ticks_per_wheel = 20
         if "ticks_per_wheel" in sensor:
-            self.ticks_per_wheel = sensor["ticks_per_wheel"].get_parameter_value().integer_value
+            self.ticks_per_wheel = (
+                sensor["ticks_per_wheel"].get_parameter_value().integer_value
+            )
         self.max_freq = -1
         self.last_publish_value = Encoder()
         self.speed_count = 0
@@ -423,7 +481,9 @@ class Servo:
         await self.board.detach_servo(self.pins["pin"])
 
     async def start(self):
-        await self.board.set_pin_mode_servo(self.pins["pin"], self.min_pulse, self.max_pulse)
+        await self.board.set_pin_mode_servo(
+            self.pins["pin"], self.min_pulse, self.max_pulse
+        )
         server = node.create_service(
             SetServoAngle,
             "/mirte/set_" + self.name + "_servo_angle",
@@ -626,7 +686,9 @@ class Oled(_SSD1306):
         # self.buffer[0] = 0x40  # Set first byte of data buffer to Co=0, D/C=1
         if board_mapping.get_mcu() == "pico":
             if "connector" in oled_obj:
-                pins = board_mapping.connector_to_pins(oled_obj["connector"].get_parameter_value().string_value)
+                pins = board_mapping.connector_to_pins(
+                    oled_obj["connector"].get_parameter_value().string_value
+                )
             else:
                 pins = get_pin_numbers(oled_obj)
             pin_numbers = {}
@@ -655,7 +717,9 @@ class Oled(_SSD1306):
     async def start(self):
         server = node.create_service(
             SetOLEDImage,
-            "/mirte/set_" + self.oled_obj["name"].get_parameter_value().string_value + "_image",
+            "/mirte/set_"
+            + self.oled_obj["name"].get_parameter_value().string_value
+            + "_image",
             self.set_oled_image_service,
         )
 
@@ -907,9 +971,13 @@ def handle_set_pin_value(req):
 def actuators(loop, board, device):
     servers = []
 
-    if ("oled" in params):
+    if "oled" in params:
         oleds = params["oled"]
-        oleds = {k: v for k, v in oleds.items() if v["device"].get_parameter_value().string_value == device}
+        oleds = {
+            k: v
+            for k, v in oleds.items()
+            if v["device"].get_parameter_value().string_value == device
+        }
         oled_id = 0
         for oled in oleds:
             oled_obj = Oled(
@@ -919,7 +987,7 @@ def actuators(loop, board, device):
             servers.append(loop.create_task(oled_obj.start()))
 
     # TODO: support multiple leds
-    if ("led" in params):
+    if "led" in params:
         led = params["led"]
         loop.run_until_complete(
             set_pin_mode_analog_output(board, get_pin_numbers(led)["pin"])
@@ -929,9 +997,13 @@ def actuators(loop, board, device):
         )
         servers.append(loop.create_task(server.start()))
 
-    if ("motor" in params):
+    if "motor" in params:
         motors = params["motor"]
-        motors = {k: v for k, v in motors.items() if v["device"].get_parameter_value().string_value == device}
+        motors = {
+            k: v
+            for k, v in motors.items()
+            if v["device"].get_parameter_value().string_value == device
+        }
         for motor in motors:
             motor_obj = {}
             motor_type = motors[motor]["type"].get_parameter_value().string_value
@@ -942,18 +1014,26 @@ def actuators(loop, board, device):
             elif motor_type == "pp":
                 motor_obj = PPMotor(board, motors[motor])
             else:
-                node.get_logger().info(f'Unsupported motor interface (ddp, dp, or pp)', once=True)
+                node.get_logger().info(
+                    f"Unsupported motor interface (ddp, dp, or pp)", once=True
+                )
             servers.append(loop.create_task(motor_obj.start()))
 
-    if ("servo" in params):
+    if "servo" in params:
         servos = params["servo"]
-        servos = {k: v for k, v in servos.items() if v["device"].get_parameter_value().string_value == device}
+        servos = {
+            k: v
+            for k, v in servos.items()
+            if v["device"].get_parameter_value().string_value == device
+        }
         for servo in servos:
             servo = Servo(board, servos[servo])
             servers.append(loop.create_task(servo.start()))
 
     # Set a raw pin value
-    server = node.create_service(SetPinValue, "/mirte/set_pin_value", handle_set_pin_value)
+    server = node.create_service(
+        SetPinValue, "/mirte/set_pin_value", handle_set_pin_value
+    )
 
     return servers
 
@@ -964,7 +1044,7 @@ def actuators(loop, board, device):
 def sensors(loop, board, device):
     tasks = []
     max_freq = 30
-    #if params["device"]["mirte"]["max_frequency"]:
+    # if params["device"]["mirte"]["max_frequency"]:
     #    max_freq = params["device"]["mirte"]["max_frequency"].get_parameter_value().integer_value
 
     # For now, we need to set the analog scan interval to teh max_freq. When we set
@@ -994,10 +1074,12 @@ def sensors(loop, board, device):
             )
 
     # initialze distance sensors
-    if ("distance" in params):
+    if "distance" in params:
         distance_sensors = params["distance"]
         distance_sensors = {
-            k: v for k, v in distance_sensors.items() if v["device"].get_parameter_value().string_value == device
+            k: v
+            for k, v in distance_sensors.items()
+            if v["device"].get_parameter_value().string_value == device
         }
         for sensor in distance_sensors:
             distance_sensors[sensor]["max_frequency"] = max_freq
@@ -1005,10 +1087,12 @@ def sensors(loop, board, device):
             tasks.append(loop.create_task(monitor.start()))
 
     # Initialize intensity sensors
-    if ("intensity" in params):
+    if "intensity" in params:
         intensity_sensors = params["intensity"]
         intensity_sensors = {
-            k: v for k, v in intensity_sensors.items() if v["device"].get_parameter_value().string_value == device
+            k: v
+            for k, v in intensity_sensors.items()
+            if v["device"].get_parameter_value().string_value == device
         }
         for sensor in intensity_sensors:
             intensity_sensors[sensor]["max_frequency"] = max_freq
@@ -1022,10 +1106,12 @@ def sensors(loop, board, device):
                 tasks.append(loop.create_task(monitor.start()))
 
     # Initialize keypad sensors
-    if ("keypad" in params):
+    if "keypad" in params:
         keypad_sensors = params["keypad"]
         keypad_sensors = {
-            k: v for k, v in keypad_sensors.items() if v["device"].get_parameter_value().string_value == device
+            k: v
+            for k, v in keypad_sensors.items()
+            if v["device"].get_parameter_value().string_value == device
         }
         for sensor in keypad_sensors:
             keypad_sensors[sensor]["max_frequency"] = max_freq
@@ -1033,10 +1119,12 @@ def sensors(loop, board, device):
             tasks.append(loop.create_task(monitor.start()))
 
     # Initialize encoder sensors
-    if ("encoder" in params):
+    if "encoder" in params:
         encoder_sensors = params("encoder")
         encoder_sensors = {
-            k: v for k, v in encoder_sensors.items() if v["device"].get_parameter_value().string_value == device == device
+            k: v
+            for k, v in encoder_sensors.items()
+            if v["device"].get_parameter_value().string_value == device == device
         }
         for sensor in encoder_sensors:
             monitor = EncoderSensorMonitor(board, encoder_sensors[sensor])
@@ -1076,7 +1164,6 @@ def shutdown(loop, board):
 def main(arg=None):
     loop = asyncio.new_event_loop()
 
-
     # Initialize the telemetrix board
     if board_mapping.get_mcu() == "pico":
         board = tmx_pico_aio.TmxPicoAio(
@@ -1091,23 +1178,23 @@ def main(arg=None):
     # Catch signals to exit properly
     # We need to do it this way instead of usgin the try/catch
     # as in the telemetrix examples
-#    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
-#    for s in signals:
-#        l = lambda loop=loop, board=board: asyncio.ensure_future(shutdown(loop, board))
-#        loop.add_signal_handler(s, l)
+    #    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+    #    for s in signals:
+    #        l = lambda loop=loop, board=board: asyncio.ensure_future(shutdown(loop, board))
+    #        loop.add_signal_handler(s, l)
 
-#    loop.add_signal_handler(signal.SIGINT, asyncio.ensure_future(shutdown(loop, board)))
+    #    loop.add_signal_handler(signal.SIGINT, asyncio.ensure_future(shutdown(loop, board)))
 
     # Initialize the ROS node as anonymous since there
     # should only be one instnace running.
-    #rospy.init_node("mirte_telemetrix", anonymous=False)
+    # rospy.init_node("mirte_telemetrix", anonymous=False)
 
     # Escalate siging to this process in order to shutdown nicely
     # This is needed when only this process is killed (eg. rosnode kill)
     # This cannot be done by calling shutdown() because that is
     # a different thread without asyncio loop.
-    #l = lambda pid=os.getpid(), sig=signal.SIGINT: os.kill(pid, sig)
-    #rospy.on_shutdown(l)
+    # l = lambda pid=os.getpid(), sig=signal.SIGINT: os.kill(pid, sig)
+    # rospy.on_shutdown(l)
 
     # Start all tasks for sensors and actuators
     device = "mirte"
@@ -1116,7 +1203,6 @@ def main(arg=None):
     all_tasks = sensor_tasks + actuator_tasks
     for task in all_tasks:
         loop.run_until_complete(task)
-
 
     # In ROS2 we need a seperate thread to run the spin
     # to be able to also have async working properly.
@@ -1132,13 +1218,14 @@ def main(arg=None):
 
 
 def spin(node: Node):
-    def _spin(node: Node,
-              future: asyncio.Future,
-              event_loop: asyncio.AbstractEventLoop):
+    def _spin(
+        node: Node, future: asyncio.Future, event_loop: asyncio.AbstractEventLoop
+    ):
         while not future.cancelled():
             rclpy.spin_once(node)
         if not future.cancelled():
             event_loop.call_soon_threadsafe(future.set_result, None)
+
     event_loop = asyncio.get_event_loop()
     spin_task = event_loop.create_future()
     spin_thread = threading.Thread(target=_spin, args=(node, spin_task, event_loop))
@@ -1146,7 +1233,8 @@ def spin(node: Node):
 
 
 def start():
-   main()
+    main()
+
 
 if __name__ == "__main__":
-   main()
+    main()

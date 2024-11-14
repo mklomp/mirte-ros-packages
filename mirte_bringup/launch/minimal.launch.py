@@ -31,7 +31,9 @@ def generate_launch_description():
 
     machine_namespace = LaunchConfiguration("machine_namespace")
     hardware_namespace = LaunchConfiguration("hardware_namespace")
-    frame_prefix = LaunchConfiguration("_frame_prefix", default=[machine_namespace, "/"])
+    frame_prefix = LaunchConfiguration(
+        "_frame_prefix", default=[machine_namespace, "/"]
+    )
 
     # Make configurable
     telemetrix = IncludeLaunchDescription(

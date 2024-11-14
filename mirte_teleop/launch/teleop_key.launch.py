@@ -9,18 +9,28 @@
 
 import sys, subprocess
 import platform
-hostname=platform.node().replace("-", "_").lower()
+
+hostname = platform.node().replace("-", "_").lower()
 
 # FIXME: This differs between the Pioneer and the Master...
 # OPT-TODO: Set it to publish stamped directly
 # Currently parameters (turn/speed) are not implemented in ROS2
-sys.exit(subprocess.call(["/opt/ros/humble/lib/teleop_twist_keyboard/teleop_twist_keyboard", "--ros-args", "-r", f"cmd_vel:=/{hostname}/mirte_base_controller/cmd_vel_unstamped"]))
+sys.exit(
+    subprocess.call(
+        [
+            "/opt/ros/humble/lib/teleop_twist_keyboard/teleop_twist_keyboard",
+            "--ros-args",
+            "-r",
+            f"cmd_vel:=/{hostname}/mirte_base_controller/cmd_vel_unstamped",
+        ]
+    )
+)
 
-#from launch import LaunchDescription
-#from launch_ros.actions import Node
+# from launch import LaunchDescription
+# from launch_ros.actions import Node
 #
 #
-#def generate_launch_description():
+# def generate_launch_description():
 #    ld = LaunchDescription()
 #
 #    # Need to add prefix: https://github.com/ros2/teleop_twist_keyboard/issues/21

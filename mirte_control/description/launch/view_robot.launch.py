@@ -14,7 +14,12 @@
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import (
+    Command,
+    FindExecutable,
+    LaunchConfiguration,
+    PathJoinSubstitution,
+)
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
@@ -92,7 +97,7 @@ def generate_launch_description():
 
     nodes = [
         joint_state_publisher_node,
-#        robot_state_publisher_node,
+        #        robot_state_publisher_node,
         rviz_node,
     ]
 
