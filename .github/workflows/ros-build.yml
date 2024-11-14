@@ -11,7 +11,11 @@ jobs:
         matrix:
                 ros_distro: [humble]
                 deb_distro: [jammy]
-                arch: [amd64, arm64, armhf]
+                arch: [
+                    amd64, 
+                    arm64, 
+                    # armhf
+                    ]
 
     steps:
       - uses: actions/checkout@v4
