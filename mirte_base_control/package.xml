@@ -54,7 +54,7 @@
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_lifecycle</depend>
-
+  <depend>std_srvs</depend>
   <depend>std_msgs</depend>
   <depend>mirte_msgs</depend>
   <depend>controller_manager</depend>
