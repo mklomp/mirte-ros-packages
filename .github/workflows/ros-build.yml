@@ -30,7 +30,7 @@ jobs:
           REPOS_FILE: ./sources.repos
           SKIP_CHECKOUT: true
           PACKAGES_BRANCH: ros_mirte_${{ matrix.ros_distro }}_${{ matrix.deb_distro }}_${{ matrix.arch }}
-          SBUILD_CONF: "$enable_network = 1;"
+        #   SBUILD_CONF: "$enable_network = 1;"
         #   Skip pushing to repo when not on main branch
           SKIP_PUSH: ${{ github.ref != 'refs/heads/main' }}
           CONTINUE_ON_ERROR: ${{ github.ref != 'refs/heads/main' }} # allows for failing builds
