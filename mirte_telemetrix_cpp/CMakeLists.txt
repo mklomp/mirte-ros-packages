@@ -57,9 +57,8 @@ include_directories(
 # include(CheckIPOSupported) check_ipo_supported(RESULT supported OUTPUT error)
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum -Wall -Werror
-# -Wno-sign-compare") # -Wall -Wextra
-# -Wpedantic -Werror")
-# set(NO_CLANG_TIDY FALSE CACHE BOOL "Disable clang-tidy") if(NOT NO_CLANG_TIDY)
+# -Wno-sign-compare") # -Wall -Wextra -Wpedantic -Werror") set(NO_CLANG_TIDY
+# FALSE CACHE BOOL "Disable clang-tidy") if(NOT NO_CLANG_TIDY)
 # set(CMAKE_CXX_CLANG_TIDY clang-tidy-14; -format-style='file';
 # -header-filter=${CMAKE_CURRENT_SOURCE_DIR}; )
 # set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -121,8 +120,7 @@ add_executable(
   src/modules/pca/pca_motor.cpp
   src/modules/pca/pca_servo.cpp
   src/modules/ssd1306_module.cpp
-  src/modules/veml6040_module.cpp
-)
+  src/modules/veml6040_module.cpp)
 ament_target_dependencies(
   ${PROJECT_NAME}_node
   std_msgs
