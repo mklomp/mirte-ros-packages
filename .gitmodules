@@ -1,0 +1,4 @@
+[submodule "libs/tmx-cpp"]
+	path = libs/tmx-cpp
+	url = https://github.com/arendjan/tmx-cpp.git
+	branch = build-improvements
