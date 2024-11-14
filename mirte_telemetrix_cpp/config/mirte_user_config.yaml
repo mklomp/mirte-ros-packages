@@ -1,268 +1,116 @@
 /**:
   ros__parameters:
-    #    max_frequency: 50
-    # distance:
-    #   left:
-    #     name: left
-    #     device: mirte
-    #     pins:
-    #       trigger: GP9
-    #       echo: GP8
-    #   right:
-    #     name: right
-    #     device: mirte
-    #     pins:
-    #       trigger: GP7
-    #       echo: GP6
+   
     device:
       mirte:
         type: pcb
         version: 0.8
         board: pico
-    # motor:
-    #   right:
-    #     name: right
-    #     device: mirte
-    #     type: ddp
-    #     pins:
-    #       p1: 3
-    #       d1: 17
-    #       d2: 27
-    encoder:
-      left_front:
-        name: left_front
+        max_frequency: 50
+    distance:
+      left:
+        name: left
         device: mirte
         pins:
-          A: 15 #21
-          B: 14 #20
-      left_rear:
-        name: left_rear
+          trigger: GP9
+          echo: GP8
+      right:
+        name: right
         device: mirte
         pins:
-          A: 17
-          B: 16
-      right_front:
-        name: right_front
+          trigger: GP7
+          echo: GP6
+   
+    intensity:
+      left:
+        name: left
         device: mirte
         pins:
-          A: 19
-          B: 18
-      right_rear:
-        name: right_rear
+          analog: GP27
+          digital: GP17
+      right:
+        name: right
         device: mirte
         pins:
-          A: 20
-          B: 21
-
-    # intensity:
-    #   left:
-    #     name: left
-    #     device: mirte
-    #     pins:
-    #       analog: GP27
-    #       digital: GP17
-    #   right:
-    #     name: right
-    #     device: mirte
-    #     pins:
-    #       analog: GP26
-    #       digital: GP16
-    # oled:
-    #   left:
-    #     name: left
-    #     device: mirte
-    #     pins:
-    #       sda: GP10
-    #       scl: GP11
-    #   right:
-    #     name: right
-    #     device: mirte
-    #     pins:
-    #       sda: GP4
-    #       scl: GP5
-    # servo:
-    #   left:
-    #     name: left
-    #     device: mirte
-    #     pins:
-    #       pin: GP14
-    #   right:
-    #     name: right
-    #     device: mirte
-    #     pins:
-    #       pin: GP15
-    #   # These servo's have the same pins as the ObjectDetectors. So as
-    #   # soon as they are implemented, these should be commented out
-    #   gripper:
-    #     name: gripper
-    #     device: mirte
-    #     pins:
-    #       pin: GP12
-    #   arm:
-    #     name: arm
-    #     device: mirte
-    #     pins:
-    #       pin: GP13
-    # keypad:
-    #   yellow:
-    #     name: yellow
-    #     device: mirte
-    #     pins:
-    #       pin: GP28
-    # motor:
-    #   left:
-    #     name: left
-    #     device: mirte
-    #     type: pp
-    #     pins:
-    #       p1: GP18
-    #       p2: GP19
-    #   right:
-    #     name: right
-    #     device: mirte
-    #     type: pp
-    #     pins:
-    #       p1: GP20
-    #       p2: GP21
+          analog: GP26
+          digital: GP16
+    oled:
+      left:
+        name: left
+        device: mirte
+        pins:
+          sda: GP10
+          scl: GP11
+      right:
+        name: right
+        device: mirte
+        pins:
+          sda: GP4
+          scl: GP5
+    servo:
+      left:
+        name: left
+        device: mirte
+        pins:
+          pin: GP14
+      right:
+        name: right
+        device: mirte
+        pins:
+          pin: GP15
+      # These servo's have the same pins as the ObjectDetectors. So as
+      # soon as they are implemented, these should be commented out
+      gripper:
+        name: gripper
+        device: mirte
+        pins:
+          pin: GP12
+      arm:
+        name: arm
+        device: mirte
+        pins:
+          pin: GP13
+    keypad:
+      yellow:
+        name: yellow
+        device: mirte
+        pins:
+          pin: GP28
+    motor:
+      left:
+        name: left
+        device: mirte
+        type: pp
+        pins:
+          p1: GP18
+          p2: GP19
+      right:
+        name: right
+        device: mirte
+        type: pp
+        pins:
+          p1: GP20
+          p2: GP21
     oled:
       oled:
         device: mirte
         connector: I2C1
+    # encoder:
+    #   left:
+    #     name: left
+    #     device: mirte
+    #     pins:
+    #       A: 15
+    #   right:
+    #     name: right
+    #     device: mirte
+    #     pins:
+    #       A: 17
+
         # type: SSD1306 # Optional must be 'SSD1306'
         # default_screen_script can be a path or package URI (pkg://PACKAGE_NAME/FOLEDRS) to a image or an executable script which provides text.
         # By default it points to "pkg://mirte_telemetrix_cpp/scripts/default_screen.sh"
         # default_screen_script: "/home/jap/mirte/mirte-oled-images/images/mirte_logo_inv.png"
-    color:
-      color:
-        connector: I2C2
-    modules:
-      alt_imu:
-        device: mirte
-        type: ADXL345
-        connector: I2C1
-      imu:
-        device: mirte
-        type: MPU9250
-        connector: I2C1
-      motorservocontroller:
-        device: mirte
-        type: PCA9685
-        addr: 0x41 # bridged A0
-        connector: I2C1
-        frequency: 100
-        servos:
-          middle:
-            pin: 8
-        motors:
-          left_rear:
-            pin_A: 6 #0
-            pin_B: 7 #1
-          left_front:
-            pin_A: 2
-            pin_B: 3
-          right_rear:
-            pin_A: 5
-            pin_B: 4
-          right_front:
-            pin_A: 1
-            pin_B: 0
-      servo_controller:
-        device: mirte
-        type: Hiwonder_Servo
-        pins:
-          rx: 0
-          tx: 1
-        servos:
-          servoRot:
-            id: 2
-            home_out: 12000
-            min_angle_out: 3400
-            max_angle_out: 21000
-            invert: true
-          servoShoulder:
-            id: 3
-            home_out: 11450
-            min_angle_out: 2832
-            max_angle_out: 20000
-            invert: false
-          servoElbow:
-            id: 4
-            home_out: 11750
-            min_angle_out: 120
-            max_angle_out: 21000
-            invert: false
-          servoWrist:
-            id: 5
-            home_out: 12200
-            min_angle_out: 1128
-            max_angle_out: 21000
-            invert: false
-          servoGripper:
-            id: 6
-            home_out: 10524
-            min_angle_out: 6168
-            max_angle_out: 14224
-            invert: true
-      power_watcher:
-        device: mirte
-        type: INA226
-        connector: I2C1
-        addr: 64 # default 0x40
-        min_voltage: 11.1 # around 10-15% battery
-        max_current: 5.0
-        max_voltage: 15.0
-        # turn_off_pin: 27
-        # turn_off_value: True
-        turn_off_time: 10
-        power_low_time: 20
-        # switch_pin: GP28
-        # switch_off_value: True
-        # switch_pull: 1 # -1 for pulldown, 1 for pullup, 0 for none
-        # switch_time: 5
-        percentage_led_pin: GPIO4_B4 # 12 = B4, left-most led on usb switcher pcb
-    distance:
-      left_front:
-        name: left_front
-        device: mirte
-        frame_id: base_sonar_left_front
-        pins:
-          trigger: 6
-          echo: 7
-      left_rear:
-        name: left_rear
-        device: mirte
-        frame_id: base_sonar_left_rear
-        pins:
-          trigger: 8
-          echo: 9
-      right_front:
-        name: right_front
-        device: mirte
-        frame_id: base_sonar_right_front
-        pins:
-          trigger: 10
-          echo: 11
-      right_rear:
-        name: right_rear
-        device: mirte
-        frame_id: base_sonar_right_rear
-        pins:
-          trigger: 12
-          echo: 13
-
-    # These motors have the same pins as the line intensity sensors. So
-    # when uncommenting these, please comment the intensity sensors.
-    #  left2:
-    #    name: left2
-    #    device: mirte
-    #    type: pp
-    #    pins:
-    #      p1: GP26
-    #      p2: GP16
-    #  right2:
-    #    name: right2
-    #    device: mirte
-    #    type: pp
-    #    pins:
-    #      p1: GP27
-    #      p2: GP17
+    # color:
+    #   color:
+    #     connector: I2C2

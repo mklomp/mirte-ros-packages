@@ -1,5 +1,14 @@
 repositories:
-  mirte-telemetrix-cpp:
+  # mirte-telemetrix-cpp:
+  #   type: git
+  #   url: https://github.com/arendjan/mirte-telemetrix-cpp.git
+  #   version: no-gpiod
+  # depth cam
+  # lidar
+  # web-video-server
+  rplidar_ros:
     type: git
-    url: https://github.com/arendjan/mirte-telemetrix-cpp.git
-    version: no-gpiod
+    url:
+  astra_camera:
+    type: git
+    url:
