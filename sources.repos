@@ -1,14 +1,13 @@
 repositories:
-  # mirte-telemetrix-cpp:
-  #   type: git
-  #   url: https://github.com/arendjan/mirte-telemetrix-cpp.git
-  #   version: no-gpiod
-  # depth cam
-  # lidar
-  # web-video-server
   rplidar_ros:
     type: git
-    url:
-  astra_camera:
+    url: https://github.com/Slamtec/rplidar_ros.git
+    version: ros2
+  ros2_astra_camera:
     type: git
-    url:
+    url: https://github.com/ArendJan/ros2_astra_camera/
+    version: fix-ros-jammy # TODO: get this merged + other fixed for camera
+  web_video_server:
+    type: git
+    url: https://github.com/RobotWebTools/web_video_server.git
+    version: ros2
