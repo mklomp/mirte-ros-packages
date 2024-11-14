@@ -5,26 +5,26 @@
 #include <gpiod.hpp>
 
 class GPIOPin {
-  public:
-    GPIOPin(std::string name, std::string gpiod_name);
+public:
+  GPIOPin(std::string name, std::string gpiod_name);
 
-    std::string name;
-    std::string gpiod_name;
+  std::string name;
+  std::string gpiod_name;
 
-    char block = 'A';
-    std::string chip_name = "gpiochip0";
-    int block_line = 0;
-    int line = 0;
+  char block = 'A';
+  std::string chip_name = "gpiochip0";
+  int block_line = 0;
+  int line = 0;
 
-    void setup();
-    void write(bool value);
-    bool read();
-    ~GPIOPin();
+  void setup();
+  void write(bool value);
+  bool read();
+  ~GPIOPin();
 
-  private:
-    bool configured = false;
-    gpiod::chip chip;
-    gpiod::line gpio_line;
+private:
+  bool configured = false;
+  gpiod::chip chip;
+  gpiod::line gpio_line;
 };
 
 #else

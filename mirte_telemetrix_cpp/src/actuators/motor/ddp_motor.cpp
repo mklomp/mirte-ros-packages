@@ -1,8 +1,8 @@
 #include <mirte_telemetrix_cpp/actuators/motor/ddp_motor.hpp>
 
 DDPMotor::DDPMotor(NodeData node_data, MotorData motor_data)
-: Motor(node_data, {motor_data.D1, motor_data.D2, motor_data.P1}, motor_data)
-{
+    : Motor(node_data, {motor_data.D1, motor_data.D2, motor_data.P1},
+            motor_data) {
   this->A_pin = motor_data.D1;
   this->B_pin = motor_data.D2;
   this->pwm_pin = motor_data.P1;
@@ -12,15 +12,16 @@ DDPMotor::DDPMotor(NodeData node_data, MotorData motor_data)
   tmx->setPinMode(this->pwm_pin, tmx_cpp::TMX::PIN_MODES::PWM_OUTPUT);
 }
 
-void DDPMotor::set_speed(int speed)
-{
+void DDPMotor::set_speed(int speed) {
   // TODO: maybe check last_speed
-  // TODO: Than maybe do something with the direction, to replace <DDPMotor::set_speed#1> regions
+  // TODO: Than maybe do something with the direction, to replace
+  // <DDPMotor::set_speed#1> regions
 
   // TODO: Python had a clamp, however none of the C++ Motors clamp
   int32_t speed_ = (int32_t)((float)speed * (this->max_pwm) / 100.0);
 
-  if (inverted) speed_ = -speed_;
+  if (inverted)
+    speed_ = -speed_;
 
   if (speed_ >= 0) {
     /* BEGIN <DDPMotor::set_speed#1> */

@@ -1,9 +1,10 @@
 #include <mirte_telemetrix_cpp/parsers/modules/pca/pca_servo_data.hpp>
 
-std::vector<std::shared_ptr<PCA_Servo_data>> PCA_Servo_data::parse_pca_servo_data(
-  std::shared_ptr<Parser> parser, /*std::shared_ptr<Mirte_Board> board,*/ std::string pca_key,
-  std::set<std::string> & unused_keys)
-{
+std::vector<std::shared_ptr<PCA_Servo_data>>
+PCA_Servo_data::parse_pca_servo_data(
+    std::shared_ptr<Parser> parser,
+    /*std::shared_ptr<Mirte_Board> board,*/ std::string pca_key,
+    std::set<std::string> &unused_keys) {
   std::vector<std::shared_ptr<PCA_Servo_data>> servos;
   auto pca_config = parser->get_params_name(pca_key);
   auto pca_keys = parser->get_params_keys(pca_key);
@@ -17,7 +18,8 @@ std::vector<std::shared_ptr<PCA_Servo_data>> PCA_Servo_data::parse_pca_servo_dat
       auto servo_keys = parser->get_params_keys(servo_param_name);
       PCA_Servo_data servo_data;
       servo_data.name = servo_key;
-      if (servo_keys.erase("pin")) servo_data.pin = servo_config["pin"].get<pin_t>();
+      if (servo_keys.erase("pin"))
+        servo_data.pin = servo_config["pin"].get<pin_t>();
 
       if (servo_keys.erase("min_pulse"))
         servo_data.min_pulse = servo_config["min_pulse"].get<int>();
@@ -30,8 +32,8 @@ std::vector<std::shared_ptr<PCA_Servo_data>> PCA_Servo_data::parse_pca_servo_dat
         servo_data.max_angle = get_float(servo_config["max_angle"]);
 
       if (servo_data.check()) {
-        RCLCPP_DEBUG(
-          parser->logger.get_child(pca_key), "Parsed PCA Servo %s", servo_data.name.c_str());
+        RCLCPP_DEBUG(parser->logger.get_child(pca_key), "Parsed PCA Servo %s",
+                     servo_data.name.c_str());
         servos.push_back(std::make_shared<PCA_Servo_data>(servo_data));
       }
 

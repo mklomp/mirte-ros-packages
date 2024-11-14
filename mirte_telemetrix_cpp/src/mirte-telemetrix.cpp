@@ -1,26 +1,25 @@
-#include <exception>  // for exception
+#include <exception> // for exception
 #include <functional>
-#include <iostream>  // for operator<<, endl, basic_ostream
-#include <memory>    // for make_shared, shared_ptr, __shared...
-#include <stdint.h>  // for uint8_t
+#include <iostream> // for operator<<, endl, basic_ostream
+#include <memory>   // for make_shared, shared_ptr, __shared...
+#include <stdint.h> // for uint8_t
 
-#include <rclcpp/executors.hpp>     // for spin
-#include <rclcpp/node.hpp>          // for Node
-#include <rclcpp/node_options.hpp>  // for NodeOptions
-#include <rclcpp/utilities.hpp>     // for shutdown, init
+#include <rclcpp/executors.hpp>    // for spin
+#include <rclcpp/node.hpp>         // for Node
+#include <rclcpp/node_options.hpp> // for NodeOptions
+#include <rclcpp/utilities.hpp>    // for shutdown, init
 
-#include "tmx_cpp/tmx.hpp"  // for TMX, TMX::GET_PICO_UNIQUE_ID, TMX...
+#include "tmx_cpp/tmx.hpp" // for TMX, TMX::GET_PICO_UNIQUE_ID, TMX...
 
-#include "mirte_telemetrix_cpp/mirte-actuators.hpp"  // for Mirte_Actuators
-#include "mirte_telemetrix_cpp/mirte-board.hpp"      // for Mirte_Board
+#include "mirte_telemetrix_cpp/mirte-actuators.hpp" // for Mirte_Actuators
+#include "mirte_telemetrix_cpp/mirte-board.hpp"     // for Mirte_Board
 #include "mirte_telemetrix_cpp/mirte-modules.hpp"
-#include "mirte_telemetrix_cpp/mirte-sensors.hpp"    // for Mirte_Sensors
-#include "mirte_telemetrix_cpp/parsers/parsers.hpp"  // for Parser
+#include "mirte_telemetrix_cpp/mirte-sensors.hpp"   // for Mirte_Sensors
+#include "mirte_telemetrix_cpp/parsers/parsers.hpp" // for Parser
 #include "mirte_telemetrix_cpp/util.hpp"
 #include <mirte_telemetrix_cpp/mirte-telemetrix.hpp>
 
-int main(int argc, char ** argv)
-{
+int main(int argc, char **argv) {
   // Initialize the ROS node
   rclcpp::init(argc, argv);
 
@@ -36,44 +35,44 @@ int main(int argc, char ** argv)
   return 0;
 }
 
-rclcpp::node_interfaces::NodeBaseInterface::SharedPtr TelemetrixNode::get_node_base_interface()
-  const
-{
+rclcpp::node_interfaces::NodeBaseInterface::SharedPtr
+TelemetrixNode::get_node_base_interface() const {
   return this->node_->get_node_base_interface();
 }
 
-TelemetrixNode::TelemetrixNode(const rclcpp::NodeOptions & options)
-: node_(std::make_shared<rclcpp::Node>(
-    "mirte_telemetrix_node", rclcpp::NodeOptions(options)
-                               .allow_undeclared_parameters(true)
-                               .automatically_declare_parameters_from_overrides(true)))
-{
-  if (!this->start()) rclcpp::shutdown();
+TelemetrixNode::TelemetrixNode(const rclcpp::NodeOptions &options)
+    : node_(std::make_shared<rclcpp::Node>(
+          "mirte_telemetrix_node",
+          rclcpp::NodeOptions(options)
+              .allow_undeclared_parameters(true)
+              .automatically_declare_parameters_from_overrides(true))) {
+  if (!this->start())
+    rclcpp::shutdown();
 }
 
-TelemetrixNode::~TelemetrixNode()
-{
+TelemetrixNode::~TelemetrixNode() {
   if (tmx) {
     tmx->stop();
   }
 }
 
-bool TelemetrixNode::start()
-{
+bool TelemetrixNode::start() {
   using namespace std::placeholders;
 
   auto parser = std::make_shared<Parser>(node_);
 
   this->board = Mirte_Board::create(parser);
 
-  this->characteristics_service = node_->create_service<mirte_msgs::srv::GetBoardCharacteristics>(
-    "get_board_characteristics",
-    std::bind(&Mirte_Board::get_board_characteristics_service_callback, this->board, _1, _2));
+  this->characteristics_service =
+      node_->create_service<mirte_msgs::srv::GetBoardCharacteristics>(
+          "get_board_characteristics",
+          std::bind(&Mirte_Board::get_board_characteristics_service_callback,
+                    this->board, _1, _2));
 
   auto ports = tmx_cpp::TMX::get_available_ports();
   decltype(ports) available_ports;
 
-  for (auto & port : ports) {
+  for (auto &port : ports) {
     // maybe move this to a function in tmx
     std::cout << "try " << port.port_name << std::endl;
     if (!tmx_cpp::TMX::is_accepted_port(port)) {
@@ -93,16 +92,17 @@ bool TelemetrixNode::start()
     return false;
   }
   if (available_ports.size() > 1) {
-    std::cout << "More than one port available, picking the first one" << std::endl;
+    std::cout << "More than one port available, picking the first one"
+              << std::endl;
   }
 
   if (false) {
-    auto mcu_id = 12;  // TODO: add to parsing and config
+    auto mcu_id = 12; // TODO: add to parsing and config
     bool found = false;
-    for (auto & port : available_ports) {
+    for (auto &port : available_ports) {
       auto id = tmx_cpp::TMX::get_id(port);
       std::cout << "ID: " << std::hex << (int)id << std::endl;
-      if (id == 0xff) {  // default flash value is 0xff, so no id set
+      if (id == 0xff) { // default flash value is 0xff, so no id set
         auto check = tmx_cpp::TMX::set_id(port, mcu_id);
         if (!check) {
           std::cout << "Failed to set MCU ID" << std::endl;
@@ -125,7 +125,8 @@ bool TelemetrixNode::start()
     }
   }
 
-  tmx = std::make_shared<tmx_cpp::TMX>([&]() { rclcpp::shutdown(); }, available_ports[0].port_name);
+  tmx = std::make_shared<tmx_cpp::TMX>([&]() { rclcpp::shutdown(); },
+                                       available_ports[0].port_name);
   tmx->sendMessage(tmx_cpp::TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
   tmx->setScanDelay(1000 / parser->get_frequency());
 

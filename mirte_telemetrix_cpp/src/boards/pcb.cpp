@@ -3,9 +3,9 @@
 
 auto const DEFAULT_VERSION = 0.8;
 
-Mirte_Board_pcb::Mirte_Board_pcb(std::shared_ptr<Mirte_Board> mcu, std::string version)
-: mcu(mcu), version(version)
-{
+Mirte_Board_pcb::Mirte_Board_pcb(std::shared_ptr<Mirte_Board> mcu,
+                                 std::string version)
+    : mcu(mcu), version(version) {
   std::cout << "Mirte_Board_pcb::Mirte_Board_pcb" << version << std::endl;
   auto v = try_parse_double(version).value_or(DEFAULT_VERSION);
   if (v == 0.8) {
@@ -18,8 +18,8 @@ Mirte_Board_pcb::Mirte_Board_pcb(std::shared_ptr<Mirte_Board> mcu, std::string v
   }
 }
 
-std::map<std::string, int> Mirte_Board_pcb::resolveConnector(std::string connector)
-{
+std::map<std::string, int>
+Mirte_Board_pcb::resolveConnector(std::string connector) {
   const auto pins = this->connectors.at(connector);
   std::map<std::string, int> resolved_pins;
   for (auto pin : pins) {
@@ -28,8 +28,14 @@ std::map<std::string, int> Mirte_Board_pcb::resolveConnector(std::string connect
   return resolved_pins;
 }
 
-int Mirte_Board_pcb::resolvePin(std::string pin) { return mcu->resolvePin(pin); }
+int Mirte_Board_pcb::resolvePin(std::string pin) {
+  return mcu->resolvePin(pin);
+}
 
-uint8_t Mirte_Board_pcb::resolveI2CPort(uint8_t sda) { return mcu->resolveI2CPort(sda); }
+uint8_t Mirte_Board_pcb::resolveI2CPort(uint8_t sda) {
+  return mcu->resolveI2CPort(sda);
+}
 
-uint8_t Mirte_Board_pcb::resolveUARTPort(uint8_t pin) { return mcu->resolveUARTPort(pin); }
+uint8_t Mirte_Board_pcb::resolveUARTPort(uint8_t pin) {
+  return mcu->resolveUARTPort(pin);
+}

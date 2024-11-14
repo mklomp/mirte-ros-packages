@@ -9,9 +9,9 @@
 #include <mirte_msgs/msg/keypad.hpp>
 #include <mirte_msgs/srv/get_keypad.hpp>
 
-std::vector<std::shared_ptr<KeypadMonitor>> KeypadMonitor::get_keypad_monitors(
-  NodeData node_data, std::shared_ptr<Parser> parser)
-{
+std::vector<std::shared_ptr<KeypadMonitor>>
+KeypadMonitor::get_keypad_monitors(NodeData node_data,
+                                   std::shared_ptr<Parser> parser) {
   std::vector<std::shared_ptr<KeypadMonitor>> sensors;
   auto keypads = parse_all<KeypadData>(parser, node_data.board);
 
@@ -23,28 +23,28 @@ std::vector<std::shared_ptr<KeypadMonitor>> KeypadMonitor::get_keypad_monitors(
 }
 
 KeypadMonitor::KeypadMonitor(NodeData node_data, KeypadData keypad_data)
-: Mirte_Sensor(node_data, {keypad_data.pin}, (SensorData)keypad_data), keypad_data(keypad_data)
-{
+    : Mirte_Sensor(node_data, {keypad_data.pin}, (SensorData)keypad_data),
+      keypad_data(keypad_data) {
   using namespace std::placeholders;
 
   // Use default QOS for sensor publishers as specified in REP2003
   keypad_pub = nh->create_publisher<mirte_msgs::msg::Keypad>(
-    "keypad/" + keypad_data.name, rclcpp::SystemDefaultsQoS());
+      "keypad/" + keypad_data.name, rclcpp::SystemDefaultsQoS());
   keypad_pressed_pub = nh->create_publisher<mirte_msgs::msg::Keypad>(
-    "keypad/" + keypad_data.name + "/pressed", rclcpp::SystemDefaultsQoS());
+      "keypad/" + keypad_data.name + "/pressed", rclcpp::SystemDefaultsQoS());
 
   keypad_service = nh->create_service<mirte_msgs::srv::GetKeypad>(
-    "keypad/" + keypad_data.name + "/get_key",
-    std::bind(&KeypadMonitor::keypad_service_callback, this, _1, _2),
-    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
+      "keypad/" + keypad_data.name + "/get_key",
+      std::bind(&KeypadMonitor::keypad_service_callback, this, _1, _2),
+      rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
-  tmx->setPinMode(keypad_data.pin, tmx_cpp::TMX::PIN_MODES::ANALOG_INPUT, true, 0);
+  tmx->setPinMode(keypad_data.pin, tmx_cpp::TMX::PIN_MODES::ANALOG_INPUT, true,
+                  0);
   tmx->add_analog_callback(
-    keypad_data.pin, [this](auto pin, auto value) { this->callback(value); });
+      keypad_data.pin, [this](auto pin, auto value) { this->callback(value); });
 }
 
-void KeypadMonitor::callback(uint16_t value)
-{
+void KeypadMonitor::callback(uint16_t value) {
   // Prevent the callback from being executed.
   this->device_timer->call();
 
@@ -76,34 +76,32 @@ void KeypadMonitor::callback(uint16_t value)
 }
 
 void KeypadMonitor::keypad_service_callback(
-  const mirte_msgs::srv::GetKeypad::Request::ConstSharedPtr req,
-  mirte_msgs::srv::GetKeypad::Response::SharedPtr res)
-{
+    const mirte_msgs::srv::GetKeypad::Request::ConstSharedPtr req,
+    mirte_msgs::srv::GetKeypad::Response::SharedPtr res) {
   res->data = key_string(this->last_debounced_key);
 }
 
-std::string KeypadMonitor::key_string(Key key)
-{
+std::string KeypadMonitor::key_string(Key key) {
   switch (key) {
-    case Key::LEFT:
-      return "left";
-    case Key::UP:
-      return "up";
-    case Key::DOWN:
-      return "down";
-    case Key::RIGHT:
-      return "right";
-    case Key::ENTER:
-      return "enter";
-    case Key::NONE:
-    default:
-      return "";
+  case Key::LEFT:
+    return "left";
+  case Key::UP:
+    return "up";
+  case Key::DOWN:
+    return "down";
+  case Key::RIGHT:
+    return "right";
+  case Key::ENTER:
+    return "enter";
+  case Key::NONE:
+  default:
+    return "";
   }
 }
 
-void KeypadMonitor::update()
-{
-  auto msg_builder = mirte_msgs::build<mirte_msgs::msg::Keypad>().header(get_header());
+void KeypadMonitor::update() {
+  auto msg_builder =
+      mirte_msgs::build<mirte_msgs::msg::Keypad>().header(get_header());
 
   Key debounced_key = NONE;
   if (nh->now().seconds() - this->last_debounce_time > 0.1) {
@@ -114,11 +112,11 @@ void KeypadMonitor::update()
   this->keypad_pub->publish(msg_builder.key(key_string(debounced_key)));
 
   // # check if we need to send a pressed message
-  if (
-    this->last_debounced_key != NONE &&
-    this->last_debounced_key != debounced_key)  // TODO: check this
+  if (this->last_debounced_key != NONE &&
+      this->last_debounced_key != debounced_key) // TODO: check this
   {
-    this->keypad_pressed_pub->publish(msg_builder.key(key_string(this->last_debounced_key)));
+    this->keypad_pressed_pub->publish(
+        msg_builder.key(key_string(this->last_debounced_key)));
   }
 
   this->last_debounced_key = debounced_key;

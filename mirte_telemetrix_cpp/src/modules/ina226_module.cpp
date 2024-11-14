@@ -9,47 +9,49 @@ using namespace std::chrono_literals;
 
 #include <mirte_telemetrix_cpp/modules/ina226_module.hpp>
 
-using namespace std::placeholders;  // for _1, _2, _3...
+using namespace std::placeholders; // for _1, _2, _3...
 
-INA226_sensor::INA226_sensor(
-  NodeData node_data, INA226Data ina_data, std::shared_ptr<tmx_cpp::Sensors> modules)
-: Mirte_module(node_data, {ina_data.scl, ina_data.sda}, (ModuleData)ina_data), data(ina_data)
-{
+INA226_sensor::INA226_sensor(NodeData node_data, INA226Data ina_data,
+                             std::shared_ptr<tmx_cpp::Sensors> modules)
+    : Mirte_module(node_data, {ina_data.scl, ina_data.sda},
+                   (ModuleData)ina_data),
+      data(ina_data) {
   tmx->setI2CPins(ina_data.sda, ina_data.scl, ina_data.port);
 
   this->used_time = nh->now();
   this->total_used_mAh = 0;
 
   this->ina226 = std::make_shared<tmx_cpp::INA226_module>(
-    ina_data.port, ina_data.addr, std::bind(&INA226_sensor::data_callback, this, _1, _2));
+      ina_data.port, ina_data.addr,
+      std::bind(&INA226_sensor::data_callback, this, _1, _2));
 
   // Use default QOS for sensor publishers as specified in REP2003
   this->battery_pub = nh->create_publisher<sensor_msgs::msg::BatteryState>(
-    "power/" + this->name, rclcpp::SystemDefaultsQoS());
+      "power/" + this->name, rclcpp::SystemDefaultsQoS());
 
   this->used_pub = nh->create_publisher<std_msgs::msg::Int32>(
-    "power/" + this->name + "/used", rclcpp::SystemDefaultsQoS());
+      "power/" + this->name + "/used", rclcpp::SystemDefaultsQoS());
 
   this->shutdown_service = nh->create_service<std_srvs::srv::SetBool>(
-    "power/" + this->name + "/shutdown",
-    std::bind(&INA226_sensor::shutdown_robot_service_callback, this, _1, _2),
-    rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
+      "power/" + this->name + "/shutdown",
+      std::bind(&INA226_sensor::shutdown_robot_service_callback, this, _1, _2),
+      rclcpp::ServicesQoS().get_rmw_qos_profile(), this->callback_group);
 
   modules->add_sens(this->ina226);
   // TODO: add shutdown service
   // TODO: add auto shutdown
 
-#ifdef WITH_GPIO  // LED Battery indicator
+#ifdef WITH_GPIO // LED Battery indicator
   if (this->data.use_percentage_led) {
     battery_led_timer = nh->create_wall_timer(
-      0.5s, std::bind(&INA226_sensor::battery_led_timer_callback, this), this->callback_group);
+        0.5s, std::bind(&INA226_sensor::battery_led_timer_callback, this),
+        this->callback_group);
   }
 #endif
 }
 
 // TODO: Maybe add mutex lock-out although not fully necessary
-void INA226_sensor::update()
-{
+void INA226_sensor::update() {
   auto msg = sensor_msgs::msg::BatteryState();
   msg.header = get_header();
 
@@ -62,8 +64,7 @@ void INA226_sensor::update()
   this->check_soc(voltage_, current_);
 }
 
-void INA226_sensor::data_callback(float voltage, float current)
-{
+void INA226_sensor::data_callback(float voltage, float current) {
   voltage_ = voltage;
   current_ = current;
   // std::cout << "INA226 data: " << current << " " << voltage << std::endl;
@@ -71,33 +72,34 @@ void INA226_sensor::data_callback(float voltage, float current)
   this->device_timer->reset();
 }
 
-float INA226_sensor::calc_soc(float voltage)
-{
+float INA226_sensor::calc_soc(float voltage) {
   const auto CELL_COUNT = 3;
   voltage = voltage / CELL_COUNT;
   std::vector<std::pair<float, float>> soc_levels{
-    // single cell voltages vs percentage
-    {0, 0},       {3.27, 0.00}, {3.61, 0.05}, {3.69, 0.10}, {3.71, 0.15}, {3.73, 0.20},
-    {3.75, 0.25}, {3.77, 0.30}, {3.79, 0.35}, {3.80, 0.40}, {3.82, 0.45}, {3.84, 0.50},
-    {3.85, 0.55}, {3.87, 0.60}, {3.91, 0.65}, {3.95, 0.70}, {3.98, 0.75}, {4.02, 0.80},
-    {4.08, 0.85}, {4.11, 0.90}, {4.15, 0.95}, {4.20, 1.00}, {10, 1.00}};
+      // single cell voltages vs percentage
+      {0, 0},       {3.27, 0.00}, {3.61, 0.05}, {3.69, 0.10}, {3.71, 0.15},
+      {3.73, 0.20}, {3.75, 0.25}, {3.77, 0.30}, {3.79, 0.35}, {3.80, 0.40},
+      {3.82, 0.45}, {3.84, 0.50}, {3.85, 0.55}, {3.87, 0.60}, {3.91, 0.65},
+      {3.95, 0.70}, {3.98, 0.75}, {4.02, 0.80}, {4.08, 0.85}, {4.11, 0.90},
+      {4.15, 0.95}, {4.20, 1.00}, {10, 1.00}};
   for (size_t i = 1; i < soc_levels.size(); i++) {
-    if (voltage < soc_levels[i].first) {  // find the first voltage level that is
-                                          // higher than the current voltage
-      return soc_levels[i - 1].second;    // return the soc level of the previous voltage level
+    if (voltage < soc_levels[i].first) { // find the first voltage level that is
+                                         // higher than the current voltage
+      return soc_levels[i - 1]
+          .second; // return the soc level of the previous voltage level
     }
   }
   return 1.00;
 }
 
 // TODO: Maybe remove,
-void INA226_sensor::integrate_usage(float current)
-{
+void INA226_sensor::integrate_usage(float current) {
   auto current_time = this->nh->now();
   auto duration = current_time - this->used_time;
 
-  auto used_mA_sec = duration.seconds() * current * 1000.0;  // milliAmpere seconds
-  auto used_mAh = used_mA_sec / 3600;                        // convert to mAh
+  auto used_mA_sec =
+      duration.seconds() * current * 1000.0; // milliAmpere seconds
+  auto used_mAh = used_mA_sec / 3600;        // convert to mAh
 
   this->total_used_mAh += used_mAh;
   this->used_time = current_time;
@@ -106,8 +108,7 @@ void INA226_sensor::integrate_usage(float current)
   this->used_pub->publish(msg);
 }
 
-void INA226_sensor::check_soc(float voltage, float current)
-{
+void INA226_sensor::check_soc(float voltage, float current) {
   if (!this->enable_turn_off) {
     if (voltage > 6 && current > 0.1) {
       this->enable_turn_off = true;
@@ -124,7 +125,8 @@ void INA226_sensor::check_soc(float voltage, float current)
     if (!this->in_power_dip) {
       this->turn_off_trigger_time = this->nh->now();
       this->in_power_dip = true;
-      std::cout << "Triggering turn off in " << this->data.power_low_time << "s" << std::endl;
+      std::cout << "Triggering turn off in " << this->data.power_low_time << "s"
+                << std::endl;
     }
   } else {
     this->in_power_dip = false;
@@ -135,8 +137,8 @@ void INA226_sensor::check_soc(float voltage, float current)
     auto current_time = this->nh->now();
     auto duration = current_time - this->turn_off_trigger_time;
     std::cout << "Triggering turn off maybe" << duration.seconds() << std::endl;
-    std::cout << "you have " << (this->data.power_low_time - duration.seconds()) << "s left"
-              << std::endl;
+    std::cout << "you have " << (this->data.power_low_time - duration.seconds())
+              << "s left" << std::endl;
     if (duration.seconds() > this->data.power_low_time) {
       std::cout << "Turning off" << std::endl;
       // this->tmx->shutdown();
@@ -145,23 +147,21 @@ void INA226_sensor::check_soc(float voltage, float current)
   }
 }
 
-void INA226_sensor::shutdown_robot()
-{
+void INA226_sensor::shutdown_robot() {
   if (this->shutdown_triggered) {
     return;
   }
   this->shutdown_triggered = true;
   std::cout << "Shutting down robot" << std::endl;
   // run shutdown command
-  exec("sudo bash -c \"wall 'Shutting down.'\"");  // TODO: check if this works
-                                                   // with sudo on a mirte
+  exec("sudo bash -c \"wall 'Shutting down.'\""); // TODO: check if this works
+                                                  // with sudo on a mirte
   exec("sudo shutdown now");
 }
 
 void INA226_sensor::shutdown_robot_service_callback(
-  const std_srvs::srv::SetBool::Request::ConstSharedPtr req,
-  std_srvs::srv::SetBool::Response::SharedPtr res)
-{
+    const std_srvs::srv::SetBool::Request::ConstSharedPtr req,
+    std_srvs::srv::SetBool::Response::SharedPtr res) {
   if (req->data) {
     this->shutdown_robot();
   }
@@ -169,9 +169,10 @@ void INA226_sensor::shutdown_robot_service_callback(
   res->message = "Shutting down";
 }
 
-std::vector<std::shared_ptr<INA226_sensor>> INA226_sensor::get_ina_modules(
-  NodeData node_data, std::shared_ptr<Parser> parser, std::shared_ptr<tmx_cpp::Sensors> modules)
-{
+std::vector<std::shared_ptr<INA226_sensor>>
+INA226_sensor::get_ina_modules(NodeData node_data,
+                               std::shared_ptr<Parser> parser,
+                               std::shared_ptr<tmx_cpp::Sensors> modules) {
   std::vector<std::shared_ptr<INA226_sensor>> new_modules;
   auto datas = parse_all_modules<INA226Data>(parser, node_data.board);
   for (auto data : datas) {
@@ -182,8 +183,7 @@ std::vector<std::shared_ptr<INA226_sensor>> INA226_sensor::get_ina_modules(
 }
 
 #ifdef WITH_GPIO
-void INA226_sensor::battery_led_timer_callback()
-{
+void INA226_sensor::battery_led_timer_callback() {
   // show the SOC by blinking the led. Shorter pulse -> lower SOC
   // cycle time of 5s
   auto now = std::chrono::system_clock::now().time_since_epoch() / 1ms;
@@ -191,10 +191,10 @@ void INA226_sensor::battery_led_timer_callback()
 
   auto percentage = calc_soc(voltage_) * 5000;
   if (time_msec > percentage) {
-    //turn off the led
+    // turn off the led
     data.percentage_led_pin->write(0);
   } else {
-    //turn on the led
+    // turn on the led
     data.percentage_led_pin->write(1);
   }
 }

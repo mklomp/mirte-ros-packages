@@ -4,8 +4,10 @@
 
 double deg_to_rad(double deg) { return deg * M_PI / 180; }
 
-// std::vector<std::shared_ptr<Hiwonder_servo_data>> Hiwonder_servo_data::parse_hiwonder_servo_data(
-//   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string bus_key)
+// std::vector<std::shared_ptr<Hiwonder_servo_data>>
+// Hiwonder_servo_data::parse_hiwonder_servo_data(
+//   std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board,
+//   std::string bus_key)
 // {
 //   std::vector<std::shared_ptr<Hiwonder_servo_data>> servos;
 //   auto bus_config = parser->get_params_name(bus_key);
@@ -14,12 +16,13 @@ double deg_to_rad(double deg) { return deg * M_PI / 180; }
 //     auto servos_name = parser->build_param_name(bus_key, "servos");
 //     auto servos_config = parser->get_params_name(servos_name);
 //     for (auto servo_key : parser->get_params_keys(servos_name)) {
-//       auto servo_config = parser->get_params_name(parser->build_param_name(servos_name, servo_key));
-//       auto servo_keys = parser->get_params_keys(parser->build_param_name(servos_name, servo_key));
-//       Hiwonder_servo_data servo_data;
-//       servo_data.name = servo_key;
-//       std::cout << "hiwo" << std::dec << (int)__LINE__ << std::endl;
-//       if (servo_keys.count("id")) {
+//       auto servo_config =
+//       parser->get_params_name(parser->build_param_name(servos_name,
+//       servo_key)); auto servo_keys =
+//       parser->get_params_keys(parser->build_param_name(servos_name,
+//       servo_key)); Hiwonder_servo_data servo_data; servo_data.name =
+//       servo_key; std::cout << "hiwo" << std::dec << (int)__LINE__ <<
+//       std::endl; if (servo_keys.count("id")) {
 //         servo_data.id = servo_config["id"].get<uint8_t>();
 //       }
 //       if (servo_keys.count("min_angle_out")) {
@@ -66,7 +69,8 @@ double deg_to_rad(double deg) { return deg * M_PI / 180; }
 //         servo_data.max_angle_in = -t;
 //       }
 //       std::cout << "hiwo" << std::dec << (int)__LINE__ << std::endl;
-//       std::cout << "Servo: " << servo_data.name << " min_angle_in: " << servo_data.min_angle_in
+//       std::cout << "Servo: " << servo_data.name << " min_angle_in: " <<
+//       servo_data.min_angle_in
 //                 << " max_angle_in: " << servo_data.max_angle_in << std::endl;
 //       if (servo_data.check()) {
 //         servos.push_back(std::make_shared<Hiwonder_servo_data>(servo_data));
@@ -77,11 +81,11 @@ double deg_to_rad(double deg) { return deg * M_PI / 180; }
 // }
 
 HiWonderServoData::HiWonderServoData(
-  std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-  std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys,
-  std::string base_frame_id)
-: DeviceData(parser, board, name, get_device_class(), parameters, unused_keys)
-{
+    std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board,
+    std::string name, std::map<std::string, rclcpp::ParameterValue> parameters,
+    std::set<std::string> &unused_keys, std::string base_frame_id)
+    : DeviceData(parser, board, name, get_device_class(), parameters,
+                 unused_keys) {
   auto logger = parser->logger;
 
   if (unused_keys.erase("id"))
@@ -101,9 +105,11 @@ HiWonderServoData::HiWonderServoData(
 
   /* NOTE: In the old implementation, this was required
      TODO: Figure out if that makes sense */
-  if (unused_keys.erase("home_out")) this->home_out = parameters["home_out"].get<int>();
+  if (unused_keys.erase("home_out"))
+    this->home_out = parameters["home_out"].get<int>();
 
-  if (unused_keys.erase("invert")) this->invert = parameters["invert"].get<bool>();
+  if (unused_keys.erase("invert"))
+    this->invert = parameters["invert"].get<bool>();
 
   /* Calculate the max and min angle_in */
   double diff_min = this->min_angle_out - this->home_out;
@@ -125,12 +131,16 @@ HiWonderServoData::HiWonderServoData(
   }
 }
 
-bool HiWonderServoData::check() { return id >= 0x00 && id < 0xFE && DeviceData::check(); }
+bool HiWonderServoData::check() {
+  return id >= 0x00 && id < 0xFE && DeviceData::check();
+}
 
-std::vector<std::shared_ptr<HiWonderServoData>> HiWonderServoData::parse_hiwonder_servo_data(
-  std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string bus_name,
-  std::set<std::string> & unused_keys, std::string base_frame_id)
-{
+std::vector<std::shared_ptr<HiWonderServoData>>
+HiWonderServoData::parse_hiwonder_servo_data(std::shared_ptr<Parser> parser,
+                                             std::shared_ptr<Mirte_Board> board,
+                                             std::string bus_name,
+                                             std::set<std::string> &unused_keys,
+                                             std::string base_frame_id) {
   auto logger = parser->logger;
 
   std::vector<std::shared_ptr<HiWonderServoData>> servos;
@@ -147,13 +157,14 @@ std::vector<std::shared_ptr<HiWonderServoData>> HiWonderServoData::parse_hiwonde
       auto servo_keys = parser->get_params_keys(servo_param_name);
 
       auto data = std::make_shared<HiWonderServoData>(
-        parser, board, servo_key, servo_config, servo_keys, base_frame_id);
+          parser, board, servo_key, servo_config, servo_keys, base_frame_id);
 
       if (data->check())
         servos.push_back(data);
       else
-        RCLCPP_ERROR(
-          logger, "HiWonder Servo '%s' is invalid and will not be active", data->name.c_str());
+        RCLCPP_ERROR(logger,
+                     "HiWonder Servo '%s' is invalid and will not be active",
+                     data->name.c_str());
 
       auto key_prefix = servo_param_name.substr(bus_name.size() + 1);
       for (auto subkey : servo_keys)

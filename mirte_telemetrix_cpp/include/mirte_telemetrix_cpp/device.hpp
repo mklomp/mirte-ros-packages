@@ -18,37 +18,37 @@
 // namespace mirte_telemetrix_cpp {
 
 class TelemetrixDevice {
-  public:
-    std::shared_ptr<tmx_cpp::TMX> tmx;
-    std::shared_ptr<rclcpp::Node> nh;
-    std::shared_ptr<Mirte_Board> board;
-    std::vector<uint8_t> pins;
-    rclcpp::Logger logger;
+public:
+  std::shared_ptr<tmx_cpp::TMX> tmx;
+  std::shared_ptr<rclcpp::Node> nh;
+  std::shared_ptr<Mirte_Board> board;
+  std::vector<uint8_t> pins;
+  rclcpp::Logger logger;
 
-    virtual void update(){};
-    std::string name;
-    std::string frame_id = "";
+  virtual void update(){};
+  std::string name;
+  std::string frame_id = "";
 
-    rclcpp::CallbackGroup::SharedPtr callback_group;
+  rclcpp::CallbackGroup::SharedPtr callback_group;
 
-    // Currently unused
-    virtual void stop() {}
+  // Currently unused
+  virtual void stop() {}
 
-    std_msgs::msg::Header get_header()
-    {
-      return std_msgs::build<std_msgs::msg::Header>()
+  std_msgs::msg::Header get_header() {
+    return std_msgs::build<std_msgs::msg::Header>()
         .stamp(this->nh->now())
         .frame_id(this->frame_id);
-    }
-    TelemetrixDevice(NodeData node_data, std::vector<uint8_t> pins, DeviceData data);
-    TelemetrixDevice(
-      NodeData node_data, std::vector<uint8_t> pins, DeviceData data,
-      rclcpp::CallbackGroupType callback_group_type);
+  }
+  TelemetrixDevice(NodeData node_data, std::vector<uint8_t> pins,
+                   DeviceData data);
+  TelemetrixDevice(NodeData node_data, std::vector<uint8_t> pins,
+                   DeviceData data,
+                   rclcpp::CallbackGroupType callback_group_type);
 
-    virtual void device_timer_callback(){};
+  virtual void device_timer_callback(){};
 
-  protected:
-    rclcpp::TimerBase::SharedPtr device_timer;
+protected:
+  rclcpp::TimerBase::SharedPtr device_timer;
 };
 
 // }  // namespace mirte_telemetrix_cpp

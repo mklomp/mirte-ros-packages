@@ -2,11 +2,12 @@
 
 #include <mirte_telemetrix_cpp/parsers/actuators/motor_data.hpp>
 
-MotorData::MotorData(
-  std::shared_ptr<Parser> parser, std::shared_ptr<Mirte_Board> board, std::string name,
-  std::map<std::string, rclcpp::ParameterValue> parameters, std::set<std::string> & unused_keys)
-: DeviceData(parser, board, name, MotorData::get_device_class(), parameters, unused_keys)
-{
+MotorData::MotorData(std::shared_ptr<Parser> parser,
+                     std::shared_ptr<Mirte_Board> board, std::string name,
+                     std::map<std::string, rclcpp::ParameterValue> parameters,
+                     std::set<std::string> &unused_keys)
+    : DeviceData(parser, board, name, MotorData::get_device_class(), parameters,
+                 unused_keys) {
   auto logger = parser->logger;
 
   if (unused_keys.erase("connector")) {
@@ -18,19 +19,24 @@ MotorData::MotorData(
     this->D1 = pins["D1"];
     this->D2 = pins["D2"];
   } else if (unused_keys.erase("pins")) {
-    auto subkeys = parser->get_params_keys(parser->build_param_name(get_device_key(this), "pins"));
+    auto subkeys = parser->get_params_keys(
+        parser->build_param_name(get_device_key(this), "pins"));
 
-    if (subkeys.erase("p1")) this->P1 = board->resolvePin(get_string(parameters["pins.p1"]));
-    if (subkeys.erase("p2")) this->P2 = board->resolvePin(get_string(parameters["pins.p2"]));
+    if (subkeys.erase("p1"))
+      this->P1 = board->resolvePin(get_string(parameters["pins.p1"]));
+    if (subkeys.erase("p2"))
+      this->P2 = board->resolvePin(get_string(parameters["pins.p2"]));
 
-    if (subkeys.erase("d1")) this->D1 = board->resolvePin(get_string(parameters["pins.d1"]));
-    if (subkeys.erase("d2")) this->D2 = board->resolvePin(get_string(parameters["pins.d2"]));
+    if (subkeys.erase("d1"))
+      this->D1 = board->resolvePin(get_string(parameters["pins.d1"]));
+    if (subkeys.erase("d2"))
+      this->D2 = board->resolvePin(get_string(parameters["pins.d2"]));
 
-    for (auto subkey : subkeys) unused_keys.insert(parser->build_param_name("pins", subkey));
+    for (auto subkey : subkeys)
+      unused_keys.insert(parser->build_param_name("pins", subkey));
   } else
-    RCLCPP_ERROR(
-      logger, "Device %s.%s has no a connector or pins specified.", get_device_class().c_str(),
-      name.c_str());
+    RCLCPP_ERROR(logger, "Device %s.%s has no a connector or pins specified.",
+                 get_device_class().c_str(), name.c_str());
 
   if (unused_keys.erase("type")) {
     std::string motor_type = get_string(parameters["type"]);
@@ -43,27 +49,29 @@ MotorData::MotorData(
       this->type = MotorType::DDP;
     else
       RCLCPP_ERROR(
-        logger, "Unknown Motor type '%s' for Motor %s | Defaulting to PP Motor", motor_type.c_str(),
-        name.c_str());
+          logger,
+          "Unknown Motor type '%s' for Motor %s | Defaulting to PP Motor",
+          motor_type.c_str(), name.c_str());
   } else {
-    RCLCPP_WARN(logger, "No motor type found for %s defaulting to PP motor", name.c_str());
+    RCLCPP_WARN(logger, "No motor type found for %s defaulting to PP motor",
+                name.c_str());
   }
 
-  if (unused_keys.erase("inverted")) this->inverted = parameters["inverted"].get<bool>();
+  if (unused_keys.erase("inverted"))
+    this->inverted = parameters["inverted"].get<bool>();
 }
 
-bool MotorData::check()
-{
+bool MotorData::check() {
   bool device_ok = DeviceData::check();
 
   switch (type) {
-    case MotorType::PP:
-      return P1 != (pin_t)-1 && P2 != (pin_t)-1 && device_ok;
-    case MotorType::DP:
-      return P1 != (pin_t)-1 && D1 != (pin_t)-1 && device_ok;
-    case MotorType::DDP:
-      return P1 != (pin_t)-1 && D1 != (pin_t)-1 && D2 != (pin_t)-1 && device_ok;
-    default:
-      return false;
+  case MotorType::PP:
+    return P1 != (pin_t)-1 && P2 != (pin_t)-1 && device_ok;
+  case MotorType::DP:
+    return P1 != (pin_t)-1 && D1 != (pin_t)-1 && device_ok;
+  case MotorType::DDP:
+    return P1 != (pin_t)-1 && D1 != (pin_t)-1 && D2 != (pin_t)-1 && device_ok;
+  default:
+    return false;
   }
 }

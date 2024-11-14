@@ -4,11 +4,10 @@
 #include <mirte_telemetrix_cpp/gpio_pin.hpp>
 
 GPIOPin::GPIOPin(std::string pin_name, std::string gpiod_name)
-: name(pin_name), gpiod_name(gpiod_name)
-{
-  rcpputils::check_true(
-    pin_name.substr(0, 4) == "GPIO",
-    "Format of pin invallid, should be 'GPIOx_yz' with 0<=x<=5, A<=y<=D, 0<=z<=7");
+    : name(pin_name), gpiod_name(gpiod_name) {
+  rcpputils::check_true(pin_name.substr(0, 4) == "GPIO",
+                        "Format of pin invallid, should be 'GPIOx_yz' with "
+                        "0<=x<=5, A<=y<=D, 0<=z<=7");
 
   // name should be GPIOx_yz, with 0<=x<=5, A<=y<=D, 0<=z<=7
   this->chip_name = (std::string)("gpiochip") + pin_name[4];
@@ -20,31 +19,30 @@ GPIOPin::GPIOPin(std::string pin_name, std::string gpiod_name)
   // std::cout << "new pin" << pin_name << std::endl;
 }
 
-void GPIOPin::setup()
-{
+void GPIOPin::setup() {
   if (!configured) {
-    gpio_line.request({gpiod_name, gpiod::line_request::DIRECTION_OUTPUT, 0}, 0);
-    gpio_line.set_value(0);  // Force off before turning on.
+    gpio_line.request({gpiod_name, gpiod::line_request::DIRECTION_OUTPUT, 0},
+                      0);
+    gpio_line.set_value(0); // Force off before turning on.
     configured = true;
   }
 }
 
-void GPIOPin::write(bool value)
-{
-  if (!configured) setup();
+void GPIOPin::write(bool value) {
+  if (!configured)
+    setup();
 
   gpio_line.set_value((int)value);
 }
 
-bool GPIOPin::read()
-{
-  if (!configured) setup();
+bool GPIOPin::read() {
+  if (!configured)
+    setup();
 
   return (bool)gpio_line.get_value();
 }
 
-GPIOPin::~GPIOPin()
-{
+GPIOPin::~GPIOPin() {
   if (configured) {
     gpio_line.set_value(0);
     gpio_line.release();
