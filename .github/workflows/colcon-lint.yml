@@ -20,6 +20,7 @@ jobs:
       shell: bash
       run: |
         . /opt/ros/humble/setup.bash
+        rosdep update
         rosdep install --from-paths ./ --ignore-src -y --rosdistro=humble -r
         colcon build --continue-on-error --cmake-args -Wno-dev --trace-expand --trace-redirect=trace.log
         # for every folder in the workspace starting with mirte_ excluding mirte_teleop, run command
