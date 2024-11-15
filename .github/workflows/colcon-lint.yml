@@ -8,6 +8,8 @@ jobs:
     container: osrf/ros:humble-desktop-jammy #faster than using setup-ros
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
     # - uses: ros-tooling/setup-ros@master
     #   with:
     #         required-ros-distributions: 'humble'
