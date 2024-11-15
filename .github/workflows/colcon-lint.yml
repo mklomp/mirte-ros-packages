@@ -5,12 +5,12 @@ on: [push, pull_request]
 jobs:
   colcon-lint:
     runs-on: ubuntu-latest
-
+    container: ros:humble-desktop-jammy #faster than using setup-ros
     steps:
     - uses: actions/checkout@v4
-    - uses: ros-tooling/setup-ros@master
-      with:
-            required-ros-distributions: 'humble'
+    # - uses: ros-tooling/setup-ros@master
+    #   with:
+    #         required-ros-distributions: 'humble'
     - run: |
         sudo apt install apt-rdepends -y
         pip install colcon-lint
