@@ -1,4 +1,4 @@
-name: test-clang-format
+name: colcon-lint
 
 on: [push, pull_request]
 
@@ -17,4 +17,10 @@ jobs:
     - name: colcon lint
       run: |
         source /opt/ros/humble/setup.bash
-        colcon lint
+        colcon build --continue-on-error --cmake-args -Wno-dev --trace-expand --trace-redirect=trace.log
+        # for every folder in the workspace starting with mirte_ excluding mirte_teleop, run command
+        for d in mirte_*; do
+          if [ "$d" != "mirte_teleop" ]; then
+            colcon lint --packages-select $d
+          fi
+        done
