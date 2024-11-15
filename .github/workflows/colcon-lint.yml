@@ -23,6 +23,7 @@ jobs:
         rosdep update
         rosdep install --from-paths ./ --ignore-src -y --rosdistro=humble -r
         colcon build --continue-on-error --cmake-args -Wno-dev --trace-expand --trace-redirect=trace.log || true
+        . ./install/setup.bash
         # for every folder in the workspace starting with mirte_ excluding mirte_teleop, run command
         ERROR=false
         for d in mirte_*; do
