@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   colcon-lint:
     runs-on: ubuntu-latest
-    container: ros:humble-desktop-jammy #faster than using setup-ros
+    container: osrf/ros:humble-desktop-jammy #faster than using setup-ros
     steps:
     - uses: actions/checkout@v4
     # - uses: ros-tooling/setup-ros@master
