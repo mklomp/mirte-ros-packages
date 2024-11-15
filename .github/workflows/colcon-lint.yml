@@ -15,4 +15,6 @@ jobs:
         sudo apt install apt-rdepends -y
         pip install colcon-lint
     - name: colcon lint
-      run: colcon lint
+      run: |
+        source /opt/ros/humble/setup.bash
+        colcon lint

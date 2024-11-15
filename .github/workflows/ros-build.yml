@@ -39,5 +39,5 @@ jobs:
         #   SBUILD_CONF: "$enable_network = 1;"
         #   Skip pushing to repo when not on main branch
           SKIP_PUSH: ${{ github.ref != 'refs/heads/main' }}
-          UPLOAD_ARTIFACTS: ${{ github.ref == 'refs/heads/main' }}
+          UPLOAD_ARTIFACTS: ${{ github.ref != 'refs/heads/main' }}
           CONTINUE_ON_ERROR: ${{ github.ref != 'refs/heads/main' }} # allows for failing builds
