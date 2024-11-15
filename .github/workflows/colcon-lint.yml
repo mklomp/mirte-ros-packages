@@ -11,13 +11,16 @@ jobs:
     # - uses: ros-tooling/setup-ros@master
     #   with:
     #         required-ros-distributions: 'humble'
-    - run: |
+    - shell: bash
+      run: |
         sudo apt update
-        sudo apt install apt-rdepends -y
+        sudo apt install apt-rdepends python3-pip -y
         pip install colcon-lint
     - name: colcon lint
+      shell: bash
       run: |
-        source /opt/ros/humble/setup.bash
+        . /opt/ros/humble/setup.bash
+        rosdep install --from-paths ./ --ignore-src -y --rosdistro=humble -r
         colcon build --continue-on-error --cmake-args -Wno-dev --trace-expand --trace-redirect=trace.log
         # for every folder in the workspace starting with mirte_ excluding mirte_teleop, run command
         for d in mirte_*; do
