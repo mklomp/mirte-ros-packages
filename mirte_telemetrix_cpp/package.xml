@@ -22,8 +22,10 @@
   <depend>ament_index_cpp</depend>
   <depend>color_util</depend>
   <depend>std_srvs</depend>
-  <build_depend condition="$MIRTE_TYPE == 'mirte-master'">libgpiod-dev</build_depend>
-
+  <!-- <build_depend condition="$MIRTE_TYPE == 'mirte-master'">libgpiod-dev</build_depend> -->
+  
+  <!-- Just added to fix online deb build -->
+  <depend>libgpiod-dev</depend> 
   <!-- <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
