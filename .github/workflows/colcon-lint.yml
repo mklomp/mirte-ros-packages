@@ -12,6 +12,7 @@ jobs:
     #   with:
     #         required-ros-distributions: 'humble'
     - run: |
+        sudo apt update
         sudo apt install apt-rdepends -y
         pip install colcon-lint
     - name: colcon lint
