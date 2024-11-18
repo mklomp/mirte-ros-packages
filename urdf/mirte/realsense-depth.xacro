@@ -74,7 +74,6 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
         </plugin>
       </sensor>
     </gazebo>
-
     <gazebo reference="${prefix}depth_cam">
       <sensor type="depth" name="${prefix}camera_depth">
         <update_rate>5</update_rate>
@@ -92,15 +91,15 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
           </clip>
         </camera>
         <plugin name="camera_controller_depth" filename="libgazebo_ros_camera.so">
-            <ros>
-              <namespace>/mirte</namespace>
-              <remapping>camera_depth/image_raw:=camera_rgb/image_raw</remapping>
-              <remapping>camera_depth/camera_info:=camera_rgb/camera_info</remapping>
-              <remapping>camera_depth/depth/image_raw:=camera_depth/depth_image_raw</remapping>
-              <remapping>camera_depth/depth/camera_info:=camera_depth/camera_depth_info</remapping>         
-            </ros>
+          <ros>
+            <namespace>/mirte</namespace>
+            <remapping>camera_depth/image_raw:=camera_rgb/image_raw</remapping>
+            <remapping>camera_depth/camera_info:=camera_rgb/camera_info</remapping>
+            <remapping>camera_depth/depth/image_raw:=camera_depth/depth_image_raw</remapping>
+            <remapping>camera_depth/depth/camera_info:=camera_depth/camera_depth_info</remapping>
+          </ros>
           <camera_name>camera_depth</camera_name>
-          <frame_name>${prefix}depth_cloud</frame_name> 
+          <frame_name>${prefix}depth_cloud</frame_name>
           <hack_baseline>0.07</hack_baseline>
           <min_depth>0.1</min_depth>
           <max_depth>30.0</max_depth>

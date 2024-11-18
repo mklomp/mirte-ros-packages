@@ -27,7 +27,7 @@
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
     <xacro:tileWorld name="tile_0_0" material="floor" size="4" x="0.5" y="0.25" yaw="0" z_offset="-0.009"/>
-     <xacro:person name="obj_6_0_2_3" size="0.5" x="6.0" y="2.3" yaw="-90" static="${True}" scale="${0.2}"/>
+    <xacro:person name="obj_6_0_2_3" size="0.5" x="6.0" y="2.3" yaw="-90" static="${True}" scale="${0.2}"/>
     <xacro:model name="obj_0_5_1_5" type="cone" size="0.5" x="0.5" y="1.5" yaw="0" static="${True}" scale="${0.1}"/>
     <xacro:model name="obj_1_5_0_5" type="cone" size="0.5" x="1.5" y="0.5" yaw="0" static="${True}" scale="${0.1}"/>
     <xacro:model name="obj_0_55_1_25" type="cone" size="0.5" x="0.55" y="1.25" yaw="0" static="${True}" scale="${0.1}"/>
@@ -164,12 +164,12 @@
     <state world_name="default">
  
     </state>
-  <light name="directionallight" type="directional">
-    <pose>3.14919 1.1553 2 0 -0 0</pose>
-    <cast_shadows>false</cast_shadows>
-    <intensity>1</intensity>
-    <direction>0 0 -1</direction>
-    <diffuse>0.8 0.8 0.8 1</diffuse>
+    <light name="directionallight" type="directional">
+      <pose>3.14919 1.1553 2 0 -0 0</pose>
+      <cast_shadows>false</cast_shadows>
+      <intensity>1</intensity>
+      <direction>0 0 -1</direction>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
       <specular>0.2 0.2 0.2 1</specular>
       <attenuation>
         <range>1000</range>
@@ -177,11 +177,11 @@
         <constant>0.90000000000000002</constant>
         <quadratic>0.001</quadratic>
       </attenuation>
-    <spot>
-      <inner_angle>0</inner_angle>
-      <outer_angle>0</outer_angle>
-      <falloff>0</falloff>
-    </spot>
-  </light>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
   </world>
 </sdf>

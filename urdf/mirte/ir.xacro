@@ -34,12 +34,12 @@
         <always_on>true</always_on>
         <visualize>false</visualize>
         <topic>camera_${name}/image_raw</topic>
-<ros>
-        <imageTopicName>camera_${name}/image_raw</imageTopicName>
-        <cameraInfoTopicName>camera_${name}/cam_info</cameraInfoTopicName>
-        <!-- <depthImageTopicName>[your depth image topic]</depthImageTopicName>
+        <ros>
+          <imageTopicName>camera_${name}/image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_${name}/cam_info</cameraInfoTopicName>
+          <!-- <depthImageTopicName>[your depth image topic]</depthImageTopicName>
         <pointCloudTopicName>[your point cloud topic]</pointCloudTopicName> -->
-     </ros>
+        </ros>
         <camera name="head">
           <horizontal_fov>1.2</horizontal_fov>
           <image>

@@ -19,10 +19,8 @@
       <mass value="${mass}"/>
       <xacro:insert_block name="origin"/>
       <inertia ixx="${2/5 * mass * r*r}" ixy="0" ixz="0" iyy="${2/5 * mass * r*r}" iyz="0" izz="${2/5 * mass * r*r}"/>
-            <!-- <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/> -->
-
+      <!-- <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/> -->
     </inertial>
-
   </xacro:macro>
   <xacro:macro name="wheel" params="name parent radius mass visualRot *origin **content">
     <link name="link_${name}">
@@ -32,9 +30,9 @@
       <collision name="link_${name}_collision">
         <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
         <geometry>
-          <sphere  radius="${radius}"/>
+          <sphere radius="${radius}"/>
         </geometry>
-                <surface>
+        <surface>
           <friction>
             <ode>
               <mu>1</mu>
@@ -42,7 +40,6 @@
             </ode>
           </friction>
         </surface>
-
         <!-- <surface>
           <friction>
             <ode>
@@ -67,11 +64,10 @@
         <geometry>
           <mesh filename="file://$(find mirte_gazebo)/meshes/wheel.stl" scale="1 1 1" rpy="0 0 ${pi*0 + visualRot*pi}"/>
         </geometry>
-                <!-- <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+        <!-- <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
         <geometry>
           <cylinder length="0.015" radius="${radius}"/>
         </geometry> -->
-
       </visual>
     </link>
     <gazebo reference="link_${name}">
@@ -84,8 +80,7 @@
       <parent link="${parent}"/>
       <axis rpy="0 0 0" xyz="0 1 0"/>
       <!-- max wheel speed is around 2 rot/s = 4 rad -->
-      <limit effort="100" velocity="4"/> 
-
+      <limit effort="100" velocity="4"/>
       <xacro:insert_block name="content"/>
     </joint>
     <transmission name="trans_${name}">

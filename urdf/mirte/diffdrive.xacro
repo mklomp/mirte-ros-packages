@@ -13,7 +13,6 @@
       <wheel_separation>0.14</wheel_separation>
       <wheel_diameter>0.065</wheel_diameter>
       <odometry_frame>odom</odometry_frame>
-
       <!-- wheelTorque and wheelAcceleration now have max_ prefix -->
       <max_wheel_torque>20</max_wheel_torque>
       <max_wheel_acceleration>5</max_wheel_acceleration>

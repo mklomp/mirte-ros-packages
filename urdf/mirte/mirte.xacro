@@ -68,7 +68,7 @@
   <joint name="base_footprint_joint" type="fixed">
     <parent link="base_footprint"/>
     <child link="base_link"/>
-     <origin rpy="0 0 0" xyz="0 0 0.018"/>
+    <origin rpy="0 0 0" xyz="0 0 0.018"/>
   </joint>
   <link name="base_link"/>
   <gazebo reference="base_link">
@@ -108,18 +108,14 @@
       <origin rpy="0 ${radians(90)} 0" xyz="0.0785 -0.022 0.002"/>
     </xacro:ir_sensor>
   </xacro:if>
-
   <xacro:include filename="$(find mirte_gazebo)/urdf/mirte/diffdrive.xacro"/>
-
   <gazebo>
     <plugin name="gazebo_ros_p3d" filename="libgazebo_ros_p3d.so">
-
       <ros>
         <!-- Add namespace and remap the default topic -->
         <namespace>/mirte</namespace>
         <remapping>odom:=pos</remapping>
       </ros>
-
       <!-- Replace camelCase elements with camel_case ones -->
       <body_name>base_footprint</body_name>
       <frame_name>world</frame_name>
@@ -127,7 +123,7 @@
       <xyz_offset>0 0 0</xyz_offset>
       <rpy_offset>0.0 0.0 0.0</rpy_offset>
       <gaussian_noise>0.01</gaussian_noise>
-     </plugin>
+    </plugin>
   </gazebo>
   <gazebo>
     <plugin filename="libgazebo_ros_joint_state_publisher.so" name="joint_state_publisher">
