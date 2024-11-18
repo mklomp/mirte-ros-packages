@@ -5,11 +5,19 @@
       <static>true</static>
       <link name="top_down_link">
         <static>1</static>
+              
+
         <sensor name="top_down_camera_sensor" type="camera">
           <always_on>true</always_on>
           <visualize>true</visualize>
           <update_rate>10</update_rate>
           <topic>top_down_camera/image_raw</topic>
+          <ros>
+        <imageTopicName>top_down_camera/image_raw</imageTopicName>
+        <cameraInfoTopicName>top_down_camera/cam_info</cameraInfoTopicName>
+        <!-- <depthImageTopicName>[your depth image topic]</depthImageTopicName>
+        <pointCloudTopicName>[your point cloud topic]</pointCloudTopicName> -->
+     </ros>
           <gz_frame_id>top_down_camera_rgb_frame</gz_frame_id>
           <camera name="top_down_camera">
             <camera_info_topic>camera/camera_info</camera_info_topic>
@@ -24,6 +32,12 @@
               <far>6</far>
             </clip>
           </camera>
+           <plugin name="camera_controller_top_down" filename="libgazebo_ros_camera.so">
+          <camera_name>camera_top_down</camera_name>
+          <frame_name>base_top_down</frame_name>
+          <frameName>base_top_down</frameName>
+          <cameraName>camera_top_down</cameraName>
+        </plugin>
         </sensor>
         <static>1</static>
         <pose>1.688 1.36 4 0 1.57 0</pose>
