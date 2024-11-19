@@ -127,7 +127,7 @@ bool TelemetrixNode::start() {
 
   tmx = std::make_shared<tmx_cpp::TMX>([&]() { rclcpp::shutdown(); },
                                        available_ports[0].port_name);
-  tmx->sendMessage(tmx_cpp::TMX::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
+  tmx->sendMessage(tmx_cpp::MESSAGE_TYPE::GET_PICO_UNIQUE_ID, {});
   tmx->setScanDelay(1000 / parser->get_frequency());
 
   NodeData node_data{node_, tmx, board};

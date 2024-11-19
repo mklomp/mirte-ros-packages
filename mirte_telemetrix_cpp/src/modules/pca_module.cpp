@@ -47,9 +47,7 @@ PCA_Module::PCA_Module(NodeData node_data, PCAData pca_data,
 void PCA_Module::set_multi_speed_service_callback(
     const mirte_msgs::srv::SetSpeedMultiple::Request::ConstSharedPtr req,
     mirte_msgs::srv::SetSpeedMultiple::Response::SharedPtr res) {
-  // TODO: Why is this a shared_ptr? (Probably unneccessary)
-  std::shared_ptr<std::vector<tmx_cpp::PCA9685_module::PWM_val>> pwm_vals =
-      std::make_shared<std::vector<tmx_cpp::PCA9685_module::PWM_val>>();
+  std::vector<tmx_cpp::PCA9685_module::PWM_val> pwm_vals;
   if (req->speeds.size() == 0) {
     res->success = false;
     return;
@@ -70,12 +68,12 @@ void PCA_Module::set_multi_speed_service_callback(
     }
 
     auto motor_pwm_vals = (*motor)->get_multi_speed_pwm(speed.speed);
-    pwm_vals->insert(pwm_vals->end(), motor_pwm_vals.begin(),
+    pwm_vals.insert(pwm_vals->end(), motor_pwm_vals.begin(),
                      motor_pwm_vals.end());
   }
 
   if (pwm_vals->size() > 0)
-    pca9685->set_multiple_pwm(pwm_vals);
+    pca9685.set_multiple_pwm(pwm_vals);
 
   res->success = true;
 }
