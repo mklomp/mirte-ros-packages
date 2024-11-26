@@ -75,6 +75,17 @@ Hiwonder_servo::Hiwonder_servo(
   // Currently overpublishing slightly
   this->servo_timer = nh->create_wall_timer(
       duration, std::bind(&Hiwonder_servo::update, this), callback_group);
+
+  if (this->servo_data->enable_motor) {
+    // this->bus_mod->motor_mode_write(this->servo_data->id, 1);
+    this->motor_speed_service =
+        nh->create_service<mirte_msgs::srv::SetMotorSpeed>(
+            "servo/" + servo_group + this->servo_data->name +
+                "/set_motor_speed",
+            std::bind(&Hiwonder_servo::set_motor_speed_service_callback, this,
+                      _1, _2),
+            rclcpp::ServicesQoS().get_rmw_qos_profile(), callback_group);
+  }
 }
 
 // TODO: Add update en fix time
@@ -232,4 +243,13 @@ std_msgs::msg::Header Hiwonder_servo::get_header() {
   return std_msgs::build<std_msgs::msg::Header>()
       .stamp(this->nh->now())
       .frame_id(this->servo_data->frame_id);
+}
+
+void Hiwonder_servo::set_motor_speed_service_callback(
+    const mirte_msgs::srv::SetMotorSpeed::Request::ConstSharedPtr req,
+    mirte_msgs::srv::SetMotorSpeed::Response::SharedPtr res) {
+  // input: speed from -100 to 100
+  // output: speed from -1000 to 1000
+  int16_t speed = std::clamp(req->speed, -100, 100) * 10;
+  res->status = this->bus_mod->motor_mode_write(this->servo_data->id, speed);
 }

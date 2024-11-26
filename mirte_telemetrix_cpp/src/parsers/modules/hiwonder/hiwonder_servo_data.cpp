@@ -126,6 +126,11 @@ HiWonderServoData::HiWonderServoData(
     this->max_angle_in = -tmp;
   }
 
+  // TODO: document this feature
+  if (unused_keys.erase("motor_mode")) {
+    this->enable_motor = parameters["motor_mode"].get<bool>();
+  }
+
   if (!parameters.count("frame_id")) {
     this->frame_id = base_frame_id + "/" + name;
   }

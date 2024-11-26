@@ -52,6 +52,7 @@ public:
   float max_angle_in = -1;
 
   bool invert = false;
+  bool enable_motor = false;
 
   HiWonderServoData(std::shared_ptr<Parser> parser,
                     std::shared_ptr<Mirte_Board> board, std::string name,

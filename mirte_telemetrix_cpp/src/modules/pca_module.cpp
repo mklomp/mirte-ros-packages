@@ -68,12 +68,12 @@ void PCA_Module::set_multi_speed_service_callback(
     }
 
     auto motor_pwm_vals = (*motor)->get_multi_speed_pwm(speed.speed);
-    pwm_vals.insert(pwm_vals->end(), motor_pwm_vals.begin(),
+    pwm_vals.insert(pwm_vals.end(), motor_pwm_vals.begin(),
                     motor_pwm_vals.end());
   }
 
-  if (pwm_vals->size() > 0)
-    pca9685.set_multiple_pwm(pwm_vals);
+  if (pwm_vals.size() > 0)
+    pca9685->set_multiple_pwm(pwm_vals);
 
   res->success = true;
 }
