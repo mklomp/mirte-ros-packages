@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by
-Stephen Brawner (brawner@gmail.com) 
-     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
-     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+
 <robot
   name="mirte_master" xmlns:xacro="http://ros.org/wiki/xacro">
+
 
   <xacro:arg name="flag_enable" default="False" />
   <xacro:arg name="arm_enable" default="False" />
   <xacro:arg name="screen_enable" default="False" />
   <xacro:arg name="front_camera_enable" default="False" />
-  <xacro:arg name="sonar_enable" default="True" />
+  <xacro:arg name="sonar_enable" default="False" />
   <xacro:arg name="lidar_enable" default="True" />
   <xacro:arg name="depth_camera_enable" default="False" />
-  <xacro:arg name="imu_enable" default="True" />
+  <xacro:arg name="imu_enable" default="False" />
 
   <xacro:arg name="use_namespace" default="False"/>
   <xacro:arg name="namespace_name" default="" />
@@ -28,28 +26,22 @@ Stephen Brawner (brawner@gmail.com)
     <xacro:property name="tf_namespace" value="" scope="global" lazy_eval="False"/>
   </xacro:unless>
 
-  <xacro:arg name="use_correct_laser_frame" default="False" />
+  <xacro:arg name="use_correct_laser_frame" default="True" />
 
   <xacro:property name="wheel_radius" value="0.050" />
   <xacro:property name="wheel_length" value="0.055" />
-  <xacro:property name="wheel_mass" value="2.15" /> <!-- 0.26661 -->
+  <xacro:property name="wheel_mass" value="2.15" /> 
 
-  <!-- Currently unused -->
-  <xacro:property name="wheel_velocity" value="8" /> <!-- Was 10 based on calc-->
+  <xacro:property name="wheel_velocity" value="8" />
   <xacro:property name="wheel_effort" value="5" />
 
-  <xacro:property name="base_mass" value="5.0" /> <!-- 4.0815 --> <!-- 3.0815 -->
+  <xacro:property name="base_mass" value="5.0" /> 
 
-  <!-- Used for sonar by mirte-gazebo -->
   <material name="blue">
     <color rgba="0.203125 0.23828125 0.28515625 1.0" />
   </material>
 
-  <!-- Bring in simulation data for Gazebo. -->
   <xacro:include filename="$(find mirte_master_description)/urdf/mirte_master_base.gazebo.xacro" />
-
-  <xacro:include
-    filename="$(find gazebo_sensor_collection_description)/urdf/cameras/rgbd/orbbec_astra_pro_plus.urdf.xacro" />
 
   <xacro:if value="$(arg depth_camera_enable)">
     <xacro:sensor_orbbec_astra_pro_plus name="${camera_name}" parent="frame_link" color="black">
@@ -79,7 +71,6 @@ Stephen Brawner (brawner@gmail.com)
   <link
     name="frame_link">
     <inertial>
-      <!-- Lower the center of mass for less woble as a result of accelaration -->
       <origin xyz="-0.00024285 0.0082178 ${-0.0037661 - 0.04}" />
       <mass value="${base_mass}" />
       <inertia
@@ -91,20 +82,19 @@ Stephen Brawner (brawner@gmail.com)
     <visual>
       <geometry>
         <mesh
-          filename="package://mirte_master_description/meshes/frame_link.STL" />
+          filename="file://$(find mirte_master_description)/meshes/frame_link.STL" />
       </geometry>
       <material name="">
         <color rgba="0.52941 0.54902 0.54902 1" />
       </material>
     </visual>
 
-    <!-- Add visuals for ultra sonic sensors-->
     <visual>
       <origin
         xyz="0.05297775289576 -0.120282421780502 -0.031"
         rpy="3.14159265358979 0 0.296705972839036" />
       <geometry>
-        <mesh filename="package://mirte_master_description/meshes/ultrasonic_fl.STL" />
+        <mesh filename="file://$(find mirte_master_description)/meshes/ultrasonic_fl.STL" />
       </geometry>
       <material name="blue" />
     </visual>
@@ -113,7 +103,7 @@ Stephen Brawner (brawner@gmail.com)
         xyz="-0.05297775289576 -0.120282421780502 -0.031"
         rpy="3.14159265358979 0 -0.296705972839036" />
       <geometry>
-        <mesh filename="package://mirte_master_description/meshes/ultrasonic_fr.STL" />
+        <mesh filename="file://$(find mirte_master_description)/meshes/ultrasonic_fr.STL" />
       </geometry>
       <material name="blue" />
     </visual>
@@ -122,7 +112,7 @@ Stephen Brawner (brawner@gmail.com)
         xyz="0.0565606470918482 0.119187021096338 -0.031"
         rpy="3.14159265358979 0 2.84488668075076" />
       <geometry>
-        <mesh filename="package://mirte_master_description/meshes/ultrasonic_bl.STL" />
+        <mesh filename="file://$(find mirte_master_description)/meshes/ultrasonic_bl.STL" />
       </geometry>
       <material name="blue" />
     </visual>
@@ -131,7 +121,7 @@ Stephen Brawner (brawner@gmail.com)
         xyz="-0.0565606470918482 0.119187021096338 -0.031"
         rpy="3.14159265358979 0 -2.84488668075076" />
       <geometry>
-        <mesh filename="package://mirte_master_description/meshes/ultrasonic_br.STL" />
+        <mesh filename="file://$(find mirte_master_description)/meshes/ultrasonic_br.STL" />
       </geometry>
       <material name="blue" />
     </visual>
@@ -178,7 +168,7 @@ Stephen Brawner (brawner@gmail.com)
     <visual>
       <geometry>
         <mesh
-          filename="package://mirte_master_description/meshes/wheel_left_front.STL" />
+          filename="file://$(find mirte_master_description)/meshes/wheel_left_front.STL" />
       </geometry>
       <material name="">
         <color rgba="0.79216 0.81961 0.93333 1" />
@@ -200,9 +190,6 @@ Stephen Brawner (brawner@gmail.com)
     <parent link="frame_link" />
     <child link="wheel_left_front" />
     <axis xyz="0 0 -1" />
-    <!--<dynamics
-    damping="3.0" friction="5.0" />
-    <limit velocity="${wheel_velocity}" effort="${wheel_effort}" /> -->
   </joint>
 
   <transmission name="wheel_left_front_transmission">
@@ -229,7 +216,7 @@ Stephen Brawner (brawner@gmail.com)
     <visual>
       <geometry>
         <mesh
-          filename="package://mirte_master_description/meshes/wheel_left_rear.STL" />
+          filename="file://$(find mirte_master_description)/meshes/wheel_left_rear.STL" />
       </geometry>
       <material name="">
         <color rgba="0.79216 0.81961 0.93333 1" />
@@ -252,8 +239,6 @@ Stephen Brawner (brawner@gmail.com)
     <parent link="frame_link" />
     <child link="wheel_left_rear" />
     <axis xyz="0 0 -1" />
-    <!-- <dynamics damping="3.0" friction="5.0" />
-  <limit velocity="${wheel_velocity}" effort="${wheel_effort}" />-->
   </joint>
 
   <transmission name="wheel_left_rear_transmission">
@@ -280,7 +265,7 @@ Stephen Brawner (brawner@gmail.com)
     <visual>
       <geometry>
         <mesh
-          filename="package://mirte_master_description/meshes/wheel_right_front.STL" />
+          filename="file://$(find mirte_master_description)/meshes/wheel_right_front.STL" />
       </geometry>
       <material name="">
         <color rgba="0.79216 0.81961 0.93333 1" />
@@ -302,8 +287,6 @@ Stephen Brawner (brawner@gmail.com)
     <parent link="frame_link" />
     <child link="wheel_right_front" />
     <axis xyz="0 0 -1" />
-    <!-- <dynamics damping="3.0" friction="5.0" />
-    <limit velocity="${wheel_velocity}" effort="${wheel_effort}" /> -->
   </joint>
 
   <transmission name="wheel_right_front_transmission">
@@ -330,7 +313,7 @@ Stephen Brawner (brawner@gmail.com)
     <visual>
       <geometry>
         <mesh
-          filename="package://mirte_master_description/meshes/wheel_right_rear.STL" />
+          filename="file://$(find mirte_master_description)/meshes/wheel_right_rear.STL" />
       </geometry>
       <material name="">
         <color rgba="0.79216 0.81961 0.93333 1" />
@@ -353,9 +336,6 @@ Stephen Brawner (brawner@gmail.com)
     <parent link="frame_link" />
     <child link="wheel_right_rear" />
     <axis xyz="0 0 -1" />
-    <!--<dynamics
-    damping="3.0" friction="5.0" />
-    <limit velocity="${wheel_velocity}" effort="${wheel_effort}" />-->
   </joint>
 
   <transmission name="wheel_right_rear_transmission">
@@ -391,7 +371,7 @@ Stephen Brawner (brawner@gmail.com)
           rpy="0 0 0" />
         <geometry>
           <mesh
-            filename="package://mirte_master_description/meshes/cam_front.STL" />
+            filename="file://$(find mirte_master_description)/meshes/cam_front.STL" />
         </geometry>
         <material
           name="">
@@ -399,17 +379,6 @@ Stephen Brawner (brawner@gmail.com)
             rgba="0.79608 0.82353 0.93725 1" />
         </material>
       </visual>
-<!-- 
-      <collision>
-        <origin
-          xyz="0 0 0"
-          rpy="0 0 0" />
-        <geometry>
-          <mesh
-            filename="package://mirte_master_description/meshes/cam_front.STL" />
-        </geometry>
-      </collision>
- -->
     </link>
     <joint
       name="cam_joint_front"
@@ -428,8 +397,6 @@ Stephen Brawner (brawner@gmail.com)
 
 
     <joint name="chassis_base_joint" type="fixed">
-      <!-- Move the link so the rest will line up easier -->
-      <!-- <origin xyz="0 0 -0.031" /> -->
       <parent link="frame_link" />
       <child link="link_chassis" />
     </joint>
@@ -489,7 +456,7 @@ Stephen Brawner (brawner@gmail.com)
           rpy="0 0 0" />
         <geometry>
           <mesh
-            filename="package://mirte_master_description/meshes/screen.STL" />
+            filename="file://$(find mirte_master_description)/meshes/screen.STL" />
         </geometry>
         <material
           name="">
@@ -503,7 +470,7 @@ Stephen Brawner (brawner@gmail.com)
           rpy="0 0 0" />
         <geometry>
           <mesh
-            filename="package://mirte_master_description/meshes/screen.STL" />
+            filename="file://$(find mirte_master_description)/meshes/screen.STL" />
         </geometry>
       </collision>
     </link>
@@ -529,4 +496,6 @@ Stephen Brawner (brawner@gmail.com)
   <xacro:if value="$(arg arm_enable)">
     <xacro:include filename="$(find mirte_master_description)/urdf/arm.xacro" />
   </xacro:if>
+
+
 </robot>
