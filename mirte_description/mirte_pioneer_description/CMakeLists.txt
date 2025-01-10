@@ -8,7 +8,7 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 
-foreach(X IN ITEMS "urdf" "meshes" "models" "config")
+foreach(X IN ITEMS "launch" "urdf" "meshes" "models" "config" "rviz")
     message(STATUS "X=${X}")
     install(DIRECTORY ${X}
       DESTINATION share/${PROJECT_NAME}/)
