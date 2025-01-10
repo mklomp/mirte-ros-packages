@@ -9,13 +9,13 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 -0.03"/>
       <geometry>
-        <mesh filename="file://$(find mirte_gazebo)/meshes/lidar.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633"/>
+        <mesh filename="file://$(find mirte_pioneer_description)/meshes/lidar.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633"/>
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 -0.03"/>
       <geometry>
-        <mesh filename="file://$(find mirte_gazebo)/meshes/lidar.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633"/>
+        <mesh filename="file://$(find mirte_pioneer_description)/meshes/lidar.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633"/>
       </geometry>
     </collision>
   </link>

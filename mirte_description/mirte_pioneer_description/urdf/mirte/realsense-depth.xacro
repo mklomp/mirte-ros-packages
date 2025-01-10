@@ -18,7 +18,7 @@ https://github.com/SyrianSpock/realsense_gazebo_plugin
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="file://$(find mirte_gazebo)/models/realsense_camera/meshes/realsense.dae"/>
+          <mesh filename="file://$(find mirte_pioneer_description)/models/realsense_camera/meshes/realsense.dae"/>
         </geometry>
       </visual>
       <collision name="realsense_collision">

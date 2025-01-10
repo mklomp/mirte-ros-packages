@@ -5,28 +5,28 @@
   <xacro:arg name="camera_enable" default="true"/>
   <xacro:arg name="lidar_enable" default="true"/>
   <xacro:arg name="realsense_enable" default="true"/>
-  <xacro:include filename="$(find mirte_gazebo)/urdf/mirte/materials.xacro"/>
-  <xacro:include filename="$(find mirte_gazebo)/urdf/mirte/macros.xacro"/>
+  <xacro:include filename="$(find mirte_pioneer_description)/urdf/mirte/materials.xacro"/>
+  <xacro:include filename="$(find mirte_pioneer_description)/urdf/mirte/macros.xacro"/>
   <test value="$(arg sonar_enable)" name="sonar_enable"/>
   <test value="$(arg intensity_enable)" name="intensity_enable"/>
   <test value="$(arg camera_enable)" name="camera_enable"/>
   <test value="$(arg lidar_enable)" name="lidar_enable"/>
   <xacro:if value="$(arg lidar_enable)">
-    <xacro:include filename="$(find mirte_gazebo)/urdf/mirte/lidar.xacro"/>
+    <xacro:include filename="$(find mirte_pioneer_description)/urdf/mirte/lidar.xacro"/>
   </xacro:if>
   <xacro:if value="$(arg intensity_enable)">
-    <xacro:include filename="$(find mirte_gazebo)/urdf/mirte/ir.xacro"/>
+    <xacro:include filename="$(find mirte_pioneer_description)/urdf/mirte/ir.xacro"/>
   </xacro:if>
   <xacro:if value="$(arg camera_enable)">
-    <xacro:include filename="$(find mirte_gazebo)/urdf/mirte/camera.xacro"/>
+    <xacro:include filename="$(find mirte_pioneer_description)/urdf/mirte/camera.xacro"/>
   </xacro:if>
   <xacro:if value="$(arg sonar_enable)">
-    <xacro:include filename="$(find mirte_gazebo)/urdf/mirte/ultrasonic.xacro"/>
+    <xacro:include filename="$(find mirte_pioneer_description)/urdf/mirte/ultrasonic.xacro"/>
   </xacro:if>
   <xacro:if value="$(arg realsense_enable)">
-    <xacro:include filename="$(find mirte_gazebo)/urdf/mirte/realsense.xacro"/>
+    <xacro:include filename="$(find mirte_pioneer_description)/urdf/mirte/realsense.xacro"/>
   </xacro:if>
-  <xacro:property name="yaml_param_file" value="$(find mirte_gazebo)/config/mirte_dimensions.yaml"/>
+  <xacro:property name="yaml_param_file" value="$(find mirte_pioneer_description)/config/mirte_dimensions.yaml"/>
   <xacro:property name="params" value="${xacro.load_yaml(yaml_param_file)}"/>
   <link name="link_chassis">
     <!-- pose and inertial -->
@@ -37,13 +37,13 @@
     <!-- body -->
     <collision name="collision_chassis">
       <geometry>
-        <mesh filename="file://$(find mirte_gazebo)/meshes/mirte_base.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633"/>
+        <mesh filename="file://$(find mirte_pioneer_description)/meshes/mirte_base.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633"/>
       </geometry>
     </collision>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mirte_gazebo)/meshes/mirte_base.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633"/>
+        <mesh filename="file://$(find mirte_pioneer_description)/meshes/mirte_base.stl" scale="0.001 0.001 0.001" rpy="0 0 1.57079633"/>
       </geometry>
       <material name="blue"/>
     </visual>
@@ -108,7 +108,7 @@
       <origin rpy="0 ${radians(90)} 0" xyz="0.0785 -0.022 0.002"/>
     </xacro:ir_sensor>
   </xacro:if>
-  <xacro:include filename="$(find mirte_gazebo)/urdf/mirte/diffdrive.xacro"/>
+  <xacro:include filename="$(find mirte_pioneer_description)/urdf/mirte/diffdrive.xacro"/>
   <gazebo>
     <plugin name="gazebo_ros_p3d" filename="libgazebo_ros_p3d.so">
       <ros>

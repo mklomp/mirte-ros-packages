@@ -62,7 +62,7 @@
       <visual name="link_${name}_visual">
         <origin rpy="0 1.5707 ${1.5707 + visualRot*pi}" xyz="-0 0.0 0"/>
         <geometry>
-          <mesh filename="file://$(find mirte_gazebo)/meshes/wheel.stl" scale="1 1 1" rpy="0 0 ${pi*0 + visualRot*pi}"/>
+          <mesh filename="file://$(find mirte_pioneer_description)/meshes/wheel.stl" scale="1 1 1" rpy="0 0 ${pi*0 + visualRot*pi}"/>
         </geometry>
         <!-- <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
         <geometry>
