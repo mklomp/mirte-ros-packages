@@ -1,1 +1,0 @@
-Downloaded from http://models.gazebosim.org/person_standing/ and updated to work for ign gazebo.
