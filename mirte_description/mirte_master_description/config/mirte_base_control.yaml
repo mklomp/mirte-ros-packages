@@ -11,7 +11,44 @@
     mirte_base_controller:
       type: clearpath_mecanum_drive_controller/MecanumDriveController
 
-/**/mirte_base_controller:
+    mirte_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    mirte_gripper_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+mirte_arm_controller:
+  ros__parameters:
+    joints:
+      - arm_Rot_joint
+      - arm_Shoulder_joint
+      - arm_Elbow_joint
+      - arm_Wrist_joint
+
+    command_interfaces:
+      - position
+
+    state_interfaces:
+      - position
+
+    open_loop_control: true
+    allow_integration_in_goal_trajectories: true
+
+mirte_gripper_controller:
+  ros__parameters:
+    joints:
+      - Gripper_joint
+
+    command_interfaces:
+      - position
+
+    state_interfaces:
+      - position
+
+    open_loop_control: true
+    allow_integration_in_goal_trajectories: true
+
+mirte_base_controller:
   ros__parameters:
     # hardware_parameters:
     # ticks: 1320

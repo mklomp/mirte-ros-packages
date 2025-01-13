@@ -59,8 +59,6 @@
             velocity="2"
         />
     </joint>
-
-<!--
     <link
         name="arm_Shoulder">
         <inertial>
@@ -587,6 +585,4 @@
             effort="0"
             velocity="0" />
     </joint>
-
--->
 </robot>
