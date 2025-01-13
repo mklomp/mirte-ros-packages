@@ -295,7 +295,8 @@
             velocity="2"
         />
     </joint>
-    <link
+<!-- 
+   <link
         name="_gripper_link_r">
         <inertial>
             <origin
@@ -527,6 +528,7 @@
             effort="0"
             velocity="0" />
     </joint>
+-->
     <link
         name="_Gripper_r">
         <inertial>
@@ -578,11 +580,14 @@
         <child
             link="_Gripper_r" />
         <axis
-            xyz="0 0 1" />
+            xyz="0 -1 0" />
         <limit
-            lower="0"
+            lower="-${pi/2}"
             upper="0"
-            effort="0"
-            velocity="0" />
+            effort="2"
+            velocity="2"
+        />
+        <mimic joint="Gripper_joint" multiplier="-1"/>
     </joint>
+
 </robot>
