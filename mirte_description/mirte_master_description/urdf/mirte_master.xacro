@@ -5,11 +5,11 @@
 
 
   <xacro:arg name="flag_enable" default="False" />
-  <xacro:arg name="arm_enable" default="False" />
+  <xacro:arg name="arm_enable" default="True" />
   <xacro:arg name="screen_enable" default="False" />
   <xacro:arg name="front_camera_enable" default="False" />
   <xacro:arg name="sonar_enable" default="False" />
-  <xacro:arg name="lidar_enable" default="True" />
+  <xacro:arg name="lidar_enable" default="False" />
   <xacro:arg name="depth_camera_enable" default="False" />
   <xacro:arg name="imu_enable" default="False" />
 
