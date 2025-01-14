@@ -8,7 +8,7 @@
   <xacro:arg name="arm_enable" default="True" />
   <xacro:arg name="screen_enable" default="False" />
   <xacro:arg name="front_camera_enable" default="False" />
-  <xacro:arg name="sonar_enable" default="False" />
+  <xacro:arg name="sonar_enable" default="True" />
   <xacro:arg name="lidar_enable" default="True" />
   <xacro:arg name="depth_camera_enable" default="False" />
   <xacro:arg name="imu_enable" default="False" />
@@ -89,49 +89,13 @@
       </material>
     </visual>
 
-    <visual>
-      <origin
-        xyz="0.05297775289576 -0.120282421780502 -0.031"
-        rpy="3.14159265358979 0 0.296705972839036" />
-      <geometry>
-        <mesh filename="file://$(find mirte_master_description)/meshes/ultrasonic_fl.STL" />
-      </geometry>
-      <material name="blue" />
-    </visual>
-    <visual>
-      <origin
-        xyz="-0.05297775289576 -0.120282421780502 -0.031"
-        rpy="3.14159265358979 0 -0.296705972839036" />
-      <geometry>
-        <mesh filename="file://$(find mirte_master_description)/meshes/ultrasonic_fr.STL" />
-      </geometry>
-      <material name="blue" />
-    </visual>
-    <visual>
-      <origin
-        xyz="0.0565606470918482 0.119187021096338 -0.031"
-        rpy="3.14159265358979 0 2.84488668075076" />
-      <geometry>
-        <mesh filename="file://$(find mirte_master_description)/meshes/ultrasonic_bl.STL" />
-      </geometry>
-      <material name="blue" />
-    </visual>
-    <visual>
-      <origin
-        xyz="-0.0565606470918482 0.119187021096338 -0.031"
-        rpy="3.14159265358979 0 -2.84488668075076" />
-      <geometry>
-        <mesh filename="file://$(find mirte_master_description)/meshes/ultrasonic_br.STL" />
-      </geometry>
-      <material name="blue" />
-    </visual>
-
     <collision>
       <origin xyz="0 0 -0.03" />
       <geometry>
         <box size="0.19 0.28 0.06" />
       </geometry>
     </collision>
+
     <collision>
       <origin xyz="0 0.05 0.045" />
       <geometry>
