@@ -82,6 +82,33 @@
         <state_interface name="position" />
     </joint>
 
+    <joint name="_gripper_link_joint_l">
+        <param name="mimic">Gripper_joint</param>
+        <param name="multiplier">-1.4</param>
+        <command_interface name="position"/>
+        <state_interface name="position" />
+    </joint>
+
+    <joint name="_gripper_link_joint_r">
+        <param name="mimic">Gripper_joint</param>
+        <param name="multiplier">-1.4</param>
+        <command_interface name="position"/>
+        <state_interface name="position" />
+    </joint>
+
+    <joint name="gripper_finger_joint_l">
+        <command_interface name="position"/>
+        <state_interface name="position" />
+    </joint>
+
+    <joint name="gripper_finger_joint_r">
+        <command_interface name="position"/>
+        <state_interface name="position" />
+    </joint>
+
+
+
+
   </ros2_control>
 
 

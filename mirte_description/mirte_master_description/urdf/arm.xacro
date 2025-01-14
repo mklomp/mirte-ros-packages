@@ -289,13 +289,13 @@
         <axis
             xyz="0 -1 0" />
         <limit
-            lower="0"
-            upper="${pi/2}"
+            lower="-.20"
+            upper="0.25"
             effort="2"
             velocity="2"
         />
     </joint>
-<!-- 
+
    <link
         name="_gripper_link_r">
         <inertial>
@@ -347,13 +347,15 @@
         <child
             link="_gripper_link_r" />
         <axis
-            xyz="0 0 1" />
+            xyz="0 -1 0" />
         <limit
             lower="0"
             upper="0"
             effort="0"
             velocity="0" />
+        <mimic joint="Gripper_joint" multiplier="1.4"/>
     </joint>
+
     <link
         name="gripper_finger_r">
         <inertial>
@@ -463,12 +465,13 @@
         <child
             link="_gripper_link_l" />
         <axis
-            xyz="0 0 1" />
+            xyz="0 -1 0" />
         <limit
             lower="0"
             upper="0"
             effort="0"
             velocity="0" />
+        <mimic joint="Gripper_joint" multiplier="-1.4"/>
     </joint>
     <link
         name="gripper_finger_l">
@@ -528,7 +531,6 @@
             effort="0"
             velocity="0" />
     </joint>
--->
     <link
         name="_Gripper_r">
         <inertial>
@@ -582,8 +584,8 @@
         <axis
             xyz="0 -1 0" />
         <limit
-            lower="-${pi/2}"
-            upper="0"
+            lower="-.25"
+            upper="0.20"
             effort="2"
             velocity="2"
         />
