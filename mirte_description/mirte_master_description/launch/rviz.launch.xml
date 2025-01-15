@@ -5,12 +5,12 @@
 
 
   <arg name="flag_enable" default="False" />
-  <arg name="arm_enable" default="False" />
+  <arg name="arm_enable" default="True" />
   <arg name="screen_enable" default="False" />
   <arg name="front_camera_enable" default="False" />
-  <arg name="sonar_enable" default="True" />
+  <arg name="sonar_enable" default="False" />
   <arg name="lidar_enable" default="False" />
-  <arg name="depth_camera_enable" default="False" />
+  <arg name="depth_camera_enable" default="True" />
   <arg name="imu_enable" default="False" />
 
   <!-- Add this as a default parameter to maintain compatibility-->

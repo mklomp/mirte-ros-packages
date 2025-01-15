@@ -6,11 +6,11 @@
 
   <xacro:arg name="flag_enable" default="False" />
   <xacro:arg name="arm_enable" default="True" />
-  <xacro:arg name="screen_enable" default="False" />
+  <xacro:arg name="screen_enable" default="True" />
   <xacro:arg name="front_camera_enable" default="False" />
-  <xacro:arg name="sonar_enable" default="True" />
-  <xacro:arg name="lidar_enable" default="True" />
-  <xacro:arg name="depth_camera_enable" default="False" />
+  <xacro:arg name="sonar_enable" default="False" />
+  <xacro:arg name="lidar_enable" default="False" />
+  <xacro:arg name="depth_camera_enable" default="True" />
   <xacro:arg name="imu_enable" default="False" />
 
   <xacro:arg name="use_namespace" default="False"/>
@@ -44,7 +44,8 @@
   <xacro:include filename="$(find mirte_master_description)/urdf/mirte_master_base.gazebo.xacro" />
 
   <xacro:if value="$(arg depth_camera_enable)">
-    <xacro:sensor_orbbec_astra_pro_plus name="${camera_name}" parent="frame_link" color="black">
+    <xacro:include filename="$(find mirte_master_description)/urdf/orbbec_astra_plus_pro.xacro" />
+    <xacro:sensor_orbbec_astra_pro_plus name="${camera_name}" parent="frame_link" color="blue">
       <origin xyz="0.01 -0.146658788505756 0.0427" rpy="0 0 ${radians(-90)}" />
     </xacro:sensor_orbbec_astra_pro_plus>
   </xacro:if>
