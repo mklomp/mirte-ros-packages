@@ -349,8 +349,8 @@
         <axis
             xyz="0 -1 0" />
         <limit
-            lower="0"
-            upper="0"
+            lower="-3.14"
+            upper="3.14"
             effort="0"
             velocity="0" />
         <mimic joint="Gripper_joint" multiplier="1.4"/>
@@ -467,8 +467,8 @@
         <axis
             xyz="0 -1 0" />
         <limit
-            lower="0"
-            upper="0"
+            lower="-3.14"
+            upper="3.14"
             effort="0"
             velocity="0" />
         <mimic joint="Gripper_joint" multiplier="-1.4"/>
