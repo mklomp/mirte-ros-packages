@@ -102,4 +102,4 @@ mirte_base_controller:
       wheel_left_front_joint: {p: 1.0, i: 0.0, d: 0.0, i_clamp_max: 5.0, i_clamp_min: -5.0}
       wheel_left_rear_joint: {p: 1.0, i: 0.0, d: 0.0, i_clamp_max: 5.0, i_clamp_min: -5.0}
       wheel_right_rear_joint: {p: 1.0, i: 0.0, d: 0.0, i_clamp_max: 5.0, i_clamp_min: -5.0}
-      wheel_right_front_joint: {p: 1.0,i: 0.0, d: 0.0, i_clamp_max: 5.0, i_clamp_min: -5.0}
+      wheel_right_front_joint: {p: 1.0, i: 0.0, d: 0.0, i_clamp_max: 5.0, i_clamp_min: -5.0}
