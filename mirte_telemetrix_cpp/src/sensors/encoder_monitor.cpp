@@ -47,7 +47,7 @@ std_msgs::msg::Header EncoderMonitor::create_header() {
     auto diff = this->nh->now() - this->last_update_time;
     // if pico forgot to send or message missing, forward the timestamp some
     // steps.
-    if (diff >= 2*update_interval) {
+    if (diff >= 2 * update_interval) {
       // count is int, so need to use ms for calculations.
       this->last_update_time +=
           std::floor((diff.to_chrono<std::chrono::milliseconds>().count() /
