@@ -131,17 +131,9 @@ void MirteBaseHWInterface::read_single(int joint,
   //   odom
   //   // can jump at the first loop
   // }
-  // int16_t diff_ticks = _wheel_encoder[joint] - _last_value[joint];
+  const auto last_msg = latest_msgs_[joint].readFromRT()->msg;
+  const auto first_msg = _last_value[joint];
 
-  // _last_value[joint] = _wheel_encoder[joint];
-
-  if (this->latest_msgs_[joint].readFromRT()->size() < 2) {
-    // no message received yet, do nothing
-    // diff_ticks = 0;
-    return;
-  }
-  auto first_msg = this->latest_msgs_[joint].readFromRT()->front();
-  auto last_msg = this->latest_msgs_[joint].readFromRT()->back();
   //   static auto prev_msg_ticks = latest_msg->first->value;
   // static auto prev_msg_stamp = latest_msg->first->header.stamp;
   // if (this->_last_value[joint]->header.stamp.sec == 0 &&
@@ -150,12 +142,12 @@ void MirteBaseHWInterface::read_single(int joint,
   //   return;
   // }
 
-  auto latest_encoder_val = last_msg->value;
-
-  auto diff_ticks = last_msg->value - first_msg->value;
+  const auto diff_ticks = last_msg->value - first_msg->value;
   auto period_sec = (rclcpp::Time(last_msg->header.stamp) -
                      rclcpp::Time(first_msg->header.stamp))
                         .seconds();
+  _last_value[joint] = latest_msgs_[joint].readFromRT()->msg;
+
   // this->_last_value[joint] = latest_msg->first;
   // if(joint == 0){
   //   prev_msg_ticks = latest_msg->first->value;
@@ -182,20 +174,15 @@ void MirteBaseHWInterface::read_single(int joint,
 
   // Doesn't work with single pin encoders, but no'ones using pos for odom with
   // those anyways.
-  double distance_pos_rad = latest_encoder_val * radPerEncoderTick * 1.0;
 
-  pos[joint] = distance_pos_rad; // TODO: fix with last pos
-  // if () {
-  //   // vel[joint] = 0;
-  //   // return;
-  // }
+  pos[joint] += distance_rad; // TODO: fix with last pos
   if (joint == 0) {
     std::cout << "read_single joint: " << joint << " diff_ticks: " << diff_ticks
-              << " distance_rad: " << distance_rad
-              << " distance_pos_rad: " << distance_pos_rad
+              << " distance_rad: "
+              << distance_rad
+              // << " distance_pos_rad: " << distance_pos_rad
               << " period_sec: " << period_sec
-              << " radPerEncoderTick: " << radPerEncoderTick
-              << " latest_encoder_val: " << latest_encoder_val << std::endl;
+              << " radPerEncoderTick: " << radPerEncoderTick << std::endl;
   }
   auto velo = distance_rad / period_sec;
   if (period_sec < 0.01) { // if velocity is way too high, assume error in
@@ -488,9 +475,7 @@ MirteBaseHWInterface::on_init(const hardware_interface::HardwareInfo &info) {
   // Initialize raw data
   for (size_t i = 0; i < NUM_JOINTS; i++) {
     // _wheel_encoder.push_back(0);
-    latest_msgs_.push_back(
-        realtime_tools::RealtimeBuffer<
-            std::deque<std::shared_ptr<mirte_msgs::msg::Encoder>>>{});
+    latest_msgs_.push_back(realtime_tools::RealtimeBuffer<Encoder_store>{});
     // _wheel_encoder_update_time.push_back(nh->now());
     // _last_value.push_back(std::make_shared<mirte_msgs::msg::Encoder>());
     _last_wheel_cmd_direction.push_back(0);
