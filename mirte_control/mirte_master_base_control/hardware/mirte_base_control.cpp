@@ -1,7 +1,7 @@
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include <algorithm>
-#include <chrono>
 #include <boost/algorithm/string.hpp>
+#include <chrono>
 
 #include <mirte_base_control.hpp>
 namespace mirte_base_control {
@@ -57,13 +57,16 @@ MirteBaseHWInterface::write(const rclcpp::Time &time,
   // Putting this logic in on_init() or on_activate() will
   // deadlock the controller (PID controller will wait for
   // HW inreface to be up).
-  if (!feedforward_enabled_){
+  // TODO: this can be removed from Jazzy onward, as
+  // ff is enabled when ff!=0
+  if (!feedforward_enabled_) {
     auto ff_service = "/pid_wheels_controller/set_feedforward_control";
     auto client = nh->create_client<std_srvs::srv::SetBool>(ff_service);
     auto request = std::make_shared<std_srvs::srv::SetBool::Request>();
     request->data = true;
     auto result = client->async_send_request(request);
-    if (result.wait_for(std::chrono::seconds(2)) == std::future_status::ready && result.get()->success) {
+    if (result.wait_for(std::chrono::seconds(2)) == std::future_status::ready 
+      && result.get()->success) {
       feedforward_enabled_ = true;
     }
   }
