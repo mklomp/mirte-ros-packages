@@ -65,7 +65,7 @@ MirteBaseHWInterface::write(const rclcpp::Time &time,
     auto request = std::make_shared<std_srvs::srv::SetBool::Request>();
     request->data = true;
     auto result = client->async_send_request(request);
-    if (result.wait_for(std::chrono::seconds(2)) == std::future_status::ready && 
+    if (result.wait_for(std::chrono::seconds(2)) == std::future_status::ready &&
         result.get()->success) {
       feedforward_enabled_ = true;
     }
